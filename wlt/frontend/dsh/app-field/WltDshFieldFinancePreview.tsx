@@ -13,6 +13,7 @@ import {
   Text,
   TopBar,
   useTheme,
+  spacing,
 } from '@bthwani/ui-kit';
 import type {
   WltDshFinancePreviewRecord,
@@ -28,7 +29,7 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
 
   return (
     <Box gap={2} paddingY={2} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12 }}>
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[3] }}>
         <View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>
             {record.title}

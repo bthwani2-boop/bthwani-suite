@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View } from 'react-native';
 import { Box, Button, SelectField, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
 import type { VideoDraft, EditorWorkspaceTab } from './video-types';
@@ -63,7 +63,7 @@ export function VideoEditorSection({
   return (
     <Surface tone="raised" style={styles.editorPanel}>
       <View style={[styles.panelHeader]}>
-        <Text role="titleSm" style={[{ fontWeight: '900' }, rtlText]}>محرر الفيديو الذكي</Text>
+        <Text role="titleSm" weight="black" style={[{ }, rtlText]}>محرر الفيديو الذكي</Text>
         <View style={[styles.headerRow, { gap: 8, flexWrap: 'wrap' }]}>
           {selected ? (
             <Button
@@ -181,7 +181,7 @@ export function VideoEditorSection({
               <View style={{ flex: 1 }} />
             </View>
             <Box gap={2}>
-              <Text role="caption" style={[{ fontWeight: '900', color: theme.textMuted }, rtlText]}>سلوك التشغيل</Text>
+              <Text role="caption" weight="black" style={[{ color: theme.textMuted }, rtlText]}>سلوك التشغيل</Text>
               <View style={[styles.headerRow, { gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start' }]}>
                 <Button label={draft.mute ? "صامت ✓" : "صوت"} tone={draft.mute ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, mute: !d.mute }))} />
                 <Button label={draft.autoplay ? "تشغيل تلقائي ✓" : "يدوي"} tone={draft.autoplay ? "secondary" : "ghost"} fullWidth={false} size="sm" onPress={() => setDraft(d => ({ ...d, autoplay: !d.autoplay }))} />
@@ -318,7 +318,7 @@ export function VideoEditorSection({
             <TextField label="الترتيب" value={draft.order} onChangeText={(v) => setDraft(d => ({ ...d, order: v }))} style={rtlText} />
 
             <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: 12 }}>
-              <Text role="caption" style={[{ fontWeight: '900', color: theme.textMuted }, rtlText]}>حالة المراجعة</Text>
+              <Text role="caption" weight="black" style={[{ color: theme.textMuted }, rtlText]}>حالة المراجعة</Text>
               {draft.reviewState === 'none' && (
                 <Button
                   label="إرسال للمراجعة"
@@ -395,12 +395,12 @@ export function VideoEditorSection({
               )}
               {draft.reviewState === 'approved' && (
                 <View style={[styles.statusBadge, { backgroundColor: theme.successSurface, alignSelf: 'flex-start' }]}>
-                  <Text role="caption" style={[{ color: theme.success, fontWeight: '900' }, rtlText]}>معتمد</Text>
+                  <Text role="caption" weight="black" style={[{ color: theme.success }, rtlText]}>معتمد</Text>
                 </View>
               )}
               {draft.reviewState === 'rejected' && (
                 <View style={[styles.statusBadge, { backgroundColor: theme.dangerSurface ?? theme.surfaceInset, alignSelf: 'flex-start' }]}>
-                  <Text role="caption" style={[{ color: theme.danger, fontWeight: '900' }, rtlText]}>مرفوض</Text>
+                  <Text role="caption" weight="black" style={[{ color: theme.danger }, rtlText]}>مرفوض</Text>
                 </View>
               )}
             </Surface>

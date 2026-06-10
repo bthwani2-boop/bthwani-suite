@@ -125,18 +125,18 @@ export const HomePromoSection = React.memo(function HomePromoSection({
                   )}
                 </View>
                 <View style={styles.heroPromoTextWrap}>
-                  <Text style={styles.heroPromoTitle} numberOfLines={1}>
+                  <Text weight="black" style={styles.heroPromoTitle} numberOfLines={1}>
                     بثواني برو
                   </Text>
-                  <Text style={styles.heroPromoSubtitle} numberOfLines={1}>
+                  <Text weight="bold" style={styles.heroPromoSubtitle} numberOfLines={1}>
                     {activeHomePromo.subtitle}
                   </Text>
                   {activeHomePromo.ctaText && (
                     <View style={styles.heroPromoCtaButton}>
-                      <Text style={styles.heroPromoCtaText}>
+                      <Text weight="black" style={styles.heroPromoCtaText}>
                         {activeHomePromo.ctaText}
                       </Text>
-                      <Icon name="chevron-back" size={10} color="white" />
+                      <Icon name="chevron-back" size={10} color="var(--bthwani-brand-contrast)" />
                     </View>
                   )}
                 </View>
@@ -168,6 +168,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
                   </View>
                   <Text
                     role="bodySm"
+                    weight="bold"
                     style={[
                       styles.subcategoryName,
                       homeState.activeSubcategoryId === subcategory.id && styles.subcategoryNameActive,

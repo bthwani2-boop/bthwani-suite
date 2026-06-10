@@ -42,7 +42,6 @@ export type DshCaptainSurfaceProps = {
   onOpenService?: (serviceId: string) => void;
 };
 
-export type DshSurfaceHostProps = DshCaptainSurfaceProps;
 
 export type {
   DshCaptainState,

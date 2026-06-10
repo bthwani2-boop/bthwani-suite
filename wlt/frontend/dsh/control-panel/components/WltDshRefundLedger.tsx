@@ -75,7 +75,7 @@ export function WltDshRefundLedger({ subGroup }: { subGroup?: string } = {}) {
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <Text role="titleMd" style={{ fontWeight: 800 }}>سجل الاستردادات والنزاعات</Text>
+        <Text role="titleMd" weight="black">سجل الاستردادات والنزاعات</Text>
         <Text role="bodySm" tone="soft">
           {filteredRuntimeCases
             ? `مرتبط بقائمة WLT runtime للاستردادات · ${runtimeData?.baseUrl ?? 'WLT runtime'}`
@@ -88,7 +88,7 @@ export function WltDshRefundLedger({ subGroup }: { subGroup?: string } = {}) {
           <Box key={item.id} padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
               <div>
-                <Text role="titleSm" style={{ fontWeight: 800 }}>{item.id} · {item.order_id}</Text>
+                <Text role="titleSm" weight="black">{item.id} · {item.order_id}</Text>
                 <Text role="caption" tone="muted">العميل {item.client_id} · {item.status}</Text>
               </div>
               <div style={{ textAlign: 'left', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
@@ -105,7 +105,7 @@ export function WltDshRefundLedger({ subGroup }: { subGroup?: string } = {}) {
           <Box key={item.refundCaseId} padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', flexWrap: 'wrap' }}>
               <div>
-                <Text role="titleSm" style={{ fontWeight: 800 }}>{item.refundCaseId} · {item.orderId}</Text>
+                <Text role="titleSm" weight="black">{item.refundCaseId} · {item.orderId}</Text>
                 <Text role="caption" tone="muted">العميل {item.customerId} · المتجر {item.storeId} · {STATUS_LABEL[item.status]}</Text>
               </div>
               <div style={{ textAlign: 'left', fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>

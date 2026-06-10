@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   Box,
   Button,
+  Divider,
   Surface,
   Text,
   TopBar,
@@ -45,7 +46,7 @@ function CheckoutContextNotice({
   return (
     <Box padding={4} background="surfaceInset" radiusToken="md" style={{ margin: spacing[4] }}>
       <Text role="titleSm" style={{ color: colorPalette.brandStrong, marginBottom: spacing[1] }}>{title}</Text>
-      <Text role="bodySm" style={{ color: colorPalette.textMuted, lineHeight: 20 }}>{body}</Text>
+      <Text role="bodySm" style={{ color: colorPalette.textMuted }}>{body}</Text>
     </Box>
   );
 }
@@ -266,7 +267,7 @@ export function DshCheckoutIntentScreen({
               <Text role="bodyMd" style={styles.summaryLabel}>رسوم التوصيل</Text>
               <Text role="bodyMd" style={styles.summaryValue}>{deliveryFee}</Text>
             </View>
-            <View style={styles.divider} />
+            <Divider />
             <View style={[styles.summaryRow, { flexDirection: isRtl ? 'row' : 'row-reverse' }]}>
               <Text role="titleMd" style={styles.totalLabel}>الإجمالي</Text>
               <Text role="titleMd" style={styles.totalValue}>{total}</Text>
@@ -315,7 +316,6 @@ const styles = StyleSheet.create({
   },
   addressText: {
     color: colorPalette.textMuted,
-    lineHeight: 22,
   },
   etaRow: {
     alignItems: 'center',
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
   },
   paymentItem: {
     height: 64,
-    borderRadius: 12,
+    borderRadius: radius.sm2,
     borderWidth: 1,
     borderColor: colorPalette.line,
     marginBottom: spacing[3],
@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
   radioCircle: {
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: radius.sm,
     borderWidth: 2,
     borderColor: colorPalette.line,
     alignItems: 'center',
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     backgroundColor: colorPalette.surfaceInset,
-    borderRadius: 16,
+    borderRadius: radius.md2,
     padding: spacing[4],
     marginTop: spacing[3],
   },
@@ -382,11 +382,6 @@ const styles = StyleSheet.create({
   },
   summaryValue: {
     color: colorPalette.brandStrong,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colorPalette.line,
-    marginVertical: spacing[2],
   },
   totalLabel: {
     color: colorPalette.brandStrong,

@@ -11,17 +11,11 @@ import { SHEIN_PROXY_STAGE_LABELS } from '../../shared/dsh-order-preview.contrac
 import { buildOperationsHref } from './operations.registry';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
+import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 
 export type ControlPanelDshSheinProxyScreenProps = {
   hubHref?: string;
   subGroup?: string;
-};
-
-const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  warning: 'warning',
-  danger: 'danger',
-  best: 'success',
-  brand: 'neutral',
 };
 
 const STAGE_ORDER = Object.keys(SHEIN_PROXY_STAGE_LABELS) as Array<keyof typeof SHEIN_PROXY_STAGE_LABELS>;
@@ -55,7 +49,7 @@ export function ControlPanelDshSheinProxyScreen({ hubHref: _hubHref, subGroup }:
             entityId={request.id}
             entityLabel={request.customer}
             status={request.statusLabel}
-            statusTone={TONE_MAP[request.statusTone] ?? 'neutral'}
+            statusTone={DSH_CONTROL_PANEL_TONE_MAP[request.statusTone] ?? 'neutral'}
             risk={request.statusTone === 'danger' ? 'danger' : request.statusTone === 'warning' ? 'warning' : 'neutral'}
             recommendation={request.nextStep}
             reason={request.note}

@@ -16,6 +16,8 @@ import {
   useTheme,
   useDirection,
   borders,
+  radius,
+  spacing,
 } from '@bthwani/ui-kit';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
@@ -256,15 +258,15 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   kindRow: {
-    padding: 12,
-    borderRadius: 8,
+    padding: spacing[3],
+    borderRadius: radius.xs2,
     borderWidth: borders.hairline,
     alignItems: 'center',
   },
   radioOuter: {
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: radius.sm,
     borderWidth: borders.strong,
     justifyContent: 'center',
     alignItems: 'center',

@@ -13,7 +13,7 @@ import {
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 // SSoT: delivery mode labels come from dsh-delivery-mode.model, not inline strings.
 import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';
 import {
@@ -93,29 +93,6 @@ function resolveCommitmentLabel() {
   return 'خطر الالتزام';
 }
 
-function resolveSupportPolicyLabel(policy?: string): string {
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  if (policy === 'chat-on-open') {
-    return 'محادثة عند الفتح';
-  }
-
-  if (policy === 'finance-preview-only') {
-    return 'مالي للقراءة فقط';
-  }
-
-  if (policy === 'summary-only') {
-    return 'ملخص أولًا';
-  }
-
-  return 'سياسة مرتبطة بالسجل';
-}
 
 const SUPPORT_GOVERNANCE = getDshControlPanelGovernanceEntry('support');
 const FINANCE_GOVERNANCE = getDshControlPanelGovernanceEntry('finance');
@@ -216,7 +193,7 @@ function buildSupportRow(rowData: DshControlPanelSupportRowSeed): SupportRow {
     nextAction: flowEntry.nextAction,
     recommendation: `قسم المتابعة: ${governanceSectionLabel}`,
     governanceSectionLabel,
-    policyLabel: resolveSupportPolicyLabel(flowSummary?.onDemandPolicy),
+    policyLabel: resolveDshOnDemandPolicyLabel(flowSummary?.onDemandPolicy),
     forbiddenPreview,
     financeReference,
     primaryActionLabel: rowData.primaryActionLabel,

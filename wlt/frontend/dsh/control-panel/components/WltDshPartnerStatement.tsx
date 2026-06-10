@@ -59,7 +59,7 @@ export function WltDshPartnerStatement() {
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div className={wltStyles.partnerHeaderFlex}>
           <div className={wltStyles.partnerTitleFlex}>
-            <Text role="titleMd" style={{ fontWeight: 800 }}>كشف الحساب الموحد للشريك</Text>
+            <Text role="titleMd" weight="black">كشف الحساب الموحد للشريك</Text>
             <div className={wltStyles.storeSelectorButtonsFlex}>
               {statements.map((s) => (
                 <button
@@ -116,7 +116,7 @@ export function WltDshPartnerStatement() {
         {/* Stores Table Container */}
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
           <div className={wltStyles.tableHeaderFlex}>
-            <Text role="titleSm" style={{ fontWeight: 800 }}>توزيع المستحقات المالية للمتاجر التابعة</Text>
+            <Text role="titleSm" weight="black">توزيع المستحقات المالية للمتاجر التابعة</Text>
             <span className={wltStyles.readinessDesc}>
               اضغط على أي متجر لعرض تفاصيل الصرف البنكي وقنوات التحويل المرتبطة.
             </span>

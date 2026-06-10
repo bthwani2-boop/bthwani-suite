@@ -7,7 +7,9 @@ import {
   View,
   type ImageSourcePropType,
 } from 'react-native';
-import { ServiceOrbitCarousel, colorPalette, radius, spacing, useDirection, withAlpha, shadowPresets } from '@bthwani/ui-kit';
+import { ServiceOrbitCarousel, colorPalette, radius, spacing, useDirection, withAlpha, shadowPresets,
+  typographyRoles,
+} from '@bthwani/ui-kit';
 import { Text } from '@bthwani/ui-kit';
 
 import type { DshServiceId } from '../../contracts/dsh-home-types';
@@ -229,7 +231,7 @@ const tileStyles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   emoji: {
-    fontSize: 30,
+    fontSize: typographyRoles.hero.fontSize,
   },
   textContent: {
     alignItems: 'center',
@@ -276,7 +278,7 @@ const carouselStyles = StyleSheet.create({
     alignSelf: 'center',
     width: 42,
     height: 4,
-    borderRadius: 999,
+    borderRadius: radius.pill,
     backgroundColor: colorPalette.brand,
     marginBottom: spacing[1],
   },

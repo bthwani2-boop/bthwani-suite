@@ -29,5 +29,5 @@ export function useServiceLabels() {
   return appCaptainServiceLabels;
 }
 
-export { DshCaptainSurface, DshCaptainSurface as DshSurfaceHost };
+export { DshCaptainSurface };
 export type { DshCaptainCommandTarget, DshCaptainNavigationCommand, DshCaptainSurfaceProps };

@@ -148,6 +148,7 @@ export {
   isLegacyPublishedPreview,
   isPartnerOwnedException,
   moveApprovalRecordToStage,
+  resolveApprovalStageMeta,
   resolveNextOwner,
   transitionApprovalStage,
   translateEntityType,
@@ -155,6 +156,7 @@ export {
   translateStage,
   upsertApprovalRecord,
   getDynamicUiAudits,
+  type ApprovalStageTone,
 } from './workflow';
 
 export { resolveDshImageSource } from './resolve-dsh-image-source';
@@ -192,6 +194,7 @@ export {
   getDshFlowPolicySummary,
   getDshFlowRegistryStats,
   getDshFlowRegistryValidationSummary,
+  resolveDshOnDemandPolicyLabel,
 } from './dsh-flow-registry';
 
 export type {

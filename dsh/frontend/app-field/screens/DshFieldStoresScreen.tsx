@@ -1,6 +1,8 @@
 ﻿import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { Badge, Box, Button, Divider, colorPalette, Icon, MobileScrollView, ModernPremiumHeader, ScreenHeader, SearchField, StateView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Divider, colorPalette, Icon, MobileScrollView, ModernPremiumHeader, ScreenHeader, SearchField, StateView, Text, TopBar, useTheme,
+  spacing,
+} from '@bthwani/ui-kit';
 import { FieldStoreCard } from '../parts/FieldStoreCard';
 import { DSH_FIELD_BINDING_CONTRACTS } from '../contracts/dsh-field-binding.contracts';
 import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from '../../data/stores.preview-data';
@@ -131,7 +133,7 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
                 تلخيص سريع للجولة الحالية وحجم المتابعة داخل ملف المتجر فقط.
               </Text>
             </Box>
-            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing[2] }}>
               <Badge label={`اليوم ${counts.today}`} tone="brand" />
               <Badge label={`جاهز للإضافة ${counts.ready}`} tone="success" />
               <Badge label={`تحتاج متابعة ${counts['follow-up']}`} tone="warning" />
@@ -157,7 +159,7 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
                 nestedScrollEnabled
                 decelerationRate="fast"
                 style={{ transform: [{ scaleX: -1 }] }}
-                contentContainerStyle={{ flexDirection: 'row', gap: 8, paddingHorizontal: 2 }}
+                contentContainerStyle={{ flexDirection: 'row', gap: spacing[2], paddingHorizontal: 2 }}
               >
                 {fieldFilterOptions.map((option) => {
                   const selected = activeFilter === option.id;

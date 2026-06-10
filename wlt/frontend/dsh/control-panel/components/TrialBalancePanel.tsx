@@ -24,7 +24,7 @@ export function TrialBalancePanel({ entries, businessDate }: {
   return (
     <Box gap={3} style={{ direction: 'rtl', width: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text role="titleSm" style={{ fontWeight: 700 }}>ميزان المراجعة</Text>
+        <Text role="titleSm" weight="bold">ميزان المراجعة</Text>
         <span style={{
           fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 5,
           color: isBalanced ? 'var(--bth-success-text)' : 'var(--bth-danger-text)',

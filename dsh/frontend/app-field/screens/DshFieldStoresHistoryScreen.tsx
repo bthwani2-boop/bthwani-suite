@@ -1,6 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Badge, Box, Divider, Icon, MobileScrollView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
+import { Badge, Box, Divider, Icon, MobileScrollView, Text, TopBar, useTheme,
+  spacing,
+} from '@bthwani/ui-kit';
 import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from '../../data/stores.preview-data';
 
 type DshFieldStoresHistoryScreenProps = {
@@ -24,7 +26,7 @@ export function DshFieldStoresHistoryScreen({ stores, onBack }: DshFieldStoresHi
             <View key={store.id}>
               {index > 0 && <Divider style={{ marginVertical: 8 }} />}
               <Box gap={2} paddingY={2}>
-                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', gap: spacing[3] }}>
                   <View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
                     <Text role="bodyStrong" style={{ textAlign: 'right' }}>
                       {store.name}

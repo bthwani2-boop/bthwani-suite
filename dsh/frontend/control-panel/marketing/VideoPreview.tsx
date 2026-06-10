@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Box, Surface, Text } from '@bthwani/ui-kit';
 import type { VideoDraft } from './video-types';
@@ -16,7 +16,7 @@ export function VideoPreview({ draft, theme, styles, isRtl, rtlText }: VideoPrev
   return (
     <Surface tone="inset" style={styles.previewPanel}>
       <View style={[styles.panelHeader]}>
-        <Text role="titleSm" style={[{ fontWeight: '900', color: theme.textInverse }, rtlText]}>
+        <Text role="titleSm" weight="black" style={[{ color: theme.textInverse }, rtlText]}>
           المعاينة الحية
         </Text>
       </View>
@@ -35,7 +35,7 @@ export function VideoPreview({ draft, theme, styles, isRtl, rtlText }: VideoPrev
                 },
               ]}
             >
-              <Text style={{ fontSize: 12, color: theme.textSoft, fontWeight: '800' }}>
+              <Text weight="black" style={{ fontSize: 12, color: theme.textSoft }}>
                 مساحة معاينة الفيديو
               </Text>
             </View>
@@ -44,12 +44,12 @@ export function VideoPreview({ draft, theme, styles, isRtl, rtlText }: VideoPrev
           <View style={styles.previewOverlay}>
             <View style={[styles.previewTopBar]}>
               <View style={styles.previewBadge}>
-                <Text style={[{ color: theme.textInverse, fontSize: 10, fontWeight: '900' }, rtlText]}>
+                <Text weight="black" style={[{ color: theme.textInverse, fontSize: 10 }, rtlText]}>
                   {draft.highlight || 'عرض جديد'}
                 </Text>
               </View>
               <View style={styles.previewTime}>
-                <Text style={[{ color: theme.textInverse, fontSize: 9, fontWeight: '700' }, rtlText]}>
+                <Text weight="bold" style={[{ color: theme.textInverse, fontSize: 9 }, rtlText]}>
                   {draft.durationSeconds} ث
                 </Text>
               </View>
@@ -57,7 +57,7 @@ export function VideoPreview({ draft, theme, styles, isRtl, rtlText }: VideoPrev
 
             <View style={styles.previewBottomContent}>
               <Box gap={1}>
-                <Text role="titleSm" style={[{ color: theme.textInverse, fontWeight: '900' }, rtlText]}>
+                <Text role="titleSm" weight="black" style={[{ color: theme.textInverse }, rtlText]}>
                   {draft.title || 'عنوان الفيديو يظهر هنا'}
                 </Text>
                 <Text role="caption" style={[{ color: theme.textInverse, opacity: 0.9 }, rtlText]}>
@@ -65,7 +65,7 @@ export function VideoPreview({ draft, theme, styles, isRtl, rtlText }: VideoPrev
                 </Text>
               </Box>
               <View style={[styles.previewCta, isRtl ? { alignSelf: 'flex-end' } : null]}>
-                <Text style={[{ color: theme.brandHeaderBackground, fontWeight: '900', fontSize: 12 }, rtlText]}>
+                <Text weight="black" style={[{ color: theme.brandHeaderBackground, fontSize: 12 }, rtlText]}>
                   {draft.ctaLabel}
                 </Text>
                 <Text style={[{ color: theme.brandHeaderBackground, fontSize: 12 }, rtlText]}>

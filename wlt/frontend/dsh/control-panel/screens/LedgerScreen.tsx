@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text,
+  radius,
+} from '@bthwani/ui-kit';
 import { getWltControlPanelFinancePreview } from '../financeContracts';
 import { buildWltFinancialCenter } from '../selectors/buildFinancialCenter';
 import {
@@ -39,7 +41,7 @@ export function LedgerScreen({ hubHref: _hubHref, subGroup: _subGroup }: { hubHr
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={1}>
-        <Text role="titleMd" style={{ fontWeight: 700 }}>دفتر الأستاذ</Text>
+        <Text role="titleMd" weight="bold">دفتر الأستاذ</Text>
         <Text role="bodySm" tone="soft">
           قيود اليومية + ميزان المراجعة. {runtimeFinance?.state === 'runtime' ? 'مرتبطة بـ WLT runtime read model.' : 'Fallback preview عند تعذر WLT runtime.'}
         </Text>
@@ -57,7 +59,7 @@ export function LedgerScreen({ hubHref: _hubHref, subGroup: _subGroup }: { hubHr
             key={v}
             onClick={() => setActiveView(v)}
             style={{
-              padding: '6px 14px', borderRadius: 6, border: '1px solid var(--bthwani-control-panel-border)',
+              padding: '6px 14px', borderRadius: radius.xs, border: '1px solid var(--bthwani-control-panel-border)',
               background: activeView === v ? 'var(--bthwani-brand-primary)' : 'var(--bthwani-control-panel-surface)',
               color: activeView === v ? 'var(--bthwani-text-inverse)' : 'var(--bthwani-control-panel-text)',
               fontWeight: 700, fontSize: 12, cursor: 'pointer',

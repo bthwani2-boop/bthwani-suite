@@ -11,6 +11,7 @@ import {
   TextField,
   ActionStrip,
   useTheme,
+  radius,
 } from '@bthwani/ui-kit';
 import { subscriptionHeroCopy, subscriptionPlanCards } from '../../data/subscriptions.preview-data';
 
@@ -115,7 +116,7 @@ export function DshSubscriptionsScreen({
     >
       {/* Success Message */}
       {successMessage && (
-        <View style={{ margin: spacing[4], backgroundColor: theme.successSurface, padding: spacing[3], borderRadius: 12, borderWidth: 1, borderColor: theme.success, flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+        <View style={{ margin: spacing[4], backgroundColor: theme.successSurface, padding: spacing[3], borderRadius: radius.sm2, borderWidth: 1, borderColor: theme.success, flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
           <Icon name="checkmark-circle" tone="success" size={20} />
           <Text role="bodyStrong" style={{ color: theme.success, textAlign: 'right', flex: 1 }}>
             {successMessage}
@@ -184,7 +185,7 @@ export function DshSubscriptionsScreen({
                     </Pressable>
                     {isSelected && plan.id !== currentPlanId && (
                       <View style={{ alignItems: 'flex-start', marginTop: spacing[3], marginRight: 36 }}>
-                        <Button label="اختيار هذه الباقة" tone="brand" size="sm" onPress={() => setExpandedSection(null)} style={{ borderRadius: 8 }} />
+                        <Button label="اختيار هذه الباقة" tone="brand" size="sm" onPress={() => setExpandedSection(null)} style={{ borderRadius: radius.xs2 }} />
                       </View>
                     )}
                   </View>
@@ -323,7 +324,7 @@ export function DshSubscriptionsScreen({
                   </View>
                </View>
             </View>
-            <Button label="تأكيد التغييرات" tone="brand" size="lg" onPress={applyChanges} style={{ marginTop: spacing[4], borderRadius: 12 }} />
+            <Button label="تأكيد التغييرات" tone="brand" size="lg" onPress={applyChanges} style={{ marginTop: spacing[4], borderRadius: radius.sm2 }} />
          </View>
       )}
 

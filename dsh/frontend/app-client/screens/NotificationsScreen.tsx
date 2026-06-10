@@ -1,6 +1,8 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Box, Button, Divider, MobileScrollView, Text, TopBar } from '@bthwani/ui-kit';
+import { Box, Button, Divider, MobileScrollView, Text, TopBar,
+  spacing,
+} from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import { dshNotificationsFixtures } from '../../data/support.preview-data';
@@ -131,8 +133,8 @@ function DshNotificationRow({ item, onPress }: { item: DshNotificationItem; onPr
         style={{
           flexDirection: 'row-reverse',
           alignItems: 'flex-start',
-          paddingVertical: 12,
-          paddingHorizontal: 16,
+          paddingVertical: spacing[3],
+          paddingHorizontal: spacing[4],
           minHeight: 58,
         }}
       >
@@ -148,7 +150,7 @@ function DshNotificationRow({ item, onPress }: { item: DshNotificationItem; onPr
         </View>
 
         {/* Text Area (Align right, RTL style) */}
-        <View style={{ flex: 1, alignItems: 'flex-end', paddingHorizontal: 4 }}>
+        <View style={{ flex: 1, alignItems: 'flex-end', paddingHorizontal: spacing[1] }}>
           <Text
             role="bodyStrong"
             align="end"
@@ -185,14 +187,15 @@ function DshNotificationRow({ item, onPress }: { item: DshNotificationItem; onPr
             style={{
               paddingHorizontal: 6,
               paddingVertical: 2,
-              marginLeft: 8,
+              marginLeft: spacing[2],
               alignSelf: 'flex-start',
             }}
           >
             <Text
               role="caption"
               tone={isUrgent ? 'danger' : 'brand'}
-              style={{ textAlign: 'right', fontWeight: 'bold' }}
+              weight="bold"
+              style={{ textAlign: 'right' }}
             >
               {isUrgent ? 'عاجل' : 'هام'}
             </Text>
@@ -271,7 +274,7 @@ function renderContent(
       <MobileScrollView fill padding={3} gap={3}>
         {topAttention ? (
           <View style={{ gap: 2 }}>
-            <Text role="titleSm" align="end" style={{ textAlign: 'right', paddingHorizontal: 12, marginTop: 4 }}>
+            <Text role="titleSm" align="end" style={{ textAlign: 'right', paddingHorizontal: spacing[3], marginTop: spacing[1] }}>
               يحتاج انتباهك الآن
             </Text>
             <Box background="surface" border borderTone="line" radiusToken="lg" style={{ overflow: 'hidden' }}>
@@ -281,7 +284,7 @@ function renderContent(
         ) : null}
 
         <View style={{ gap: 2 }}>
-          <Text role="titleSm" align="end" style={{ textAlign: 'right', paddingHorizontal: 12 }}>
+          <Text role="titleSm" align="end" style={{ textAlign: 'right', paddingHorizontal: spacing[3] }}>
             اليوم
           </Text>
           <Box background="surface" border borderTone="line" radiusToken="lg" style={{ overflow: 'hidden' }}>
@@ -293,7 +296,7 @@ function renderContent(
                 </React.Fragment>
               ))
             ) : (
-              <View style={{ padding: 16 }}>
+              <View style={{ padding: spacing[4] }}>
                 <Text role="bodySm" tone="soft" align="end" style={{ textAlign: 'right' }}>
                   لا توجد تنبيهات اليوم
                 </Text>
@@ -303,7 +306,7 @@ function renderContent(
         </View>
 
         <View style={{ gap: 2 }}>
-          <Text role="titleSm" align="end" style={{ textAlign: 'right', paddingHorizontal: 12 }}>
+          <Text role="titleSm" align="end" style={{ textAlign: 'right', paddingHorizontal: spacing[3] }}>
             سابقًا
           </Text>
           <Box background="surface" border borderTone="line" radiusToken="lg" style={{ overflow: 'hidden' }}>
@@ -315,7 +318,7 @@ function renderContent(
                 </React.Fragment>
               ))
             ) : (
-              <View style={{ padding: 16 }}>
+              <View style={{ padding: spacing[4] }}>
                 <Text role="bodySm" tone="soft" align="end" style={{ textAlign: 'right' }}>
                   لا توجد تنبيهات سابقة
                 </Text>
@@ -325,7 +328,7 @@ function renderContent(
         </View>
 
         {hasMoreItems && onOpenSearch ? (
-          <View style={{ alignItems: 'flex-end', marginTop: 12, paddingHorizontal: 12 }}>
+          <View style={{ alignItems: 'flex-end', marginTop: spacing[3], paddingHorizontal: spacing[3] }}>
             <Button
               label="عرض الأقدم"
               tone="secondary"

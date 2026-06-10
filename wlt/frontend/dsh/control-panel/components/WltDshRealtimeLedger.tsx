@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text,
+  radius,
+} from '@bthwani/ui-kit';
 import { resolveWltDshApiBaseUrl, type WltLedgerEntry } from '../../contracts';
 import { loadWltDshFinanceRuntimeReadModel, type WltDshFinanceRuntimeResult } from '../adapters/wltDshFinanceRuntime.adapter';
 import { formatWltYer } from '../models/dshFinance.types';
@@ -153,7 +155,7 @@ export function WltDshRealtimeLedger() {
       <Box padding={4} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <Text role="titleMd" style={{ fontWeight: 800 }}>دفتر الأستاذ العام اللحظي (Real-time Ledger)</Text>
+            <Text role="titleMd" weight="black">دفتر الأستاذ العام اللحظي (Real-time Ledger)</Text>
             <Text role="bodySm" tone="soft">
               {runtimeData
                 ? `مرتبط بالمنفذ الحي لخدمة WLT: ${runtimeData.baseUrl}`
@@ -194,7 +196,7 @@ export function WltDshRealtimeLedger() {
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <Text role="caption" tone="muted">إجمالي القيود اللحظية</Text>
-            <Text role="titleLg" style={{ fontWeight: 800, color: 'var(--bthwani-brand-primary)' }}>{entries.length}</Text>
+            <Text role="titleLg" weight="black" style={{ color: 'var(--bthwani-brand-primary)' }}>{entries.length}</Text>
           </div>
         </Box>
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -202,7 +204,7 @@ export function WltDshRealtimeLedger() {
             onClick={simulateLiveEntry}
             style={{
               background: 'linear-gradient(135deg, var(--bthwani-brand-primary) 0%, var(--bthwani-brand-secondary, var(--bthwani-brand-primary)) 100%)',
-              color: 'white',
+              color: 'var(--bthwani-brand-contrast)',
               border: 'none',
               borderRadius: 8,
               padding: '10px 20px',
@@ -269,7 +271,7 @@ export function WltDshRealtimeLedger() {
                           fontSize: 10,
                           background: isCredit ? 'color-mix(in srgb, var(--bth-success-text) 10%, transparent)' : 'color-mix(in srgb, var(--bth-danger-text) 10%, transparent)',
                           padding: '2px 8px',
-                          borderRadius: 6
+                          borderRadius: radius.xs
                         }}>
                           {isCredit ? 'إيداع / دائن' : 'سحب / مدين'}
                         </span>

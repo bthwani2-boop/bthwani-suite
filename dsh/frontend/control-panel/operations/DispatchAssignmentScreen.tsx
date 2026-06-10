@@ -21,6 +21,7 @@ import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
 import { getDshLifecycleStateMetadata } from '../../shared/dsh-order-journey.model';
+import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 // SSoT: dispatch queue visibility is owned by dsh-fulfillment-surface-visibility.
 // Do not duplicate delivery-mode dispatch logic inline — use these helpers.
 import {
@@ -30,13 +31,6 @@ import {
 } from '../../shared/dsh-fulfillment-surface-visibility';
 
 export type DispatchAssignmentScreenProps = { hubHref: string; subGroup?: string };
-
-const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  warning: 'warning',
-  danger: 'danger',
-  best: 'success',
-  brand: 'neutral',
-};
 
 // SSoT: resolved once at module level — bthwani_delivery is the only mode
 // that enters the captain dispatch queue.
@@ -342,7 +336,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
               // Use dynamic states if they exist
               const resolvedCaptain = item.assignedCaptain || item.captain;
               const resolvedStatusLabel = item.customStatus || (lifecycleMetadata?.controlPanelLabel ?? item.status);
-              const resolvedStatusTone = item.customStatusTone || TONE_MAP[item.statusTone] || 'neutral';
+              const resolvedStatusTone = item.customStatusTone || DSH_CONTROL_PANEL_TONE_MAP[item.statusTone] || 'neutral';
 
               const primaryLabel = item.customStatus ? 'تم الإسناد' : (lifecycleMetadata?.primaryAction?.label ?? 'تأكيد الإسناد');
 

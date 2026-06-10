@@ -1,5 +1,9 @@
 import { StyleSheet, Platform } from 'react-native';
-import { colorPalette, shadowPresets } from '@bthwani/ui-kit';
+import { colorPalette, shadowPresets,
+  radius,
+  spacing,
+  typographyRoles,
+} from '@bthwani/ui-kit';
 
 function hexToRgba(hex: string, opacity: number) {
   let r = 0, g = 0, b = 0;
@@ -115,7 +119,7 @@ export const styles = StyleSheet.create({
   heroTopActionsLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing[3],
   },
   heroActionCircle: {
     width: 44,
@@ -133,24 +137,23 @@ export const styles = StyleSheet.create({
     height: Platform.OS === 'ios' ? 100 : 70,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingBottom: 12,
+    paddingBottom: spacing[3],
     borderBottomWidth: 1,
     zIndex: 100,
   },
   stickyHeaderTitle: {
-    fontSize: 18,
-    fontWeight: '900',
+    fontSize: typographyRoles.titleSm.fontSize,
   },
   heroLuxuryCard: {
-    paddingTop: 16,
-    paddingHorizontal: 16,
+    paddingTop: spacing[4],
+    paddingHorizontal: spacing[4],
     paddingBottom: 0,
-    gap: 16,
+    gap: spacing[4],
   },
   heroLuxuryIdentityRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 12,
+    gap: spacing[3],
   },
   heroLuxuryInfo: {
     flex: 1,
@@ -161,7 +164,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    gap: 8,
+    gap: spacing[2],
     flexWrap: 'wrap',
   },
   metricsRowReverseFeather: {
@@ -181,14 +184,14 @@ export const styles = StyleSheet.create({
   heroLuxuryDeliveryRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    padding: 4,
-    borderRadius: 16,
-    gap: 4,
+    padding: spacing[1],
+    borderRadius: radius.md2,
+    gap: spacing[1],
   },
   heroLuxuryDeliveryChip: {
     flex: 1,
     height: 40,
-    borderRadius: 12,
+    borderRadius: radius.sm2,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -198,13 +201,12 @@ export const styles = StyleSheet.create({
     gap: 6,
   },
   heroLuxuryDeliveryTitle: {
-    fontSize: 11,
-    fontWeight: '800',
+    fontSize: typographyRoles.overline.fontSize,
   },
   heroLogoWrap: {
     width: 68,
     height: 68,
-    borderRadius: 20,
+    borderRadius: radius.lg2,
     backgroundColor: stylesTokens.white,
     borderWidth: 2,
     borderColor: ORANGE,
@@ -220,7 +222,6 @@ export const styles = StyleSheet.create({
   },
   heroNameText: {
     fontSize: 22,
-    fontWeight: '900',
     textAlign: 'right',
     lineHeight: 28,
     letterSpacing: -0.4,
@@ -228,23 +229,22 @@ export const styles = StyleSheet.create({
   heroLocationRow: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    gap: 4,
+    gap: spacing[1],
   },
   heroLocationText: {
-    fontSize: 13,
+    fontSize: typographyRoles.label.fontSize,
     color: 'rgba(255, 255, 255, 0.9)',
-    fontWeight: '700',
   },
   heroStatusBadge: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     alignSelf: 'flex-end',
-    paddingHorizontal: 8,
+    paddingHorizontal: spacing[2],
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: radius.xs,
     borderWidth: 1,
     gap: 6,
-    marginTop: 4,
+    marginTop: spacing[1],
   },
   heroStatusDot: {
     width: 6,
@@ -253,23 +253,21 @@ export const styles = StyleSheet.create({
   },
   heroStatusText: {
     fontSize: 10.5,
-    fontWeight: '900',
   },
   heroFeatureChip: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.35)',
-    paddingHorizontal: 12,
+    paddingHorizontal: spacing[3],
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: radius.sm2,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
     gap: 6,
     minHeight: 32,
   },
   heroFeatureValue: {
-    fontSize: 12,
-    fontWeight: '800',
+    fontSize: typographyRoles.caption.fontSize,
     color: stylesTokens.white,
   },
   heroBadgePro: {
@@ -277,8 +275,7 @@ export const styles = StyleSheet.create({
     borderColor: 'transparent',
   },
   heroBadgeText: {
-    fontSize: 11,
-    fontWeight: '900',
+    fontSize: typographyRoles.overline.fontSize,
     color: stylesTokens.white,
   },
   sectionHeader: {
@@ -287,17 +284,16 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '900',
+    fontSize: typographyRoles.titleMd.fontSize,
   },
   storeStateNotice: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 24,
+    padding: spacing[4],
+    borderRadius: radius.xl,
     borderWidth: 1.5,
     gap: 14,
-    marginTop: 4,
+    marginTop: spacing[1],
   },
   storeStateNoticeWarning: {
     backgroundColor: 'rgba(255, 149, 0, 0.12)',
@@ -310,7 +306,7 @@ export const styles = StyleSheet.create({
   storeStateNoticeIconWrap: {
     width: 44,
     height: 44,
-    borderRadius: 12,
+    borderRadius: radius.sm2,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -321,21 +317,19 @@ export const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   storeStateNoticeTitle: {
-    fontSize: 14,
-    fontWeight: '800',
+    fontSize: typographyRoles.bodySm.fontSize,
   },
   storeStateNoticeDescription: {
     color: stylesTokens.muted,
-    fontSize: 11.5,
-    lineHeight: 17,
+    fontSize: typographyRoles.overline.fontSize.5,
+    lineHeight: typographyRoles.label.lineHeight,
   },
   storeStateNoticeAction: {
-    paddingHorizontal: 8,
+    paddingHorizontal: spacing[2],
     alignSelf: 'stretch',
   },
   storeStateNoticeActionText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: typographyRoles.label.fontSize,
   },
   contentBlock: {
     width: '100%',
@@ -346,12 +340,12 @@ export const styles = StyleSheet.create({
   },
 
   smartRailSection: {
-    marginTop: 12,
+    marginTop: spacing[3],
     marginBottom: -6,
   },
   modePill: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: radius.sm2,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -370,8 +364,7 @@ export const styles = StyleSheet.create({
   },
   modePillLabel: {
     color: stylesTokens.dark,
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: typographyRoles.label.fontSize,
   },
   modePillLabelActive: {
     color: stylesTokens.orange,
@@ -379,7 +372,7 @@ export const styles = StyleSheet.create({
 
   sectionBlock: {
     marginTop: 0,
-    paddingHorizontal: 12,
+    paddingHorizontal: spacing[3],
     width: '100%',
   },
   feedSection: {
@@ -395,7 +388,7 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 110,
-    paddingTop: 8,
+    paddingTop: spacing[2],
     paddingBottom: 10,
     borderBottomWidth: 1.5,
     ...shadowPresets.overlay,
@@ -407,7 +400,7 @@ export const styles = StyleSheet.create({
   menuActionBadge: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: radius.lg,
     backgroundColor: stylesTokens.orange,
     justifyContent: 'center',
     alignItems: 'center',
@@ -447,7 +440,7 @@ export const styles = StyleSheet.create({
     zIndex: 1,
   },
   previewCard: {
-    borderRadius: 24,
+    borderRadius: radius.xl,
     overflow: 'hidden',
     alignSelf: 'center',
     backgroundColor: stylesTokens.white,
@@ -520,30 +513,26 @@ export const styles = StyleSheet.create({
   },
   previewDetailsTitle: {
     color: stylesTokens.dark,
-    fontSize: 14,
-    fontWeight: '900',
+    fontSize: typographyRoles.bodySm.fontSize,
     marginBottom: 2,
   },
   previewStoreName: {
     color: stylesTokens.orange,
-    fontSize: 11,
-    fontWeight: '900',
+    fontSize: typographyRoles.overline.fontSize,
     marginBottom: 2,
   },
   previewDetailsSubtitle: {
     color: stylesTokens.muted,
-    fontSize: 11,
+    fontSize: typographyRoles.overline.fontSize,
     marginBottom: 0,
   },
   previewDetailsDiscount: {
     color: stylesTokens.red,
-    fontSize: 12,
-    fontWeight: '900',
+    fontSize: typographyRoles.caption.fontSize,
   },
   previewDetailsPrice: {
     color: stylesTokens.dark,
-    fontSize: 14,
-    fontWeight: '900',
+    fontSize: typographyRoles.bodySm.fontSize,
   },
   previewFavoriteCircle: {
     width: 44,
@@ -587,7 +576,7 @@ export const styles = StyleSheet.create({
   previewDetailsMetaRow: {
     marginTop: 2,
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing[2],
     alignItems: 'center',
   },
   emptyFeed: {
@@ -596,23 +585,22 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: stylesTokens.line,
-    borderRadius: 18,
+    borderRadius: radius.lg,
     backgroundColor: stylesTokens.light,
     marginHorizontal: 12,
   },
   emptyFeedEmoji: {
-    fontSize: 40,
-    marginBottom: 8,
+    fontSize: typographyRoles.displayXl.fontSize,
+    marginBottom: spacing[2],
   },
   emptyFeedTitle: {
     color: stylesTokens.dark,
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: typographyRoles.bodyMd.fontSize,
   },
   emptyFeedText: {
-    marginTop: 4,
+    marginTop: spacing[1],
     color: stylesTokens.muted,
-    fontSize: 12,
+    fontSize: typographyRoles.caption.fontSize,
     textAlign: 'center',
   },
 

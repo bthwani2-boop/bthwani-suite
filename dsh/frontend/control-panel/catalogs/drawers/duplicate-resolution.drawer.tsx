@@ -1,11 +1,13 @@
-// UI_PREVIEW_ONLY — no backend/API/DB binding.
+﻿// UI_PREVIEW_ONLY — no backend/API/DB binding.
 // Owner: control-panel/catalogs
 // Purpose: Duplicate resolution workspace — pair-by-pair comparison, merge preview,
 //   keep canonical, reject duplicate, send to review.
 //   All mutations are local state only. Audit note required for merge/reject.
 
 import React, { useState } from 'react';
-import { Box, Button, Text, TextField, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Text, TextField, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster } from '../catalogs.data';
 import { ResultBanner, type ActionResult } from '../catalogs.parts';
@@ -94,8 +96,8 @@ function ProductCard({
   }
   return (
     <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 8, padding: 12, flex: 1 }} gap={2}>
-      <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground, fontSize: 11 }}>{label}</Text>
-      <Text role="bodyMd" style={{ fontWeight: '700' }}>{product.name}</Text>
+      <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground, fontSize: 11 }}>{label}</Text>
+      <Text role="bodyMd" weight="bold" style={{ }}>{product.name}</Text>
       <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
         <Text role="caption" tone="muted" style={{ fontSize: 11 }}>SKU: {product.sku}</Text>
         <Text role="caption" tone="muted" style={{ fontSize: 11 }}>GTIN: {product.gtin || '—'}</Text>
@@ -117,10 +119,10 @@ function MergePreviewCard({ merged }: { merged: Partial<CatalogProductMaster> })
   const { theme } = useTheme();
   return (
     <Box style={{ backgroundColor: theme.successSurface, borderRadius: 8, padding: 12 }} gap={2}>
-      <Text role="caption" style={{ fontWeight: '800', color: theme.success, fontSize: 11 }}>
+      <Text role="caption" weight="black" style={{ color: theme.success, fontSize: 11 }}>
         معاينة الدمج (محلية فقط)
       </Text>
-      <Text role="bodyMd" style={{ fontWeight: '700' }}>{merged.name}</Text>
+      <Text role="bodyMd" weight="bold" style={{ }}>{merged.name}</Text>
       <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
         <Text role="caption" tone="muted" style={{ fontSize: 11 }}>SKU: {merged.sku}</Text>
         <Text role="caption" tone="muted" style={{ fontSize: 11 }}>GTIN: {merged.gtin || '—'}</Text>
@@ -229,7 +231,7 @@ export function CatalogDuplicateResolutionWorkspace({
       <Box gap={4} style={{ padding: 16 }}>
 
         {/* Owner notice */}
-        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 6, padding: 8 }}>
+        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: radius.xs, padding: 8 }}>
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
             المالك: control-panel/catalogs · كل القرارات محاكاة محلية · ملاحظة التدقيق مطلوبة للرفض والدمج
           </Text>
@@ -239,14 +241,14 @@ export function CatalogDuplicateResolutionWorkspace({
         <Box layoutDirection="row" gap={8}>
           <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 8, padding: 10, flex: 1 }}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>أزواج التكرار</Text>
-            <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>{duplicatePairs.length}</Text>
+            <Text role="label" weight="black" style={{ color: theme.brandHeaderBackground }}>{duplicatePairs.length}</Text>
           </Box>
           <Box style={{
             backgroundColor: duplicatePairs.some((p) => pairStates[pairKey(p)]?.resolution == null) ? theme.warningSurface ?? theme.surface : theme.successSurface,
             borderRadius: 8, padding: 10, flex: 1
           }}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>تمت معالجته</Text>
-            <Text role="label" style={{ fontWeight: '800', color: theme.success }}>
+            <Text role="label" weight="black" style={{ color: theme.success }}>
               {duplicatePairs.filter((p) => pairStates[pairKey(p)]?.resolution != null).length} / {duplicatePairs.length}
             </Text>
           </Box>
@@ -254,7 +256,7 @@ export function CatalogDuplicateResolutionWorkspace({
 
         {duplicatePairs.length === 0 && (
           <Box style={{ backgroundColor: theme.successSurface, borderRadius: 8, padding: 12 }}>
-            <Text role="bodyMd" style={{ color: theme.success, fontWeight: '700' }}>لا توجد تكرارات مكتشفة ✓</Text>
+            <Text role="bodyMd" weight="bold" style={{ color: theme.success }}>لا توجد تكرارات مكتشفة ✓</Text>
           </Box>
         )}
 
@@ -272,7 +274,7 @@ export function CatalogDuplicateResolutionWorkspace({
               gap={3}
               style={{
                 backgroundColor: isResolved ? theme.successSurface : theme.surfaceInset,
-                borderRadius: 10,
+                borderRadius: radius.sm,
                 padding: 14,
                 borderWidth: 1,
                 borderColor: isResolved ? theme.success : theme.line,
@@ -280,11 +282,11 @@ export function CatalogDuplicateResolutionWorkspace({
             >
               {/* Reason header */}
               <Box layoutDirection="row" gap={8} style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text role="label" style={{ fontWeight: '800', color: theme.danger, fontSize: 13 }}>
+                <Text role="label" weight="black" style={{ color: theme.danger, fontSize: 13 }}>
                   سبب التكرار: {pair.reason}
                 </Text>
                 {isResolved && (
-                  <Text role="caption" style={{ color: theme.success, fontWeight: '700', fontSize: 11 }}>✓ تمت المعالجة</Text>
+                  <Text role="caption" weight="bold" style={{ color: theme.success, fontSize: 11 }}>✓ تمت المعالجة</Text>
                 )}
               </Box>
 
@@ -292,7 +294,7 @@ export function CatalogDuplicateResolutionWorkspace({
               <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
                 {pair.conflictFields.map((f) => (
                   <Box key={f} style={{ backgroundColor: theme.dangerSurface, borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
-                    <Text role="caption" style={{ color: theme.danger, fontSize: 10, fontWeight: '700' }}>{f}</Text>
+                    <Text role="caption" weight="bold" style={{ color: theme.danger, fontSize: 10 }}>{f}</Text>
                   </Box>
                 ))}
               </Box>

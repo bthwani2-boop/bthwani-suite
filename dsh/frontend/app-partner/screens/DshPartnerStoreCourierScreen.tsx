@@ -15,6 +15,7 @@ import {
   TopBar,
   useDirection,
   useTheme,
+  spacing,
 } from '@bthwani/ui-kit';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 import type {
@@ -76,14 +77,14 @@ function SelectionBlock<T extends string>({
             key={option.id}
             onPress={() => onSelect(option.id)}
             style={({ pressed }) => ({
-              paddingVertical: 12,
-              paddingHorizontal: 4,
+              paddingVertical: spacing[3],
+              paddingHorizontal: spacing[1],
               backgroundColor: pressed ? theme.surfaceInset : undefined,
               borderBottomWidth: index < options.length - 1 ? 1 : 0,
               borderBottomColor: theme.line + '22',
             })}
           >
-            <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between', gap: spacing[2] }}>
               <Box style={{ flex: 1, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
                 <Text role="bodyStrong" align="start">{option.label}</Text>
                 <Text role="caption" tone="muted" align="start">{option.description}</Text>
@@ -140,7 +141,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
       />
 
       {/* 1) Flat boundaries notice */}
-      <Box paddingY={1} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+      <Box paddingY={1} layoutDirection="row" style={{ alignItems: 'center', gap: 6 }}>
         <Icon name="information-circle-outline" size={14} tone="muted" />
         <Text role="caption" tone="muted" align="start" style={{ flex: 1 }}>
           إعداد الموصل يتم محليًا هنا. أي تسعير أو عمولات أو تسويات مرجعها مركزيًا هو WLT/Finance/Control Panel.
@@ -185,7 +186,7 @@ export function DshPartnerStoreCourierScreen({ onBack }: { onBack: () => void })
       {/* 3) Flat Branch Scope */}
       <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align="start">الفروع المخصصة</Text>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           {BRANCH_OPTIONS.map((branch) => {
             const isSelected = selectedBranchIds.includes(branch.id);
             return (

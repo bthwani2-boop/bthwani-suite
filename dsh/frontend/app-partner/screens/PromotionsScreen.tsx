@@ -10,6 +10,7 @@ import {
   Text,
   TextField,
   useTheme,
+  spacing,
 } from '@bthwani/ui-kit';
 import {
   getPartnerOfferItems,
@@ -121,9 +122,9 @@ function PromotionRow({
         marginTop: showDivider ? 12 : 0,
       }}
     >
-      <Box layoutDirection="row" align="flex-start" justify="space-between" style={{ gap: 12 }}>
+      <Box layoutDirection="row" align="flex-start" justify="space-between" style={{ gap: spacing[3] }}>
         <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
-          <Box layoutDirection="row" style={{ gap: 8, flexWrap: 'wrap', justifyContent: 'flex-start', width: '100%' }}>
+          <Box layoutDirection="row" style={{ gap: spacing[2], flexWrap: 'wrap', justifyContent: 'flex-start', width: '100%' }}>
             <Badge label={statusMeta.label} tone={statusMeta.tone} />
             <Text role="bodyStrong" numberOfLines={1} style={{ textAlign: 'right' }}>
               {offer.title}

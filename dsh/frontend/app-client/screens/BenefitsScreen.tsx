@@ -15,6 +15,7 @@ import {
   Icon,
   TopBar,
   type IconName,
+  radius,
 } from '@bthwani/ui-kit';
 import { dshNotificationsFixtures } from '../../data/support.preview-data';
 import { subscriptionPlanCards } from '../../data/subscriptions.preview-data';
@@ -138,7 +139,7 @@ function ContentCard({
       <Text role="bodySm" tone="muted" style={{ textAlign: 'right', paddingHorizontal: spacing[3] }}>
         {hint}
       </Text>
-      <View style={{ height: 1, backgroundColor: theme.line }} />
+      <Divider />
       {children}
     </View>
   );
@@ -180,7 +181,7 @@ function BenefitListRow({
     >
       <View style={{ gap: spacing[3], paddingTop: spacing[1] }}>
         {row.helperText && (
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right', lineHeight: 20 }}>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             {row.helperText}
           </Text>
         )}
@@ -191,7 +192,7 @@ function BenefitListRow({
               tone="brand"
               size="sm"
               fullWidth={false}
-              style={{ minWidth: 120, borderRadius: 8 }}
+              style={{ minWidth: 120, borderRadius: radius.xs2 }}
               onPress={() => {
                 onActionPress?.(row);
                 setExpanded(false);
@@ -467,7 +468,7 @@ export function DshBenefitsHubScreen({
               marginBottom: spacing[2],
               backgroundColor: theme.successSurface,
               padding: spacing[3],
-              borderRadius: 12,
+              borderRadius: radius.sm2,
               borderWidth: 1,
               borderColor: theme.success,
               flexDirection: 'row-reverse',

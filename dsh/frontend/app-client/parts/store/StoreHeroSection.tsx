@@ -6,6 +6,8 @@ import {
   StoreHero,
   Text,
   type BannerCarouselItem,
+  spacing,
+  radius,
 } from '@bthwani/ui-kit';
 
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
@@ -210,17 +212,17 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
               backgroundColor: appearanceChrome.subtleSurface,
               borderColor: appearanceChrome.cardBorder,
               marginHorizontal: 16,
-              marginTop: 12,
-              marginBottom: 4,
-              padding: 12,
-              borderRadius: 12,
+              marginTop: spacing[3],
+              marginBottom: spacing[1],
+              padding: spacing[3],
+              borderRadius: radius.sm2,
               flexDirection: 'column',
-              gap: 8,
+              gap: spacing[2],
             },
           ]}
         >
           {store.openingHours ? (
-            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2] }}>
               <Icon name="time-outline" size={16} color={appearanceChrome.secondaryText} />
               <Text role="label" style={{ color: appearanceChrome.primaryText }}>
                 {isRTL ? `أوقات العمل: ${store.openingHours}` : `Opening Hours: ${store.openingHours}`}
@@ -228,7 +230,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
             </View>
           ) : null}
           {store.catalogSummary ? (
-            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+            <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2] }}>
               <Icon name="basket-outline" size={16} color={appearanceChrome.secondaryText} />
               <Text role="label" style={{ color: appearanceChrome.primaryText }}>
                 {isRTL ? `ملخص المتجر: ${store.catalogSummary}` : `Store Summary: ${store.catalogSummary}`}
@@ -253,7 +255,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
           },
         ]}
       >
-        <Text style={[styles.stickyHeaderTitle, { color: appearanceChrome.primaryText }]}>
+        <Text weight="black" style={[styles.stickyHeaderTitle, { color: appearanceChrome.primaryText }]}>
           {normalizedStoreName}
         </Text>
       </Animated.View>
@@ -264,7 +266,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
             styles.storeStateNotice,
             operationalState === 'area_unserviceable' ? styles.storeStateNoticeDanger : styles.storeStateNoticeWarning,
             { backgroundColor: appearanceChrome.subtleSurface, borderColor: appearanceChrome.cardBorder },
-            { marginHorizontal: 16, marginTop: 12, marginBottom: 8 },
+            { marginHorizontal: 16, marginTop: spacing[3], marginBottom: spacing[2] },
           ]}
         >
           <View style={styles.storeStateNoticeIconWrap}>
@@ -275,14 +277,14 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
             />
           </View>
           <View style={styles.storeStateNoticeCopy}>
-            <Text style={[styles.storeStateNoticeTitle, { color: appearanceChrome.primaryText }, isRTL && styles.textAlignRight]}>{operationalStateMeta.title}</Text>
+            <Text weight="black" style={[styles.storeStateNoticeTitle, { color: appearanceChrome.primaryText }, isRTL && styles.textAlignRight]}>{operationalStateMeta.title}</Text>
             <Text style={[styles.storeStateNoticeDescription, { color: appearanceChrome.secondaryText }, isRTL && styles.textAlignRight]}>
               {operationalStateMeta.description}
             </Text>
           </View>
           {onSupport && (
             <TouchableOpacity style={styles.storeStateNoticeAction} onPress={onSupport}>
-              <Text style={[styles.storeStateNoticeActionText, { color: stylesTokens.orange }]}>{supportActionLabel}</Text>
+              <Text weight="bold" style={[styles.storeStateNoticeActionText, { color: stylesTokens.orange }]}>{supportActionLabel}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -303,8 +305,8 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
         />
       ) : null}
 
-      <View onLayout={(event) => setStickyThreshold(event.nativeEvent.layout.y)} style={[styles.sectionHeader, { paddingHorizontal: 16, marginTop: 16, marginBottom: 8 }]}>
-        <Text style={[styles.sectionTitle, { color: appearanceChrome.primaryText }]}>قائمة الأصناف</Text>
+      <View onLayout={(event) => setStickyThreshold(event.nativeEvent.layout.y)} style={[styles.sectionHeader, { paddingHorizontal: spacing[4], marginTop: spacing[4], marginBottom: spacing[2] }]}>
+        <Text weight="black" style={[styles.sectionTitle, { color: appearanceChrome.primaryText }]}>قائمة الأصناف</Text>
       </View>
     </>
   );

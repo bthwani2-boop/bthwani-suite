@@ -13,6 +13,7 @@ import {
 } from '../../data/support.preview-data';
 import type { DshGlobalControlLink } from '../../shared/dsh-order-preview.contract';
 import styles from '../shared/control-panel-surface.module.css';
+import { SUPPORT_VERIFICATION_STATUS_META, SUPPORT_TICKET_STATUS_META } from './support.types';
 
 export type Customer360WorkspaceRouteContext = {
   customerId: string;
@@ -25,18 +26,6 @@ export type Customer360WorkspaceProps = {
   onOpenOrderRescue?: (context: Customer360WorkspaceRouteContext) => void;
   onOpenCallIntake?: (context: Customer360WorkspaceRouteContext) => void;
 };
-
-const VERIFICATION_STATUS_META = {
-  verified: { label: 'موثق', tone: 'success' as const },
-  required: { label: 'مطلوب', tone: 'warning' as const },
-  blocked: { label: 'محظور', tone: 'danger' as const },
-} as const;
-
-const TICKET_STATUS_META = {
-  open: { tone: 'warning' as const },
-  resolved: { tone: 'success' as const },
-  escalated: { tone: 'danger' as const },
-} as const;
 
 type SectionHeadingText = string;
 type SectionNoteText = string;
@@ -114,7 +103,7 @@ export function Customer360Workspace({
   }
 
   const selectedContext = buildCustomer360RouteContext(selectedRecord);
-  const selectedVerificationMeta = VERIFICATION_STATUS_META[selectedRecord.verificationStatus];
+  const selectedVerificationMeta = SUPPORT_VERIFICATION_STATUS_META[selectedRecord.verificationStatus];
   const searchDeliveryModeLabel =
     selectedRecord.lastFiveOrdersSummary.find((order) => order.deliveryMode === selectedRecord.searchFilters.deliveryMode)?.deliveryModeLabel ??
     selectedRecord.searchFilters.deliveryMode;
@@ -176,7 +165,7 @@ export function Customer360Workspace({
         <div className={styles.surfaceListColumn}>
           <Box gap={2}>
             {DSH_CUSTOMER_360_PREVIEW.map((item) => {
-              const verificationMeta = VERIFICATION_STATUS_META[item.verificationStatus];
+              const verificationMeta = SUPPORT_VERIFICATION_STATUS_META[item.verificationStatus];
 
               return (
                 <WebControlPanelDecisionRow
@@ -313,7 +302,7 @@ export function Customer360Workspace({
                     entityId={ticket.ticketId}
                     entityLabel={ticket.owner}
                     status={ticket.statusLabel}
-                    statusTone={TICKET_STATUS_META[ticket.status].tone}
+                    statusTone={SUPPORT_TICKET_STATUS_META[ticket.status].tone}
                     recommendation={ticket.latestNote}
                     reason={`مسار=${ticket.routeHint}`}
                     sla={`مدة SLA: ${ticket.sla}`}

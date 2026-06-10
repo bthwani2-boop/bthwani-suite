@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text,
+  radius,
+} from '@bthwani/ui-kit';
 import {
   getWltDshCaptainSettlementStatementsPreview,
   type WltDshCaptainStatement as CaptainStatement,
@@ -95,7 +97,7 @@ export function WltDshCaptainStatement() {
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div className={wltStyles.captainProfileFlex}>
           <div className={wltStyles.captainTitleFlex}>
-            <Text role="titleMd" style={{ fontWeight: 800 }}>كشف مستحقات وذمم الكابتن</Text>
+            <Text role="titleMd" weight="black">كشف مستحقات وذمم الكابتن</Text>
             <div className={wltStyles.storeSelectorButtonsFlex}>
               {statements.map((s) => (
                 <button
@@ -111,7 +113,7 @@ export function WltDshCaptainStatement() {
             </div>
           </div>
           <div className={wltStyles.captainMetaFlex}>
-            <span style={{ fontSize: 11, background: 'rgba(0,0,0,0.06)', padding: '4px 10px', borderRadius: 6, fontWeight: 700 }}>
+            <span style={{ fontSize: 11, background: 'rgba(0,0,0,0.06)', padding: '4px 10px', borderRadius: radius.xs, fontWeight: 700 }}>
               معرّف الكابتن: {statement.captainId}
             </span>
             <span
@@ -179,7 +181,7 @@ export function WltDshCaptainStatement() {
         {/* Main Details Table */}
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
           <div className={wltStyles.tableHeaderFlex}>
-            <Text role="titleSm" style={{ fontWeight: 800 }}>
+            <Text role="titleSm" weight="black">
               {activeTab === 'earnings' ? 'سجل مستحقات التوصيل والحوافز الإضافية' : 'سجل توريد حقائب النقدية (COD Bags)'}
             </Text>
             <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>
@@ -371,7 +373,7 @@ export function WltDshCaptainStatement() {
                 style={{
                   flex: 1,
                   padding: '6px 12px',
-                  borderRadius: 6,
+                  borderRadius: radius.xs,
                   border: '1px solid var(--bth-control-panel-border)',
                   background: 'var(--bth-control-panel-surface-raised)',
                   fontSize: 11,
@@ -387,7 +389,7 @@ export function WltDshCaptainStatement() {
                   style={{
                     flex: 1,
                     padding: '6px 12px',
-                    borderRadius: 6,
+                    borderRadius: radius.xs,
                     border: 'none',
                     background: 'var(--bth-success-text)',
                     color: 'var(--bth-text-inverse)',

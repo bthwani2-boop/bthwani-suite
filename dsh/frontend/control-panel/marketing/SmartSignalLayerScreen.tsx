@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -32,7 +32,7 @@ export function ControlPanelDshMarketingScreen({
 			{/* Sleek DSH Header (Unified Style) */}
 			<div className={styles.surfaceTopBar} style={{ padding: '12px 16px', border: `1px solid var(--bthwani-control-panel-border)`, borderRadius: '16px', backgroundColor: 'var(--bthwani-control-panel-surface)' }}>
 				<Box gap={0} style={{ flex: 1 }}>
-					<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>غرفة قيادة الإشارات الذكية</Text>
+					<Text role="caption" tone="muted" weight="black" style={{ }}>غرفة قيادة الإشارات الذكية</Text>
 					<h2 className={styles.surfaceHeaderTitle} style={{ margin: '4px 0 0 0', fontSize: '18px', color: 'var(--bthwani-control-panel-text)' }}>لوحة الإشارات التسويقية ومنظومة المفضلة المشتركة</h2>
 					<p className={styles.surfaceHeaderSubtitle} style={{ marginTop: '2px', fontSize: '11px' }}>طبقة مضغوطة لمراقبة نية الشراء، والطلب الكامن، وأداء الحملات التلقائية الموجهة بالمفضلة.</p>
 				</Box>

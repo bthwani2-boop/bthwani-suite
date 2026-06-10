@@ -16,6 +16,21 @@ export type SupportSubTabItem = {
   label: string;
 };
 
+export type SupportVerificationStatus = 'verified' | 'required' | 'blocked' | string;
+export type SupportTone = 'success' | 'warning' | 'danger' | 'default';
+
+export const SUPPORT_VERIFICATION_STATUS_META: Record<string, { label: string; tone: SupportTone }> = {
+  verified: { label: 'موثق', tone: 'success' },
+  required: { label: 'مطلوب', tone: 'warning' },
+  blocked: { label: 'محظور', tone: 'danger' },
+};
+
+export const SUPPORT_TICKET_STATUS_META: Record<string, { tone: SupportTone }> = {
+  open: { tone: 'warning' },
+  resolved: { tone: 'success' },
+  escalated: { tone: 'danger' },
+};
+
 export const SUPPORT_PRIMARY_TABS: readonly SupportTabItem[] = [
   { id: 'queue', label: 'صفوف الدعم والنزاعات' },
   { id: 'customer-360', label: 'ملف العميل المتكامل' },

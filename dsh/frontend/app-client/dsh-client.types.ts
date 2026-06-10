@@ -42,7 +42,6 @@ export type DshClientSurfaceProps = {
   renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
 };
 
-export type DshSurfaceHostProps = DshClientSurfaceProps;
 
 export type { DshClientState } from '../data/operational-statuses.preview-data';
 export type {

@@ -1,6 +1,8 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, TopBar, amountToArabicText, useBThwaniAppearance, useI18n } from '@bthwani/ui-kit';
+import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, TopBar, amountToArabicText, useBThwaniAppearance, useI18n,
+  spacing,
+} from '@bthwani/ui-kit';
 import { financeProviders } from '../../../dsh/control-panel/financeContracts';
 import { createWltDshTypedClient } from '../../../dsh/contracts';
 
@@ -108,9 +110,9 @@ export const WltHomeGetScreen: React.FC<{
         <Card
           title={tr('wlt.home.balanceTitle', 'رصيدك')}
           subtitle={tr('wlt.home.balanceSubtitle', '')}
-          style={{ margin: 16, padding: 20 }}
+          style={{ margin: spacing[4], padding: spacing[5] }}
         >
-          <Text role="titleLg" style={{ textAlign: 'center', marginTop: 8 }}>{formattedBalance} {tr('wlt.currency', 'ريال')}</Text>
+          <Text role="titleLg" style={{ textAlign: 'center', marginTop: spacing[2] }}>{formattedBalance} {tr('wlt.currency', 'ريال')}</Text>
         </Card>
 
         {/* CTA below the card (pill) */}
@@ -122,23 +124,23 @@ export const WltHomeGetScreen: React.FC<{
             fullWidth={false}
             size="md"
             leadingAccessory={<Icon name="add-outline" size={18} color={tokens.components.buttons.primary.default.iconColor} />}
-            style={{ width: 220, marginTop: 8, alignSelf: 'center' }}
+            style={{ width: 220, marginTop: spacing[2], alignSelf: 'center' }}
           />
         </View>
 
         {isTopupOpen && (
           <View onLayout={(e) => setAmountY(e.nativeEvent.layout.y)}>
-            <Text role="titleSm" style={{ marginHorizontal: 16, marginTop: 12 }}>{tr('wlt.topup.inlineTitle', 'اشحن الآن')}</Text>
-            <View style={{ alignItems: 'center', marginTop: 8 }}>
+            <Text role="titleSm" style={{ marginHorizontal: 16, marginTop: spacing[3] }}>{tr('wlt.topup.inlineTitle', 'اشحن الآن')}</Text>
+            <View style={{ alignItems: 'center', marginTop: spacing[2] }}>
               <View style={{ width: 160 }}>
                 <AmountInput value={amount} onChange={setAmount} placeholder="0.00" currencyLabel={tr('wlt.currency', 'ريال')} />
               </View>
             </View>
             <PaymentMethodList methods={methods} selectedId={method} onSelect={setMethod} />
 
-            {topupAmount > 0 ? <Text role="caption" tone="muted" style={{ textAlign: 'center', marginTop: 8 }}>{amountToArabicText(topupAmount, (k) => tr(k))}</Text> : null}
+            {topupAmount > 0 ? <Text role="caption" tone="muted" style={{ textAlign: 'center', marginTop: spacing[2] }}>{amountToArabicText(topupAmount, (k) => tr(k))}</Text> : null}
 
-            <Button label={tr('wlt.topup.confirmCta', 'تأكيد الشحن')} onPress={handleTopup} disabled={!canSubmit} style={{ margin: 16 }} />
+            <Button label={tr('wlt.topup.confirmCta', 'تأكيد الشحن')} onPress={handleTopup} disabled={!canSubmit} style={{ margin: spacing[4] }} />
           </View>
         )}
       </ScrollView>

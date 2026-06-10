@@ -13,7 +13,7 @@ export function EmptyFeed({ query, styles }: { query?: string; styles: HomeEmpty
 	return (
 		<View style={styles.emptyFeed}>
 			<Text style={styles.emptyFeedEmoji}>{isSearch ? '🔎' : '🍽️'}</Text>
-			<Text role="titleSm" style={styles.emptyFeedTitle}>
+			<Text role="titleSm" weight="black" style={styles.emptyFeedTitle}>
 				{isSearch ? 'لا توجد نتائج داخل هذه الفئة' : 'لا توجد متاجر لهذه الفئة بعد'}
 			</Text>
 			<Text role="bodySm" style={styles.emptyFeedText}>

@@ -472,5 +472,3 @@ import {
   buildStoreDeliveryModes,
   buildStoreTags,
 } from '../data/stores.preview-data';
-
-export { DshClientSurface as DshSurfaceHost };

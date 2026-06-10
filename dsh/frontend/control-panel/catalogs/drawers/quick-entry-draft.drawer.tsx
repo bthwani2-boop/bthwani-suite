@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 /**
  * CatalogQuickEntryDraftWorkspace — UI_PREVIEW_ONLY
@@ -21,7 +21,9 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Button, Surface, Text, TextField, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, TextField, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import type { CatalogPreviewProposal } from '../catalogs.model';
 import { WorkspacePreviewNotice, WorkspaceSuccessBanner, WorkspaceCategoryPicker } from '../catalogs.parts';
 import { dshCatalogCategories, DSH_COMMON_MEDIA_KEYS } from '../catalogs.data';
@@ -113,7 +115,7 @@ export function CatalogQuickEntryDraftWorkspace({
         }}
       >
         <Box layoutDirection="row" justify="space-between" align="center">
-          <Text role="titleLg" style={{ fontWeight: '800', fontSize: 18, color: theme.brandHeaderBackground }}>
+          <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
             ✏️ إدخال سريع — مسودة
           </Text>
           <Button label="✕ إغلاق" tone="secondary" size="sm" onPress={onClose} />
@@ -147,7 +149,7 @@ export function CatalogQuickEntryDraftWorkspace({
       }}
     >
       <Box layoutDirection="row" justify="space-between" align="center">
-        <Text role="titleLg" style={{ fontWeight: '800', fontSize: 18, color: theme.brandHeaderBackground }}>
+        <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
           ✏️ إدخال سريع — مسودة
         </Text>
         <Button label="✕ إغلاق" tone="secondary" size="sm" onPress={onClose} />
@@ -162,7 +164,7 @@ export function CatalogQuickEntryDraftWorkspace({
       <Box gap={3}>
         {/* Name */}
         <Box gap={1}>
-          <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
+          <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground }}>
             اسم المنتج *
           </Text>
           <TextField
@@ -187,7 +189,7 @@ export function CatalogQuickEntryDraftWorkspace({
 
         {/* Media Key */}
         <Box gap={1}>
-          <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
+          <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground }}>
             مفتاح الميديا (اختياري)
           </Text>
           <select
@@ -217,7 +219,7 @@ export function CatalogQuickEntryDraftWorkspace({
 
         {/* SKU Note */}
         <Box gap={1}>
-          <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
+          <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground }}>
             SKU مقترح (ملاحظة فقط)
           </Text>
           <TextField
@@ -233,7 +235,7 @@ export function CatalogQuickEntryDraftWorkspace({
 
         {/* GTIN Note */}
         <Box gap={1}>
-          <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
+          <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground }}>
             GTIN / باركود مقترح (ملاحظة فقط)
           </Text>
           <TextField
@@ -249,7 +251,7 @@ export function CatalogQuickEntryDraftWorkspace({
 
         {/* Price Note */}
         <Box gap={1}>
-          <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
+          <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground }}>
             سعر مقترح (ريال)
           </Text>
           <TextField
@@ -266,9 +268,9 @@ export function CatalogQuickEntryDraftWorkspace({
             tone="inset"
             padding={2}
             gap={1}
-            style={{ borderRadius: 6, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
+            style={{ borderRadius: radius.xs, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
           >
-            <Text role="caption" style={{ color: theme.warning, fontWeight: '600' }}>
+            <Text role="caption" weight="semibold" style={{ color: theme.warning }}>
               ⚠️ تحقق من التكرار
             </Text>
             <Text role="caption" tone="muted">
@@ -278,7 +280,7 @@ export function CatalogQuickEntryDraftWorkspace({
         )}
 
         {validationError && (
-          <Text role="caption" style={{ color: theme.danger, fontWeight: '700' }}>
+          <Text role="caption" weight="bold" style={{ color: theme.danger }}>
             ⛔ {validationError}
           </Text>
         )}

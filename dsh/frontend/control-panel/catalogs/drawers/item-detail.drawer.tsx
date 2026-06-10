@@ -1,11 +1,13 @@
-// UI_PREVIEW_ONLY — no backend/API/DB binding.
+﻿// UI_PREVIEW_ONLY — no backend/API/DB binding.
 // Owner: control-panel/catalogs
 // Purpose: Detail view for a single catalog product — identity, approval stage,
 //   client visibility gate, linked surfaces summary, and action result banner.
 // All CTAs are preview-only and produce result banners or are disabled with reason.
 
 import React, { useState } from 'react';
-import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster } from '../catalogs.data';
 import {
@@ -78,8 +80,8 @@ function InfoRow({ label, value, valueColor }: { label: string; value: string; v
   const { theme } = useTheme();
   return (
     <Box layoutDirection="row" gap={6} style={{ justifyContent: 'space-between', paddingVertical: 2 }}>
-      <Text role="caption" tone="muted" style={{ fontSize: 12 }}>{label}</Text>
-      <Text role="caption" style={{ fontWeight: '700', color: valueColor || theme.text, textAlign: 'right', flexShrink: 1 }}>{value}</Text>
+      <Text role="caption" tone="muted" style={{}}>{label}</Text>
+      <Text role="caption" weight="bold" style={{ color: valueColor || theme.text, textAlign: 'right', flexShrink: 1 }}>{value}</Text>
     </Box>
   );
 }
@@ -140,7 +142,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
       <Box gap={4} style={{ padding: 16 }}>
 
         {/* Owner notice */}
-        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 6, padding: 8 }}>
+        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: radius.xs, padding: 8 }}>
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
             المالك: control-panel/catalogs · كل CTAs محاكاة محلية فقط
           </Text>
@@ -221,7 +223,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
             />
           )}
           {!visibility.visible && visibility.blockedReason && (
-            <Box style={{ backgroundColor: theme.dangerSurface, borderRadius: 6, padding: 8, marginTop: 4 }}>
+            <Box style={{ backgroundColor: theme.dangerSurface, borderRadius: radius.xs, padding: 8, marginTop: 4 }}>
               <Text role="caption" style={{ color: theme.danger, fontSize: 11 }}>{visibility.blockedReason}</Text>
             </Box>
           )}
@@ -250,7 +252,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
           <SectionTitle>الأسطح المرتبطة</SectionTitle>
           {linkedSurfaces.map((s) => (
             <Box key={s.id} layoutDirection="row" gap={8} style={{ alignItems: 'flex-start', paddingVertical: 3 }}>
-              <Text role="caption" style={{ fontWeight: '700', color: theme.brand, minWidth: 120 }}>{s.label}</Text>
+              <Text role="caption" weight="bold" style={{ color: theme.brand, minWidth: 120 }}>{s.label}</Text>
               <Text role="caption" tone="muted" style={{ fontSize: 11, flexShrink: 1 }}>{s.description}</Text>
             </Box>
           ))}

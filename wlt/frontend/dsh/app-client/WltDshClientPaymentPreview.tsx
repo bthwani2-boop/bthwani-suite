@@ -12,6 +12,7 @@ import {
   Text,
   useTheme,
   type KeyValueItem,
+  spacing,
 } from '@bthwani/ui-kit';
 import {
   formatWltYer,
@@ -48,8 +49,8 @@ function PaymentOptionCard({
       gap={2}
       style={isSelected ? { borderWidth: 2, borderColor: theme.brand } : undefined}
     >
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12 }}>
-        <View style={{ flex: 1, alignItems: 'flex-end', gap: 4 }}>
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[3] }}>
+        <View style={{ flex: 1, alignItems: 'flex-end', gap: spacing[1] }}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }}>
             {titleLabel}
           </Text>

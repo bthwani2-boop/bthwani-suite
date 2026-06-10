@@ -10,6 +10,8 @@ import {
   KeyValueList,
   Chip,
   useTheme,
+  spacing,
+  radius,
 } from '@bthwani/ui-kit';
 import type { DshOperationScreenState } from '../parts/OperationScreen';
 import {
@@ -18,24 +20,8 @@ import {
   type DshOperationsSupportFlowId,
 } from '../../data/support.preview-data';
 import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
-
-function resolveClientIssuePolicyLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  if (policy === 'summary-only') {
-    return 'ملخص أولًا';
-  }
-
-  return 'سياسة مرتبطة بالسجل';
-}
 
 function resolveClientIssueOwnerLabel(ownerSurface?: string): string {
   if (ownerSurface === 'control-panel') {
@@ -72,7 +58,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
   if (isSubmitted) {
     return (
       <MobileScrollView padding={4} gap={3} style={{ backgroundColor: theme.surface }}>
-        <Box gap={3} align="center" style={{ marginTop: 40, paddingVertical: 20 }}>
+        <Box gap={3} align="center" style={{ marginTop: spacing[10], paddingVertical: spacing[5] }}>
           <Box
             style={{
               width: 72,
@@ -81,18 +67,18 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
               backgroundColor: theme.brandSurface,
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: 12,
+              marginBottom: spacing[3],
             }}
           >
             <Icon name="checkmark-circle" size={48} color={theme.brand} />
           </Box>
           <Text role="titleLg" style={{ textAlign: 'center' }}>تم إرسال بلاغك بنجاح</Text>
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'center', paddingHorizontal: 20 }}>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'center', paddingHorizontal: spacing[5] }}>
             تلقينا تفاصيل مشكلتك وسيقوم فريق الدعم والمساعدة بمراجعة طلبك والتواصل معك في أقرب وقت ممكن.
           </Text>
         </Box>
 
-        <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 16 }}>
+        <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: radius.md2 }}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }}>تفاصيل البلاغ:</Text>
           <KeyValueList
             dense
@@ -107,7 +93,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
           />
         </Surface>
 
-        <Box gap={2} style={{ marginTop: 20 }}>
+        <Box gap={2} style={{ marginTop: spacing[5] }}>
           <Button
             label="العودة إلى الطلبات"
             onPress={() => {
@@ -131,14 +117,14 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
   return (
     <MobileScrollView padding={4} gap={3} style={{ backgroundColor: theme.surface }}>
       {/* Header */}
-      <Box gap={1} style={{ alignItems: 'flex-end', marginBottom: 8 }}>
+      <Box gap={1} style={{ alignItems: 'flex-end', marginBottom: spacing[2] }}>
         <Text role="titleLg" style={{ textAlign: 'right' }}>الدعم والمساعدة</Text>
         <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
           دعم العميل يبقى داخل الطلب الحالي فقط. اختر نوع المشكلة ثم أضف ملاحظة مختصرة عند الحاجة.
         </Text>
       </Box>
 
-      <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 20 }}>
+      <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: radius.lg2 }}>
         <Box layoutDirection="row" justify="space-between" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
           <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
             <Text role="bodyStrong" style={{ textAlign: 'right' }}>سياسة البلاغ من السجل المركزي</Text>
@@ -146,7 +132,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
               {issueFlowSummary?.nextPolicyActionPreview ?? 'الأدلة والملفات لا تُفتح إلا عند طلبها من داخل هذا البلاغ.'}
             </Text>
           </Box>
-          <Chip label={resolveClientIssuePolicyLabel(issueFlowPolicy)} tone="warning" />
+          <Chip label={resolveDshOnDemandPolicyLabel(issueFlowPolicy)} tone="warning" />
         </Box>
         <KeyValueList
           dense
@@ -159,7 +145,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
       </Surface>
 
       {/* Interactive Chips list */}
-      <Surface tone="raised" padding={3} gap={3} style={{ borderRadius: 20 }}>
+      <Surface tone="raised" padding={3} gap={3} style={{ borderRadius: radius.lg2 }}>
         <Text role="bodyStrong" style={{ textAlign: 'right' }}>ما هي المشكلة التي تواجهها؟</Text>
 
         <Box layoutDirection="row" gap={1} style={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
@@ -178,7 +164,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
       </Surface>
 
       {selectedFlow ? (
-        <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: 20 }}>
+        <Surface tone="inset" padding={3} gap={2} style={{ borderRadius: radius.lg2 }}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }}>{selectedFlow.title}</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             {selectedFlow.description}
@@ -198,7 +184,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
       ) : null}
 
       {/* Details field */}
-      <Surface tone="raised" padding={3} gap={2} style={{ borderRadius: 20 }}>
+      <Surface tone="raised" padding={3} gap={2} style={{ borderRadius: radius.lg2 }}>
         <Text role="bodyStrong" style={{ textAlign: 'right' }}>تفاصيل إضافية</Text>
         <TextField
           value={detailsText}
@@ -209,7 +195,7 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
       </Surface>
 
       {/* CTA Buttons */}
-      <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: 20 }}>
+      <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: radius.lg2 }}>
         <Box gap={2}>
           <Button
             label={selectedIssue ? 'إرسال البلاغ' : 'اختر نوع المشكلة أولاً'}

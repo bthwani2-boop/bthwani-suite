@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text,
+  radius,
+} from '@bthwani/ui-kit';
 import { getAdaptedFinanceControlPanelRows } from '../adapters/dshFinanceFixture.adapter';
 import { formatWltYer } from '../financeContracts';
 import { buildWltAuditPackPreview } from '../models/auditPack.types';
@@ -40,7 +42,7 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={1}>
-        <Text role="titleMd" style={{ fontWeight: 700 }}>التدقيق والإغلاق اليومي</Text>
+        <Text role="titleMd" weight="bold">التدقيق والإغلاق اليومي</Text>
         <Text role="bodySm" tone="soft">
           حزمة التدقيق المالي اليومي — نتيجة من المركز المالي + كشوف الحسابات + دورات التسوية.
           الإغلاق الفعلي يُنفّذه WLT runtime فقط.
@@ -50,7 +52,7 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
       {/* Audit Pack Status */}
       <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" gap={2}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text role="titleSm" style={{ fontWeight: 700 }}>حزمة الإغلاق · {auditPack.closingRunId}</Text>
+          <Text role="titleSm" weight="bold">حزمة الإغلاق · {auditPack.closingRunId}</Text>
           <span style={{
             fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 5,
             color: isReadyForClose ? 'var(--bth-success-text)' : 'var(--bth-warning-text)',
@@ -78,12 +80,12 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
 
       {/* Close Gate Subledgers */}
       <Box gap={2}>
-        <Text role="titleSm" style={{ fontWeight: 700 }}>دفاتر الأستاذ المساعدة — شروط الإغلاق</Text>
+        <Text role="titleSm" weight="bold">دفاتر الأستاذ المساعدة — شروط الإغلاق</Text>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
           {closeGateSubledgers.map((sub) => (
             <Box key={sub.id} padding={2} background="surfaceInset" radiusToken="md" border borderTone="line" gap={1}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text role="label" style={{ fontWeight: 700 }}>{sub.label}</Text>
+                <Text role="label" weight="bold">{sub.label}</Text>
                 <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.06)', padding: '1px 5px', borderRadius: 3 }}>{sub.controlAccountCode}</code>
               </div>
               <Text role="caption" tone="muted">{sub.description}</Text>
@@ -95,7 +97,7 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
       {/* Exceptions */}
       {auditPack.exceptions.length > 0 && (
         <Box gap={2}>
-          <Text role="titleSm" style={{ fontWeight: 700, color: 'var(--bth-danger-text)' }}>
+          <Text role="titleSm" weight="bold" style={{ color: 'var(--bth-danger-text)' }}>
             استثناءات تمنع الإغلاق ({auditPack.exceptions.length})
           </Text>
           {auditPack.exceptions.map((ex) => (
@@ -104,7 +106,7 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
                 <code style={{ fontSize: 10, fontWeight: 700 }}>{ex.entryId}</code>
                 <span style={{ fontSize: 11, marginRight: 8, color: 'var(--bth-danger-text)' }}>{ex.reason}</span>
               </div>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'var(--bth-danger-text)', color: '#ffffff' }}>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'var(--bth-danger-text)', color: 'var(--bthwani-brand-contrast)' }}>
                 {ex.severity === 'blocking' ? 'حاجب' : 'تحذير'}
               </span>
             </div>
@@ -114,10 +116,10 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
 
       {/* Maker-Checker status */}
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <Text role="titleSm" style={{ fontWeight: 700 }}>مسار Maker-Checker</Text>
+        <Text role="titleSm" weight="bold">مسار Maker-Checker</Text>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {auditPack.approvals.slice(0, 5).map((ap) => (
-            <div key={ap.entryId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', background: 'var(--bthwani-control-panel-surface)', borderRadius: 6, border: '1px solid var(--bthwani-control-panel-border)' }}>
+            <div key={ap.entryId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', background: 'var(--bthwani-control-panel-surface)', borderRadius: radius.xs, border: '1px solid var(--bthwani-control-panel-border)' }}>
               <code style={{ fontSize: 10 }}>{ap.entryId}</code>
               <span style={{ fontSize: 10, fontWeight: 700, color: ap.state === 'approved' ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' }}>
                 {WLT_MAKER_CHECKER_STATE_LABELS[ap.state as keyof typeof WLT_MAKER_CHECKER_STATE_LABELS] ?? ap.state}

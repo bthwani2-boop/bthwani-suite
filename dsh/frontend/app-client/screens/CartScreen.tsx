@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { Dimensions, Image, Modal, Platform, Pressable, ScrollView, View } from 'react-native';
 import {
   Button,
   Box,
   Card,
   colorPalette,
+  Divider,
   withAlpha,
   DateTimePicker,
   Icon,
@@ -25,8 +26,11 @@ import {
   useDirection,
   shadowPresets,
   type PaymentDecisionOption,
+  radius,
+  typographyRoles,
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../parts/CartDetails';
+import { formatDshPrice, formatDshPriceMinorUnits } from '../../shared/dsh-price-format';
 import { getDshClientStateMeta, type DshClientState } from '../../data/operational-statuses.preview-data';
 import { getPartnerOfferItems } from '../../data/offers.preview-data';
 import { isClientVisibleStatus, type CommercialLifecycleStatus } from '../../shared/commercial.preview-contract';
@@ -45,7 +49,7 @@ import {
 } from '../contracts/dsh-client-binding.contracts';
 // SSoT: COD availability per delivery mode — bthwani_delivery only.
 import { isCodAllowedForMode } from '../dsh-client-wlt-payment-bridge';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 import type { DshCheckoutClient } from '../../shared/dsh-checkout-client';
 
@@ -62,22 +66,6 @@ const SURFACE_WARM_BORDER = colorPalette.brandSurface;
 const DANGER = colorPalette.danger;
 const DANGER_SOFT = colorPalette.dangerSoft;
 const EXPERIMENTAL_PAYMENT_ENABLED = false;
-
-function resolveCheckoutPolicyLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  if (policy === 'summary-only') {
-    return 'ملخص أولًا';
-  }
-
-  if (policy === 'finance-preview-only') {
-    return 'مالي للقراءة فقط';
-  }
-
-  return 'سياسة من السجل';
-}
 
 type ScreenNotice = {
   title: string;
@@ -234,7 +222,7 @@ function toEnglishDigits(str: string): string {
     .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 1776));
 }
 
-function formatAmount(value: number) {
+function formatDshPrice(value: number) {
   try {
     const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value);
     return `${formatted} ر.ي.`;
@@ -243,8 +231,8 @@ function formatAmount(value: number) {
   }
 }
 
-function formatMinorUnitsAmount(value: number) {
-  return formatAmount(value / 100);
+function formatDshPriceMinorUnits(value: number) {
+  return formatDshPrice(value / 100);
 }
 
 function resolveCartItemPriceValue(item: CartItem): number {
@@ -337,7 +325,7 @@ function ExecutionSchedulePicker({ selectedDate, selectedTime, onConfirm }: { se
       <Pressable onPress={() => setVisible(true)}>
         <Surface tone="default" padding={3} gap={2} radiusToken="lg" style={{ backgroundColor: SURFACE_WARM, borderColor: SURFACE_WARM_BORDER, borderStyle: 'dashed', borderWidth: 1.5 }}>
           <Box layoutDirection="row" align="center" gap={3}>
-            <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: colorPalette.white, alignItems: 'center', justifyContent: 'center', ...shadowPresets.raised }}>
+            <View style={{ width: 44, height: 44, borderRadius: radius.md, backgroundColor: colorPalette.white, alignItems: 'center', justifyContent: 'center', ...shadowPresets.raised }}>
               <Icon name="calendar-outline" size={22} color={ACCENT_ORANGE} />
             </View>
             <Box style={{ flex: 1 }} gap={1}>
@@ -375,11 +363,10 @@ function PromoBanner({ onPress }: { onPress: () => void }) {
         backgroundColor: colorPalette.warningSoft,
         borderWidth: 1,
         borderColor: colorPalette.warning,
-        borderRadius: 16,
+        borderRadius: radius.md2,
         paddingHorizontal: spacing[2],
         paddingVertical: spacing[1],
-        minHeight: 60,
-      }}
+        minHeight: 60 }}
     >
       <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', minHeight: 36 }}>
         <View style={{ width: 96, alignItems: 'center' }}>
@@ -388,12 +375,12 @@ function PromoBanner({ onPress }: { onPress: () => void }) {
             size="sm"
             fullWidth={false}
             onPress={onPress}
-            style={{ minWidth: 92, minHeight: 36, backgroundColor: ACCENT_ORANGE, borderColor: ACCENT_ORANGE, borderRadius: 18 }}
+            style={{ minWidth: 92, minHeight: 36, backgroundColor: ACCENT_ORANGE, borderColor: ACCENT_ORANGE, borderRadius: radius.lg }}
           />
         </View>
 
         <View style={{ flex: 1, paddingHorizontal: spacing[2], alignItems: 'center', justifyContent: 'center' }}>
-          <Text role="bodyMd" style={{ color: TEXT_PRIMARY, textAlign: 'center', lineHeight: 18 }}>
+          <Text role="bodyMd" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>
             اشترك بخدمة بثواني برو للاستفادة من أفضل العروض
           </Text>
         </View>
@@ -421,15 +408,14 @@ function RecommendationCard({ product, cartQty, onOpenProductPreview }: Recommen
         tone="default"
         style={{
           width: 140,
-          borderRadius: 16,
+          borderRadius: radius.md2,
           borderWidth: 1,
           borderColor: BORDER_SOFT,
           backgroundColor: colorPalette.surfacePrimary,
           padding: spacing[2],
           gap: spacing[2],
           position: 'relative',
-          justifyContent: 'space-between',
-        }}
+          justifyContent: 'space-between' }}
       >
         {cartQty > 0 && (
           <View style={{
@@ -437,32 +423,31 @@ function RecommendationCard({ product, cartQty, onOpenProductPreview }: Recommen
             top: 6,
             right: 6,
             backgroundColor: ACCENT_ORANGE,
-            borderRadius: 8,
+            borderRadius: radius.xs2,
             paddingHorizontal: 6,
             paddingVertical: 2,
-            zIndex: 2,
-          }}>
-            <Text role="caption" style={{ color: colorPalette.white, fontWeight: '700', fontSize: 10 }}>
+            zIndex: 2 }}>
+            <Text role="caption" weight="bold" style={{ color: colorPalette.white, fontSize: 10 }}>
               {`مضاف (${cartQty})`}
             </Text>
           </View>
         )}
 
-        <View style={{ height: 80, backgroundColor: SURFACE_SOFT, borderRadius: 12, justifyContent: 'center', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
+        <View style={{ height: 80, backgroundColor: SURFACE_SOFT, borderRadius: radius.sm2, justifyContent: 'center', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
           {imageSource ? (
             <Image source={imageSource} style={{ width: 64, height: 64, borderRadius: 32 }} resizeMode="cover" />
           ) : (
-            <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: colorPalette.brandSoft }} />
+            <View style={{ width: 48, height: 48, borderRadius: radius.xl, backgroundColor: colorPalette.brandSoft }} />
           )}
-          <View style={{ position: 'absolute', bottom: 4, left: 4, borderRadius: 6, backgroundColor: withAlpha(colorPalette.brandStrong, 0.75), paddingHorizontal: 6, paddingVertical: 2 }}>
-            <Text role="caption" style={{ color: colorPalette.white, fontWeight: '700', fontSize: 10 }}>
+          <View style={{ position: 'absolute', bottom: 4, left: 4, borderRadius: radius.xs, backgroundColor: withAlpha(colorPalette.brandStrong, 0.75), paddingHorizontal: 6, paddingVertical: 2 }}>
+            <Text role="caption" weight="bold" style={{ color: colorPalette.white, fontSize: 10 }}>
               {product.priceLabel}
             </Text>
           </View>
         </View>
 
         <View style={{ gap: 2 }}>
-          <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: 'center', fontSize: 13 }} numberOfLines={1}>
+          <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: 'center', fontSize: typographyRoles.label.fontSize }} numberOfLines={1}>
             {product.title}
           </Text>
         </View>
@@ -473,7 +458,7 @@ function RecommendationCard({ product, cartQty, onOpenProductPreview }: Recommen
           size="sm"
           fullWidth
           onPress={onOpenProductPreview}
-          style={{ minHeight: 32, borderRadius: 10 }}
+          style={{ minHeight: 32, borderRadius: radius.sm }}
         />
       </Surface>
     </Pressable>
@@ -501,7 +486,7 @@ function RecommendedSection({
     <View style={{ gap: spacing[2] }}>
       <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: spacing[1], gap: spacing[1] }}>
         <View style={{ flex: 1, gap: 2, alignItems: isRTL ? 'flex-end' : 'flex-start' }}>
-          <Text role="bodyMd" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
+          <Text role="bodyMd" weight="bold" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>
             قد تعجبك هذه المنتجات أيضاً
           </Text>
           <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
@@ -515,7 +500,7 @@ function RecommendedSection({
             size="sm"
             fullWidth={false}
             onPress={onOpenStore}
-            style={{ borderRadius: 10, minHeight: 32, paddingHorizontal: spacing[2] }}
+            style={{ borderRadius: radius.sm, minHeight: 32, paddingHorizontal: spacing[2] }}
           />
         )}
       </View>
@@ -527,8 +512,7 @@ function RecommendedSection({
           flexDirection: isRTL ? 'row-reverse' : 'row',
           gap: spacing[2],
           paddingHorizontal: spacing[1],
-          paddingBottom: spacing[1],
-        }}
+          paddingBottom: spacing[1] }}
       >
         {horizontalProducts.map((product) => {
           const cartItem = items.find((it) => it.title === product.title);
@@ -574,7 +558,7 @@ function ProductPreviewModal({
   const { direction } = useDirection();
   const isRTL = direction === 'rtl';
   const imageSource = product ? resolveDshImageSource(product.imageUri) : undefined;
-  const priceLabel = product ? formatAmount(product.priceValue) : '';
+  const priceLabel = product ? formatDshPrice(product.priceValue) : '';
   const hasCartQty = cartQty > 0;
   const actionLabel = hasCartQty ? 'زيادة الكمية' : 'إضافة للسلة';
   const sheetBottomInset = Math.max(bottomInset, safeArea.comfortable) + spacing[2];
@@ -593,8 +577,7 @@ function ProductPreviewModal({
           paddingHorizontal: spacing[2],
           paddingTop: sheetTopInset,
           paddingBottom: sheetBottomInset,
-          backgroundColor: withAlpha(colorPalette.brandStrong, 0.48),
-        }}
+          backgroundColor: withAlpha(colorPalette.brandStrong, 0.48) }}
       >
         <Pressable
           accessibilityRole="button"
@@ -606,30 +589,27 @@ function ProductPreviewModal({
             right: 0,
             top: 0,
             bottom: 0,
-            backgroundColor: withAlpha(colorPalette.brandStrong, 0.36),
-          }}
+            backgroundColor: withAlpha(colorPalette.brandStrong, 0.36) }}
         />
 
         <Surface
           tone="default"
           style={{
             zIndex: 1,
-            borderRadius: 24,
+            borderRadius: radius.xl,
             borderWidth: 1,
             borderColor: BORDER_SOFT,
             backgroundColor: colorPalette.surfacePrimary,
             overflow: 'hidden',
             maxHeight: '90%',
-            ...shadowPresets.floating,
-          }}
+            ...shadowPresets.floating }}
         >
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{
               padding: spacing[3],
               gap: spacing[3],
-              paddingBottom: spacing[4],
-            }}
+              paddingBottom: spacing[4] }}
           >
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing[2] }}>
               <View style={{ flex: 1, gap: spacing[1] }}>
@@ -648,7 +628,7 @@ function ProductPreviewModal({
                 style={({ pressed }) => ({
                   width: 36,
                   height: 36,
-                  borderRadius: 12,
+                  borderRadius: radius.sm2,
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderWidth: 1,
@@ -661,7 +641,7 @@ function ProductPreviewModal({
               </Pressable>
             </View>
 
-            <View style={{ backgroundColor: SURFACE_SOFT, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: BORDER_SOFT }}>
+            <View style={{ backgroundColor: SURFACE_SOFT, borderRadius: radius.lg2, overflow: 'hidden', borderWidth: 1, borderColor: BORDER_SOFT }}>
               <View style={{ height: 240, position: 'relative', backgroundColor: colorPalette.surfaceSecondary }}>
                 {imageSource ? (
                   <Image source={imageSource} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
@@ -671,9 +651,9 @@ function ProductPreviewModal({
                   </View>
                 )}
 
-                <View style={{ position: 'absolute', top: spacing[2], right: spacing[2], flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], borderRadius: 999, borderWidth: 1, borderColor: BORDER_SOFT, backgroundColor: colorPalette.white, paddingHorizontal: spacing[2], paddingVertical: spacing[1] }}>
+                <View style={{ position: 'absolute', top: spacing[2], right: spacing[2], flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], borderRadius: radius.pill, borderWidth: 1, borderColor: BORDER_SOFT, backgroundColor: colorPalette.white, paddingHorizontal: spacing[2], paddingVertical: spacing[1] }}>
                   <Icon name="cart-outline" size={14} color={ACCENT_ORANGE} />
-                  <Text role="caption" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
+                  <Text role="caption" weight="bold" style={{ color: TEXT_PRIMARY }}>
                     {hasCartQty ? `موجود في السلة · ${cartQty}` : 'غير موجود في السلة'}
                   </Text>
                 </View>
@@ -690,24 +670,24 @@ function ProductPreviewModal({
                 </View>
 
                 {product.description ? (
-                  <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left', lineHeight: 20 }}>
+                  <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
                     {product.description}
                   </Text>
                 ) : null}
 
-                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2], borderRadius: 14, borderWidth: 1, borderColor: BORDER_SOFT, backgroundColor: hasCartQty ? colorPalette.successSoft : colorPalette.surfaceSecondary, paddingHorizontal: spacing[2], paddingVertical: spacing[2] }}>
-                  <Text role="bodySm" style={{ flex: 1, color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
+                <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2], borderRadius: radius.md, borderWidth: 1, borderColor: BORDER_SOFT, backgroundColor: hasCartQty ? colorPalette.successSoft : colorPalette.surfaceSecondary, paddingHorizontal: spacing[2], paddingVertical: spacing[2] }}>
+                  <Text role="bodySm" weight="bold" style={{ flex: 1, color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>
                     {hasCartQty ? 'موجود في السلة' : 'غير موجود في السلة'}
                   </Text>
-                  <Text role="bodySm" style={{ color: hasCartQty ? colorPalette.success : TEXT_SECONDARY, fontWeight: '700' }}>
+                  <Text role="bodySm" weight="bold" style={{ color: hasCartQty ? colorPalette.success : TEXT_SECONDARY }}>
                     {hasCartQty ? `× ${cartQty}` : '0'}
                   </Text>
                 </View>
 
                 {feedback ? (
-                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], borderRadius: 14, borderWidth: 1, borderColor: feedback.tone === 'success' ? colorPalette.success : BORDER_SOFT, backgroundColor: feedback.tone === 'success' ? colorPalette.successSoft : colorPalette.brandSoft, paddingHorizontal: spacing[2], paddingVertical: spacing[2] }}>
+                  <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], borderRadius: radius.md, borderWidth: 1, borderColor: feedback.tone === 'success' ? colorPalette.success : BORDER_SOFT, backgroundColor: feedback.tone === 'success' ? colorPalette.successSoft : colorPalette.brandSoft, paddingHorizontal: spacing[2], paddingVertical: spacing[2] }}>
                     <Icon name={feedback.tone === 'success' ? 'checkmark-circle-outline' : 'information-circle-outline'} size={14} color={feedback.tone === 'success' ? colorPalette.success : ACCENT_BLUE} />
-                    <Text role="caption" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: isRTL ? 'right' : 'left' }}>
+                    <Text role="caption" weight="bold" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>
                       {feedback.message}
                     </Text>
                   </View>
@@ -719,14 +699,14 @@ function ProductPreviewModal({
                     tone="brand"
                     fullWidth={false}
                     onPress={onPrimaryAction}
-                    style={{ flex: 1, minHeight: 48, borderRadius: 16, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY }}
+                    style={{ flex: 1, minHeight: 48, borderRadius: radius.md2, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY }}
                   />
                   <Button
                     label="إغلاق"
                     tone="secondary"
                     fullWidth={false}
                     onPress={onClose}
-                    style={{ flex: 1, minHeight: 48, borderRadius: 16 }}
+                    style={{ flex: 1, minHeight: 48, borderRadius: radius.md2 }}
                   />
                 </View>
               </View>
@@ -762,18 +742,17 @@ function CartItemRow({ item, index, onChangeQty, onRemove }: CartItemRowProps) {
         backgroundColor: colorPalette.surfacePrimary,
         borderWidth: 1,
         borderColor: BORDER_SOFT,
-        borderRadius: 16,
+        borderRadius: radius.md2,
         padding: spacing[3],
-        gap: spacing[2],
-      }}
+        gap: spacing[2] }}
     >
       {/* Product Name & Unit Price */}
-      <View style={{ flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start', gap: 4, paddingLeft: isRTL ? 0 : spacing[1], paddingRight: isRTL ? spacing[1] : 0 }}>
+      <View style={{ flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start', gap: spacing[1], paddingLeft: isRTL ? 0 : spacing[1], paddingRight: isRTL ? spacing[1] : 0 }}>
         <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }} numberOfLines={2}>
           {displayIndex}{item.title}
         </Text>
         <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>
-          سعر الوحدة: {formatAmount(price)}
+          سعر الوحدة: {formatDshPrice(price)}
         </Text>
       </View>
 
@@ -784,7 +763,7 @@ function CartItemRow({ item, index, onChangeQty, onRemove }: CartItemRowProps) {
           flexDirection: isRTL ? 'row-reverse' : 'row',
           alignItems: 'center',
           backgroundColor: SURFACE_SOFT,
-          borderRadius: 12,
+          borderRadius: radius.sm2,
           padding: 2,
           gap: spacing[1]
         }}>
@@ -799,7 +778,7 @@ function CartItemRow({ item, index, onChangeQty, onRemove }: CartItemRowProps) {
                 onChangeQty(item.id, (item.qty ?? 1) - 1);
               }
             }}
-            style={{ minWidth: 28, height: 28, paddingHorizontal: 0, borderRadius: 8 }}
+            style={{ minWidth: 28, height: 28, paddingHorizontal: 0, borderRadius: radius.xs2 }}
           />
           <Text role="bodyStrong" style={{ minWidth: 20, textAlign: 'center', color: TEXT_PRIMARY }}>
             {item.qty ?? 1}
@@ -815,13 +794,13 @@ function CartItemRow({ item, index, onChangeQty, onRemove }: CartItemRowProps) {
                 onChangeQty(item.id, (item.qty ?? 1) + 1);
               }
             }}
-            style={{ minWidth: 28, height: 28, paddingHorizontal: 0, borderRadius: 8 }}
+            style={{ minWidth: 28, height: 28, paddingHorizontal: 0, borderRadius: radius.xs2 }}
           />
         </View>
 
         {/* Subtotal */}
         <Text role="bodyStrong" style={{ color: ACCENT_BLUE, minWidth: 64, textAlign: isRTL ? 'left' : 'right' }}>
-          {formatAmount(subtotal)}
+          {formatDshPrice(subtotal)}
         </Text>
 
         {/* Delete button */}
@@ -829,8 +808,8 @@ function CartItemRow({ item, index, onChangeQty, onRemove }: CartItemRowProps) {
           <Pressable
             onPress={() => onRemove(item.id)}
             style={({ pressed }) => [{
-              padding: 8,
-              borderRadius: 10,
+              padding: spacing[2],
+              borderRadius: radius.sm,
               backgroundColor: DANGER_SOFT,
               minWidth: 32,
               minHeight: 32,
@@ -881,12 +860,12 @@ function CartItemEditor({
       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingBottom: spacing[1] }}>
         <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1] }}>
           <Icon name="cart-outline" size={18} color={TEXT_PRIMARY} />
-          <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, fontWeight: '800', fontSize: 16 }}>
+          <Text role="bodyStrong" weight="black" style={{ color: TEXT_PRIMARY, fontSize: 16 }}>
             مراجعة السلة
           </Text>
           {items.length > 0 && (
-            <View style={{ backgroundColor: SURFACE_SOFT, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 }}>
-              <Text role="caption" style={{ color: TEXT_PRIMARY, fontWeight: '700' }}>
+            <View style={{ backgroundColor: SURFACE_SOFT, borderRadius: radius.xs2, paddingHorizontal: spacing[2], paddingVertical: 2 }}>
+              <Text role="caption" weight="bold" style={{ color: TEXT_PRIMARY }}>
                 {items.length} عناصر
               </Text>
             </View>
@@ -894,8 +873,8 @@ function CartItemEditor({
         </View>
 
         {items.length > 0 && onClearCart && (
-          <Pressable onPress={onClearCart} style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1, paddingVertical: 4, paddingHorizontal: 8 }]}>
-            <Text role="bodyStrong" style={{ color: DANGER, fontSize: 14 }}>
+          <Pressable onPress={onClearCart} style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1, paddingVertical: spacing[1], paddingHorizontal: spacing[2] }]}>
+            <Text role="bodyStrong" style={{ color: DANGER, fontSize: typographyRoles.bodySm.fontSize }}>
               حذف الكل
             </Text>
           </Pressable>
@@ -915,14 +894,13 @@ function CartItemEditor({
             borderStyle: 'dashed',
             borderWidth: 1,
             alignItems: 'center',
-            justifyContent: 'center',
-          }}
+            justifyContent: 'center' }}
         >
           <Icon name="basket-outline" size={32} color={colorPalette.textMuted} />
           <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, textAlign: 'center' }}>
             السلة فارغة الآن
           </Text>
-          <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'center', maxWidth: '80%', lineHeight: 18 }}>
+          <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'center', maxWidth: '80%' }}>
             أضف منتجات من المقترحات أدناه للبدء في تجهيز طلبك.
           </Text>
           {onScrollToRecommendations && (
@@ -932,7 +910,7 @@ function CartItemEditor({
               size="sm"
               fullWidth={false}
               onPress={onScrollToRecommendations}
-              style={{ marginTop: spacing[1], borderRadius: 12 }}
+              style={{ marginTop: spacing[1], borderRadius: radius.sm2 }}
             />
           )}
         </Surface>
@@ -951,33 +929,33 @@ function CartItemEditor({
           </View>
 
           {/* Divider */}
-          <View style={{ height: 1, backgroundColor: BORDER_SOFT, marginVertical: spacing[1] }} />
+          <Divider style={{ marginVertical: spacing[1] }} />
 
           {/* Integrated Live Pricing Summary */}
           <View style={{ gap: spacing[2], paddingHorizontal: spacing[1] }}>
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>إجمالي المنتجات</Text>
-              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{formatAmount(subtotal)}</Text>
+              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{formatDshPrice(subtotal)}</Text>
             </View>
 
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text role="bodySm" style={{ color: TEXT_SECONDARY, textAlign: isRTL ? 'right' : 'left' }}>سعر التوصيل</Text>
-              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{formatAmount(deliveryFee)}</Text>
+              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY }}>{formatDshPrice(deliveryFee)}</Text>
             </View>
 
             {discount > 0 && (
               <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Text role="bodySm" style={{ color: colorPalette.success, textAlign: isRTL ? 'right' : 'left' }}>الخصم (قسيمة: {couponCode})</Text>
-                <Text role="bodyStrong" style={{ color: colorPalette.success }}>-{formatAmount(discount)}</Text>
+                <Text role="bodyStrong" style={{ color: colorPalette.success }}>-{formatDshPrice(discount)}</Text>
               </View>
             )}
 
             {/* Grand Total Divider */}
-            <View style={{ height: 1, backgroundColor: BORDER_SOFT, marginVertical: spacing[1] }} />
+            <Divider style={{ marginVertical: spacing[1] }} />
 
             <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text role="bodyStrong" style={{ color: TEXT_PRIMARY, fontWeight: '800', fontSize: 15, textAlign: isRTL ? 'right' : 'left' }}>الإجمالي النهائي</Text>
-              <Text role="titleMd" style={{ color: ACCENT_BLUE, fontWeight: '900' }}>{formatAmount(grandTotal)}</Text>
+              <Text role="bodyStrong" weight="black" style={{ color: TEXT_PRIMARY, textAlign: isRTL ? 'right' : 'left' }}>الإجمالي النهائي</Text>
+              <Text role="titleMd" weight="black" style={{ color: ACCENT_BLUE }}>{formatDshPrice(grandTotal)}</Text>
             </View>
           </View>
         </>
@@ -1005,12 +983,11 @@ function InlineActionEditor({ meta, value, onChangeValue, onSubmit, onClose, sub
         backgroundColor: colorPalette.surfacePrimary,
         borderWidth: 1,
         borderColor: colorPalette.borderStrong,
-        borderRadius: 14,
-      }}
+        borderRadius: radius.md }}
     >
       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1] }}>
         {meta.icon ? <Icon name={meta.icon} size={15} color={ACCENT_ORANGE} /> : null}
-        <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right', flex: 1 }}>
+        <Text role="bodySm" weight="bold" style={{ color: TEXT_PRIMARY, textAlign: 'right', flex: 1 }}>
           {meta.title}
         </Text>
       </View>
@@ -1177,12 +1154,12 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
   const walletShortfallMinorUnits = Math.max(grandTotalMinorUnits - walletBalance, 0);
   const canUseWalletFull = walletLinked && walletBalance >= grandTotalMinorUnits;
   const canUseMixedPayment = walletLinked && walletBalance > 0 && walletBalance < grandTotalMinorUnits;
-  const formattedSubtotal = formatAmount(subtotalAmount);
-  const formattedDelivery = formatAmount(deliveryAmount);
-  const formattedDiscount = couponDiscount > 0 ? `-${formatAmount(couponDiscount)}` : undefined;
-  const formattedGrandTotal = formatAmount(grandTotalAmount);
-  const formattedWalletBalance = formatAmount(walletBalance / 100);
-  const formattedWalletShortfall = formatMinorUnitsAmount(walletShortfallMinorUnits);
+  const formattedSubtotal = formatDshPrice(subtotalAmount);
+  const formattedDelivery = formatDshPrice(deliveryAmount);
+  const formattedDiscount = couponDiscount > 0 ? `-${formatDshPrice(couponDiscount)}` : undefined;
+  const formattedGrandTotal = formatDshPrice(grandTotalAmount);
+  const formattedWalletBalance = formatDshPrice(walletBalance / 100);
+  const formattedWalletShortfall = formatDshPriceMinorUnits(walletShortfallMinorUnits);
   const canCheckout = totalItemsCount > 0;
   const androidSystemBottomInset = Platform.OS === 'android'
     ? Math.max(safeArea.compact, Dimensions.get('screen').height - Dimensions.get('window').height)
@@ -1310,7 +1287,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
       await topUpWallet(normalizedAmount);
       await refreshWallet();
-      showNotice('تم شحن الرصيد', `تم شحن ${formatMinorUnitsAmount(normalizedAmount)} في المحفظة.`, 'success');
+      showNotice('تم شحن الرصيد', `تم شحن ${formatDshPriceMinorUnits(normalizedAmount)} في المحفظة.`, 'success');
     } catch {
       showNotice('تعذر شحن الرصيد', 'حدث خطأ أثناء تحديث رصيد المحفظة.', 'danger');
     }
@@ -1442,7 +1419,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         walletAmountMinorUnits: walletBalance,
         amountDueOnDeliveryMinorUnits: grandTotalMinorUnits - walletBalance,
         valid: true,
-        summary: `سيُخصم ${formattedWalletBalance} من المحفظة ويُدفع ${formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance)} عند الاستلام.`,
+        summary: `سيُخصم ${formattedWalletBalance} من المحفظة ويُدفع ${formatDshPriceMinorUnits(grandTotalMinorUnits - walletBalance)} عند الاستلام.`,
         feedbackTone: 'info',
       };
     }
@@ -1529,8 +1506,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         statusLabel: paymentMethod === 'cod' ? 'محدد' : 'جاهز الآن',
         statusTone: paymentMethod === 'cod' ? 'brand' : 'info',
         amountRows: [
-          { label: 'من المحفظة', value: formatMinorUnitsAmount(0), tone: 'muted' },
-          { label: 'عند الاستلام', value: formatMinorUnitsAmount(grandTotalMinorUnits), tone: 'brand' },
+          { label: 'من المحفظة', value: formatDshPriceMinorUnits(0), tone: 'muted' },
+          { label: 'عند الاستلام', value: formatDshPriceMinorUnits(grandTotalMinorUnits), tone: 'brand' },
         ],
         helperText: paymentMethod === 'cod' ? 'لا يستخدم رصيد المحفظة.' : undefined,
         helperTone: 'info' as const,
@@ -1546,8 +1523,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         statusTone: paymentMethod === 'wallet' ? 'brand' : walletPending ? 'info' : canUseWalletFull ? 'success' : EXPERIMENTAL_PAYMENT_ENABLED ? 'warning' : !walletLinked || walletBalance <= 0 ? 'warning' : 'warning',
         amountRows: canUseWalletFull
           ? [
-              { label: 'من المحفظة', value: formatMinorUnitsAmount(grandTotalMinorUnits), tone: 'brand' },
-              { label: 'عند الاستلام', value: formatMinorUnitsAmount(0), tone: 'muted' },
+              { label: 'من المحفظة', value: formatDshPriceMinorUnits(grandTotalMinorUnits), tone: 'brand' },
+              { label: 'عند الاستلام', value: formatDshPriceMinorUnits(0), tone: 'muted' },
             ]
           : walletLinked
             ? [
@@ -1591,14 +1568,14 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         amountRows: canUseMixedPayment
           ? [
               { label: 'من المحفظة', value: formattedWalletBalance, tone: 'brand' },
-              { label: 'عند الاستلام', value: formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance), tone: 'brand' },
+              { label: 'عند الاستلام', value: formatDshPriceMinorUnits(grandTotalMinorUnits - walletBalance), tone: 'brand' },
             ]
           : [
-              { label: 'من المحفظة', value: walletLinked ? formattedWalletBalance : formatMinorUnitsAmount(0), tone: 'muted' },
+              { label: 'من المحفظة', value: walletLinked ? formattedWalletBalance : formatDshPriceMinorUnits(0), tone: 'muted' },
               { label: 'عند الاستلام', value: formattedGrandTotal, tone: 'brand' },
             ],
         helperText: canUseMixedPayment
-          ? `من المحفظة ${formattedWalletBalance}، وعند الاستلام ${formatMinorUnitsAmount(grandTotalMinorUnits - walletBalance)}.`
+          ? `من المحفظة ${formattedWalletBalance}، وعند الاستلام ${formatDshPriceMinorUnits(grandTotalMinorUnits - walletBalance)}.`
           : walletPending
             ? 'جاري التحقق من رصيد المحفظة...'
           : !walletLinked
@@ -1669,8 +1646,8 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       { label: 'إجمالي المنتجات', value: formattedSubtotal },
       { label: 'رسوم التوصيل', value: formattedDelivery },
       { label: 'طريقة الدفع', value: paymentMethodLabel, helper: paymentSelection.summary },
-      { label: 'من المحفظة', value: formatMinorUnitsAmount(paymentSelection.walletAmountMinorUnits) },
-      { label: 'عند الاستلام', value: formatMinorUnitsAmount(paymentSelection.amountDueOnDeliveryMinorUnits) },
+      { label: 'من المحفظة', value: formatDshPriceMinorUnits(paymentSelection.walletAmountMinorUnits) },
+      { label: 'عند الاستلام', value: formatDshPriceMinorUnits(paymentSelection.amountDueOnDeliveryMinorUnits) },
       { label: 'خيار التوصيل', value: fulfillmentModeMeta.label },
       { label: locationTitle, value: locationSubtitle },
       { label: 'وقت التنفيذ', value: executionTimingSummary },
@@ -2023,7 +2000,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
         variant="secondary"
         title="تأكيد الطلب"
         titleSlot={(
-          <Text style={{ color: TEXT_PRIMARY, fontSize: 17, fontWeight: '900', lineHeight: 20, maxWidth: '100%', flexShrink: 1, minWidth: 0, textAlign: 'center' }} numberOfLines={1}>
+          <Text role="titleSm" weight="black" style={{ color: TEXT_PRIMARY, maxWidth: '100%', flexShrink: 1, minWidth: 0, textAlign: 'center' }} numberOfLines={1}>
             تأكيد الطلب
           </Text>
         )}
@@ -2039,16 +2016,15 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               backgroundColor: colorPalette.warningSoft,
               borderWidth: 1,
               borderColor: colorPalette.warning,
-              borderRadius: 16,
+              borderRadius: radius.md2,
               paddingHorizontal: spacing[2],
               paddingVertical: spacing[2],
               flexDirection: isRTL ? 'row-reverse' : 'row',
               alignItems: 'center',
-              gap: spacing[2],
-            }}
+              gap: spacing[2] }}
           >
             <Icon name="alert-circle-outline" size={20} color={colorPalette.warningStrong} />
-            <Text role="bodySm" style={{ color: colorPalette.warningStrong, textAlign: isRTL ? 'right' : 'left', flex: 1, fontWeight: '700', lineHeight: 18 }}>
+            <Text role="bodySm" weight="bold" style={{ color: colorPalette.warningStrong, textAlign: isRTL ? 'right' : 'left', flex: 1 }}>
               {props.reorderAlertMessage}
             </Text>
           </Surface>
@@ -2059,11 +2035,11 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           tone="inset"
           padding={2}
           gap={1}
-          style={{ backgroundColor: colorPalette.surfaceSecondary, borderRadius: 16, borderWidth: 1, borderColor: BORDER_SOFT }}
+          style={{ backgroundColor: colorPalette.surfaceSecondary, borderRadius: radius.md2, borderWidth: 1, borderColor: BORDER_SOFT }}
         >
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
             <View style={{ flex: 1, gap: spacing[1], alignItems: 'flex-end' }}>
-              <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+              <Text role="bodySm" weight="bold" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>
                 سياسة تأكيد الطلب
               </Text>
               <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
@@ -2073,19 +2049,19 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                 {`الأثر المالي والتسويات المرجعية يتبعان ${resolveDshControlPanelSectionLabel('finance')} وWLT، بينما السياسة التشغيلية المركزية تتبع ${resolveDshControlPanelSectionLabel('platform')}.`}
               </Text>
             </View>
-            <Text role="caption" style={{ color: ACCENT_ORANGE, fontWeight: '800', textAlign: 'right' }}>
-              {resolveCheckoutPolicyLabel(checkoutFlowPolicy)}
+            <Text role="caption" weight="black" style={{ color: ACCENT_ORANGE, textAlign: 'right' }}>
+              {resolveDshOnDemandPolicyLabel(checkoutFlowPolicy)}
             </Text>
           </View>
         </Surface>
 
-        <Surface tone="default" gap={0} style={{ backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: 16, overflow: 'hidden' }}>
+        <Surface tone="default" gap={0} style={{ backgroundColor: colorPalette.surfacePrimary, borderWidth: 1, borderColor: BORDER_SOFT, borderRadius: radius.md2, overflow: 'hidden' }}>
           <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[3], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'flex-start', gap: spacing[2], flex: 1 }}>
                 <Icon name={fulfillmentModeMeta.icon} size={18} color={TEXT_PRIMARY} style={{ marginTop: 2, flexShrink: 0 }} />
                 <View style={{ flex: 1, gap: spacing[1], alignItems: 'flex-end' }}>
-                  <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+                  <Text role="bodySm" weight="bold" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>
                     خيار التوصيل
                   </Text>
                   <Text role="caption" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>
@@ -2118,16 +2094,15 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
                         borderWidth: 1,
                         borderColor: isSelected ? SURFACE_WARM_BORDER : BORDER_SOFT,
                         backgroundColor: isSelected ? SURFACE_WARM : colorPalette.surfacePrimary,
-                        borderRadius: 16,
+                        borderRadius: radius.md2,
                         paddingHorizontal: spacing[2],
-                        paddingVertical: spacing[2],
-                      }}
+                        paddingVertical: spacing[2] }}
                     >
                       <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
                         <Icon name={option.icon} size={18} color={isSelected ? ACCENT_ORANGE : TEXT_PRIMARY} style={{ flexShrink: 0 }} />
                         <View style={{ flex: 1, gap: spacing[1], alignItems: 'flex-end' }}>
                           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1] }}>
-                            <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+                            <Text role="bodySm" weight="bold" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>
                               {option.label}
                             </Text>
                             {isSelected && (
@@ -2170,7 +2145,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           <View style={{ paddingHorizontal: spacing[3], paddingVertical: spacing[3], borderBottomWidth: 1, borderColor: BORDER_SOFT }}>
             <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
               <View style={{ flex: 1, gap: spacing[1], alignItems: 'flex-end' }}>
-                <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', textAlign: 'right' }}>
+                <Text role="bodySm" weight="bold" style={{ color: TEXT_PRIMARY, textAlign: 'right' }}>
                   {locationTitle}
                 </Text>
                 <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
@@ -2285,10 +2260,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
         <View style={{ gap: spacing[2] }}>
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2], paddingHorizontal: spacing[1] }}>
-            <Text role="bodySm" style={{ color: TEXT_PRIMARY, fontWeight: '700', flex: 1, textAlign: 'right' }}>قرار الدفع</Text>
+            <Text role="bodySm" weight="bold" style={{ color: TEXT_PRIMARY, flex: 1, textAlign: 'right' }}>قرار الدفع</Text>
             {EXPERIMENTAL_PAYMENT_ENABLED ? (
-              <View style={{ backgroundColor: colorPalette.warningSoft, borderRadius: 8, paddingHorizontal: spacing[2], paddingVertical: 2 }}>
-                <Text role="caption" style={{ color: colorPalette.warning, fontWeight: '700' }}>تجريبي</Text>
+              <View style={{ backgroundColor: colorPalette.warningSoft, borderRadius: radius.xs2, paddingHorizontal: spacing[2], paddingVertical: 2 }}>
+                <Text role="caption" weight="bold" style={{ color: colorPalette.warning }}>تجريبي</Text>
               </View>
             ) : null}
           </View>
@@ -2334,8 +2309,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
           borderTopWidth: 1,
           borderColor: BORDER_SOFT,
           zIndex: 5,
-           ...shadowPresets.overlay,
-        }}
+           ...shadowPresets.overlay }}
       >
         {!canCheckout ? (
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[1], paddingBottom: spacing[1] }}>
@@ -2354,7 +2328,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             disabled={isOrderSubmitted || !canCheckout || checkoutLoading}
             loading={checkoutLoading}
             onPress={handleCheckoutPress}
-            style={{ flex: 2, minHeight: 52, borderRadius: 18, opacity: isOrderSubmitted ? 0.6 : 1 }}
+            style={{ flex: 2, minHeight: 52, borderRadius: radius.lg, opacity: isOrderSubmitted ? 0.6 : 1 }}
           />
           <Button
             label={isOrderSubmitted ? 'طلب تعديل عبر العمليات' : 'تعديل'}
@@ -2363,7 +2337,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             fullWidth={false}
             disabled={!canEditOrder}
             onPress={isOrderSubmitted ? undefined : handleEditPress}
-            style={{ flex: 1, minHeight: 52, borderRadius: 18 }}
+            style={{ flex: 1, minHeight: 52, borderRadius: radius.lg }}
           />
         </View>
       </View>
@@ -2377,7 +2351,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
             راجع كل تفاصيل الطلب قبل تأكيد التنفيذ النهائي.
           </Text>
           <Text role="caption" style={{ color: TEXT_SECONDARY, textAlign: 'right' }}>
-            {`هذا هو مسار التفاصيل المعتمد من السجل المركزي: ${resolveCheckoutPolicyLabel(checkoutFlowPolicy)}.`}
+            {`هذا هو مسار التفاصيل المعتمد من السجل المركزي: ${resolveDshOnDemandPolicyLabel(checkoutFlowPolicy)}.`}
           </Text>
           <SummaryCard
             items={checkoutReviewItems}
@@ -2394,7 +2368,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               disabled={checkoutLoading}
               loading={checkoutLoading}
               onPress={confirmCheckoutReview}
-              style={{ flex: 1, minHeight: 50, borderRadius: 16, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY }}
+              style={{ flex: 1, minHeight: 50, borderRadius: radius.md2, backgroundColor: CTA_PRIMARY, borderColor: CTA_PRIMARY }}
             />
             <Button
               label="رجوع للتعديل"
@@ -2402,7 +2376,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
               fullWidth={false}
               disabled={checkoutLoading}
               onPress={() => setCheckoutReviewVisible(false)}
-              style={{ flex: 1, minHeight: 50, borderRadius: 16 }}
+              style={{ flex: 1, minHeight: 50, borderRadius: radius.md2 }}
             />
           </View>
         </ScrollView>

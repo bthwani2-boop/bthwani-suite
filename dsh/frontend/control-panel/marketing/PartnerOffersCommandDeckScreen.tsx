@@ -1,7 +1,9 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
-import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, KeyValueList, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, KeyValueList, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getPartnerOfferItems,
@@ -334,7 +336,7 @@ export function PartnerOffersCommandDeckScreen() {
 
     return (
       <Surface tone="inset" padding={4} gap={3}>
-        <Text role="caption" style={{ fontWeight: '800' }}>محاكاة بطاقة المتجر</Text>
+        <Text role="caption" weight="black" style={{ }}>محاكاة بطاقة المتجر</Text>
         <CommercialParityPreview features={features} storeName={draft.storeLabel || draft.partnerName} />
       </Surface>
     );
@@ -432,9 +434,9 @@ export function PartnerOffersCommandDeckScreen() {
           { label: 'منشور', value: kpis.published, color: theme.success },
           { label: 'مرفوض', value: kpis.rejected, color: theme.textMuted },
         ].map(k => (
-          <Surface key={k.label} tone="raised" padding={3} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 120, borderRadius: 10, borderStartWidth: 3, borderStartColor: k.color }}>
-            <Text role="caption" style={{ fontWeight: 800, color: theme.textMuted }}>{k.label}</Text>
-            <Text role="titleSm" style={{ fontWeight: 900, color: k.color, marginTop: 4, fontSize: 18 }}>{k.value}</Text>
+          <Surface key={k.label} tone="raised" padding={3} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 120, borderRadius: radius.sm, borderStartWidth: 3, borderStartColor: k.color }}>
+            <Text role="caption" weight="black" style={{ color: theme.textMuted }}>{k.label}</Text>
+            <Text role="titleSm" weight="black" style={{ color: k.color, marginTop: 4,}}>{k.value}</Text>
           </Surface>
         ))}
       </Box>

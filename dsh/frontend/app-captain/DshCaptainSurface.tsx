@@ -16,7 +16,10 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { Badge, borders, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, shadowPresets, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha } from '@bthwani/ui-kit';
+import { Badge, borders, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, shadowPresets, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha,
+  radius,
+  spacing,
+} from '@bthwani/ui-kit';
 import type { DshCaptainBellEvent } from '../shared/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy } from '../../../wlt/frontend/dsh/app-captain/wlt-dsh-captain.ui-copy';
@@ -346,10 +349,10 @@ function CaptainAccountNavRow({
       style={({ pressed }) => ({
         flexDirection: 'row-reverse',
         alignItems: 'center',
-        paddingHorizontal: 12,
-        paddingVertical: 12,
+        paddingHorizontal: spacing[3],
+        paddingVertical: spacing[3],
         backgroundColor: pressed ? theme.surfaceInset : 'transparent',
-        gap: 12,
+        gap: spacing[3],
         borderBottomWidth: 1,
         borderBottomColor: theme.line + '22',
       })}
@@ -358,7 +361,7 @@ function CaptainAccountNavRow({
         style={{
           flexDirection: 'row-reverse',
           alignItems: 'center',
-          gap: 12,
+          gap: spacing[3],
           flex: 1,
           minWidth: 0,
         }}
@@ -367,7 +370,7 @@ function CaptainAccountNavRow({
           style={{
             width: 44,
             height: 44,
-            borderRadius: 14,
+            borderRadius: radius.md,
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: theme.brandSurface,
@@ -919,7 +922,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           subtitle={subtitle}
         />
         <Box style={{ flex: 1, paddingBottom: showCaptainBottomNav ? 80 : 0 }}>
-          <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 32 }}>
+          <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: spacing[8] }}>
             <Box padding={4} gap={4}>
               {content}
             </Box>
@@ -1155,17 +1158,17 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           flexDirection: rowDirection,
           alignItems: 'center',
           justifyContent: 'space-between',
-          paddingHorizontal: 16,
+          paddingHorizontal: spacing[4],
           paddingVertical: 14,
           backgroundColor: theme.surface,
         }}
       >
-        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[3], flexShrink: 1, minWidth: 0 }}>
           <View
             style={{
               width: 36,
               height: 36,
-              borderRadius: 10,
+              borderRadius: radius.sm,
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: theme.surfaceInset,
@@ -1189,36 +1192,36 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           style={{
             flexDirection: rowDirection,
             backgroundColor: theme.surfaceInset,
-            borderRadius: 12,
+            borderRadius: radius.sm2,
             padding: 3,
             borderWidth: borders.hairline,
             borderColor: theme.line,
-            gap: 4,
+            gap: spacing[1],
           }}
         >
           <Pressable
             onPress={() => setAppearanceMode('lightPremium')}
             style={{
-              paddingHorizontal: 12,
+              paddingHorizontal: spacing[3],
               paddingVertical: 6,
               borderRadius: 9,
               backgroundColor: appearanceMode === 'lightPremium' ? theme.brand : 'transparent',
             }}
           >
-            <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text }}>
+            <Text role="bodyStrong" style={{ color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text }}>
               فاتح
             </Text>
           </Pressable>
           <Pressable
             onPress={() => setAppearanceMode('darkGlass')}
             style={{
-              paddingHorizontal: 12,
+              paddingHorizontal: spacing[3],
               paddingVertical: 6,
               borderRadius: 9,
               backgroundColor: appearanceMode === 'darkGlass' ? theme.brand : 'transparent',
             }}
           >
-            <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text }}>
+            <Text role="bodyStrong" style={{ color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text }}>
               داكن
             </Text>
           </Pressable>
@@ -1233,19 +1236,19 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           flexDirection: rowDirection,
           alignItems: 'center',
           justifyContent: 'space-between',
-          paddingHorizontal: 16,
+          paddingHorizontal: spacing[4],
           paddingVertical: 14,
           backgroundColor: theme.surface,
           borderTopWidth: 1,
           borderTopColor: theme.line,
         }}
       >
-        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+        <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[3], flexShrink: 1, minWidth: 0 }}>
           <View
             style={{
               width: 36,
               height: 36,
-              borderRadius: 10,
+              borderRadius: radius.sm,
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: theme.surfaceInset,
@@ -1837,10 +1840,10 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
       <Surface tone="inset" padding={0} gap={0} radiusToken="xl" style={{ flex: 1, overflow: 'hidden', borderColor: theme.lineStrong }}>
         <Box style={{ flex: 1, backgroundColor: theme.surfaceSecondary, overflow: 'hidden' }}>
           <Box style={{ position: 'absolute', inset: 0, backgroundColor: withAlpha(colorPalette.white, 0.12) }} />
-          <Box style={{ position: 'absolute', top: 78, left: 40, width: 7, height: 222, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.10) }} />
-          <Box style={{ position: 'absolute', top: 136, left: 40, right: 74, height: 7, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.08) }} />
-          <Box style={{ position: 'absolute', top: 214, right: 58, width: 148, height: 7, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.08), transform: [{ rotate: '-18deg' }] }} />
-          <Box style={{ position: 'absolute', bottom: 122, left: 92, right: 42, height: 7, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.06), transform: [{ rotate: '14deg' }] }} />
+          <Box style={{ position: 'absolute', top: 78, left: 40, width: 7, height: 222, borderRadius: radius.pill, backgroundColor: withAlpha(colorPalette.brandStrong, 0.10) }} />
+          <Box style={{ position: 'absolute', top: 136, left: 40, right: 74, height: 7, borderRadius: radius.pill, backgroundColor: withAlpha(colorPalette.brandStrong, 0.08) }} />
+          <Box style={{ position: 'absolute', top: 214, right: 58, width: 148, height: 7, borderRadius: radius.pill, backgroundColor: withAlpha(colorPalette.brandStrong, 0.08), transform: [{ rotate: '-18deg' }] }} />
+          <Box style={{ position: 'absolute', bottom: 122, left: 92, right: 42, height: 7, borderRadius: radius.pill, backgroundColor: withAlpha(colorPalette.brandStrong, 0.06), transform: [{ rotate: '14deg' }] }} />
 
           {demandHeatZones.map((zone) => (
             <Box
@@ -1926,13 +1929,13 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
 
                 <Box layoutDirection="row" align="center" gap={1} paddingX={1} paddingY={1} radiusToken="pill" background="surfaceRaised" border borderTone="line">
                   <Box layoutDirection="row" align="center" gap={1}>
-                    <Box style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brand, 0.95) }} />
+                    <Box style={{ width: 8, height: 8, borderRadius: radius.pill, backgroundColor: withAlpha(colorPalette.brand, 0.95) }} />
                     <Text role="caption" tone="muted" weight="semibold" numberOfLines={1}>
                       فرص طلبات
                     </Text>
                   </Box>
                   <Box layoutDirection="row" align="center" gap={1}>
-                    <Box style={{ width: 8, height: 8, borderRadius: 999, backgroundColor: withAlpha(colorPalette.brandStrong, 0.95) }} />
+                    <Box style={{ width: 8, height: 8, borderRadius: radius.pill, backgroundColor: withAlpha(colorPalette.brandStrong, 0.95) }} />
                     <Text role="caption" tone="muted" weight="semibold" numberOfLines={1}>
                       تجمع كباتن
                     </Text>
@@ -2176,7 +2179,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
           />
         )}
         <View style={{ flex: 1, paddingBottom: showCaptainBottomNav ? 80 : 0 }}>
-          <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 32 }}>
+          <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: spacing[8] }}>
             <Box padding={4} gap={4}>
               {content}
             </Box>
@@ -2220,5 +2223,4 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
   );
 }
 
-export { DshCaptainSurface as DshSurfaceHost };
 export default DshCaptainSurface;

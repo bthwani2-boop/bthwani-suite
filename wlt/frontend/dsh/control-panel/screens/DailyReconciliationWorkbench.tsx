@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Box, Text, Button } from '@bthwani/ui-kit';
+import { Box, Text, Button,
+  radius,
+} from '@bthwani/ui-kit';
 import { getAdaptedFinanceControlPanelRows, type DshFinancePreviewRow } from '../adapters/dshFinanceFixture.adapter';
 import { formatWltYer } from '../financeContracts';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
@@ -286,7 +288,7 @@ export function DailyReconciliationWorkbench() {
               onPress={() => setShowCloseSimPreview((v) => !v)}
             />
           ) : (
-            <span style={{ fontSize: 11, color: 'var(--bth-danger-text)', fontWeight: '700', background: 'var(--bth-danger-surface)', padding: '6px 12px', borderRadius: 6 }}>
+            <span style={{ fontSize: 11, color: 'var(--bth-danger-text)', fontWeight: '700', background: 'var(--bth-danger-surface)', padding: '6px 12px', borderRadius: radius.xs }}>
               🔒 ترحيل الإغلاق معلق
             </span>
           )}
@@ -312,7 +314,7 @@ export function DailyReconciliationWorkbench() {
 
       <Box gap={2}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: 4 }}>
-          <Text role="titleSm" style={{ fontWeight: '800', margin: 0 }}>ميزان مطابقة البنود والقيود اليومية ({allRows.length} قيد)</Text>
+          <Text role="titleSm" weight="black" style={{ margin: 0 }}>ميزان مطابقة البنود والقيود اليومية ({allRows.length} قيد)</Text>
           <button
             onClick={() => {
               const surfaces = getAdaptedFinanceControlPanelRows();
@@ -338,7 +340,7 @@ export function DailyReconciliationWorkbench() {
             style={{
               background: 'transparent',
               border: '1px solid var(--bthwani-control-panel-border)',
-              borderRadius: 6,
+              borderRadius: radius.xs,
               padding: '4px 10px',
               fontSize: 11,
               cursor: 'pointer',
@@ -365,7 +367,7 @@ export function DailyReconciliationWorkbench() {
                   background: 'var(--bthwani-control-panel-surface)',
                   border: '1px solid var(--bthwani-control-panel-border)',
                   borderRight: `4px solid ${toneColor}`,
-                  borderRadius: 10,
+                  borderRadius: radius.sm,
                   overflow: 'hidden',
                 }}
               >
@@ -480,7 +482,7 @@ export function DailyReconciliationWorkbench() {
                                 width: '100%',
                                 background: 'var(--bth-warning-surface)',
                                 border: '1px solid var(--bth-warning-text)',
-                                borderRadius: 6,
+                                borderRadius: radius.xs,
                                 padding: '6px 10px',
                                 fontSize: 10,
                                 cursor: 'pointer',
@@ -520,7 +522,7 @@ export function DailyReconciliationWorkbench() {
                             <div style={{
                               background: 'var(--bthwani-control-panel-surface)',
                               border: '1px solid var(--bthwani-control-panel-border)',
-                              borderRadius: 6,
+                              borderRadius: radius.xs,
                               padding: '6px 10px',
                               display: 'flex',
                               alignItems: 'center',
@@ -556,7 +558,7 @@ export function DailyReconciliationWorkbench() {
                             <div style={{
                               background: 'var(--bth-danger-surface)',
                               border: '1px dashed var(--bth-danger-text)',
-                              borderRadius: 6,
+                              borderRadius: radius.xs,
                               padding: 8,
                               textAlign: 'center',
                               color: 'var(--bth-danger-text)',
@@ -825,7 +827,7 @@ export function DailyReconciliationWorkbench() {
         ].map(({ label, value, color }) => (
           <div key={label} className={wltStyles.reconciliationSummaryCard}>
             <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{label}</Text>
-            <Text role="bodyStrong" style={{ textAlign: 'right', fontWeight: '800', color, fontSize: 14 }}>
+            <Text role="bodyStrong" weight="black" style={{ textAlign: 'right', color, fontSize: 14 }}>
               <span className={wltStyles.tabularNums}>{value}</span>
             </Text>
           </div>

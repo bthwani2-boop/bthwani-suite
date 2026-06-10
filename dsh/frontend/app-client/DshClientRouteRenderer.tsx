@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Platform } from 'react-native';
-import { Text, colorPalette } from '@bthwani/ui-kit';
+import { Text, colorPalette,
+  spacing,
+} from '@bthwani/ui-kit';
 
 import { DshEntryScreen } from './screens/EntryScreen';
 import { DshClientBellScreen } from './screens/BellScreen';
@@ -248,8 +250,8 @@ export function DshClientRouteRenderer({
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
   if (missing.length > 0) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <Text style={{ color: colorPalette.brandStrong, fontSize: 18, fontWeight: '700', marginBottom: 12 }}>مكوّنات مفقودة</Text>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing[6] }}>
+        <Text role="headingSm" weight="bold" style={{ color: colorPalette.brandStrong, marginBottom: spacing[3] }}>مكوّنات مفقودة</Text>
         <Text style={{ color: colorPalette.brandStrong }}>{missing.join(', ')}</Text>
       </View>
     );

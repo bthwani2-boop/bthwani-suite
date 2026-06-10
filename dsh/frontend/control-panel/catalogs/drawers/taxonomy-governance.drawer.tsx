@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 /**
  * CatalogTaxonomyGovernanceWorkspace — UI_PREVIEW_ONLY
@@ -17,7 +17,9 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import type { CatalogPreviewProposal } from '../catalogs.model';
 import { type ActionResult, WorkspacePreviewNotice, WorkspaceSuccessBanner } from '../catalogs.parts';
 import { dshCatalogCategories } from '../catalogs.data';
@@ -109,7 +111,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
     >
       {/* Header */}
       <Box layoutDirection="row" justify="space-between" align="center">
-        <Text role="titleLg" style={{ fontWeight: '800', fontSize: 18, color: theme.brandHeaderBackground }}>
+        <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
           🗂 حوكمة التصنيف والفئات
         </Text>
         <Button label="✕ إغلاق" tone="secondary" size="sm" onPress={onClose} />
@@ -123,7 +125,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
 
       {/* Category tree selector */}
       <Box gap={2}>
-        <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+        <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
           اختر الفئة للمراجعة
         </Text>
 
@@ -164,8 +166,8 @@ export function CatalogTaxonomyGovernanceWorkspace({
                 >
                   <Text
                     role="caption"
+                    weight={selectedCatId === cat.id ? 'black' : 'semibold'}
                     style={{
-                      fontWeight: selectedCatId === cat.id ? '800' : '600',
                       color: selectedCatId === cat.id ? theme.brandHeaderBackground : theme.text,
                     }}
                   >
@@ -189,14 +191,14 @@ export function CatalogTaxonomyGovernanceWorkspace({
                       style={{
                         background: selectedSubId === sub.id ? theme.surfaceInset : 'transparent',
                         border: `1px solid ${selectedSubId === sub.id ? theme.brand : 'transparent'}`,
-                        borderRadius: 6,
+                        borderRadius: radius.xs,
                         cursor: 'pointer',
                         padding: '4px 8px',
                         textAlign: 'right',
                         width: '100%',
                       }}
                     >
-                      <Text role="caption" style={{ color: theme.text, fontSize: 12 }}>
+                      <Text role="caption" style={{ color: theme.text,}}>
                         └ {sub.label}
                       </Text>
                       {sub.mainClassifications && sub.mainClassifications.length > 0 && (
@@ -226,10 +228,10 @@ export function CatalogTaxonomyGovernanceWorkspace({
               borderStyle: 'solid',
             }}
           >
-            <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+            <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
               📌 الفئة المختارة
             </Text>
-            <Text role="bodyMd" style={{ fontWeight: '700', color: theme.text }}>
+            <Text role="bodyMd" weight="bold" style={{ color: theme.text }}>
               {selectedCat?.emojiFallback} {selectedCat?.label}
               {selectedSub ? ` > ${selectedSub.label}` : ''}
             </Text>
@@ -244,9 +246,9 @@ export function CatalogTaxonomyGovernanceWorkspace({
             <Surface
               tone="inset"
               padding={2}
-              style={{ borderRadius: 6, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
+              style={{ borderRadius: radius.xs, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
             >
-              <Text role="caption" style={{ color: theme.warning, fontWeight: '600', fontSize: 11 }}>
+              <Text role="caption" weight="semibold" style={{ color: theme.warning, fontSize: 11 }}>
                 ⚠️ لم تختر فئة فرعية — يُفضَّل اختيار فئة فرعية لاتخاذ إجراء دقيق
               </Text>
             </Surface>
@@ -254,7 +256,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
 
           {/* Actions */}
           <Box gap={2}>
-            <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+            <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
               الإجراءات المتاحة
             </Text>
 

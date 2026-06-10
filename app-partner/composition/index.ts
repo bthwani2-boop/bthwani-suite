@@ -24,5 +24,5 @@ export function useServiceLabels() {
 	return appPartnerServiceLabels;
 }
 
-export { DshPartnerSurface, DshPartnerSurface as DshSurfaceHost };
+export { DshPartnerSurface };
 export type { DshPartnerSurfaceProps };

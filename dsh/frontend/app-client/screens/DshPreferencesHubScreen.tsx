@@ -16,6 +16,7 @@ import {
   Switch,
   ActionStrip,
   Divider,
+  radius,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshMySpaceSubScreenProps } from './DshWalletHubScreen';
@@ -120,7 +121,7 @@ export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: Ds
               backgroundColor: statusTone === 'success' ? colorPalette.successSoft : colorPalette.dangerSoft,
               borderColor: statusTone === 'success' ? colorPalette.successSoft : colorPalette.dangerSoft,
               borderWidth: 1,
-              borderRadius: 12,
+              borderRadius: radius.sm2,
             }}
           >
             <Box align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
@@ -131,9 +132,9 @@ export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: Ds
               />
               <Text
                 role="bodySm"
+                weight="bold"
                 style={{
                   color: statusTone === 'success' ? colorPalette.successStrong : colorPalette.dangerStrong,
-                  fontWeight: 'bold',
                   flex: 1,
                   textAlign: 'right',
                 }}
@@ -185,7 +186,7 @@ export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: Ds
                         paddingVertical: 6,
                         paddingHorizontal: spacing[3],
                         backgroundColor: theme.fieldBackground,
-                        borderRadius: 20,
+                        borderRadius: radius.lg2,
                         borderWidth: 1,
                         borderColor: theme.line,
                       }}

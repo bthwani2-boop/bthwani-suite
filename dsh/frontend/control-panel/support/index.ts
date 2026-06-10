@@ -17,7 +17,11 @@ export {
   SUPPORT_PRIMARY_TABS,
   SUPPORT_SECONDARY_TABS,
   SUPPORT_TAB_WORKSPACE_MAP,
+  SUPPORT_VERIFICATION_STATUS_META,
+  SUPPORT_TICKET_STATUS_META,
   type SupportSubTabItem,
   type SupportTab,
   type SupportTabItem,
+  type SupportTone,
+  type SupportVerificationStatus,
 } from './support.types';

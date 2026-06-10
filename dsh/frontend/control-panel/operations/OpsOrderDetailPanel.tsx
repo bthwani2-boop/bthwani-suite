@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 // OpsOrderDetailPanel — approval queue detail view for the control-panel operations hub.
 // Data ownership:
@@ -198,8 +198,8 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
                       </div>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--bthwani-control-panel-border)', paddingTop: '4px' }}>
-                      <Text family="mono" style={{ fontSize: 10, fontWeight: '800' }}>الإجمالي</Text>
-                      <Text family="mono" style={{ fontSize: 10, fontWeight: '800' }}>6,000 ر.ي</Text>
+                      <Text family="mono" weight="black" style={{ fontSize: 10 }}>الإجمالي</Text>
+                      <Text family="mono" weight="black" style={{ fontSize: 10 }}>6,000 ر.ي</Text>
                     </div>
                   </div>
                 </div>

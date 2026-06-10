@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Animated, Platform, View } from 'react-native';
-import { BThwaniFilterRail, Text } from '@bthwani/ui-kit';
+import { BThwaniFilterRail, Text,
+  spacing,
+} from '@bthwani/ui-kit';
 
 export const StoreFilterRailSection = React.memo(function StoreFilterRailSection({
   categoryRailItems,
@@ -39,8 +41,8 @@ export const StoreFilterRailSection = React.memo(function StoreFilterRailSection
         pointerEvents="box-none"
       >
         <View style={styles.stickyCategoriesContent}>
-          <View style={[styles.sectionHeader, { paddingHorizontal: 16, marginBottom: 8 }]}>
-            <Text style={[styles.sectionTitle, { color: appearanceChrome.primaryText, fontSize: 16 }]}>قائمة الأصناف</Text>
+          <View style={[styles.sectionHeader, { paddingHorizontal: spacing[4], marginBottom: spacing[2] }]}>
+            <Text role="labelLg" weight="black" style={[styles.sectionTitle, { color: appearanceChrome.primaryText }]}>قائمة الأصناف</Text>
           </View>
           <View style={styles.sectionBlock}>
             <BThwaniFilterRail

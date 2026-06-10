@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 /**
  * CatalogAuditTrailWorkspace — UI_PREVIEW_ONLY
@@ -16,7 +16,9 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WorkspacePreviewNotice } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
 import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../../shared/dsh-product-api.transport';
@@ -226,7 +228,7 @@ export function CatalogAuditTrailWorkspace({
     >
       {/* Header */}
       <Box layoutDirection="row" justify="space-between" align="center">
-        <Text role="titleLg" style={{ fontWeight: '800', fontSize: 18, color: theme.brandHeaderBackground }}>
+        <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
           📋 سجل التدقيق
         </Text>
         <Button label="✕ إغلاق" tone="secondary" size="sm" onPress={onClose} />
@@ -240,7 +242,7 @@ export function CatalogAuditTrailWorkspace({
 
       {/* Product selector */}
       <Box gap={2}>
-        <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+        <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
           اختر منتج
         </Text>
         <select
@@ -273,31 +275,31 @@ export function CatalogAuditTrailWorkspace({
           gap={2}
           style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.brand, borderStyle: 'solid' }}
         >
-          <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+          <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
             📌 {selectedProduct.name}
           </Text>
           <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
             <Box gap={0}>
               <Text role="caption" tone="muted" style={{ fontSize: 10 }}>SKU</Text>
-              <Text role="caption" style={{ fontWeight: '700', direction: 'ltr', fontSize: 12 }}>
+              <Text role="caption" weight="bold" style={{ direction: 'ltr',}}>
                 {selectedProduct.sku}
               </Text>
             </Box>
             <Box gap={0}>
               <Text role="caption" tone="muted" style={{ fontSize: 10 }}>المرحلة</Text>
-              <Text role="caption" style={{ fontWeight: '700', fontSize: 12 }}>
+              <Text role="caption" weight="bold" style={{}}>
                 {selectedProduct.approvalStage}
               </Text>
             </Box>
             <Box gap={0}>
               <Text role="caption" tone="muted" style={{ fontSize: 10 }}>المصدر</Text>
-              <Text role="caption" style={{ fontWeight: '700', fontSize: 12 }}>
+              <Text role="caption" weight="bold" style={{}}>
                 {selectedProduct.sourceSurface}
               </Text>
             </Box>
             <Box gap={0}>
               <Text role="caption" tone="muted" style={{ fontSize: 10 }}>تعارض</Text>
-              <Text role="caption" style={{ fontWeight: '700', fontSize: 12, color: selectedProduct.conflictReason ? theme.danger : theme.success }}>
+              <Text role="caption" weight="bold" style={{ color: selectedProduct.conflictReason ? theme.danger : theme.success }}>
                 {selectedProduct.conflictReason ? '⚠️ نعم' : '✅ لا'}
               </Text>
             </Box>
@@ -308,7 +310,7 @@ export function CatalogAuditTrailWorkspace({
       {/* Catalog Conflicts (LIVE_API_BOUND) */}
       <Box gap={3} style={{ borderTopWidth: 1, borderTopColor: theme.lineStrong, paddingTop: 16 }}>
         <Box layoutDirection="row" justify="space-between" align="center">
-          <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+          <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
             ⚠️ تعارضات الكتالوج (قاعدة البيانات الحية)
           </Text>
           <Button
@@ -321,8 +323,8 @@ export function CatalogAuditTrailWorkspace({
         </Box>
 
         {error && (
-          <Surface tone="inset" padding={2} style={{ borderRadius: 6, borderColor: theme.danger, borderWidth: 1 }}>
-            <Text role="caption" style={{ color: theme.danger, fontSize: 12 }}>
+          <Surface tone="inset" padding={2} style={{ borderRadius: radius.xs, borderColor: theme.danger, borderWidth: 1 }}>
+            <Text role="caption" style={{ color: theme.danger,}}>
               {error}
             </Text>
           </Surface>
@@ -342,7 +344,7 @@ export function CatalogAuditTrailWorkspace({
               if (activeConflicts.length === 0) {
                 return (
                   <Surface tone="inset" padding={3} style={{ borderRadius: 8 }}>
-                    <Text role="caption" tone="muted" style={{ textAlign: 'center', fontSize: 12 }}>
+                    <Text role="caption" tone="muted" style={{ textAlign: 'center',}}>
                       {selectedProduct
                         ? `لا توجد تعارضات معلقة للمنتج: ${selectedProduct.name}`
                         : 'لا توجد تعارضات معلقة في النظام حالياً.'}
@@ -365,7 +367,7 @@ export function CatalogAuditTrailWorkspace({
                   }}
                 >
                   <Box layoutDirection="row" justify="space-between" align="center">
-                    <Text role="caption" style={{ fontWeight: '700', fontSize: 13 }}>
+                    <Text role="caption" weight="bold" style={{ fontSize: 13 }}>
                       {conflict.conflict_type === 'price_divergence' ? '⚖️ تعارض في السعر' : '⚠️ تعارض في التوفر'}
                     </Text>
                     <span
@@ -389,20 +391,20 @@ export function CatalogAuditTrailWorkspace({
                     </span>
                   </Box>
 
-                  <Text role="caption" style={{ fontSize: 12, color: theme.brandHeaderBackground }}>
+                  <Text role="caption" style={{ color: theme.brandHeaderBackground }}>
                     المنتج: {conflict.product_name} ({conflict.product_id})
                   </Text>
 
-                  <Box layoutDirection="row" gap={4} style={{ backgroundColor: theme.surface, padding: 8, borderRadius: 6 }}>
+                  <Box layoutDirection="row" gap={4} style={{ backgroundColor: theme.surface, padding: 8, borderRadius: radius.xs }}>
                     <Box style={{ flex: 1 }}>
                       <Text role="caption" tone="muted" style={{ fontSize: 10 }}>القيمة المركزية</Text>
-                      <Text role="caption" style={{ fontWeight: '700', fontSize: 12, color: theme.brandHeaderBackground }}>
+                      <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground }}>
                         {conflict.central_value}
                       </Text>
                     </Box>
                     <Box style={{ flex: 1 }}>
                       <Text role="caption" tone="muted" style={{ fontSize: 10 }}>القيمة المحلية المقترحة</Text>
-                      <Text role="caption" style={{ fontWeight: '700', fontSize: 12, color: theme.brandHeaderBackground }}>
+                      <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground }}>
                         {conflict.override_value}
                       </Text>
                     </Box>
@@ -436,7 +438,7 @@ export function CatalogAuditTrailWorkspace({
       {/* Audit timeline */}
       {auditEvents.length > 0 && (
         <Box gap={3}>
-          <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+          <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
             سجل الأحداث ({auditEvents.length})
           </Text>
 
@@ -456,11 +458,11 @@ export function CatalogAuditTrailWorkspace({
                 }}
               >
                 <Box layoutDirection="row" align="center" gap={2}>
-                  <Text role="caption" style={{ fontSize: 18 }}>
+                  <Text role="titleSm" style={{}}>
                     {EVENT_TYPE_ICONS[event.eventType]}
                   </Text>
                   <Box gap={0} style={{ flex: 1 }}>
-                    <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground, fontSize: 13 }}>
+                    <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground, fontSize: 13 }}>
                       {event.summary}
                     </Text>
                     <Box layoutDirection="row" gap={3}>

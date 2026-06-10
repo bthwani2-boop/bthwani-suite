@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Badge, Box, Button, KeyValueList, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
+import { Badge, Box, Button, KeyValueList, SectionHeader, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
@@ -196,12 +196,12 @@ export function DshCaptainMapScreen({
         <Box gap={3}>
           {errorMessage && (
             <Surface tone="danger" padding={3} radiusToken="md">
-              <Text role="bodySm" style={{ color: 'red', textAlign: 'right' }}>{errorMessage}</Text>
+              <Text role="bodySm" tone="danger" style={{ textAlign: 'right' }}>{errorMessage}</Text>
             </Surface>
           )}
           {successMessage && (
             <Surface tone="brand" padding={3} radiusToken="md">
-              <Text role="bodySm" style={{ color: 'green', textAlign: 'right' }}>{successMessage}</Text>
+              <Text role="bodySm" tone="success" style={{ textAlign: 'right' }}>{successMessage}</Text>
             </Surface>
           )}
 

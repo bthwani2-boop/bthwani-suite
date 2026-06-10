@@ -15,6 +15,7 @@ import type {
   DshRouteHintedAction,
 } from '../../shared/dsh-order-preview.contract';
 import styles from '../shared/control-panel-surface.module.css';
+import { SUPPORT_VERIFICATION_STATUS_META } from './support.types';
 
 export type ManualCallIntakeRouteContext = {
   intakeId: string;
@@ -29,12 +30,6 @@ export type ManualCallIntakeWorkspaceProps = {
   onOpenOrderRescue?: (context: ManualCallIntakeRouteContext) => void;
   onOpenSupportEscalation?: (context: ManualCallIntakeRouteContext) => void;
 };
-
-const VERIFICATION_STATUS_META = {
-  verified: { label: 'موثق', tone: 'success' as const },
-  required: { label: 'مطلوب', tone: 'warning' as const },
-  blocked: { label: 'محظور', tone: 'danger' as const },
-} as const;
 
 type ManualSectionHeading = string;
 type ManualSectionNote = string;
@@ -113,7 +108,7 @@ export function ManualCallIntakeWorkspace({
   }
 
   const selectedContext = buildCallRouteContext(selectedRecord);
-  const verificationMeta = VERIFICATION_STATUS_META[selectedRecord.identityVerificationResult.verificationStatus];
+  const verificationMeta = SUPPORT_VERIFICATION_STATUS_META[selectedRecord.identityVerificationResult.verificationStatus];
 
   function openRouteHint(routeHint: string) {
     router.push(routeHint);
@@ -192,7 +187,7 @@ export function ManualCallIntakeWorkspace({
         <div className={styles.surfaceListColumn}>
           <Box gap={2}>
             {DSH_CALL_INTAKE_PREVIEW.map((record) => {
-              const recordVerificationMeta = VERIFICATION_STATUS_META[record.identityVerificationResult.verificationStatus];
+              const recordVerificationMeta = SUPPORT_VERIFICATION_STATUS_META[record.identityVerificationResult.verificationStatus];
 
               return (
                 <WebControlPanelDecisionRow

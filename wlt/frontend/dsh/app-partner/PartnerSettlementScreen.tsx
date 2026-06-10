@@ -15,6 +15,7 @@ import {
 	colorPalette,
 	radius,
 	spacing,
+  typographyRoles,
 } from '@bthwani/ui-kit';
 import { useWltDshPartnerWalletPreview } from './useWltDshPartnerWalletPreview';
 import { formatWltYer } from '../control-panel/financeContracts';
@@ -66,7 +67,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 						<Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
 							إجمالي المبيعات
 						</Text>
-						<Text role="bodyStrong" style={[styles.metricValue, { color: theme.brand }]}>
+						<Text role="bodyStrong" weight="black" style={[styles.metricValue, { color: theme.brand }]}>
 							{formatWltYer(partnerPreview.grossSalesMinorUnits)}
 						</Text>
 					</Surface>
@@ -75,7 +76,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 						<Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
 							صافي مستحقات التسوية
 						</Text>
-						<Text role="bodyStrong" style={[styles.metricValue, { color: theme.success }]}>
+						<Text role="bodyStrong" weight="black" style={[styles.metricValue, { color: theme.success }]}>
 							{formatWltYer(partnerPreview.netSettlementMinorUnits)}
 						</Text>
 					</Surface>
@@ -176,8 +177,7 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 	},
 	metricValue: {
-		fontSize: 20,
-		fontWeight: '800',
+		fontSize: typographyRoles.titleMd.fontSize,
 		marginTop: spacing[1],
 	},
 	cycleCard: {

@@ -1361,3 +1361,18 @@ export function getDshFlowRegistryValidationSummary(): DshFlowRegistryValidation
     hiddenCompatViolations,
   };
 }
+
+/**
+ * Translates a DshOnDemandPolicy value to a human-readable Arabic label.
+ * Centralizes the label map that was previously duplicated in
+ * SupportEscalationQueueScreen, SupportHubScreens, DshFieldReadinessEscalationScreen,
+ * DshFieldStoreOnboardingScreen, and similar screens.
+ */
+export function resolveDshOnDemandPolicyLabel(policy?: string): string {
+  if (policy === 'detail-on-open') return 'تفاصيل عند الفتح';
+  if (policy === 'evidence-on-open') return 'أدلة عند الفتح';
+  if (policy === 'chat-on-open') return 'محادثة عند الفتح';
+  if (policy === 'finance-preview-only') return 'مالي للقراءة فقط';
+  if (policy === 'summary-only') return 'ملخص أولًا';
+  return policy ?? 'سياسة من السجل';
+}

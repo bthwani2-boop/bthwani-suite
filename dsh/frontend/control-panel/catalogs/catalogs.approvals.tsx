@@ -1,5 +1,7 @@
-import React from 'react';
-import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
+﻿import React from 'react';
+import { Box, Button, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import { FilterDropdown } from './catalogs.parts';
 import {
@@ -515,13 +517,13 @@ export function ItemApprovalScreen({
                   }}
                 >
                   <td style={{ padding: '12px' }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 6, backgroundColor: theme.surfaceInset, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: radius.xs, backgroundColor: theme.surfaceInset, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <span style={{ fontSize: 14 }}>📦</span>
                     </div>
                   </td>
                   <td style={{ padding: '12px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>{item.displayCaption}</Text>
+                      <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>{item.displayCaption}</Text>
                       {item.approvalNote && (
                         <Text role="caption" tone="warning" style={{ fontSize: 9 }}>{`ملاحظة سابقة: ${item.approvalNote}`}</Text>
                       )}

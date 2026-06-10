@@ -15,15 +15,9 @@ import { getDynamicUiAudits, resolveAuditEntry } from '../../shared';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 import styles from '../shared/control-panel-surface.module.css';
+import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 
 export type AuditSupportSlaScreenProps = { hubHref: string; subGroup?: string; };
-
-const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  warning: 'warning',
-  danger: 'danger',
-  best: 'success',
-  brand: 'neutral',
-};
 
 export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }: AuditSupportSlaScreenProps) {
   const router = useRouter();
@@ -163,7 +157,7 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
 
             {/* Table Rows */}
             {allAudits.map((item) => {
-              const statusTone = TONE_MAP[item.statusTone] ?? 'neutral';
+              const statusTone = DSH_CONTROL_PANEL_TONE_MAP[item.statusTone] ?? 'neutral';
               const isSelected = detailOrderId === item.id;
 
               return (

@@ -19,6 +19,8 @@ import {
   useTheme,
   colorPalette,
   borders,
+  radius,
+  spacing,
 } from '@bthwani/ui-kit';
 import {
   fieldSectionLabels,
@@ -38,7 +40,7 @@ import {
 } from '../../data/stores.preview-data';
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
 import { getOperationsSupportFlowsForSurface } from '../../data/support.preview-data';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 const FIELD_ONBOARDING_OPERATION_FLOWS = getOperationsSupportFlowsForSurface('app-field');
@@ -48,22 +50,6 @@ const FIELD_PRODUCT_OPERATION_FLOWS = FIELD_ONBOARDING_OPERATION_FLOWS.filter(
 const FIELD_REVIEW_OPERATION_FLOWS = FIELD_ONBOARDING_OPERATION_FLOWS.filter(
   (item) => item.flowId === 'field-proof-required' || item.flowId === 'branch-readiness-escalation',
 );
-
-function resolveFieldPolicyLabel(policy?: string): string {
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'summary-only') {
-    return 'ملخص أولًا';
-  }
-
-  return policy ?? 'سياسة من السجل';
-}
 
 export type DshFieldStoreOnboardingScreenState = 'onboarding' | 'activated' | 'exit';
 
@@ -387,7 +373,7 @@ export function DshFieldStoreOnboardingScreen({
             placeholder="مثال: أسواق العليا الطازجة"
           />
 
-          <View style={{ gap: 8 }}>
+          <View style={{ gap: spacing[2] }}>
             <TextField
               label="اسم المالك الثنائي/الثلاثي"
               value={draft.basics.ownerName}
@@ -511,7 +497,7 @@ export function DshFieldStoreOnboardingScreen({
               disabled={gpsLoading}
               icon={<Icon name="locate-outline" size={18} color={theme.brandContrast} />}
               onPress={handleGPSAutofill}
-              style={{ paddingVertical: 12 }}
+              style={{ paddingVertical: spacing[3] }}
             />
           )}
 
@@ -541,7 +527,7 @@ export function DshFieldStoreOnboardingScreen({
             placeholder="مثال: طريق الملك فهد، بجانب البنك الأهلي"
           />
 
-          <View style={{ flexDirection: 'row-reverse', gap: 12 }}>
+          <View style={{ flexDirection: 'row-reverse', gap: spacing[3] }}>
             <View style={{ flex: 1 }}>
               <TextField
                 label="Latitude (خط العرض)"
@@ -604,7 +590,7 @@ export function DshFieldStoreOnboardingScreen({
             const isCapturing = cameraLoading[photoKey];
 
             return (
-              <View key={photoKey} style={{ gap: 8 }}>
+              <View key={photoKey} style={{ gap: spacing[2] }}>
                 <TextField
                   label={labels[photoKey]}
                   value={draft.photos[photoKey]}
@@ -643,7 +629,7 @@ export function DshFieldStoreOnboardingScreen({
             documents={documentItems}
             onUploadDocument={() => onUploadDocument?.(store.id)}
           />
-          <Text role="caption" tone="soft" style={{ textAlign: 'right', marginTop: 8 }}>
+          <Text role="caption" tone="soft" style={{ textAlign: 'right', marginTop: spacing[2] }}>
             تم ربط رفع المستندات مباشرة بنظام معالجة وتدقيق التراخيص المركزي في بثواني.
           </Text>
         </Box>
@@ -686,7 +672,7 @@ export function DshFieldStoreOnboardingScreen({
           />
 
           <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-            {`سياسة كتالوج المنتجات: ${resolveFieldPolicyLabel(onboardingFlowSummary?.onDemandPolicy)} · المستندات المرفقة لا تراجع إلا عند اكتمال هذا القسم.`}
+            {`سياسة كتالوج المنتجات: ${resolveDshOnDemandPolicyLabel(onboardingFlowSummary?.onDemandPolicy)} · المستندات المرفقة لا تراجع إلا عند اكتمال هذا القسم.`}
           </Text>
 
           <Divider style={{ marginVertical: 8 }} />
@@ -696,7 +682,7 @@ export function DshFieldStoreOnboardingScreen({
             <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
               المشاكل التشغيلية والباركود الميداني تعالج داخل هذا الملف لتفادي نقلها لنظام دعم شركاء بثواني.
             </Text>
-            <Box gap={3} style={{ marginTop: 8 }}>
+            <Box gap={3} style={{ marginTop: spacing[2] }}>
               {FIELD_PRODUCT_OPERATION_FLOWS.map((flow, index) => (
                 <View key={flow.flowId}>
                   {index > 0 && <Divider style={{ marginVertical: 8 }} />}
@@ -767,7 +753,7 @@ export function DshFieldStoreOnboardingScreen({
                 <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
                   بيانات مرجعية للعرض فقط — نسب العمولات الفعلية وأرقام التسوية يتم إدارتها وتعديلها من قِبل WLT وليس للميداني صلاحية تعديلها.
                 </Text>
-                <Box gap={3} style={{ marginTop: 8 }}>
+                <Box gap={3} style={{ marginTop: spacing[2] }}>
                   {store.fulfillmentAgreements.map((agreement, index) => (
                     <View key={agreement.mode}>
                       {index > 0 && <Divider style={{ marginVertical: 8 }} />}
@@ -776,7 +762,7 @@ export function DshFieldStoreOnboardingScreen({
                           <Text role="bodyStrong" style={{ textAlign: 'right' }}>{agreement.modeLabel}</Text>
                           <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{agreement.settlementBasis}</Text>
                         </Box>
-                        <View style={{ flexDirection: 'row', gap: 8 }}>
+                        <Box layoutDirection="row" gap={2}>
                           <Badge
                             label={
                               agreement.operationalReadiness === 'ready'
@@ -797,7 +783,7 @@ export function DshFieldStoreOnboardingScreen({
                             label={agreement.enabled ? 'مفعّل' : 'معطّل'}
                             tone={agreement.enabled ? 'success' : 'neutral'}
                           />
-                        </View>
+                        </Box>
                       </Box>
                     </View>
                   ))}
@@ -845,7 +831,7 @@ export function DshFieldStoreOnboardingScreen({
                 ? 'العناصر التالية مفقودة أو غير مستوفاة وتمنع تفعيل خيار إرسال الملف:'
                 : 'تم تعبئة كافة الحقول الأساسية المطلوبة. الملف جاهز للإرسال الفوري للتدقيق.'}
             </Text>
-            <Box gap={2} style={{ marginTop: 8 }}>
+            <Box gap={2} style={{ marginTop: spacing[2] }}>
               {missingItems.length ? (
                 missingItems.map((item) => (
                   <Text key={item} role="bodySm" tone="danger" style={{ textAlign: 'right' }}>
@@ -866,9 +852,9 @@ export function DshFieldStoreOnboardingScreen({
           {store.reviewFeedback ? (
             <>
               <Divider style={{ marginVertical: 8 }} />
-              <Box gap={2} style={{ padding: 12, backgroundColor: theme.dangerSurface, borderRadius: 8 }}>
+              <Box gap={2} style={{ padding: spacing[3], backgroundColor: theme.dangerSurface, borderRadius: radius.xs2 }}>
                 <Text role="bodyStrong" tone="danger" style={{ textAlign: 'right' }}>سبب رفض الملف من الإدارة</Text>
-                <Text role="bodySm" tone="danger" style={{ textAlign: 'right', marginTop: 4 }}>
+                <Text role="bodySm" tone="danger" style={{ textAlign: 'right', marginTop: spacing[1] }}>
                   {store.reviewFeedback}
                 </Text>
               </Box>
@@ -882,7 +868,7 @@ export function DshFieldStoreOnboardingScreen({
             <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
               {`في حالة تعذر استيفاء بعض النواقص ميدانيًا، يمكنك تصعيد الملف لطلب استثناء تشغيلي من قسم الشركاء (${resolveDshControlPanelSectionLabel('partners')})`}
             </Text>
-            <Box gap={3} style={{ marginTop: 8 }}>
+            <Box gap={3} style={{ marginTop: spacing[2] }}>
               {FIELD_REVIEW_OPERATION_FLOWS.map((flow, index) => (
                 <View key={flow.flowId}>
                   {index > 0 && <Divider style={{ marginVertical: 8 }} />}
@@ -925,14 +911,14 @@ export function DshFieldStoreOnboardingScreen({
           {/* Section 1: Store Metadata Header Card */}
           <Card padding={4} gap={3}>
             <Box gap={2} style={{ alignItems: 'flex-end' }}>
-              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+              <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing[2] }}>
                 <Badge label={resolveFieldStoreStatusLabel(store)} tone={resolveFieldStoreStatusTone(store)} />
                 <Badge label={`اكتمال ${completionPercent}%`} tone="info" />
                 <Badge label={draft.lastSavedLabel} tone="default" />
               </View>
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginTop: 4 }}>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6, marginTop: spacing[1] }}>
                 <Icon name="business-outline" size={20} tone="brand" />
-                <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '900' }}>
+                <Text role="titleMd" weight="black" style={{ textAlign: 'right' }}>
                   {store.name}
                 </Text>
               </View>
@@ -965,26 +951,26 @@ export function DshFieldStoreOnboardingScreen({
             >
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}>
                 <Icon name="information-circle-outline" size={16} tone="brand" />
-                <Text role="bodyStrong" style={{ fontSize: 13, color: theme.brand }}>
+                <Text role="bodyStrong" style={{ color: theme.brand }}>
                   سياسة الإضافة والربط للمحل
                 </Text>
               </View>
-              <Text role="label" tone="brand" style={{ fontSize: 12 }}>
+              <Text role="label" tone="brand">
                 {policyExpanded ? 'إخفاء ▲' : 'تفاصيل السياسة ▾'}
               </Text>
             </Pressable>
 
             {policyExpanded ? (
-              <Box gap={2} style={{ padding: 10, backgroundColor: theme.surfaceSecondary, borderRadius: 8, marginTop: 4 }}>
+              <Box gap={2} style={{ padding: 10, backgroundColor: theme.surfaceSecondary, borderRadius: radius.xs2, marginTop: spacing[1] }}>
                 <KeyValueList
                   dense
                   items={[
                     { label: 'المالك التشغيلي', value: onboardingFlowSummary?.ownerSurface ?? 'app-field', tone: 'brand' },
-                    { label: 'سياسة التحميل والفتح', value: resolveFieldPolicyLabel(onboardingFlowSummary?.onDemandPolicy) },
+                    { label: 'سياسة التحميل والفتح', value: resolveDshOnDemandPolicyLabel(onboardingFlowSummary?.onDemandPolicy) },
                     { label: 'مالك قرار التصعيد والاعتماد', value: resolveDshControlPanelSectionLabel('partners') },
                   ]}
                 />
-                <Text role="caption" tone="soft" style={{ textAlign: 'right', marginTop: 4 }}>
+                <Text role="caption" tone="soft" style={{ textAlign: 'right', marginTop: spacing[1] }}>
                   {onboardingFlowSummary?.nextPolicyActionPreview ?? 'افتح التفاصيل أو الوثائق عند الحاجة فقط، ولا تعتمد أي قرار مالي من هذه الشاشة.'}
                 </Text>
               </Box>
@@ -996,15 +982,15 @@ export function DshFieldStoreOnboardingScreen({
           {/* Section 2: Smart Linear Progress */}
           <Box gap={3} paddingY={1}>
             <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text role="titleSm" style={{ textAlign: 'right', fontWeight: '900' }}>
+              <Text role="titleSm" weight="black" style={{ textAlign: 'right' }}>
                 التقدم الإجمالي لملف الانضمام
               </Text>
-              <Text role="bodySm" tone="brand" style={{ fontWeight: '900' }}>
+              <Text role="bodySm" tone="brand" weight="black">
                 {`${completionPercent}% مكتمل`}
               </Text>
             </View>
-            <View style={{ height: 8, width: '100%', backgroundColor: theme.line, borderRadius: 4, overflow: 'hidden' }}>
-              <View style={{ height: '100%', width: `${completionPercent}%`, backgroundColor: theme.brand, borderRadius: 4 }} />
+            <View style={{ height: 8, width: '100%', backgroundColor: theme.line, borderRadius: radius.xxs, overflow: 'hidden' }}>
+              <View style={{ height: '100%', width: `${completionPercent}%`, backgroundColor: theme.brand, borderRadius: radius.xxs }} />
             </View>
           </Box>
 
@@ -1020,7 +1006,7 @@ export function DshFieldStoreOnboardingScreen({
               return (
                 <View key={section.id} style={{ flexDirection: 'row-reverse', alignItems: 'stretch', marginVertical: 4 }}>
                   {/* Timeline Column */}
-                  <View style={{ alignItems: 'center', width: 36, marginStart: 12, position: 'relative' }}>
+                  <View style={{ alignItems: 'center', width: 36, marginStart: spacing[3], position: 'relative' }}>
                     {index < sections.length - 1 && (
                       <View
                         style={{
@@ -1038,7 +1024,7 @@ export function DshFieldStoreOnboardingScreen({
                       style={{
                         width: 28,
                         height: 28,
-                        borderRadius: 14,
+                        borderRadius: radius.md,
                         backgroundColor: isComplete
                           ? theme.success
                           : isActive
@@ -1055,9 +1041,9 @@ export function DshFieldStoreOnboardingScreen({
                         <Icon name="checkmark" size={14} color={theme.brandContrast} />
                       ) : (
                         <Text
+                          role="caption"
+                          weight="black"
                           style={{
-                            fontSize: 12,
-                            fontWeight: '950',
                             color: isActive ? theme.brandContrast : theme.textMuted,
                           }}
                         >
@@ -1068,26 +1054,25 @@ export function DshFieldStoreOnboardingScreen({
                   </View>
 
                   {/* Content Column */}
-                  <View style={{ flex: 1, gap: 8 }}>
+                  <View style={{ flex: 1, gap: spacing[2] }}>
                     <Pressable
                       onPress={() => setActiveSection(section.id)}
                       style={{
-                        padding: 12,
-                        borderRadius: 12,
+                        padding: spacing[3],
+                        borderRadius: radius.sm2,
                         backgroundColor: isActive ? theme.brandSurface : theme.surface,
                         borderWidth: borders.hairline,
                         borderColor: isActive ? theme.brand : theme.line,
-                        gap: 4,
+                        gap: spacing[1],
                         alignItems: 'flex-end',
                       }}
                     >
                       <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                         <Text
                           role="bodyStrong"
+                          weight="black"
                           style={{
-                            fontSize: 14,
                             color: isActive ? theme.brand : theme.text,
-                            fontWeight: '900',
                           }}
                         >
                           {section.label}
@@ -1095,7 +1080,7 @@ export function DshFieldStoreOnboardingScreen({
                         {isActive ? (
                           <Badge label="قيد التعديل" tone="brand" />
                         ) : isComplete ? (
-                          <Text style={{ fontSize: 11.5, color: theme.success, fontWeight: '700' }}>مكتمل ✓</Text>
+                          <Text role="caption" weight="bold" style={{ color: theme.success }}>مكتمل ✓</Text>
                         ) : sectionMissing > 0 ? (
                           <Badge label={`${sectionMissing} ناقص`} tone="danger" />
                         ) : null}
@@ -1104,7 +1089,7 @@ export function DshFieldStoreOnboardingScreen({
                         <Text
                           role="caption"
                           tone={isComplete ? 'muted' : 'danger'}
-                          style={{ textAlign: 'right', marginTop: 2, fontSize: 11.5 }}
+                          style={{ textAlign: 'right', marginTop: 2 }}
                         >
                           {isComplete ? resolveSectionSummary(section.id) : 'يتطلب استكمال الحقول الإلزامية للمرحلة'}
                         </Text>
@@ -1112,7 +1097,7 @@ export function DshFieldStoreOnboardingScreen({
                     </Pressable>
 
                     {isActive && (
-                      <Card padding={4} gap={4} style={{ marginTop: 4, borderRadius: 12 }}>
+                      <Card padding={4} gap={4} style={{ marginTop: spacing[1], borderRadius: radius.sm2 }}>
                         {renderSectionContent()}
                       </Card>
                     )}
@@ -1125,7 +1110,7 @@ export function DshFieldStoreOnboardingScreen({
           <Divider />
 
           {/* Section 4: Scrollable Form Footer buttons */}
-          <View style={{ flexDirection: 'row-reverse', gap: 12 }}>
+          <View style={{ flexDirection: 'row-reverse', gap: spacing[3] }}>
             <Button
               label="الخطوة السابقة"
               tone="secondary"

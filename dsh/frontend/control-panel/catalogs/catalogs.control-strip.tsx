@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Button, Text, SearchField, Surface, useTheme } from '@bthwani/ui-kit';
@@ -143,7 +143,7 @@ export function CatalogControlStrip({
 
         {/* Sub-row 2: Smart Filter chips */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', alignItems: 'center' }}>
-          <Text role="caption" numberOfLines={1} style={{ fontSize: 10, fontWeight: 800, color: theme.textMuted }}>تصفية ذكية:</Text>
+          <Text role="caption" numberOfLines={1} weight="black" style={{ fontSize: 10, color: theme.textMuted }}>تصفية ذكية:</Text>
           {SMART_FILTERS.map(f => {
             const isSelected = activeFilter === f.id;
             return (
@@ -161,7 +161,7 @@ export function CatalogControlStrip({
         {/* Sub-row 3: Contextual Micro Action Strip */}
         {microActions.length > 0 && (
           <div style={{ display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap', borderTop: `1px solid ${theme.line}`, paddingTop: '6px' }}>
-            <Text role="caption" numberOfLines={1} style={{ fontSize: 10, fontWeight: 800, color: theme.textMuted }}>إجراء:</Text>
+            <Text role="caption" numberOfLines={1} weight="black" style={{ fontSize: 10, color: theme.textMuted }}>إجراء:</Text>
             {microActions.map((action) => (
               <button
                 key={action.id}

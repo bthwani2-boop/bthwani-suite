@@ -174,7 +174,7 @@ export function WltDshWalletControlCenter() {
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div className={wltStyles.walletCenterHeader}>
           <div>
-            <Text role="titleMd" style={{ fontWeight: 800 }}>مركز تحكم المحافظ</Text>
+            <Text role="titleMd" weight="black">مركز تحكم المحافظ</Text>
             <Text role="bodySm" tone="soft" style={{ marginTop: 4 }}>
               نظرة موحدة على جميع محافظ العملاء والشركاء والكباتن والميدانيين
             </Text>

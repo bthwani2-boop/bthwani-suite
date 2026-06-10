@@ -97,7 +97,7 @@ export function DshOrdersListScreen({
         ) : (
           <View style={{ padding: spacing[4] }}>
             <Surface tone="raised" padding={4} radiusToken="xl" gap={2}>
-              <Text role="titleMd" style={{ textAlign: 'center', fontWeight: '700' }}>لا توجد طلبات</Text>
+              <Text role="titleMd" weight="bold" style={{ textAlign: 'center' }}>لا توجد طلبات</Text>
               <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>لم نعثر على أي طلب يطابق بحثك.</Text>
               {onBack ? <Button label="العودة" tone="secondary" onPress={onBack} style={{ marginTop: spacing[2] }} /> : null}
               {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}

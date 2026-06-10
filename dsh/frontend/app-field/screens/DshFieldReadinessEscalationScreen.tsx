@@ -22,20 +22,9 @@ import {
   getOperationsSupportFlowPreview,
   getOperationsSupportFlowsForSurface,
 } from '../../data/support.preview-data';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 
-function resolveFieldPolicyLabel(policy?: string): string {
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  return policy ?? 'سياسة من السجل';
-}
 
 export type DshFieldReadinessEscalationScreenProps = {
   // ML-004: added pending-response / approved / rejected states for ops response tracking
@@ -187,7 +176,7 @@ export function DshFieldReadinessEscalationScreen({
               items={[
                 { label: 'المالك الحالي', value: registryFlowSummary?.ownerSurface ?? readinessFlow.ownerLabel, tone: 'brand' as const },
                 { label: 'مالك التصعيد (السجل المركزي)', value: registryEscalationOwner, tone: 'brand' as const },
-                { label: 'سياسة فتح الأدلة', value: resolveFieldPolicyLabel(registryFlowSummary?.onDemandPolicy) },
+                { label: 'سياسة فتح الأدلة', value: resolveDshOnDemandPolicyLabel(registryFlowSummary?.onDemandPolicy) },
                 { label: 'الإجراء التالي', value: readinessFlow.nextAction, tone: 'brand' as const },
               ]}
             />
@@ -323,7 +312,7 @@ const styles = StyleSheet.create({
   radioCircle: {
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: radius.sm,
     borderWidth: borders.strong,
     alignItems: 'center',
     justifyContent: 'center',

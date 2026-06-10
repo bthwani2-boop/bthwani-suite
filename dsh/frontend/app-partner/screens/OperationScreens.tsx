@@ -1,5 +1,7 @@
 import React from 'react';
-import { Box, Button, Chip, ListItem, Surface, Text, TextField } from '@bthwani/ui-kit';
+import { Box, Button, Chip, ListItem, Surface, Text, TextField,
+  spacing,
+} from '@bthwani/ui-kit';
 import {
   mapDshPartnerOperationalFlowToSupportRoute,
   type DshPartnerOperationalFlowId,
@@ -110,7 +112,7 @@ export function AuctionStatusUpdateScreen({ onBack, onSecondaryAction }: Auction
       />
 
       <Surface tone="raised" padding={0} gap={0}>
-        <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 }}>
+        <Text role="label" tone="muted" style={{ paddingHorizontal: spacing[4], paddingTop: spacing[4], paddingBottom: spacing[2] }}>
           مراحل التحديث
         </Text>
         {auctionStatusItems.map((item) => (
@@ -228,7 +230,7 @@ export function ConversationScreen({ activeFlowId = 'chat-send', onBack, onOpenS
       />
 
       <Surface tone="raised" padding={0} gap={0}>
-        <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 }}>
+        <Text role="label" tone="muted" style={{ paddingHorizontal: spacing[4], paddingTop: spacing[4], paddingBottom: spacing[2] }}>
           الردود السريعة
         </Text>
         {quickReplyItems.map((item) => (

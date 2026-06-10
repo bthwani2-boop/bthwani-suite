@@ -66,7 +66,7 @@ export function WltDshStoreSettlementStatement() {
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div className={wltStyles.storeSelectorHeaderFlex}>
           <div className={wltStyles.storeSelectorTitleFlex}>
-            <Text role="titleMd" style={{ fontWeight: 800 }}>كشف تسوية متجر</Text>
+            <Text role="titleMd" weight="black">كشف تسوية متجر</Text>
             <div className={wltStyles.storeSelectorButtonsFlex}>
               {statements.map((s) => (
                 <button
@@ -126,7 +126,7 @@ export function WltDshStoreSettlementStatement() {
         {/* Orders Table Container */}
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
           <div className={wltStyles.tableHeaderFlex}>
-            <Text role="titleSm" style={{ fontWeight: 800 }}>الطلبات المرتبطة بالدورة الحالية</Text>
+            <Text role="titleSm" weight="black">الطلبات المرتبطة بالدورة الحالية</Text>
             <span className={wltStyles.readinessDesc}>
               اضغط على أي صف لعرض تفاصيل العمولات المفرزة وقيود الأستاذ.
             </span>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
@@ -148,7 +148,7 @@ export function TaxonomyNodeInspector({
 
         <Box gap={3}>
           <Box gap={1}>
-            <Text role="caption" tone="muted" style={{ fontSize: 11, fontWeight: 700, textAlign: 'right' }}>اسم العنصر *</Text>
+            <Text role="caption" tone="muted" weight="bold" style={{ fontSize: 11, textAlign: 'right' }}>اسم العنصر *</Text>
             <input
               type="text"
               value={nodeLabel}
@@ -159,7 +159,7 @@ export function TaxonomyNodeInspector({
 
           {(selectedTaxonomyNode.type === 'main' || selectedTaxonomyNode.type === 'sub') && (
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={{ fontSize: 11, fontWeight: 700, textAlign: 'right' }}>الوصف أو الترجمة الفرعية</Text>
+              <Text role="caption" tone="muted" weight="bold" style={{ fontSize: 11, textAlign: 'right' }}>الوصف أو الترجمة الفرعية</Text>
               <input
                 type="text"
                 value={nodeSubtitle}
@@ -170,7 +170,7 @@ export function TaxonomyNodeInspector({
           )}
 
           <Box gap={2} style={{ borderTopWidth: 1, borderTopColor: theme.line, paddingTop: 12, marginTop: 4 }}>
-            <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground, textAlign: 'right', fontSize: 11 }}>إدارة وصورة الفئة (Category Image & Icon)</Text>
+            <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground, textAlign: 'right', fontSize: 11 }}>إدارة وصورة الفئة (Category Image & Icon)</Text>
 
             <Box layoutDirection="row" gap={2}>
               <Box style={{ flex: 1 }} gap={1}>
@@ -225,7 +225,7 @@ export function TaxonomyNodeInspector({
 
           {bindedProducts.length > 0 && (
             <Box gap={2} style={{ borderTopWidth: 1, borderTopColor: theme.line, paddingTop: 12 }}>
-              <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground, fontSize: 11 }}>المنتجات المرتبطة ({bindedProducts.length})</Text>
+              <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground, fontSize: 11 }}>المنتجات المرتبطة ({bindedProducts.length})</Text>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px' }}>
                 <thead>
                   <tr style={{ backgroundColor: theme.surfaceInset }}>

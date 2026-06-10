@@ -1,4 +1,4 @@
-// UI_PREVIEW_ONLY — no backend/API/DB binding.
+﻿// UI_PREVIEW_ONLY — no backend/API/DB binding.
 // Owner: control-panel/catalogs
 // Purpose: Bridge from control-panel/partners and app-partner into catalog onboarding.
 //   Shows partner activation status, readiness checklist, incoming items, and handoff result.
@@ -6,7 +6,9 @@
 //   All actions are preview-only.
 
 import React, { useState } from 'react';
-import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster, CatalogApprovalStage } from '../catalogs.data';
 import {
@@ -73,7 +75,7 @@ function ChecklistRow({ label, satisfied, blockedReason }: {
         <Text role="caption" style={{ fontSize: 14, color: satisfied ? theme.success : theme.danger }}>
           {satisfied ? '✓' : '✗'}
         </Text>
-        <Text role="caption" style={{ fontWeight: '700', color: satisfied ? theme.text : theme.danger, flexShrink: 1 }}>
+        <Text role="caption" weight="bold" style={{ color: satisfied ? theme.text : theme.danger, flexShrink: 1 }}>
           {label}
         </Text>
       </Box>
@@ -170,7 +172,7 @@ export function CatalogPartnerHandoffWorkspace({
       <Box gap={4} style={{ padding: 16 }}>
 
         {/* Owner notice */}
-        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 6, padding: 8 }}>
+        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: radius.xs, padding: 8 }}>
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
             المالك: control-panel/catalogs · الشريك لا يملك اعتماد/نشر · جميع الإجراءات محاكاة محلية
           </Text>
@@ -186,10 +188,10 @@ export function CatalogPartnerHandoffWorkspace({
         >
           <SectionTitle>حالة الشريك</SectionTitle>
           <Box layoutDirection="row" gap={8} style={{ alignItems: 'center', flexWrap: 'wrap' }}>
-            <Box style={{ backgroundColor: badgeColor + '22', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4 }}>
-              <Text role="caption" style={{ fontWeight: '800', color: badgeColor }}>{badgeLabel}</Text>
+            <Box style={{ backgroundColor: badgeColor + '22', borderRadius: radius.xs, paddingHorizontal: 10, paddingVertical: 4 }}>
+              <Text role="caption" weight="black" style={{ color: badgeColor }}>{badgeLabel}</Text>
             </Box>
-            <Text role="caption" style={{ color: theme.text, fontSize: 12 }}>{activationStatus}</Text>
+            <Text role="caption" style={{ color: theme.text,}}>{activationStatus}</Text>
           </Box>
           <Box gap={1}>
             <Text role="caption" tone="muted" style={{ fontSize: 11 }}>المالك الحالي: {metadata.ownerSurface}</Text>
@@ -224,7 +226,7 @@ export function CatalogPartnerHandoffWorkspace({
           )}
           {pendingItems.length > 0 && (
             <Box gap={1}>
-              <Text role="caption" style={{ fontWeight: '700', color: theme.warning, fontSize: 12 }}>
+              <Text role="caption" weight="bold" style={{ color: theme.warning,}}>
                 معلق ({pendingItems.length})
               </Text>
               {pendingItems.map((item) => (
@@ -241,7 +243,7 @@ export function CatalogPartnerHandoffWorkspace({
           )}
           {adoptedItems.length > 0 && (
             <Box gap={1}>
-              <Text role="caption" style={{ fontWeight: '700', color: theme.success, fontSize: 12 }}>
+              <Text role="caption" weight="bold" style={{ color: theme.success,}}>
                 مُدمج / منشور ({adoptedItems.length})
               </Text>
               {adoptedItems.map((item) => (
@@ -259,13 +261,13 @@ export function CatalogPartnerHandoffWorkspace({
         {/* ── Partner permissions summary ────────────────────────────────── */}
         <Box layoutDirection="row" gap={8} style={{ flexWrap: 'wrap' }}>
           <Box gap={2} style={{ backgroundColor: theme.successSurface, borderRadius: 8, padding: 12, flex: 1, minWidth: 200 }}>
-            <Text role="caption" style={{ fontWeight: '800', color: theme.success, fontSize: 12 }}>✓ ما يملكه الشريك</Text>
+            <Text role="caption" weight="black" style={{ color: theme.success,}}>✓ ما يملكه الشريك</Text>
             {PARTNER_CAN_EDIT.map((item) => (
               <Text key={item} role="caption" style={{ color: theme.text, fontSize: 11 }}>• {item}</Text>
             ))}
           </Box>
           <Box gap={2} style={{ backgroundColor: theme.dangerSurface, borderRadius: 8, padding: 12, flex: 1, minWidth: 200 }}>
-            <Text role="caption" style={{ fontWeight: '800', color: theme.danger, fontSize: 12 }}>✗ ما لا يملكه الشريك</Text>
+            <Text role="caption" weight="black" style={{ color: theme.danger,}}>✗ ما لا يملكه الشريك</Text>
             {PARTNER_CANNOT_DO.map((item) => (
               <Text key={item} role="caption" style={{ color: theme.danger, fontSize: 11 }}>• {item}</Text>
             ))}

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Pressable } from 'react-native';
-import { Box, Button, FormScreenShell, SectionHeader, StateView, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
+import { Box, Button, FormScreenShell, SectionHeader, StateView, Surface, Tabs, Text, TextField,
+  radius,
+} from '@bthwani/ui-kit';
 
 export type DshAwnakOrderCreateScreenState = 'ready' | 'loading' | 'disabled';
 
@@ -90,7 +92,7 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
 
     if (embedded) {
       return (
-        <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 24, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: radius.xl, overflow: 'hidden' }}>
           <Box gap={1}>
             <Text role="titleSm">طلب عونك</Text>
           </Box>
@@ -204,7 +206,7 @@ export function DshAwnakOrderCreateScreen({ state = 'ready', embedded = false, o
 
   if (embedded) {
     return (
-      <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 24, overflow: 'hidden' }}>
+      <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: radius.xl, overflow: 'hidden' }}>
         <Box gap={1}>
           <Text role="titleSm">طلب عونك</Text>
           <Text role="bodySm" tone="muted">

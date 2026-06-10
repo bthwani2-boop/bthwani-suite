@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Surface, Text } from '@bthwani/ui-kit';
@@ -98,7 +98,7 @@ function OverviewPanel({ platformGovernance, activeFilter }: { platformGovernanc
       {/* status strip notice */}
       <Surface tone="brand" padding={3} radiusToken="md" border>
         <Box layoutDirection="row" gap={2} align="center" justify="space-between" style={{ flexWrap: 'wrap' }}>
-          <Text role="bodySm" tone="brand" style={{ fontWeight: 'bold' }}>
+          <Text role="bodySm" tone="brand" weight="bold" style={{ }}>
             تنبيه النظام: تفضيلات المظهر والهوية البصرية خاصة بملف تعريف المستخدم (Shell Profile) وليست جزءاً من السياسات السيادية للمنصة.
           </Text>
           <span className={styles.surfaceMetaChip}>إقرار الحرس التشغيلي</span>

@@ -29,6 +29,7 @@ import {
   type DshFlowRegistryEntry,
 } from '../../shared/dsh-flow-registry';
 import { findDshControlPanelGovernanceSectionByFlowId } from '../shared/dsh-control-panel-governance.map';
+import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 
 export type ExceptionsEscalationsScreenProps = { hubHref: string; subGroup?: string; };
 
@@ -39,13 +40,6 @@ type SelectedItem =
   | { type: 'rescue'; id: string }
   | { type: 'playbook'; id: string }
   | null;
-
-const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  warning: 'warning',
-  danger: 'danger',
-  best: 'success',
-  brand: 'neutral',
-};
 
 const WORKSPACE_FILTERS: ReadonlyArray<{ id: WorkspaceFilterId; label: string }> = [
   { id: 'all', label: 'الكل' },
@@ -405,7 +399,7 @@ type ExceptionsStateItem = {
         const linkage = EXCEPTION_TICKET_MAP[exc.id];
         const supportTicketId = linkage?.supportTicketId ?? `UNPROVEN-${exc.id}`;
         const auditEntryId = linkage?.auditEntryId;
-        const statusTone = TONE_MAP[exc.customStatusTone] ?? 'neutral';
+        const statusTone = DSH_CONTROL_PANEL_TONE_MAP[exc.customStatusTone] ?? 'neutral';
         const slaStateLabel = exc.customSlaState === 'نشط' ? 'نشط (مفتوح)' : exc.customSlaState === 'مصعّد' ? 'مصعّد (تحت المراجعة)' : 'مستقر (محلول)';
 
         inspectorContent = (
@@ -520,7 +514,7 @@ type ExceptionsStateItem = {
                         fontSize: '11px',
                         fontWeight: 700,
                         background: 'var(--bthwani-control-panel-brand)',
-                        color: 'white',
+                        color: 'var(--bthwani-brand-contrast)',
                         border: 'none',
                         borderRadius: '6px',
                         cursor: 'pointer',
@@ -581,7 +575,7 @@ type ExceptionsStateItem = {
                         fontSize: '11px',
                         fontWeight: 700,
                         background: 'var(--bthwani-control-panel-success)',
-                        color: 'white',
+                        color: 'var(--bthwani-brand-contrast)',
                         border: 'none',
                         borderRadius: '6px',
                         cursor: 'pointer',
@@ -618,7 +612,7 @@ type ExceptionsStateItem = {
                           width: '100%',
                           padding: '10px',
                           background: 'var(--bthwani-control-panel-success)',
-                          color: 'white',
+                          color: 'var(--bthwani-brand-contrast)',
                           border: 'none',
                           borderRadius: '8px',
                           cursor: 'pointer',
@@ -635,7 +629,7 @@ type ExceptionsStateItem = {
                           width: '100%',
                           padding: '10px',
                           background: 'var(--bthwani-control-panel-brand)',
-                          color: 'white',
+                          color: 'var(--bthwani-brand-contrast)',
                           border: 'none',
                           borderRadius: '8px',
                           cursor: 'pointer',
@@ -805,7 +799,7 @@ type ExceptionsStateItem = {
                     flex: 1,
                     padding: '8px 12px',
                     background: 'var(--bthwani-control-panel-brand)',
-                    color: 'white',
+                    color: 'var(--bthwani-brand-contrast)',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -861,7 +855,7 @@ type ExceptionsStateItem = {
                     flex: 1,
                     padding: '8px 12px',
                     background: 'var(--bthwani-control-panel-brand)',
-                    color: 'white',
+                    color: 'var(--bthwani-brand-contrast)',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -923,7 +917,7 @@ type ExceptionsStateItem = {
             meta={`${exceptions.filter((e) => e.customSlaState !== 'محلول').length} استثناءات مفتوحة`}
           >
             {exceptions.map((exc) => {
-              const statusTone = TONE_MAP[exc.customStatusTone] ?? 'neutral';
+              const statusTone = DSH_CONTROL_PANEL_TONE_MAP[exc.customStatusTone] ?? 'neutral';
               const displayStatus = exc.customSlaState === 'محلول'
                 ? 'محلول'
                 : exc.customSlaState === 'مصعّد'

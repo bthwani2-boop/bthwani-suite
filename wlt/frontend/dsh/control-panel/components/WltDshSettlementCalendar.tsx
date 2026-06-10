@@ -18,7 +18,7 @@ export function WltDshSettlementCalendar() {
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <Text role="titleMd" style={{ fontWeight: 800 }}>تقويم التسويات</Text>
+        <Text role="titleMd" weight="black">تقويم التسويات</Text>
         <Text role="bodySm" tone="soft">
           يوضح دورات القطع والدفع والحجز لكل مالك مالي. لا ينفذ دفعًا ولا يفتح ledger runtime.
         </Text>
@@ -27,7 +27,7 @@ export function WltDshSettlementCalendar() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
         {cycles.map((cycle) => (
           <Box key={cycle.cycleId} padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-            <Text role="titleSm" style={{ fontWeight: 800 }}>{cycle.ownerLabel}</Text>
+            <Text role="titleSm" weight="black">{cycle.ownerLabel}</Text>
             <Text role="caption" tone="muted">{cycle.cycleId} · {cycle.frequency} · {STATUS_LABEL[cycle.status]}</Text>
             <div style={{ display: 'grid', gap: 7, marginTop: 6 }}>
               <div>الفترة: {cycle.periodStart} → {cycle.periodEnd}</div>

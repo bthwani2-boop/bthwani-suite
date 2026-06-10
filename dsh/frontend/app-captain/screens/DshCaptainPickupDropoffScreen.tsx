@@ -18,24 +18,8 @@ import {
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
-
-function resolveCaptainPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'summary-only') {
-    return 'ملخص أولًا';
-  }
-
-  return 'سياسة من السجل';
-}
 
 export type DshCaptainPickupDropoffScreenProps = {
   // ML-029: added 'out-for-delivery' and 'navigating-to-dropoff' in-transit states
@@ -166,7 +150,7 @@ export function DshCaptainPickupDropoffScreen({
       title={config.title}
       subtitle={config.subtitle}
       content={
-        <Box gap={4} style={{ paddingHorizontal: 4 }}>
+        <Box gap={4} style={{ paddingHorizontal: spacing[1] }}>
           <Box gap={3}>
             <Box layoutDirection="row" justify="space-between" align="center">
               <Badge label={config.badge} tone="warning" />
@@ -191,7 +175,7 @@ export function DshCaptainPickupDropoffScreen({
                     {pickupFlowSummary?.nextPolicyActionPreview ?? 'ابدأ بملخص المهمة، ثم افتح قائمة التحقق أو التفاصيل عند الحاجة.'}
                   </Text>
                 </Box>
-                <Badge label={resolveCaptainPolicyLabel(pickupFlowPolicy)} tone="brand" />
+                <Badge label={resolveDshOnDemandPolicyLabel(pickupFlowPolicy)} tone="brand" />
               </Box>
               <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
                 {`مالك قرار التصعيد: ${resolveDshControlPanelSectionLabel('operations')}`}
@@ -214,7 +198,7 @@ export function DshCaptainPickupDropoffScreen({
           {detailsVisible ? (
             <>
               <Divider />
-              <Box gap={3} style={{ paddingVertical: 4 }}>
+              <Box gap={3} style={{ paddingVertical: spacing[1] }}>
                 <SectionHeader
                   title="قائمة التحقق"
                   subtitle="يرجى مراجعة النقاط التالية لضمان جودة الخدمة."
@@ -320,7 +304,7 @@ const styles = StyleSheet.create({
   checkCircle: {
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: radius.sm,
     backgroundColor: colorPalette.brandStrong,
     alignItems: 'center',
     justifyContent: 'center',

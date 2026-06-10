@@ -16,6 +16,7 @@ import {
 	Text,
 	TextField,
 	useTheme,
+  spacing,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen, type DshOperationScreenState } from '../parts/OperationScreen';
 import type {
@@ -258,7 +259,7 @@ const OrderInboxSection = React.memo(function OrderInboxSection({
 	const { theme } = useTheme();
 
 	return (
-		<MobileScrollView padding={4} gap={5} contentContainerStyle={{ paddingBottom: 40 }}>
+		<MobileScrollView padding={4} gap={5} contentContainerStyle={{ paddingBottom: spacing[10] }}>
 			<Box gap={2}>
 				<Text role="bodyStrong" style={{ textAlign: 'right' }}>{nextOrder.title}</Text>
 				<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{nextOrder.subtitle}</Text>
@@ -289,7 +290,7 @@ const OrderInboxSection = React.memo(function OrderInboxSection({
 										backgroundColor: pressed ? theme.surfaceInset : theme.surface,
 										borderBottomWidth: index === arr.length - 1 ? 0 : 1,
 										borderBottomColor: theme.line,
-										gap: 12,
+										gap: spacing[3],
 									})}
 								>
 									<View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
@@ -340,9 +341,9 @@ const OrderDetailSection = React.memo(function OrderDetailSection({
 			title="تفاصيل الطلب"
 			subtitle="مهمة نشطة مع تواصل متكامل وجرس تنبيه ذكي مباشر داخل نفس شاشة الطلب."
 			content={
-				<Box gap={4} style={{ paddingHorizontal: 4 }}>
+				<Box gap={4} style={{ paddingHorizontal: spacing[1] }}>
 					{/* بطاقة تفاصيل الطلب الرئيسية */}
-					<Box gap={3} style={{ paddingVertical: 4 }}>
+					<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 						<Box gap={1} style={{ alignItems: 'flex-end' }}>
 							<Badge label="طلب الكابتن" tone="warning" />
 							<Text role="titleLg" style={{ textAlign: 'right' }}>{summary.orderId}</Text>
@@ -363,7 +364,7 @@ const OrderDetailSection = React.memo(function OrderDetailSection({
 
 					<Divider />
 
-					<Box gap={3} style={{ paddingVertical: 4 }}>
+					<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 						<SectionHeader title="قواعد الالتقاط والتسليم" subtitle="أسباب الرفض والفشل وإثباتات التسليم تبقى إلزامية داخل نفس المسار." />
 						<KeyValueList
 							items={[
@@ -377,12 +378,12 @@ const OrderDetailSection = React.memo(function OrderDetailSection({
 					<Divider />
 
 					{/* جرس تنبيه الكابتن المدمج والمباشر */}
-					<Box gap={2} style={{ paddingVertical: 8, paddingHorizontal: 12, borderLeftWidth: 4, borderLeftColor: bellRung ? theme.success : theme.warning }}>
+					<Box gap={2} style={{ paddingVertical: spacing[2], paddingHorizontal: spacing[3], borderLeftWidth: 4, borderLeftColor: bellRung ? theme.success : theme.warning }}>
 						<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
 							<Badge label={bellRung ? 'تم إرسال التنبيه' : 'جرس تنبيه الكابتن'} tone={bellRung ? 'success' : 'warning'} />
 							<Icon name="notifications-outline" size={20} tone={bellRung ? 'success' : 'warning'} />
 						</Box>
-						<Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: 4 }}>
+						<Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: spacing[1] }}>
 							{bellRung
 								? 'تم إرسال رنة جرس تنبيه للكابتن داخل الطلب لتحديث حالة الوصول الفوري بنجاح.'
 								: 'يرجى قرع الجرس لإرسال رنة تنبيه فوري للكابتن وتنبيهه للوصول دون الحاجة للاتصال الخارجي.'}
@@ -411,15 +412,15 @@ const OrderDetailSection = React.memo(function OrderDetailSection({
 					<Divider />
 
 					{/* قسم المحادثة والمراسلة المتكامل */}
-					<Box gap={3} style={{ paddingVertical: 4 }}>
+					<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 						<SectionHeader
 							title="مراسلة وتواصل الطلب"
 							subtitle="دردشة مباشرة ثنائية بين الكابتن والعميل في سياق الطلب."
 						/>
 
 						<ScrollView
-							style={{ maxHeight: 180, minHeight: 110, paddingVertical: 8 }}
-							contentContainerStyle={{ gap: 8 }}
+							style={{ maxHeight: 180, minHeight: 110, paddingVertical: spacing[2] }}
+							contentContainerStyle={{ gap: spacing[2] }}
 							showsVerticalScrollIndicator={false}
 						>
 							{localMessages.map((msg) => {
@@ -446,7 +447,7 @@ const OrderDetailSection = React.memo(function OrderDetailSection({
 												direction: 'rtl',
 											}}
 										>
-											<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, gap: 12 }}>
+											<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, gap: spacing[3] }}>
 												<Text role="caption" weight="bold" style={{ color: isOutbound ? theme.textInverse : theme.brand }}>
 													{msg.sender}
 												</Text>
@@ -470,7 +471,7 @@ const OrderDetailSection = React.memo(function OrderDetailSection({
 								placeholder="اكتب رسالة للكابتن هنا..."
 								style={{ minHeight: 44 }}
 							/>
-							<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+							<Box style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', marginTop: spacing[1] }}>
 								<Button
 									size="sm"
 									fullWidth={false}
@@ -557,8 +558,8 @@ const OrderChatBubble = React.memo(function OrderChatBubble({ message }: { messa
 				borderTone="line"
 				radiusToken="lg"
 				style={{
-					padding: 12,
-					gap: 8,
+					padding: spacing[3],
+					gap: spacing[2],
 				}}
 			>
 				<Box layoutDirection="row" justify="space-between" align="center" gap={2}>
@@ -692,7 +693,7 @@ const OrderChatSection = React.memo(function OrderChatSection({
 						</Text>
 					</Box>
 
-					<Box gap={3} style={{ paddingVertical: 4 }}>
+					<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 						<Box gap={1}>
 							<Text role="titleSm">سجل تواصل الطلب</Text>
 							<Text role="bodySm" tone="muted">
@@ -700,7 +701,7 @@ const OrderChatSection = React.memo(function OrderChatSection({
 							</Text>
 						</Box>
 
-						<ScrollView style={{ maxHeight: 380 }} contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
+						<ScrollView style={{ maxHeight: 380 }} contentContainerStyle={{ gap: spacing[3] }} showsVerticalScrollIndicator={false}>
 							{messages.map((message) => (
 								<OrderChatBubble key={message.id} message={message} />
 							))}
@@ -714,8 +715,8 @@ const OrderChatSection = React.memo(function OrderChatSection({
 							borderTone="line"
 							radiusToken="md"
 							style={{
-								padding: 12,
-								gap: 8,
+								padding: spacing[3],
+								gap: spacing[2],
 							}}
 						>
 							<TextField
@@ -727,7 +728,7 @@ const OrderChatSection = React.memo(function OrderChatSection({
 								numberOfLines={3}
 								style={{ minHeight: 92, textAlignVertical: 'top' }}
 							/>
-							<Box layoutDirection="row" justify="space-between" align="center" style={{ gap: 12, flexWrap: 'wrap' }}>
+							<Box layoutDirection="row" justify="space-between" align="center" style={{ gap: spacing[3], flexWrap: 'wrap' }}>
 								<Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
 									<ComposerActionButton iconName="mic-outline" accessibilityLabel="رسالة صوتية" disabled={isReadOnly || isSending} onPress={() => toggleAttachment('voice')} />
 									<ComposerActionButton iconName="camera-outline" accessibilityLabel="التقاط صورة" disabled={isReadOnly || isSending} onPress={() => toggleAttachment('camera')} />
@@ -781,8 +782,8 @@ const OrderBellSection = React.memo(function OrderBellSection({
 			title="جرس الطلبات الجديدة للكابتن"
 			subtitle="تنبيه واضح ومختصر يدفع نحو الصندوق أو أول طلب يحتاج قرارًا سريعًا."
 			content={
-				<Box gap={4} style={{ paddingHorizontal: 4 }}>
-					<Box gap={3} style={{ paddingVertical: 4 }}>
+				<Box gap={4} style={{ paddingHorizontal: spacing[1] }}>
+					<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 						<Box gap={1} style={{ alignItems: 'flex-end' }}>
 							<Badge label="طلبات جديدة" tone="warning" />
 							<Text role="titleLg" style={{ textAlign: 'right' }}>جرس الطلبات الجديدة للكابتن</Text>
@@ -798,10 +799,10 @@ const OrderBellSection = React.memo(function OrderBellSection({
 								borderTone="line"
 								radiusToken="md"
 								style={{
-									padding: 12,
+									padding: spacing[3],
 									flex: 1,
 									minWidth: 80,
-									gap: 4,
+									gap: spacing[1],
 								}}
 							>
 								<Text role="caption" tone="muted">طلبات جديدة</Text>
@@ -813,10 +814,10 @@ const OrderBellSection = React.memo(function OrderBellSection({
 								borderTone="line"
 								radiusToken="md"
 								style={{
-									padding: 12,
+									padding: spacing[3],
 									flex: 1,
 									minWidth: 80,
-									gap: 4,
+									gap: spacing[1],
 								}}
 							>
 								<Text role="caption" tone="muted">بحاجة إلى موافقة</Text>
@@ -828,10 +829,10 @@ const OrderBellSection = React.memo(function OrderBellSection({
 								borderTone="line"
 								radiusToken="md"
 								style={{
-									padding: 12,
+									padding: spacing[3],
 									flex: 1,
 									minWidth: 80,
-									gap: 4,
+									gap: spacing[1],
 								}}
 							>
 								<Text role="caption" tone="muted">رنات عاجلة</Text>
@@ -863,7 +864,7 @@ const OrderBellSection = React.memo(function OrderBellSection({
 									backgroundColor: pressed ? theme.surfaceInset : theme.surface,
 									borderBottomWidth: index === arr.length - 1 ? 0 : 1,
 									borderBottomColor: theme.line,
-									gap: 12,
+									gap: spacing[3],
 								})}
 							>
 								<View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
@@ -1093,8 +1094,8 @@ function renderSection({
 			title="طلبات الكابتن"
 			subtitle="نظرة موحدة على الصندوق والمهمة النشطة والجرس بنفس الغلاف البصري المستخدم في تطبيق العميل."
 			content={
-				<Box gap={4} style={{ paddingHorizontal: 4 }}>
-					<Box gap={3} style={{ paddingVertical: 4 }}>
+				<Box gap={4} style={{ paddingHorizontal: spacing[1] }}>
+					<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 						<SectionHeader title="الطلب التالي" subtitle="أولوية واحدة واضحة قبل أي انتقال آخر." />
 						<Text role="bodyStrong">{activeItems[0]?.title ?? `طلب #${activeSummary.orderId}`}</Text>
 						<Text role="bodySm" tone="muted">{activeItems[0]?.subtitle ?? activeSummary.currentStageLabel}</Text>
@@ -1102,7 +1103,7 @@ function renderSection({
 
 					<Divider />
 
-					<Box gap={3} style={{ paddingVertical: 4 }}>
+					<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 						<SectionHeader title="المهمة النشطة" subtitle="تفاصيل مختصرة للمهمة الجارية." />
 						<KeyValueList
 							items={[
@@ -1116,7 +1117,7 @@ function renderSection({
 
 					<Divider />
 
-					<Box gap={3} style={{ paddingVertical: 4 }}>
+					<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 						<SectionHeader title="الرنات الحالية" subtitle="أقصر قائمة ممكنة للطلبات التي تنتظر قرارًا." />
 						<Box gap={2}>
 							{activeItems.slice(0, 3).map((item) => (
@@ -1127,7 +1128,7 @@ function renderSection({
 
 					<Divider />
 
-					<Box gap={2} style={{ paddingVertical: 4 }}>
+					<Box gap={2} style={{ paddingVertical: spacing[1] }}>
 						<Text role="bodyStrong">حالة الإثبات: {proofStatus ?? 'idle'}</Text>
 						<Text role="bodySm" tone="muted">
 							عندما تصل المهمة إلى الإغلاق، انتقل إلى رفع الإثبات من شريط الإجراءات السفلي بدل تناثر الأزرار داخل الصفحة.
@@ -1351,7 +1352,7 @@ function SimpleSupportScreen({
 	const [draftValue, setDraftValue] = React.useState('');
 
 	return (
-		<MobileScrollView padding={4} gap={5} contentContainerStyle={{ paddingBottom: 40 }}>
+		<MobileScrollView padding={4} gap={5} contentContainerStyle={{ paddingBottom: spacing[10] }}>
 			{/* Hero — flat label + description, no card */}
 			<Box gap={2}>
 				<Text role="bodyStrong" style={{ textAlign: 'right' }}>{heroTitle}</Text>
@@ -1378,10 +1379,10 @@ function SimpleSupportScreen({
 									flexDirection: 'row-reverse',
 									alignItems: 'flex-start',
 									justifyContent: 'space-between',
-									paddingVertical: 12,
+									paddingVertical: spacing[3],
 									borderBottomWidth: index === arr.length - 1 ? 0 : 1,
 									borderBottomColor: theme.line,
-									gap: 12,
+									gap: spacing[3],
 								}}
 							>
 								<View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
@@ -1538,7 +1539,7 @@ export function DshCaptainOrderAcceptScreen({
 				onBackToInbox={onBack}
 			/>
 			{onDecline && (
-				<Box paddingX={4} style={{ paddingBottom: 16 }}>
+				<Box paddingX={4} style={{ paddingBottom: spacing[4] }}>
 					<Button
 						label="رفض المهمة (Decline)"
 						tone="danger"

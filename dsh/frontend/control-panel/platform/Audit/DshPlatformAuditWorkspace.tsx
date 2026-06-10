@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
@@ -123,7 +123,7 @@ export function DshPlatformAuditWorkspace({ activeFilter }: { activeFilter: stri
                     </Box>
                     <Box gap={1}>
                       <Text role="caption" tone="muted">القيمة الجديدة:</Text>
-                      <Text role="bodySm" tone="success" style={{ fontWeight: 'bold' }}>{selectedEvent.newValue}</Text>
+                      <Text role="bodySm" tone="success" weight="bold" style={{ }}>{selectedEvent.newValue}</Text>
                     </Box>
                     <Box gap={1}>
                       <Text role="caption" tone="muted">السبب للقرار:</Text>

@@ -12,7 +12,7 @@ import { useHomeTickerState } from '../hooks/useHomeTickerState';
 import { useDebounce } from '../hooks/useDebounce';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
 import { HomeScreenShell } from '../parts/home/HomeScreenShell';
-import { createStyles } from '../parts/home/home-screen.styles';
+import { buildHomeScreenStyles } from '../parts/home/home-screen.styles';
 import type { DshHomeGetPromo, DshHomeGetStore } from '../contracts/dsh-home-types';
 import type { DshHomeGetScreenProps } from '../contracts/dsh-home-screen-props';
 function resolveDshHomeBannerImageSource(imageUrl?: string): any {
@@ -36,7 +36,7 @@ export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent(
   const { width: viewportWidth } = useWindowDimensions();
   const { theme } = useTheme();
   const uiText = useUiText();
-  const styles = React.useMemo(() => createStyles(direction, theme), [direction, theme]);
+  const styles = React.useMemo(() => buildHomeScreenStyles(direction, theme), [direction, theme]);
   const categoriesAnchorRef = React.useRef<any>(null);
 
   const homeState = useHomeState();

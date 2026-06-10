@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text,
+  radius,
+} from '@bthwani/ui-kit';
 import { buildFinanceHref } from '../constants/finance.registry';
 import { getWltControlPanelFinancePreview } from '../financeContracts';
 import { buildWltFinancialCenter } from '../selectors/buildFinancialCenter';
@@ -44,7 +46,7 @@ function PositionCard({ section }: { section: WltFinancialCenterSection }) {
         background: 'var(--bthwani-control-panel-surface)',
         border: '1px solid var(--bthwani-control-panel-border)',
         borderTop: `3px solid ${color}`,
-        borderRadius: 10,
+        borderRadius: radius.sm,
         overflow: 'hidden',
       }}
     >
@@ -87,7 +89,7 @@ function PositionCard({ section }: { section: WltFinancialCenterSection }) {
                 padding: '8px 10px',
                 marginBottom: 6,
                 background: 'var(--bthwani-control-panel-surface-raised)',
-                borderRadius: 6,
+                borderRadius: radius.xs,
                 borderRight: `3px solid ${color}`,
               }}
             >
@@ -129,7 +131,7 @@ function LedgerTable({ entries }: { entries: readonly WltLedgerEntry[] }) {
   return (
     <Box gap={2} style={{ direction: 'rtl' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text role="titleSm" style={{ fontWeight: '700' }}>قيود دفتر الأستاذ</Text>
+        <Text role="titleSm" weight="bold">قيود دفتر الأستاذ</Text>
         <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>
           {entries.length} قيد إجمالي · معاينة تشغيلية
         </span>
@@ -206,7 +208,7 @@ function LedgerTable({ entries }: { entries: readonly WltLedgerEntry[] }) {
           style={{
             background: 'transparent',
             border: '1px solid var(--bthwani-control-panel-border)',
-            borderRadius: 6,
+            borderRadius: radius.xs,
             padding: '4px 12px',
             fontSize: 11,
             cursor: 'pointer',
@@ -274,7 +276,7 @@ function CloseGatePanel({ canClose, blockingCount }: { canClose: boolean; blocki
       style={{
         background: 'var(--bthwani-control-panel-surface-raised)',
         border: `1px solid ${canClose ? 'var(--bth-success-border)' : 'var(--bth-warning-border)'}`,
-        borderRadius: 10,
+        borderRadius: radius.sm,
         overflow: 'hidden',
       }}
     >
@@ -321,7 +323,7 @@ function CloseGatePanel({ canClose, blockingCount }: { canClose: boolean; blocki
               style={{
                 background: canClose ? 'var(--bth-success-surface)' : 'var(--bth-warning-surface)',
                 border: `1px solid ${canClose ? 'var(--bth-success-border)' : 'var(--bth-warning-border)'}`,
-                borderRadius: 6,
+                borderRadius: radius.xs,
                 padding: '6px 14px',
                 fontSize: 11,
                 fontWeight: '700',
@@ -377,7 +379,7 @@ export function FinancialCenterScreen({ hubHref: _hubHref, subGroup: _subGroup }
       </div>
 
       <Box gap={2}>
-        <Text role="titleSm" style={{ fontWeight: '700' }}>المركز المالي اليومي</Text>
+        <Text role="titleSm" weight="bold">المركز المالي اليومي</Text>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
           <PositionCard section={center.sections[0]!} />
           <PositionCard section={center.sections[1]!} />
@@ -393,7 +395,7 @@ export function FinancialCenterScreen({ hubHref: _hubHref, subGroup: _subGroup }
         padding: '12px 16px',
         background: 'var(--bthwani-control-panel-surface-raised)',
         border: '1px solid var(--bthwani-control-panel-border)',
-        borderRadius: 10,
+        borderRadius: radius.sm,
       }}>
         {[
           { label: 'إجمالي الأصول', value: center.totalAssetsLabel, color: SECTION_COLOR['asset'] },
@@ -419,7 +421,7 @@ export function FinancialCenterScreen({ hubHref: _hubHref, subGroup: _subGroup }
 
       <Box gap={2}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text role="titleSm" style={{ fontWeight: '700' }}>الفوارق التي تمنع الإغلاق</Text>
+          <Text role="titleSm" weight="bold">الفوارق التي تمنع الإغلاق</Text>
           {center.blockingVariances.length > 0 && (
             <span style={{ fontSize: 10, fontWeight: '700', color: 'var(--bth-warning-text)', background: 'var(--bth-warning-surface)', padding: '2px 8px', borderRadius: 4 }}>
               {center.blockingVariances.length} بند يحتاج مراجعة

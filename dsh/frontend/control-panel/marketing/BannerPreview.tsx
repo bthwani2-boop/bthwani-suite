@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 // Authority: control-panel/marketing — banner live preview component.
 // Extracted from BannersCommandDeckScreen (inner component) as part of Giant Screen split.
@@ -6,7 +6,9 @@
 
 import React from 'react';
 import { Image, StyleSheet, View, type ImageStyle, type ViewStyle } from 'react-native';
-import { Box, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Text, shadowPresets, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { resolvePreviewColor } from '../../shared/dsh-preview-color';
 import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
 import { BANNER_MOTION_OPTIONS } from './banner-types';
@@ -72,12 +74,12 @@ export function BannerPreview({ draft, templates }: BannerPreviewProps) {
           ])}
         >
           <Box gap={1}>
-            {draft.partnerName ? <Text style={styles.bannerPartner}>{draft.partnerName}</Text> : null}
-            <Text style={styles.bannerTitle} numberOfLines={1}>{draft.title || 'عنوان البنر'}</Text>
-            <Text style={styles.bannerSubtitle} numberOfLines={2}>{draft.subtitle || 'أضف وصفاً جذاباً هنا'}</Text>
+            {draft.partnerName ? <Text weight="black" style={styles.bannerPartner}>{draft.partnerName}</Text> : null}
+            <Text weight="black" style={styles.bannerTitle} numberOfLines={1}>{draft.title || 'عنوان البنر'}</Text>
+            <Text weight="bold" style={styles.bannerSubtitle} numberOfLines={2}>{draft.subtitle || 'أضف وصفاً جذاباً هنا'}</Text>
           </Box>
           <View style={StyleSheet.flatten([styles.bannerCta, { backgroundColor: theme.surface }])}>
-            <Text style={StyleSheet.flatten([styles.bannerCtaText, { color: resolvedAccentColor }])}>
+            <Text weight="black" style={StyleSheet.flatten([styles.bannerCtaText, { color: resolvedAccentColor }])}>
               {draft.ctaLabel}
             </Text>
           </View>
@@ -92,7 +94,7 @@ export function BannerPreview({ draft, templates }: BannerPreviewProps) {
               draft.offerBadgePosition === 'top-left' ? { left: 20, top: 20 } : { right: 20, top: 20 },
             ])}
           >
-            <Text style={styles.bannerBadgeText}>{draft.offerBadgeText}</Text>
+            <Text weight="black" style={styles.bannerBadgeText}>{draft.offerBadgeText}</Text>
           </View>
         ) : null}
 
@@ -119,15 +121,15 @@ export function BannerPreview({ draft, templates }: BannerPreviewProps) {
       {/* Motion Meta */}
       <View style={styles.previewMetaRow}>
         <View style={styles.previewMetaPill}>
-          <Text role="caption" style={styles.previewMetaText}>{previewMotionLabel}</Text>
+          <Text role="caption" weight="black" style={styles.previewMetaText}>{previewMotionLabel}</Text>
         </View>
         <View style={styles.previewMetaPill}>
-          <Text role="caption" style={styles.previewMetaText}>
+          <Text role="caption" weight="black" style={styles.previewMetaText}>
             {draft.autoplayEnabled ? `تشغيل تلقائي ${draft.autoplayIntervalMs}ms` : 'تشغيل يدوي'}
           </Text>
         </View>
       </View>
-      <Text role="caption" tone="muted" style={{ marginTop: 10, textAlign: 'center', fontWeight: '800' }}>
+      <Text role="caption" tone="muted" weight="black" style={{ marginTop: 10, textAlign: 'center' }}>
         معاينة حية مضغوطة
       </Text>
     </View>
@@ -143,14 +145,11 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     bannerBase: {
       width: 288,
       height: 300,
-      borderRadius: 24,
+      borderRadius: radius.xl,
       overflow: 'hidden',
       position: 'relative',
-      elevation: 8,
+      ...shadowPresets.overlay,
       shadowColor: theme.overlay,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.16,
-      shadowRadius: 14,
     },
     bannerImage: {
       position: 'absolute',
@@ -189,62 +188,55 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     bannerPartner: {
       color: theme.brandContrast,
       fontSize: 11,
-      fontWeight: '900',
       opacity: 0.9,
       textShadowColor: theme.overlay,
       textShadowOffset: { width: 0, height: 1 },
-      shadowRadius: 2,
+      textShadowRadius: 2,
     },
     bannerTitle: {
       color: theme.brandContrast,
       fontSize: 22,
-      fontWeight: '900',
       textShadowColor: theme.overlay,
       textShadowOffset: { width: 0, height: 2 },
-      shadowRadius: 4,
+      textShadowRadius: 4,
     },
     bannerSubtitle: {
       color: theme.brandContrast,
       fontSize: 12,
-      fontWeight: '700',
       marginTop: 4,
     },
     bannerCta: {
       marginTop: 14,
       paddingHorizontal: 14,
       paddingVertical: 8,
-      borderRadius: 999,
+      borderRadius: radius.pill,
       alignSelf: 'flex-start',
       elevation: 4,
     },
     bannerCtaText: {
       fontSize: 11,
-      fontWeight: '900',
-    },
+      },
     bannerBadge: {
       position: 'absolute',
       top: 16,
       paddingHorizontal: 10,
       paddingVertical: 5,
-      borderRadius: 999,
+      borderRadius: radius.pill,
       elevation: 5,
     },
     bannerBadgeText: {
       color: theme.brandContrast,
       fontSize: 10,
-      fontWeight: '900',
-    },
+      },
     partnerLogoWrap: {
       position: 'absolute',
       width: 38,
       height: 38,
-      borderRadius: 999,
+      borderRadius: radius.pill,
       backgroundColor: theme.surface,
       padding: 5,
-      elevation: 6,
+      ...shadowPresets.raised,
       shadowColor: theme.overlay,
-      shadowOpacity: 0.15,
-      shadowRadius: 8,
     },
     partnerLogo: {
       width: '100%',
@@ -258,7 +250,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       flexWrap: 'wrap',
     },
     previewMetaPill: {
-      borderRadius: 999,
+      borderRadius: radius.pill,
       backgroundColor: theme.infoSurface,
       borderWidth: 1,
       borderColor: theme.info,
@@ -267,7 +259,6 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     },
     previewMetaText: {
       color: theme.brandHeaderBackground,
-      fontWeight: '800',
-    },
+      },
   });
 }

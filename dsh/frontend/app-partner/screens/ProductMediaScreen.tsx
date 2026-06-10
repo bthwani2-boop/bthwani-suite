@@ -4,11 +4,15 @@ import {
 	Box,
 	Button,
 	Divider,
+	StateView,
 	Text,
 	resolveRowDirection,
 	useDirection,
 	useTheme,
 	Chip,
+  radius,
+  spacing,
+  typographyRoles,
 } from '@bthwani/ui-kit';
 import {
 	createDshMediaApiHttpClient,
@@ -183,34 +187,15 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 	const isWorking = screenState === 'loading' || screenState === 'uploading';
 
 	if (screenState === 'loading' && assets.length === 0) {
-		return (
-			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: theme.background }}>
-				<ActivityIndicator size="large" color={theme.brand} />
-				<Text role="bodyStrong" tone="muted" align="center" style={{ marginTop: 12 }}>
-					جارٍ تحميل وسائط المنتج…
-				</Text>
-			</Box>
-		);
+		return <StateView kind="loading" title="جارٍ تحميل وسائط المنتج…" />;
 	}
 
 	if (screenState === 'offline') {
-		return (
-			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 16, backgroundColor: theme.background }}>
-				<Text role="bodyStrong" tone="warning" align="center">لا يوجد اتصال بالشبكة</Text>
-				<Text role="bodySm" tone="muted" align="center">يرجى التحقق من الاتصال والمحاولة مرة أخرى.</Text>
-				<Button label="إعادة المحاولة" tone="primary" onPress={loadAssets} />
-				{onBack && <Button label="رجوع" tone="ghost" onPress={onBack} />}
-			</Box>
-		);
+		return <StateView stateId="offline" actionLabel="إعادة المحاولة" onActionPress={loadAssets} />;
 	}
 
 	if (screenState === 'disabled' || !client) {
-		return (
-			<Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: theme.background }}>
-				<Text role="bodyStrong" tone="muted" align="center">واجهة API غير متاحة — تحقق من DSH_API_BASE_URL.</Text>
-				{onBack && <Button label="رجوع" tone="ghost" onPress={onBack} style={{ marginTop: 16 }} />}
-			</Box>
-		);
+		return <StateView stateId="blockingError" title="واجهة API غير متاحة" description="تحقق من DSH_API_BASE_URL." actionLabel={onBack ? 'رجوع' : undefined} onActionPress={onBack} />;
 	}
 
 	return (
@@ -219,10 +204,10 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 			contentContainerStyle={{ paddingBottom: 120 }}
 			keyboardShouldPersistTaps="handled"
 		>
-			<Box gap={4} style={{ padding: 16 }}>
+			<Box gap={4} style={{ padding: spacing[4] }}>
 
 				{/* ── Header ── */}
-				<Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 12 }}>
+				<Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[3] }}>
 					{onBack && (
 						<Button label="رجوع" tone="ghost" size="sm" fullWidth={false} onPress={onBack} />
 					)}
@@ -239,11 +224,11 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 					<Box
 						style={{
 							backgroundColor: theme.danger + '15',
-							borderRadius: 8,
-							padding: 12,
+							borderRadius: radius.xs2,
+							padding: spacing[3],
 							borderStartWidth: 3,
 							borderStartColor: theme.danger,
-							gap: 8,
+							gap: spacing[2],
 						}}
 					>
 						<Text role="bodySm" tone="danger" align="start">
@@ -258,11 +243,11 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 					<Box
 						style={{
 							backgroundColor: theme.brand + '12',
-							borderRadius: 8,
-							padding: 12,
+							borderRadius: radius.xs2,
+							padding: spacing[3],
 							borderStartWidth: 3,
 							borderStartColor: theme.brand,
-							gap: 8,
+							gap: spacing[2],
 						}}
 					>
 						<Text role="bodyStrong" tone="brand" align="start">جارٍ الرفع… {uploadProgress}%</Text>
@@ -277,7 +262,7 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 					<Text role="bodyStrong" align="start">وسائط المنتج الحالية ({assets.length})</Text>
 
 					{assets.length === 0 ? (
-						<Box style={{ padding: 24, borderStyle: 'dashed', borderWidth: 1, borderColor: theme.line, borderRadius: 8, alignItems: 'center' }}>
+						<Box style={{ padding: spacing[6], borderStyle: 'dashed', borderWidth: 1, borderColor: theme.line, borderRadius: radius.xs2, alignItems: 'center' }}>
 							<Text role="bodySm" tone="muted" align="center">لا توجد وسائط مرتبطة بهذا المنتج.</Text>
 						</Box>
 					) : (
@@ -288,27 +273,27 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 									flexDirection: resolveRowDirection(direction),
 									alignItems: 'center',
 									justifyContent: 'space-between',
-									paddingVertical: 12,
-									paddingHorizontal: 4,
+									paddingVertical: spacing[3],
+									paddingHorizontal: spacing[1],
 									borderBottomWidth: 1,
 									borderBottomColor: theme.line,
-									gap: 12,
+									gap: spacing[3],
 								}}
 							>
-								<Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 12, flex: 1 }}>
+								<Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[3], flex: 1 }}>
 									{asset.public_url ? (
 										<Image
 											source={{ uri: asset.public_url }}
-											style={{ width: 64, height: 64, borderRadius: 6, backgroundColor: theme.line + '20' }}
+											style={{ width: 64, height: 64, borderRadius: radius.xs, backgroundColor: theme.line + '20' }}
 											resizeMode="cover"
 										/>
 									) : (
-										<Box style={{ width: 64, height: 64, borderRadius: 6, backgroundColor: theme.line + '20', justifyContent: 'center', alignItems: 'center' }}>
+										<Box style={{ width: 64, height: 64, borderRadius: radius.xs, backgroundColor: theme.line + '20', justifyContent: 'center', alignItems: 'center' }}>
 											<Text role="caption" tone="muted" align="center">{asset.status}</Text>
 										</Box>
 									)}
 									<Box style={{ flex: 1 }}>
-										<Text role="bodyStrong" align="start" style={{ fontSize: 12 }}>{asset.id}</Text>
+										<Text role="bodyStrong" align="start" style={{ fontSize: typographyRoles.caption.fontSize }}>{asset.id}</Text>
 										<Text role="caption" tone="muted" align="start">{formatMediaLabel(asset)}</Text>
 										<Chip label={asset.status} tone={asset.status === 'uploaded' ? 'success' : 'default'} />
 									</Box>
@@ -343,7 +328,7 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 						tone="primary"
 						disabled={isWorking || Platform.OS !== 'web'}
 						onPress={handlePickAndUpload}
-						style={{ marginTop: 12 }}
+						style={{ marginTop: spacing[3] }}
 					/>
 				</Box>
 

@@ -1,8 +1,11 @@
 import { StyleSheet } from 'react-native';
-import { colorPalette, withAlpha, resolveRowDirection, resolveTextAlign, type Direction, spacing, shadowPresets } from '@bthwani/ui-kit';
+import { colorPalette, withAlpha, resolveRowDirection, resolveTextAlign, type Direction, spacing, shadowPresets,
+  radius,
+  typographyRoles,
+} from '@bthwani/ui-kit';
 import { useTheme } from '@bthwani/ui-kit';
 
-export function createStyles(direction: Direction, theme: ReturnType<typeof useTheme>['theme']) {
+export function buildHomeScreenStyles(direction: Direction, theme: ReturnType<typeof useTheme>['theme']) {
   const rowDirection = resolveRowDirection(direction);
   const textAlign = resolveTextAlign(direction);
 
@@ -17,9 +20,9 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       borderBottomLeftRadius: 32,
       borderBottomRightRadius: 32,
       overflow: 'visible',
-      paddingTop: 12,
-      paddingBottom: 12,
-      paddingHorizontal: 16,
+      paddingTop: spacing[3],
+      paddingBottom: spacing[3],
+      paddingHorizontal: spacing[4],
       backgroundColor: theme.brand,
       borderWidth: 0,
       borderColor: 'transparent',
@@ -38,7 +41,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       justifyContent: 'center',
     },
     premiumBannerCard: {
-      borderRadius: 24,
+      borderRadius: radius.xl,
       overflow: 'hidden',
       backgroundColor: theme.surfaceRaised,
       ...shadowPresets.raised,
@@ -86,7 +89,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       top: 12,
       width: 32,
       height: 32,
-      borderRadius: 16,
+      borderRadius: radius.md2,
       backgroundColor: colorPalette.white,
       padding: 3,
       elevation: 6,
@@ -99,39 +102,36 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     premiumBannerBadge: {
       position: 'absolute',
       top: 14,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 999,
+      paddingHorizontal: spacing[2],
+      paddingVertical: spacing[1],
+      borderRadius: radius.pill,
       elevation: 6,
       zIndex: 5,
     },
     premiumBannerBadgeText: {
       color: colorPalette.white,
-      fontSize: 11,
-      fontWeight: '900',
+      fontSize: typographyRoles.overline.fontSize,
     },
     premiumBannerContent: {
       flex: 1,
       paddingHorizontal: 14,
-      paddingTop: 40,
+      paddingTop: spacing[10],
       paddingBottom: 14,
       zIndex: 4,
       justifyContent: 'flex-end',
     },
     premiumBannerTitle: {
       color: colorPalette.white,
-      fontSize: 17,
-      fontWeight: '900',
+      fontSize: typographyRoles.bodyLg.fontSize,
       textShadowColor: withAlpha(colorPalette.black, 0.4),
       textShadowOffset: { width: 0, height: 2 },
       textShadowRadius: 4,
-      lineHeight: 20,
+      lineHeight: typographyRoles.bodySm.lineHeight,
       textAlign,
     },
     premiumBannerSubtitle: {
       color: withAlpha(colorPalette.white, 0.95),
       fontSize: 10,
-      fontWeight: '600',
       marginTop: 3,
       textShadowColor: withAlpha(colorPalette.black, 0.3),
       textShadowOffset: { width: 0, height: 1 },
@@ -140,17 +140,16 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       textAlign,
     },
     premiumBannerCta: {
-      marginTop: 8,
-      paddingHorizontal: 12,
+      marginTop: spacing[2],
+      paddingHorizontal: spacing[3],
       paddingVertical: 6,
-      borderRadius: 999,
+      borderRadius: radius.pill,
       alignSelf: 'flex-start',
       elevation: 5,
       zIndex: 5,
     },
     premiumBannerCtaText: {
       fontSize: 10,
-      fontWeight: '900',
     },
     premiumCarouselControls: {
       position: 'absolute',
@@ -170,14 +169,14 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       gap: 6,
       alignItems: 'center',
       backgroundColor: withAlpha(colorPalette.black, 0.3),
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 999,
+      paddingHorizontal: spacing[2],
+      paddingVertical: spacing[1],
+      borderRadius: radius.pill,
     },
     premiumIndicator: {
       width: 5,
       height: 5,
-      borderRadius: 999,
+      borderRadius: radius.pill,
       backgroundColor: withAlpha(colorPalette.white, 0.4),
     },
     premiumIndicatorActive: {
@@ -199,17 +198,17 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     categoriesSelectorRow: {
       flexDirection: rowDirection,
       alignItems: 'flex-start',
-      gap: 4, // Further reduced to minimize space as requested
+      gap: spacing[1], // Further reduced to minimize space as requested
     },
     fixedIconsContainer: {
       flexDirection: rowDirection,
       alignItems: 'flex-start',
-      gap: 8,
+      gap: spacing[2],
       flexShrink: 0,
     },
     categorySelectorCard: {
       alignItems: 'center',
-      gap: 4,
+      gap: spacing[1],
     },
     videoIconContainer: {
       backgroundColor: theme.surfaceRaised,
@@ -222,14 +221,13 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     },
     categoryName: {
       color: theme.text,
-      fontWeight: '700',
-      fontSize: 11,
+      fontSize: typographyRoles.overline.fontSize,
       textAlign: 'center',
     },
     categoryIconContainer: {
       width: 56,
       height: 56,
-      borderRadius: 20, // More premium rounded corner
+      borderRadius: radius.lg2, // More premium rounded corner
       backgroundColor: theme.surfaceRaised,
       alignItems: 'center',
       justifyContent: 'center',
@@ -259,11 +257,11 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     heroPromoCard: {
       flex: 1.6,
       height: 74, // Matches the height of CategorySelectorItem (56 icon + 4 gap + 14 text)
-      borderRadius: 18,
+      borderRadius: radius.lg,
       backgroundColor: theme.surfaceInset,
       borderWidth: 1,
       borderColor: theme.line,
-      paddingHorizontal: 12,
+      paddingHorizontal: spacing[3],
       justifyContent: 'center',
       overflow: 'hidden',
       ...shadowPresets.raised,
@@ -283,7 +281,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     heroPromoIconContainer: {
       width: 44,
       height: 44,
-      borderRadius: 12,
+      borderRadius: radius.sm2,
       backgroundColor: withAlpha(colorPalette.warning, 0.08),
       alignItems: 'center',
       justifyContent: 'center',
@@ -300,15 +298,13 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     },
     heroPromoTitle: {
       color: theme.brand,
-      fontWeight: '900',
-      fontSize: 15, // Slightly larger for prominence
-      lineHeight: 18,
+      fontSize: typographyRoles.bodyMd.fontSize, // Slightly larger for prominence
+      lineHeight: typographyRoles.titleSm.lineHeight,
       textAlign: 'right',
     },
     heroPromoSubtitle: {
       color: theme.textMuted,
       fontSize: 9,
-      fontWeight: '700',
       marginTop: 0,
       textAlign: 'right',
       marginBottom: 2,
@@ -318,19 +314,18 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       flexDirection: 'row-reverse',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: 8,
+      paddingHorizontal: spacing[2],
       paddingVertical: 3,
       height: 22, // Fixed height for consistency
-      borderRadius: 8,
+      borderRadius: radius.xs2,
       gap: 3,
     },
     heroPromoCtaText: {
       color: colorPalette.white,
       fontSize: 9,
-      fontWeight: '900',
     },
     heroPagerRow: {
-      marginTop: 4,
+      marginTop: spacing[1],
       alignItems: 'center',
     },
     heroPagerActive: {
@@ -345,15 +340,15 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     categoriesSelectorScrollContent: {
       flexDirection: rowDirection,
       alignItems: 'center',
-      gap: 8,
+      gap: spacing[2],
     },
     subcategorySelectorCard: {
       flexDirection: rowDirection,
       alignItems: 'center',
       backgroundColor: theme.surfaceInset,
-      borderRadius: 999,
-      paddingHorizontal: 12,
-      paddingVertical: 8,
+      borderRadius: radius.pill,
+      paddingHorizontal: spacing[3],
+      paddingVertical: spacing[2],
       gap: 6,
       borderWidth: 1,
       borderColor: theme.line,
@@ -365,18 +360,17 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     subcategoryIconContainer: {
       width: 32,
       height: 32,
-      borderRadius: 16,
+      borderRadius: radius.md2,
       backgroundColor: theme.surface,
       alignItems: 'center',
       justifyContent: 'center',
     },
     subcategoryEmoji: {
-      fontSize: 14,
+      fontSize: typographyRoles.bodySm.fontSize,
     },
     subcategoryName: {
       color: theme.text,
-      fontWeight: '700',
-      fontSize: 12,
+      fontSize: typographyRoles.caption.fontSize,
     },
     subcategoryNameActive: {
       color: theme.textInverse,
@@ -400,12 +394,12 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
       paddingBottom: spacing[8],
     },
     emptyFeed: {
-      borderRadius: 24,
+      borderRadius: radius.xl,
       backgroundColor: theme.surface,
-      padding: 32,
+      padding: spacing[8],
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 12,
+      gap: spacing[3],
       borderWidth: 1,
       borderColor: theme.line,
     },
@@ -419,7 +413,7 @@ export function createStyles(direction: Direction, theme: ReturnType<typeof useT
     emptyFeedText: {
       color: theme.textMuted,
       textAlign: 'center',
-      lineHeight: 20,
+      lineHeight: typographyRoles.bodySm.lineHeight,
     },
     storeListCard: {
       width: '100%',

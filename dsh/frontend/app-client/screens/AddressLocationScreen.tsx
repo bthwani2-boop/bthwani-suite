@@ -15,6 +15,7 @@ import {
   ActionStrip,
   Badge,
   Divider,
+  radius,
 } from '@bthwani/ui-kit';
 
 export type DshAddressLocationScreenProps = {
@@ -67,7 +68,7 @@ function AddressRow({ address, isLast = false, onSetDefault, onEdit }: AddressRo
               tone="brand"
               size="sm"
               fullWidth={false}
-              style={{ borderRadius: 8 }}
+              style={{ borderRadius: radius.xs2 }}
               onPress={() => {
                 onSetDefault(address.id);
                 setExpanded(false);
@@ -79,7 +80,7 @@ function AddressRow({ address, isLast = false, onSetDefault, onEdit }: AddressRo
             tone="secondary"
             size="sm"
             fullWidth={false}
-            style={{ borderRadius: 8 }}
+            style={{ borderRadius: radius.xs2 }}
             onPress={() => {
               onEdit(address.id);
               setExpanded(false);
@@ -159,7 +160,7 @@ export function DshAddressLocationScreen({ onBack }: DshAddressLocationScreenPro
           <View
             style={{
               backgroundColor: theme.brandSurface,
-              borderRadius: 12,
+              borderRadius: radius.sm2,
               borderWidth: 1,
               borderColor: theme.line,
               paddingHorizontal: spacing[3],
@@ -178,7 +179,7 @@ export function DshAddressLocationScreen({ onBack }: DshAddressLocationScreenPro
           />
         </Box>
 
-        <View style={{ height: 1, backgroundColor: theme.line, marginVertical: spacing[1] }} />
+        <Divider style={{ marginVertical: spacing[1] }} />
 
         <View style={{ marginTop: spacing[4], gap: spacing[2] }}>
           <Text role="bodyStrong" tone="muted" style={{ textAlign: 'right', paddingHorizontal: spacing[4] }}>

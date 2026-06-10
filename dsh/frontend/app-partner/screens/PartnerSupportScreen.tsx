@@ -14,6 +14,7 @@ import {
   Text,
   TopBar,
   useDirection,
+  spacing,
 } from '@bthwani/ui-kit';
 import type {
   DshPartnerOperationalFlowId,
@@ -413,7 +414,6 @@ function InlineActionPanel({
   feedback?: string | null;
 }) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
 
   return (
@@ -482,7 +482,7 @@ function InlineActionPanel({
       </View>
 
       {feedback ? (
-        <Text role="caption" tone="success" style={{ textAlign, marginTop: 4 }}>
+        <Text role="caption" tone="success" style={{ textAlign, marginTop: spacing[1] }}>
           {feedback}
         </Text>
       ) : null}
@@ -492,7 +492,6 @@ function InlineActionPanel({
 
 function InlineDetailsPanel({ item }: { item: OperationsSupportCase }) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
 
   return (
@@ -523,7 +522,7 @@ function InlineDetailsPanel({ item }: { item: OperationsSupportCase }) {
         );
       })() : null}
 
-      <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: 4, alignItems: 'center' }}>
+      <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: spacing[1], alignItems: 'center' }}>
         <Text role="caption" tone="muted" style={{ textAlign }}>الأطراف:</Text>
         {item.linkedParties.map((party) => (
           <ReadOnlyMetaLabel key={party} label={party} tone="brand" />
@@ -568,14 +567,13 @@ function CommandCenterCaseRow({
   feedback?: string | null;
 }) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
   const category = getPartnerOrderIssueCategorySpec(item.issueCategoryId);
 
   return (
     <Box gap={1} style={{ width: '100%' }}>
       <Box paddingY={2}>
-        <View style={{ flexDirection: rowDirection, alignItems: 'flex-start', gap: 12 }}>
+        <View style={{ flexDirection: rowDirection, alignItems: 'flex-start', gap: spacing[3] }}>
           <Icon
             name={
               item.requiresProof
@@ -595,7 +593,7 @@ function CommandCenterCaseRow({
 
           <View style={{ flex: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
             <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
-              <Text role="bodyStrong" style={{ textAlign, fontSize: 15 }}>
+              <Text role="bodyStrong" style={{ textAlign,}}>
                 {item.headline}
               </Text>
               <ReadOnlyMetaLabel
@@ -614,7 +612,7 @@ function CommandCenterCaseRow({
               </Text>
             ) : null}
 
-            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 8, marginTop: 4 }}>
+            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[2], marginTop: spacing[1] }}>
               <Button label="معالجة" size="sm" fullWidth={false} onPress={onToggleAction} />
               <Button label={isExpanded ? "إغلاق التفاصيل" : "تفاصيل"} size="sm" fullWidth={false} tone="secondary" onPress={onToggleDetails} />
             </View>
@@ -660,7 +658,6 @@ export function PartnerSupportScreen({
   initialSupportRouteId = null,
 }: PartnerSupportScreenProps) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
 
   const [selectedFilterId, setSelectedFilterId] = React.useState<DshPartnerSupportCommandFilterId>(initialFilterId);
@@ -747,7 +744,7 @@ export function PartnerSupportScreen({
   const listCases = visibleItems.slice(1);
 
   return (
-    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 48 }}>
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: spacing[12] }}>
       <TopBar
         variant="secondary"
         title="العمليات والدعم"
@@ -756,7 +753,7 @@ export function PartnerSupportScreen({
       />
 
       <Box gap={1} paddingY={1}>
-        <Text role="bodySm" tone="danger" style={{ textAlign, fontWeight: 'bold' }}>
+        <Text role="bodySm" tone="danger" weight="bold" style={{ textAlign }}>
           {`الأولوية الآن: ${urgentCount} حالات تحتاج إجراءً عاجلاً`}
         </Text>
       </Box>
@@ -764,7 +761,7 @@ export function PartnerSupportScreen({
       <Divider />
 
       <Box gap={2} paddingY={1}>
-        <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', gap: spacing[2] }}>
           <Tabs
             items={commandCenterFilterItems}
             value={selectedFilterId}
@@ -830,7 +827,7 @@ export function PartnerSupportScreen({
             ) : null}
           </View>
 
-          <View style={{ flexDirection: rowDirection, gap: 8, marginTop: 4, width: '100%' }}>
+          <View style={{ flexDirection: rowDirection, gap: spacing[2], marginTop: spacing[1], width: '100%' }}>
             <Button
               label="معالجة الآن"
               size="sm"

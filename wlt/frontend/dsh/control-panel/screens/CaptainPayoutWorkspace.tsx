@@ -44,7 +44,7 @@ export function CaptainPayoutWorkspace({
           <Box padding={4} gap={4}>
             <WltBoundaryBanner record={boundaryRecord} />
             <Box padding={3} background="surfaceRaised" radiusToken="md" gap={1}>
-              <Text role="bodySm" tone="muted" style={{ fontWeight: '700' }}>تنبيه الفصل المالي</Text>
+              <Text role="bodySm" tone="muted" weight="bold">تنبيه الفصل المالي</Text>
               <Text role="bodySm" tone="muted">
                 هذه البيانات لكباتن بثواني (bthwani_captain_mode) فقط — موصلو المتاجر (store_courier_mode) لا يظهرون هنا. تعويض موصل المتجر يُدار بين المتجر وموصله مباشرةً ولا يمر عبر تسوية WLT للكابتن.
               </Text>

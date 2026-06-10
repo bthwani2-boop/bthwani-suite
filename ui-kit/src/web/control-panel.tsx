@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { Box, Surface, Text, Divider } from '../primitives';
 import { useDirection, useTheme } from '../providers';
@@ -23,13 +24,12 @@ export function WebControlPanelShell({ children, rail, topBar }: WebControlPanel
       style={{
         width: '100%',
         height: '100vh',
-        minHeight: '100vh',
         minHeight: '100dvh',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
         backgroundColor: neutralPalette[50]
-      }}
+      } as any}
     >
       {topBar}
       <Box
@@ -84,7 +84,7 @@ export function WebControlPanelTopBar({ title, subtitle, leading, trailing, acti
         flexDirection: isRtl ? 'row-reverse' : 'row',
         alignItems: 'center',
         justifyContent: 'space-between'
-      }}
+      } as any}
     >
       <Box layoutDirection="row" align="center" gap={3}>
         {leading}
@@ -132,13 +132,13 @@ export function WebControlPanelRail({ children, collapsed, footer }: WebControlP
         flexDirection: 'column',
         overflow: 'hidden',
         zIndex: 5
-      }}
+      } as any}
     >
       <Box style={{ flex: 1, minHeight: 0, minWidth: 0, overflow: 'hidden' }} padding={2}>
         {children}
       </Box>
       {footer && (
-        <Box padding={2} style={{ borderTop: `1px solid ${withAlpha(colorPalette.white, 0.1)}` }}>
+        <Box padding={2} style={{ borderTop: `1px solid ${withAlpha(colorPalette.white, 0.1)}` } as any}>
           {footer}
         </Box>
       )}
@@ -164,7 +164,7 @@ export function WebControlPanelStage({ children, maxWidth = '100%' }: WebControl
         maxWidth: maxWidth,
         margin: '0 auto',
         minHeight: '100%'
-      }}
+      } as any}
     >
       {children}
     </Box>
@@ -191,7 +191,7 @@ export function WebControlPanelSectionHeader({ title, description, actions }: We
       align="flex-end"
       style={{ width: '100%', marginBottom: 12 }}
     >
-      <Box gap={1} style={{ textAlign: isRtl ? 'right' : 'left' }}>
+      <Box gap={1} style={{ textAlign: isRtl ? 'right' : 'left' } as any}>
         <Text role="headingSm" weight="black" tone="default">{title}</Text>
         {description && <Text role="bodySm" tone="muted">{description}</Text>}
       </Box>
@@ -217,7 +217,7 @@ export function WebControlPanelSignalStrip({ children }: WebControlPanelSignalSt
         flexWrap: 'wrap',
         overflowX: 'hidden',
         paddingBottom: 8
-      }}
+      } as any}
     >
       {children}
     </Box>
@@ -246,7 +246,7 @@ export function WebControlPanelKpiTile({ label, value, trend, icon }: WebControl
         flex: 1,
         border: `1px solid ${withAlpha(colorPalette.brandStrong, 0.05)}`,
         background: colorPalette.white
-      }}
+      } as any}
     >
       <Box layoutDirection="row" justify="space-between" align="flex-start">
         <Box gap={1}>
@@ -302,7 +302,7 @@ export function WebControlPanelCommandCard({ title, description, icon, onPress, 
         transition: 'transform 0.15s ease, box-shadow 0.15s ease',
         border: `1px solid ${withAlpha(colorPalette.brandStrong, 0.08)}`,
         background: `linear-gradient(180deg, ${colorPalette.white} 0%, ${neutralPalette[50]} 100%)`
-      }}
+      } as any}
       elevationToken="flat"
       // @ts-ignore
       hoverStyle={{ transform: 'translateY(-2px)', boxShadow: `0 12px 24px ${withAlpha(colorPalette.brandStrong, 0.08)}` }}
@@ -314,13 +314,13 @@ export function WebControlPanelCommandCard({ title, description, icon, onPress, 
           radiusToken="lg"
           style={{ backgroundColor: withAlpha(colorPalette.brand, 0.08) }}
         >
-          <Icon name={icon} size={24} tone="accent" />
+          <Icon name={icon} size={24} tone="brand" />
         </Box>
         {badge && (
           <Box
             paddingX={2}
             paddingY={1}
-            radiusToken="full"
+            radiusToken="pill"
             style={{ backgroundColor: colorPalette.brand }}
           >
             <Text role="caption" weight="black" style={{ color: colorPalette.white, fontSize: 10 }}>{badge}</Text>
@@ -358,9 +358,9 @@ export function WebControlPanelDecisionQueue({ title, items }: WebControlPanelDe
     <Surface
       padding={0}
       radiusToken="xl"
-      style={{ width: '100%', overflow: 'hidden', border: `1px solid ${withAlpha(colorPalette.brandStrong, 0.08)}` }}
+      style={{ width: '100%', overflow: 'hidden', border: `1px solid ${withAlpha(colorPalette.brandStrong, 0.08)}` } as any}
     >
-      <Box padding={4} style={{ backgroundColor: neutralPalette[100], borderBottom: `1px solid ${withAlpha(colorPalette.brandStrong, 0.05)}` }}>
+      <Box padding={4} style={{ backgroundColor: neutralPalette[100], borderBottom: `1px solid ${withAlpha(colorPalette.brandStrong, 0.05)}` } as any}>
         <Text role="labelLg" weight="black">{title}</Text>
       </Box>
       <Box>
@@ -376,13 +376,13 @@ export function WebControlPanelDecisionQueue({ title, items }: WebControlPanelDe
                 flexDirection: isRtl ? 'row-reverse' : 'row'
               }}
             >
-              <Box gap={1} style={{ textAlign: isRtl ? 'right' : 'left' }}>
+              <Box gap={1} style={{ textAlign: isRtl ? 'right' : 'left' } as any}>
                 <Text role="labelMd" weight="bold">{item.title}</Text>
                 <Text role="caption" tone="muted">{item.meta} • {item.status}</Text>
               </Box>
               <Box layoutDirection="row" gap={2}>
-                <Button label="Reject" tone="danger" size="sm" onAction={item.onReject} />
-                <Button label="Approve" tone="brand" size="sm" onAction={item.onApprove} />
+                <Button label="Reject" tone="danger" size="sm" onPress={item.onReject} />
+                <Button label="Approve" tone="brand" size="sm" onPress={item.onApprove} />
               </Box>
             </Box>
             {index < items.length - 1 && <Divider />}
@@ -414,12 +414,12 @@ export function WebControlPanelEmptyState({ title, description, icon, actionLabe
     <Box padding={10} align="center" gap={4} style={{ width: '100%', minHeight: 400, justifyContent: 'center' }}>
       <Box
         padding={6}
-        radiusToken="full"
+        radiusToken="pill"
         style={{ backgroundColor: withAlpha(colorPalette.brandStrong, 0.03), marginBottom: 12 }}
       >
-        <Icon name={icon} size={64} tone="soft" />
+        <Icon name={icon} size={64} tone="muted" />
       </Box>
-      <Box gap={2} align="center" style={{ maxWidth: 400, textAlign: 'center' }}>
+      <Box gap={2} align="center" style={{ maxWidth: 400, textAlign: 'center' } as any}>
         <Text role="headingSm" weight="black">{title}</Text>
         <Text role="bodyMd" tone="muted">{description}</Text>
       </Box>
@@ -427,7 +427,7 @@ export function WebControlPanelEmptyState({ title, description, icon, actionLabe
         <Button
           label={actionLabel}
           tone="brand"
-          onAction={onAction}
+          onPress={onAction}
           style={{ marginTop: 12 }}
         />
       )}

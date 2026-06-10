@@ -17,6 +17,7 @@ import {
   resolveRowDirection,
   useBThwaniAppearance,
   useDirection,
+  spacing,
 } from '@bthwani/ui-kit';
 import type { DshPartnerOrderConversationMode } from '../../shared/dsh-order-preview.contract';
 import { AcceptanceTimerSheet } from '../sheets';
@@ -434,7 +435,6 @@ function ReadOnlyMetaLabel({
 // ─── Inline Details Panel ──────────────────────────────────────────────────────
 function InlineOrderDetailsPanel({ item }: { item: PartnerOrderItem }) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
 
   return (
@@ -449,8 +449,8 @@ function InlineOrderDetailsPanel({ item }: { item: PartnerOrderItem }) {
         {`تاريخ الإنشاء: ${item.createdAtLabel} (${item.elapsedLabel})`}
       </Text>
 
-      <View style={{ gap: 2, marginTop: 4, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
-        <Text role="bodySm" style={{ fontWeight: '600', textAlign }}>تتبع حالة الطلب:</Text>
+      <View style={{ gap: 2, marginTop: spacing[1], alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
+        <Text role="bodySm" weight="semibold" style={{ textAlign }}>تتبع حالة الطلب:</Text>
         {resolveOrderHistory(item.status, item.orderMode).map((step) => (
           <View key={step.id} style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>
             <Icon
@@ -481,7 +481,6 @@ function InlineOrderActionPanel({
   onIssueAction: () => void;
 }) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
 
   return (
@@ -543,7 +542,6 @@ function CommandCenterOrderRow({
   onIssueAction: () => void;
 }) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
   const statusLabel = resolveStatusLabel(item.status, item.orderMode);
   const statusTone = resolveStatusTone(item.status);
@@ -552,7 +550,7 @@ function CommandCenterOrderRow({
   return (
     <Box gap={1} style={{ width: '100%' }}>
       <Box paddingY={2}>
-        <View style={{ flexDirection: rowDirection, alignItems: 'flex-start', gap: 12 }}>
+        <View style={{ flexDirection: rowDirection, alignItems: 'flex-start', gap: spacing[3] }}>
           <Icon
             name={
               item.orderMode === 'pickup'
@@ -569,7 +567,7 @@ function CommandCenterOrderRow({
           <View style={{ flex: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
             <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
               <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>
-                <Text role="bodyStrong" style={{ textAlign, fontSize: 15, color: colorPalette.textPrimary }}>
+                <Text role="bodyStrong" style={{ textAlign, color: colorPalette.textPrimary }}>
                   {item.orderCode}
                 </Text>
                 {isNewUnread ? (
@@ -608,7 +606,7 @@ function CommandCenterOrderRow({
               </Text>
             </Box>
 
-            <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: 4, alignItems: 'center' }}>
+            <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: spacing[1], alignItems: 'center' }}>
               <ReadOnlyMetaLabel label={item.orderTypeLabel} tone="brand" />
               {item.nextOwnerLabel ? (
                 <Text role="caption" tone="muted" style={{ textAlign }}>
@@ -625,7 +623,7 @@ function CommandCenterOrderRow({
               ) : null}
             </View>
 
-            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 8, marginTop: 6 }}>
+            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[2], marginTop: 6 }}>
               <Button label="معالجة" size="sm" fullWidth={false} onPress={onToggleAction} />
               <Button label={isExpanded ? "إغلاق التفاصيل" : "تفاصيل"} size="sm" fullWidth={false} tone="secondary" onPress={onToggleDetails} />
             </View>
@@ -662,7 +660,6 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
     onRetry,
   } = props;
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
 
   const enrichedItems = React.useMemo(() => {
@@ -887,7 +884,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
 
   return (
     <>
-      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: 48 }}>
+      <MobileScrollView fill padding={4} gap={3} contentContainerStyle={{ paddingBottom: spacing[12] }}>
 
         {/* ─── Search + filter header ─── */}
         <Box layoutDirection="row" justify="space-between" align="center" style={{ flexDirection: resolveRowDirection(direction) }}>
@@ -925,8 +922,8 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
           />
 
           {/* Level 2: Secondary control buttons row and toggleable search field */}
-          <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 4 }}>
-            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 8 }}>
+          <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', gap: spacing[2], marginTop: spacing[1] }}>
+            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[2] }}>
               <Button
                 label={showSearch ? "إلغاء البحث" : "بحث"}
                 size="sm"
@@ -1006,7 +1003,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
               </Box>
             </View>
 
-            <View style={{ flexDirection: rowDirection, gap: 8, marginTop: 4, width: '100%' }}>
+            <View style={{ flexDirection: rowDirection, gap: spacing[2], marginTop: spacing[1], width: '100%' }}>
               <Button
                 label="معالجة الآن"
                 size="sm"
@@ -1132,7 +1129,7 @@ export function DshPartnerOrdersScreen(props: PartnerOrdersHomeScreenProps) {
             </Box>
           </Box>
 
-          <Box layoutDirection="row" gap={2} style={{ flexDirection: resolveRowDirection(direction), marginTop: 8 }}>
+          <Box layoutDirection="row" gap={2} style={{ flexDirection: resolveRowDirection(direction), marginTop: spacing[2] }}>
             <Button
               label="تطبيق"
               style={{ flex: 1 }}

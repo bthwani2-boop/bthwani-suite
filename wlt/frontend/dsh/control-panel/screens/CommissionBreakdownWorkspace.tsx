@@ -58,7 +58,7 @@ export function CommissionBreakdownWorkspace({ orderId = '—' }: CommissionBrea
         <div className={styles.surfaceInnerScroll}>
           <Box padding={4} gap={4}>
             <Box padding={3} background="warningSurface" radiusToken="md" gap={1}>
-              <Text role="label" style={{ fontWeight: '800', textAlign: 'right' }}>نظرة عامة على العمولات</Text>
+              <Text role="label" weight="black" style={{ textAlign: 'right' }}>نظرة عامة على العمولات</Text>
               <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
                 العمولة الحقيقية هي per-partner + per-mode وتُدار بالكامل عبر WLT. لا تُستخدم هذه الشاشة كمصدر مالي أو محاسبي.
               </Text>
@@ -106,7 +106,7 @@ export function CommissionBreakdownWorkspace({ orderId = '—' }: CommissionBrea
                     }}
                   >
                     <Text role="bodySm" tone={item.applies ? 'default' : 'muted'}>{label}</Text>
-                    <Text role="bodySm" family="mono" style={{ fontWeight: item.applies ? 700 : 400, color: item.applies ? theme.brand : theme.textMuted, direction: 'ltr', textAlign: 'right' }}>
+                    <Text role="bodySm" family="mono" weight={item.applies ? 'bold' : 'regular'} style={{ color: item.applies ? theme.brand : theme.textMuted, direction: 'ltr', textAlign: 'right' }}>
                       {item.applies ? item.label : `— ${item.reason}`}
                     </Text>
                   </div>

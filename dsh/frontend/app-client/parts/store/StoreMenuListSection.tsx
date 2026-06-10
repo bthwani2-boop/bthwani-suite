@@ -112,7 +112,7 @@ export const StoreMenuListSection = React.memo(function StoreMenuListSection({
         id: category.id,
         label: normalizeDisplayText(category.label),
         icon: CATEGORY_ICON[category.id]
-          ? <Text style={{ fontSize: 14 }}>{CATEGORY_ICON[category.id]}</Text>
+          ? <Text role="bodyMd" style={{}}>{CATEGORY_ICON[category.id]}</Text>
           : ({ selected }: { selected: boolean }) => (
               <Icon
                 name={
@@ -162,7 +162,7 @@ export const StoreMenuListSection = React.memo(function StoreMenuListSection({
   const listEmptyComponent = React.useMemo(() => (
     <View style={styles.emptyFeed}>
       <Text style={styles.emptyFeedEmoji}>{headerSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
-      <Text style={styles.emptyFeedTitle}>
+      <Text weight="black" style={styles.emptyFeedTitle}>
         {headerSearchQuery.trim() ? 'لا توجد نتائج داخل هذا المتجر' : storeText.get.emptyCategoryTitle}
       </Text>
       <Text style={styles.emptyFeedText}>

@@ -9,19 +9,12 @@
 // Core Surface & Host
 export { DshClientSurface } from './DshClientSurface';
 
-/**
- * Compatibility alias for DshClientSurface.
- * @deprecated Use DshClientSurface instead.
- */
-export { DshClientSurface as DshSurfaceHost } from './DshClientSurface';
-
 // Public Types required by Composition/Shell
 export type {
 	DshClientSurfaceProps,
 	DshCommandTarget,
 	DshNavigationCommand,
 	DshRoute,
-	DshSurfaceHostProps,
 } from './dsh-client.types';
 
 // Routing & Registry

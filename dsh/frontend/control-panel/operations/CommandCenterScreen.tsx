@@ -20,14 +20,6 @@ import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data'
 
 export type CommandCenterScreenProps = { hubHref: string; subGroup?: string; };
 
-const PULSE_TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  brand:   'neutral',
-  best:    'success',
-  warning: 'warning',
-  danger:  'danger',
-  neutral: 'neutral',
-  success: 'success',
-};
 
 const TOP_SUGGESTIONS = [
   {

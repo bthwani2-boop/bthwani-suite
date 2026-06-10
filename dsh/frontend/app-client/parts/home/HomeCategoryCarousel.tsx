@@ -87,7 +87,7 @@ export const CategorySelectorItem = React.memo(function CategorySelectorItem({
 				{icon}
 			</View>
 			<View style={[styles.categoryNameContainer]}>
-				<Text role="bodySm" style={[styles.categoryName, isSelected && { color: theme.brand }]} numberOfLines={1}>
+				<Text role="bodySm" weight="bold" style={[styles.categoryName, isSelected && { color: theme.brand }]} numberOfLines={1}>
 					{label}
 				</Text>
 			</View>

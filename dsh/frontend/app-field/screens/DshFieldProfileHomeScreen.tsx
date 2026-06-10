@@ -1,6 +1,9 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Badge, borders, Box, Button, Divider, Icon, MobileScrollView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
+import { Badge, borders, Box, Button, Divider, Icon, MobileScrollView, Text, TopBar, useTheme,
+  radius,
+  spacing,
+} from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { resolveFieldFilterCounts, type FieldStoreFile } from '../../data/stores.preview-data';
 
@@ -41,7 +44,7 @@ export function DshFieldProfileHomeScreen({
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
         <Box padding={4} gap={4}>
           <Box gap={3} paddingY={2}>
-            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing[2] }}>
               <Badge label="DSH" tone="success" />
               <Badge label="الميداني" tone="brand" />
             </View>
@@ -49,7 +52,7 @@ export function DshFieldProfileHomeScreen({
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
               الفريق الشمالي · الملف التشغيلي يبقى عند الميداني حتى اكتمال الملف والمراجعة والمالية المرتبطة به.
             </Text>
-            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing[2] }}>
               <Badge label={`ملفات اليوم ${counts.today}`} tone="brand" />
               <Badge label={`مرسل ${counts.submitted}`} tone="info" />
               <Badge label={`مالية جاهزة ${counts.done}`} tone="success" />
@@ -72,12 +75,12 @@ export function DshFieldProfileHomeScreen({
                 backgroundColor: theme.surface,
               }}
             >
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[3], flexShrink: 1, minWidth: 0 }}>
                 <View
                   style={{
                     width: 36,
                     height: 36,
-                    borderRadius: 10,
+                    borderRadius: radius.sm,
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: theme.surfaceInset,
@@ -100,36 +103,36 @@ export function DshFieldProfileHomeScreen({
                 style={{
                   flexDirection: 'row-reverse',
                   backgroundColor: theme.surfaceInset,
-                  borderRadius: 12,
+                  borderRadius: radius.sm2,
                   padding: 3,
                   borderWidth: borders.hairline,
                   borderColor: theme.line,
-                  gap: 4,
+                  gap: spacing[1],
                 }}
               >
                 <Pressable
                   onPress={() => onAppearanceModeChange('lightPremium')}
                   style={{
-                    paddingHorizontal: 12,
+                    paddingHorizontal: spacing[3],
                     paddingVertical: 6,
                     borderRadius: 9,
                     backgroundColor: appearanceMode === 'lightPremium' ? theme.brand : 'transparent',
                   }}
                 >
-                  <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text }}>
+                  <Text role="bodyStrong" style={{ color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text }}>
                     فاتح
                   </Text>
                 </Pressable>
                 <Pressable
                   onPress={() => onAppearanceModeChange('darkGlass')}
                   style={{
-                    paddingHorizontal: 12,
+                    paddingHorizontal: spacing[3],
                     paddingVertical: 6,
                     borderRadius: 9,
                     backgroundColor: appearanceMode === 'darkGlass' ? theme.brand : 'transparent',
                   }}
                 >
-                  <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text }}>
+                  <Text role="bodyStrong" style={{ color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text }}>
                     داكن
                   </Text>
                 </Pressable>

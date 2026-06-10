@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   radioCircle: {
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: radius.sm,
     borderWidth: 2,
     borderColor: colorPalette.line,
     alignItems: 'center',

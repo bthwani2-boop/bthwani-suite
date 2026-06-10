@@ -74,7 +74,7 @@ export function DshIdentityHubScreen({ state = 'ready', onRetry, onBack }: DshMy
             <Text role="bodyStrong" style={{ textAlign: 'right', color: theme.text }}>بيانات الحساب الشخصي</Text>
             <Box align="center" gap={1} style={{ flexDirection: 'row-reverse' }}>
               <Icon name="checkmark-circle" size={16} color={colorPalette.success} />
-              <Text role="bodySm" style={{ color: colorPalette.success, fontWeight: 'bold' }}>نشط وآمن</Text>
+              <Text role="bodySm" weight="bold" style={{ color: colorPalette.success }}>نشط وآمن</Text>
             </Box>
           </Box>
 
@@ -220,7 +220,7 @@ export function DshIdentityHubScreen({ state = 'ready', onRetry, onBack }: DshMy
                   <Text role="bodySm" style={{ textAlign: 'right', color: colorPalette.dangerStrong }}>
                     حذف الحساب سيؤدي إلى مسح كافة البيانات والطلبات والمحفظة بشكل نهائي ولا يمكن استرجاعها.
                   </Text>
-                  <Text role="bodySm" style={{ textAlign: 'right', color: colorPalette.dangerStrong, marginTop: 4 }}>
+                  <Text role="bodySm" style={{ textAlign: 'right', color: colorPalette.dangerStrong, marginTop: spacing[1] }}>
                     لتأكيد الإجراء, يرجى كتابة "حذف" في الحقل أدناه:
                   </Text>
 
@@ -232,7 +232,7 @@ export function DshIdentityHubScreen({ state = 'ready', onRetry, onBack }: DshMy
                   />
 
                   {deleteStatusMsg ? (
-                    <Text role="bodySm" style={{ textAlign: 'right', color: colorPalette.success, fontWeight: 'bold', marginTop: 4 }}>
+                    <Text role="bodySm" weight="bold" style={{ textAlign: 'right', color: colorPalette.success, marginTop: spacing[1] }}>
                       {deleteStatusMsg}
                     </Text>
                   ) : null}

@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { Modal, View, Pressable, Animated, Platform, Image, TouchableOpacity } from 'react-native';
-import { Icon, Text } from '@bthwani/ui-kit';
+import { Icon, Text,
+  radius,
+  spacing,
+} from '@bthwani/ui-kit';
 
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
 import { normalizeDisplayText } from '../../shared/store-formatting';
@@ -91,9 +94,9 @@ export function StoreImagePreviewSheet({
                 backgroundColor: stylesTokens.whiteOverlay,
                 borderColor: appearanceChrome.modalBorder,
                 borderWidth: 1,
-                borderRadius: 24,
-                margin: 12,
-                padding: 12,
+                borderRadius: radius.xl,
+                margin: spacing[3],
+                padding: spacing[3],
                 position: 'absolute',
                 bottom: 0,
                 left: 0,
@@ -107,18 +110,18 @@ export function StoreImagePreviewSheet({
           >
             <View style={[styles.previewDetailsContent, { flex: 1, alignItems: isRTL ? 'flex-end' : 'flex-start', paddingRight: isRTL ? 56 : 0, paddingLeft: isRTL ? 0 : 8 }]}>
               <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap' }}>
-                <Text style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText, fontSize: 16 }]} numberOfLines={1}>{normalizeDisplayText(item.name)}</Text>
-                {store ? <Text style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 4, fontSize: 12 }]}>· {normalizedStoreName}</Text> : null}
+                <Text role="labelLg" weight="black" style={[styles.previewDetailsTitle, { color: appearanceChrome.primaryText }]} numberOfLines={1}>{normalizeDisplayText(item.name)}</Text>
+                {store ? <Text role="caption" weight="black" style={[styles.previewStoreName, { color: appearanceChrome.accent, marginHorizontal: 4 }]}>· {normalizedStoreName}</Text> : null}
               </View>
               <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', alignItems: 'center', flexWrap: 'wrap', marginTop: 2 }}>
-                {item.priceLabel ? <Text style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText, fontSize: 18, fontWeight: '900' }]}>{normalizeDisplayText(item.priceLabel)}</Text> : null}
-                {item.discountLabel ? <Text style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent, marginHorizontal: 6, fontSize: 12, fontWeight: '700' }]}>{normalizeDisplayText(item.discountLabel)}</Text> : null}
-                {item.subtitle ? <Text style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText, fontSize: 12 }]}>· {normalizeDisplayText(item.subtitle)}</Text> : null}
+                {item.priceLabel ? <Text role="headingSm" weight="black" style={[styles.previewDetailsPrice, { color: appearanceChrome.primaryText }]}>{normalizeDisplayText(item.priceLabel)}</Text> : null}
+                {item.discountLabel ? <Text role="caption" weight="bold" style={[styles.previewDetailsDiscount, { color: appearanceChrome.accent, marginHorizontal: 6 }]}>{normalizeDisplayText(item.discountLabel)}</Text> : null}
+                {item.subtitle ? <Text role="caption" style={[styles.previewDetailsSubtitle, { color: appearanceChrome.secondaryText }]}>· {normalizeDisplayText(item.subtitle)}</Text> : null}
               </View>
             </View>
 
             <TouchableOpacity
-              style={[styles.previewActionButton, { backgroundColor: stylesTokens.orange, padding: 10, borderRadius: 16 }]}
+              style={[styles.previewActionButton, { backgroundColor: stylesTokens.orange, padding: 10, borderRadius: radius.md2 }]}
               onPress={() => {
                 openMeasurementPicker(item, { x: viewportWidth / 2, y: viewportHeight / 2 });
                 closeImagePreview();

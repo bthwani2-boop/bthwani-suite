@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
   },
   cartNotice: {
     color: colorPalette.deepBlue,
-    lineHeight: 20,
   },
   boundaryTitle: {
     color: colorPalette.deepBlue,
@@ -141,7 +140,6 @@ const styles = StyleSheet.create({
   },
   boundaryBody: {
     color: colorPalette.deepBlueLighter,
-    lineHeight: 20,
   },
   actions: {
     gap: spacing[3],

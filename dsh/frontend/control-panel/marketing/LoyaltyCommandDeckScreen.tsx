@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -11,6 +11,7 @@ import {
   Tabs,
   Text,
   useTheme,
+  radius,
 } from '@bthwani/ui-kit';
 import {
   getEntitlements,
@@ -220,7 +221,7 @@ function LoyaltyDetailPanel({ rowKey, tab, tiers, subscriptions, rewards, entitl
         <Box layoutDirection="row" gap={2}>
           <Button label="إغلاق" tone="ghost" size="sm" fullWidth={false} onPress={onClose} />
         </Box>
-        <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: '800', textAlign: 'right' }}>تفاصيل العنصر</Text>
+        <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>تفاصيل العنصر</Text>
       </Box>
       <Divider />
       {renderBody()}
@@ -344,7 +345,7 @@ export function LoyaltyCommandDeckScreen() {
         borderWidth: 1,
         borderColor: theme.line,
         backgroundColor: theme.surface,
-        borderRadius: 14,
+        borderRadius: radius.md,
         padding: 12,
       },
       layout: {
@@ -357,14 +358,14 @@ export function LoyaltyCommandDeckScreen() {
         minWidth: 420,
         borderWidth: 1,
         borderColor: theme.line,
-        borderRadius: 18,
+        borderRadius: radius.lg,
       },
       sidePanel: {
         flex: 1,
         minWidth: 280,
         borderWidth: 1,
         borderColor: theme.line,
-        borderRadius: 18,
+        borderRadius: radius.lg,
       },
     }),
     [theme],
@@ -434,7 +435,7 @@ export function LoyaltyCommandDeckScreen() {
                 />
               ))
             ) : (
-              <Surface tone="inset" style={{ padding: 20, borderRadius: 10, alignItems: 'center' }}>
+              <Surface tone="inset" style={{ padding: 20, borderRadius: radius.sm, alignItems: 'center' }}>
                 <Text style={{ fontSize: 24, marginBottom: 6 }}>◎</Text>
                 <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>
                   لا توجد عناصر في هذا القسم حالياً.

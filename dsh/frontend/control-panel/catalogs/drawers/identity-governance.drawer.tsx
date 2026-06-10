@@ -1,11 +1,13 @@
-// UI_PREVIEW_ONLY — no backend/API/DB binding.
+﻿// UI_PREVIEW_ONLY — no backend/API/DB binding.
 // Owner: control-panel/catalogs
 // Purpose: SKU / GTIN / Barcode governance workspace.
 //   Consolidates mapping/gtin and approvals/barcode subtabs into one operational workspace.
 //   All actions produce result banners or are disabled with reason. No barcode generation. No backend.
 
 import React, { useState } from 'react';
-import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster } from '../catalogs.data';
 import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
@@ -127,20 +129,20 @@ export function CatalogIdentityGovernanceWorkspace({
         <Box layoutDirection="row" gap={8} style={{ flexWrap: 'wrap' }}>
           <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 8, padding: 10, flex: 1, minWidth: 100 }}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>إجمالي العناصر</Text>
-            <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>{items.length}</Text>
+            <Text role="label" weight="black" style={{ color: theme.brandHeaderBackground }}>{items.length}</Text>
           </Box>
           <Box style={{ backgroundColor: missingCount > 0 ? theme.dangerSurface : theme.successSurface, borderRadius: 8, padding: 10, flex: 1, minWidth: 100 }}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>GTIN مفقود</Text>
-            <Text role="label" style={{ fontWeight: '800', color: missingCount > 0 ? theme.danger : theme.success }}>{missingCount}</Text>
+            <Text role="label" weight="black" style={{ color: missingCount > 0 ? theme.danger : theme.success }}>{missingCount}</Text>
           </Box>
           <Box style={{ backgroundColor: conflictCount > 0 ? theme.dangerSurface : theme.successSurface, borderRadius: 8, padding: 10, flex: 1, minWidth: 100 }}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>تعارضات</Text>
-            <Text role="label" style={{ fontWeight: '800', color: conflictCount > 0 ? theme.danger : theme.success }}>{conflictCount}</Text>
+            <Text role="label" weight="black" style={{ color: conflictCount > 0 ? theme.danger : theme.success }}>{conflictCount}</Text>
           </Box>
         </Box>
 
         {/* Owner notice */}
-        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 6, padding: 8 }}>
+        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: radius.xs, padding: 8 }}>
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
             المالك: control-panel/catalogs · لا توليد باركود فعلي · لا backend
           </Text>
@@ -172,9 +174,9 @@ export function CatalogIdentityGovernanceWorkspace({
             >
               {/* Row header */}
               <Box layoutDirection="row" gap={8} style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text role="label" style={{ fontWeight: '700', color: theme.text, flexShrink: 1 }}>{item.name}</Text>
+                <Text role="label" weight="bold" style={{ color: theme.text, flexShrink: 1 }}>{item.name}</Text>
                 <Box style={{ backgroundColor: toneColor + '22', borderRadius: 4, paddingHorizontal: 6, paddingVertical: 2 }}>
-                  <Text role="caption" style={{ fontSize: 10, fontWeight: '800', color: toneColor }}>
+                  <Text role="caption" weight="black" style={{ fontSize: 10, color: toneColor }}>
                     {identityStateLabel[state]}
                   </Text>
                 </Box>
@@ -184,17 +186,17 @@ export function CatalogIdentityGovernanceWorkspace({
               <Box layoutDirection="row" gap={12} style={{ flexWrap: 'wrap' }}>
                 <Box gap={0}>
                   <Text role="caption" tone="muted" style={{ fontSize: 10 }}>SKU</Text>
-                  <Text role="caption" style={{ fontWeight: '600', fontSize: 12 }}>{item.sku}</Text>
+                  <Text role="caption" weight="semibold" style={{}}>{item.sku}</Text>
                 </Box>
                 <Box gap={0}>
                   <Text role="caption" tone="muted" style={{ fontSize: 10 }}>GTIN</Text>
-                  <Text role="caption" style={{ fontWeight: '600', fontSize: 12, color: item.gtin ? theme.text : theme.danger }}>
+                  <Text role="caption" weight="semibold" style={{ color: item.gtin ? theme.text : theme.danger }}>
                     {item.gtin || '—'}
                   </Text>
                 </Box>
                 <Box gap={0}>
                   <Text role="caption" tone="muted" style={{ fontSize: 10 }}>Barcode</Text>
-                  <Text role="caption" style={{ fontWeight: '600', fontSize: 12, color: item.barcode ? theme.text : theme.danger }}>
+                  <Text role="caption" weight="semibold" style={{ color: item.barcode ? theme.text : theme.danger }}>
                     {item.barcode || '—'}
                   </Text>
                 </Box>

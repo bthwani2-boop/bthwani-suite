@@ -132,7 +132,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 							<Text role="label" tone="muted" style={{ textAlign: 'right' }}>
 								الرصيد المتاح
 							</Text>
-							<Text role="hero" style={[styles.balanceText, { color: theme.brand }]}>
+							<Text role="hero" weight="black" style={[styles.balanceText, { color: theme.brand }]}>
 								{formatWltYer(wallet.balance ?? 0)}
 							</Text>
 							<View style={styles.badgeRow}>
@@ -252,7 +252,6 @@ const styles = StyleSheet.create({
 	},
 	balanceText: {
 		fontSize: 32,
-		fontWeight: '800',
 		textAlign: 'right',
 		marginVertical: spacing[2],
 	},

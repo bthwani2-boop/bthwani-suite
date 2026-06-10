@@ -49,7 +49,7 @@ export function WltDshAccountStatement({
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <Text role="titleMd" style={{ fontWeight: 800 }}>كشوف الحساب</Text>
+        <Text role="titleMd" weight="black">كشوف الحساب</Text>
         <Text role="bodySm" tone="soft">
           أرصدة افتتاحية وختامية، ذمم، مستحقات، دفعات، واستردادات.
         </Text>
@@ -77,7 +77,7 @@ export function WltDshAccountStatement({
       </div>
 
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={3}>
-        <Text role="titleSm" style={{ fontWeight: 800 }}>{statement.actorLabel} · {statement.actorId}</Text>
+        <Text role="titleSm" weight="black">{statement.actorLabel} · {statement.actorId}</Text>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10 }}>
           <SummaryCell label="الرصيد الافتتاحي" value={statement.openingBalanceLabel} />
           <SummaryCell label="مدين الفترة" value={statement.periodDebitLabel} />
@@ -92,7 +92,7 @@ export function WltDshAccountStatement({
       </Box>
 
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <Text role="titleSm" style={{ fontWeight: 800 }}>سطور الكشف</Text>
+        <Text role="titleSm" weight="black">سطور الكشف</Text>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', minWidth: 820, borderCollapse: 'collapse' }}>
             <thead>

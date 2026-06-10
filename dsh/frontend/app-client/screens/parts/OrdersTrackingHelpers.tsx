@@ -26,6 +26,7 @@ import {
   DeferredReviewBlock,
   StickyActionBar,
   shadowPresets,
+  typographyRoles,
 } from '@bthwani/ui-kit';
 import { DshOperationScreenState } from '../../parts/OperationScreen';
 import { getDshClientStateMeta, type DshClientState } from '../../../data/operational-statuses.preview-data';
@@ -45,32 +46,8 @@ import type {
 import { getDshClientFlowPolicy } from '../../contracts/dsh-client-binding.contracts';
 import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../../shared/dsh-order-journey.model';
 import { DSH_ORDER_JOURNEY_STEPS } from '../../../shared/dsh-order-journey.model';
-import { getDshFlowPolicySummary } from '../../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../../shared';
-
-export function resolveClientPolicyChipLabel(policy: ReturnType<typeof getDshClientFlowPolicy>): string {
-  if (policy === 'summary-only') {
-    return 'ملخص أولًا';
-  }
-
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'chat-on-open') {
-    return 'دردشة عند الفتح';
-  }
-
-  if (policy === 'finance-preview-only') {
-    return 'مالي للقراءة فقط';
-  }
-
-  return 'سياسة غير محددة';
-}
 
 export function resolveEscalationOwnerLabel(ownerSurface?: string): string {
   if (ownerSurface === 'control-panel') {
@@ -396,7 +373,7 @@ export const StageRail = React.memo(function StageRail({ activeStepId, steps }: 
                 style={{
                   width: 28,
                   height: 28,
-                  borderRadius: 14,
+                  borderRadius: radius.md,
                   alignItems: 'center',
                   justifyContent: 'center',
                   ...(isActive ? shadowPresets.raised : {}),
@@ -409,7 +386,7 @@ export const StageRail = React.memo(function StageRail({ activeStepId, steps }: 
                     role="bodyStrong"
                     style={{
                       color: isActive ? theme.brandContrast : theme.textSoft,
-                      fontSize: 13,
+                      fontSize: typographyRoles.label.fontSize,
                     }}
                   >
                     {index + 1}
@@ -457,9 +434,9 @@ export const StageRail = React.memo(function StageRail({ activeStepId, steps }: 
                     style={{
                       width: 8,
                       height: 8,
-                      borderRadius: 4,
+                      borderRadius: radius.xxs,
                       backgroundColor: theme.brand,
-                      marginLeft: 8,
+                      marginLeft: spacing[2],
                     }}
                   />
                 )}
@@ -560,7 +537,7 @@ export const OrderRow = React.memo(function OrderRow({
           </Text>
           <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
             <Badge label={item.statusLabel} tone={item.isActive ? 'brand' : 'default'} />
-            <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#{displayOrderNumber} · {formatRelativeTime(item.timestamp)}</Text>
+            <Text role="bodySm" tone="muted" style={{ fontSize: typographyRoles.overline.fontSize }}>#{displayOrderNumber} · {formatRelativeTime(item.timestamp)}</Text>
           </View>
         </View>
       }
@@ -694,7 +671,7 @@ export const OrderCaptainChatSection = React.memo(function OrderCaptainChatSecti
                 tone="inset"
                 padding={2}
                 gap={1}
-                style={{ borderRadius: 18, borderWidth: 1, borderColor: theme.line, backgroundColor: theme.surfaceRaised }}
+                style={{ borderRadius: radius.lg, borderWidth: 1, borderColor: theme.line, backgroundColor: theme.surfaceRaised }}
               >
                 <Badge label={message.senderLabel} tone={message.tone} />
                 <Text role="bodySm" style={{ textAlign: 'right' }}>{message.body}</Text>
@@ -711,7 +688,7 @@ export const OrderCaptainChatSection = React.memo(function OrderCaptainChatSecti
                 padding={2}
                 gap={1}
                 style={{
-                  borderRadius: 18,
+                  borderRadius: radius.lg,
                   borderWidth: 1,
                   borderColor: isClient ? theme.brand : theme.line,
                   backgroundColor: isClient ? theme.brandSurface : theme.surfaceRaised,
@@ -1284,7 +1261,7 @@ export const HorizontalMilestones = React.memo(function HorizontalMilestones({ a
   ];
 
   return (
-    <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, width: '100%', position: 'relative' }}>
+    <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingVertical: spacing[3], width: '100%', position: 'relative' }}>
       {/* Background line */}
       <View style={{ position: 'absolute', top: 22, left: '10%', right: '10%', height: 3, backgroundColor: theme.line, zIndex: 1 }} />
       {/* Progress fill line */}
@@ -1322,12 +1299,11 @@ export const HorizontalMilestones = React.memo(function HorizontalMilestones({ a
             />
             <Text
               role="bodySm"
+              weight={isActive ? 'bold' : 'regular'}
               style={{
                 textAlign: 'center',
-                marginTop: 8,
+                marginTop: spacing[2],
                 color: isActive ? theme.brand : isPassedOrActive ? theme.text : theme.textSoft,
-                fontWeight: isActive ? '700' : '400',
-                fontSize: 12,
               }}
             >
               {milestone.label}
@@ -1682,7 +1658,7 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
 
         {/* 2. Communication Section */}
         <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
-          <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700' }}>متابعة الطلب والدعم</Text>
+          <Text role="titleMd" weight="bold" style={{ textAlign: 'right' }}>متابعة الطلب والدعم</Text>
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             {communicationSummary}
           </Text>
@@ -1706,7 +1682,7 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
           </Box>
 
           {isBthwaniDelivery && hasAlertedCaptain && !hasClientReceived && (
-            <Box layoutDirection="row" align="center" gap={2} style={{ marginTop: 4 }}>
+            <Box layoutDirection="row" align="center" gap={2} style={{ marginTop: spacing[1] }}>
               <Icon name="checkmark-circle-outline" size={16} color={theme.success} />
               <Text role="bodySm" style={{ color: theme.success, textAlign: 'right' }}>
                 أرسلنا تنبيهًا للكابتن داخل هذا الطلب.
@@ -1752,7 +1728,7 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
                     {issueFlowSummary?.nextPolicyActionPreview ?? 'الأدلة لا تُفتح أو تُرفق إلا عند الحاجة ومن داخل نفس الطلب.'}
                   </Text>
                 </Box>
-                <Chip label={resolveClientPolicyChipLabel(issueFlowPolicy)} tone="warning" />
+                <Chip label={resolveDshOnDemandPolicyLabel(issueFlowPolicy)} tone="warning" />
               </Box>
               <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
                 {`مالك قرار التصعيد: ${resolveEscalationOwnerLabel(issueFlowSummary?.escalationOwner)} · الأفعال الممنوعة: ${issueFlowSummary?.forbiddenActions.join('، ') ?? 'غير محدد'}`}
@@ -1769,13 +1745,13 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
                     backgroundColor: theme.brandSurface,
                     alignItems: 'center',
                     justifyContent: 'center',
-                    marginBottom: 8,
+                    marginBottom: spacing[2],
                   }}
                 >
                   <Icon name="checkmark-circle" size={40} color={theme.brand} />
                 </Box>
-                <Text role="titleMd" style={{ textAlign: 'center', fontWeight: '700' }}>تم إرسال بلاغك بنجاح</Text>
-                <Text role="bodySm" tone="muted" style={{ textAlign: 'center', paddingHorizontal: 16 }}>
+                <Text role="titleMd" weight="bold" style={{ textAlign: 'center' }}>تم إرسال بلاغك بنجاح</Text>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'center', paddingHorizontal: spacing[4] }}>
                   تلقينا تفاصيل مشكلتك وسيقوم فريق الدعم والمساعدة بمراجعة طلبك والتواصل معك في أقرب وقت ممكن.
                 </Text>
                 <KeyValueList
@@ -1795,13 +1771,13 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
                     setSupportDetailsText('');
                     setSupportAttachment(null);
                   }}
-                  style={{ width: '100%', marginTop: 8 }}
+                  style={{ width: '100%', marginTop: spacing[2] }}
                 />
               </Box>
             ) : (
               <Box gap={3}>
                 <Box gap={1} style={{ alignItems: 'flex-end' }}>
-                  <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700' }}>الدعم والمساعدة</Text>
+                  <Text role="titleMd" weight="bold" style={{ textAlign: 'right' }}>الدعم والمساعدة</Text>
                   <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
                     اختر نوع المشكلة في طلبك لمتابعتها مع الدعم الفني فوراً.
                   </Text>
@@ -1838,7 +1814,7 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
                       justifyContent: 'flex-start',
                       gap: spacing[2],
                       padding: spacing[3],
-                      borderRadius: 12,
+                      borderRadius: radius.sm2,
                       borderWidth: 1,
                       borderStyle: 'dashed',
                       borderColor: theme.brand,
@@ -1847,7 +1823,7 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
                     })}
                   >
                     <Icon name="camera-outline" size={20} color={theme.brand} />
-                    <Text role="bodySm" style={{ color: theme.brand, fontWeight: '500' }}>
+                    <Text role="bodySm" weight="medium" style={{ color: theme.brand }}>
                       إرفاق صورة أو مستند داعم (اختياري)
                     </Text>
                   </Pressable>
@@ -1867,7 +1843,7 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
                   >
                     <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
                       <Icon name="checkmark-circle-outline" size={20} color={theme.success} />
-                      <Text role="bodySm" style={{ color: theme.success, fontWeight: '600' }}>
+                      <Text role="bodySm" weight="semibold" style={{ color: theme.success }}>
                         تم إرفاق صورة الإثبات بنجاح ({supportAttachment})
                       </Text>
                     </Box>
@@ -1898,7 +1874,7 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
                       setIsSupportSubmitted(true);
                     }
                   }}
-                  style={{ marginTop: 8 }}
+                  style={{ marginTop: spacing[2] }}
                 />
               </Box>
             )}
@@ -1908,7 +1884,7 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
         {/* 4. Post-Delivery Section Only */}
         {hasClientReceived && (
           <Surface tone="raised" padding={4} radiusToken="xl" gap={3}>
-            <Text role="titleMd" style={{ textAlign: 'right', fontWeight: '700', color: theme.success }}>
+            <Text role="titleMd" weight="bold" style={{ textAlign: 'right', color: theme.success }}>
               {isPickup ? 'تقييم التجربة بعد الاستلام' : 'تقييم الخدمة وما بعد التسليم'}
             </Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
@@ -1942,7 +1918,7 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
               placeholderTone="brand"
             />
 
-            <View style={{ height: 1, backgroundColor: theme.line }} />
+            <Divider />
 
             <Box gap={2}>
               {onReorder && <Button label="إعادة الطلب" onPress={onReorder} />}
@@ -2061,7 +2037,7 @@ export function renderTracking(
           {trackingFlowSummary?.nextPolicyActionPreview ?? 'يبدأ this المسار بملخص الحالة، ويفتح التفصيل فقط عند الطلب.'}
         </Text>
         <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-          {`النمط الحالي: ${resolveClientPolicyChipLabel(trackingFlowPolicy)}`}
+          {`النمط الحالي: ${resolveDshOnDemandPolicyLabel(trackingFlowPolicy)}`}
         </Text>
       </Surface>
 

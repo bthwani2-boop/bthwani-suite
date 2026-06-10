@@ -1,8 +1,10 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { StyleSheet, View, Pressable } from 'react-native';
-import { Box, Button, Surface, Tabs, Text, TextField, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Tabs, Text, TextField, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getCampaignItems,
@@ -334,7 +336,7 @@ export function CampaignsCommandDeckScreen() {
     statusBadge: {
       paddingHorizontal: 8,
       paddingVertical: 4,
-      borderRadius: 6,
+      borderRadius: radius.xs,
       backgroundColor: theme.surfaceInset,
     },
     statusBadgeActive: {
@@ -342,7 +344,6 @@ export function CampaignsCommandDeckScreen() {
     },
     statusText: {
       fontSize: 10,
-      fontWeight: '800',
       color: theme.textMuted,
     },
     statusTextActive: {
@@ -377,14 +378,12 @@ export function CampaignsCommandDeckScreen() {
     },
     chipText: {
       fontSize: 12,
-      fontWeight: '700',
       color: theme.textMuted,
     },
     chipTextActive: {
       color: theme.brandContrast,
     },
     labelTitle: {
-      fontWeight: '800',
       textAlign: 'right',
     },
     smallButton: {
@@ -559,7 +558,7 @@ export function CampaignsCommandDeckScreen() {
             <TextField label="عنوان الحملة" value={draft.title || ''} onChangeText={v => setDraft({ ...draft, title: v })} style={{ textAlign: 'right' }} />
             <TextField label="الوصف" value={draft.subtitle || ''} onChangeText={v => setDraft({ ...draft, subtitle: v })} style={{ textAlign: 'right' }} />
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={styles.labelTitle}>الهدف</Text>
+              <Text role="caption" tone="muted" weight="black" style={styles.labelTitle}>الهدف</Text>
               <Tabs<CampaignGoal>
                 items={[
                   { value: 'awareness', label: 'توعية' },
@@ -573,7 +572,7 @@ export function CampaignsCommandDeckScreen() {
               />
             </Box>
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={styles.labelTitle}>الأولوية</Text>
+              <Text role="caption" tone="muted" weight="black" style={styles.labelTitle}>الأولوية</Text>
               <Tabs<CampaignPriority>
                 items={[
                   { value: 'low', label: 'منخفضة' },
@@ -592,7 +591,7 @@ export function CampaignsCommandDeckScreen() {
         return (
           <Box gap={3}>
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={styles.labelTitle}>الجمهور المستهدف</Text>
+              <Text role="caption" tone="muted" weight="black" style={styles.labelTitle}>الجمهور المستهدف</Text>
               <Tabs<CampaignAudience>
                 items={[
                   { value: 'all', label: 'الجميع' },
@@ -606,7 +605,7 @@ export function CampaignsCommandDeckScreen() {
               />
             </Box>
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={styles.labelTitle}>نوع الوجهة</Text>
+              <Text role="caption" tone="muted" weight="black" style={styles.labelTitle}>نوع الوجهة</Text>
               <select
                 value={draft.targetType}
                 onChange={(e) => setDraft({ ...draft, targetType: e.target.value as CampaignTargetType, targetId: '' })}
@@ -626,7 +625,7 @@ export function CampaignsCommandDeckScreen() {
               </select>
             </Box>
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={styles.labelTitle}>الوجهة المحددة</Text>
+              <Text role="caption" tone="muted" weight="black" style={styles.labelTitle}>الوجهة المحددة</Text>
               {renderTargetIdOptions()}
             </Box>
           </Box>
@@ -634,7 +633,7 @@ export function CampaignsCommandDeckScreen() {
       case 'channels':
         return (
           <Box gap={3}>
-            <Text role="caption" tone="muted" style={styles.labelTitle}>القنوات المستخدمة</Text>
+            <Text role="caption" tone="muted" weight="black" style={styles.labelTitle}>القنوات المستخدمة</Text>
             <View style={styles.chipsContainer}>
               {(['banner', 'promo', 'video', 'ticker', 'store-card'] as CampaignChannel[]).map(ch => {
                 const isActive = draft.channels?.includes(ch);
@@ -650,7 +649,7 @@ export function CampaignsCommandDeckScreen() {
                     }}
                     style={[styles.chip, isActive && styles.chipActive]}
                   >
-                    <Text style={[styles.chipText, isActive && styles.chipTextActive]}>{CAMPAIGN_CHANNEL_LABELS[ch] ?? ch}</Text>
+                    <Text weight="bold" style={[styles.chipText, isActive && styles.chipTextActive]}>{CAMPAIGN_CHANNEL_LABELS[ch] ?? ch}</Text>
                   </Pressable>
                 );
               })}
@@ -667,7 +666,7 @@ export function CampaignsCommandDeckScreen() {
             <TextField label="تاريخ البدء" value={draft.startDate || ''} onChangeText={v => setDraft({ ...draft, startDate: v })} hint="مثال: 2026-05-01" style={{ textAlign: 'left' }} />
             <TextField label="تاريخ الانتهاء" value={draft.endDate || ''} onChangeText={v => setDraft({ ...draft, endDate: v })} hint="مثال: 2026-06-01" style={{ textAlign: 'left' }} />
             <Box gap={1}>
-              <Text role="caption" tone="muted" style={styles.labelTitle}>حالة الحملة</Text>
+              <Text role="caption" tone="muted" weight="black" style={styles.labelTitle}>حالة الحملة</Text>
               <select
                 value={draft.status}
                 onChange={(e) => setDraft({ ...draft, status: e.target.value as CampaignStatus })}
@@ -705,7 +704,7 @@ export function CampaignsCommandDeckScreen() {
               </ul>
             </div>
 
-            <Text role="caption" tone="muted" style={styles.labelTitle}>محاكاة بطاقة المتجر</Text>
+            <Text role="caption" tone="muted" weight="black" style={styles.labelTitle}>محاكاة بطاقة المتجر</Text>
             <CommercialParityPreview features={features} />
           </Box>
         );
@@ -718,20 +717,20 @@ export function CampaignsCommandDeckScreen() {
       {/* KPIs Header */}
       <View style={styles.kpiRow}>
         <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>إجمالي الحملات</Text>
-          <Text role="titleLg" style={{ color: theme.brandHeaderBackground, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.total.value}</Text>
+          <Text role="caption" weight="black" style={{ color: theme.textMuted, textAlign: 'right', width: '100%' }}>إجمالي الحملات</Text>
+          <Text role="titleMd" weight="black" style={{ color: theme.brandHeaderBackground, textAlign: 'right', width: '100%', marginTop: 4 }}>{kpis.total.value}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>حي الآن</Text>
-          <Text role="titleLg" style={{ color: theme.success, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.live.value}</Text>
+          <Text role="caption" weight="black" style={{ color: theme.textMuted, textAlign: 'right', width: '100%' }}>حي الآن</Text>
+          <Text role="titleMd" weight="black" style={{ color: theme.success, textAlign: 'right', width: '100%', marginTop: 4 }}>{kpis.live.value}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>قيد المراجعة</Text>
-          <Text role="titleLg" style={{ color: theme.warning, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.pending.value}</Text>
+          <Text role="caption" weight="black" style={{ color: theme.textMuted, textAlign: 'right', width: '100%' }}>قيد المراجعة</Text>
+          <Text role="titleMd" weight="black" style={{ color: theme.warning, textAlign: 'right', width: '100%', marginTop: 4 }}>{kpis.pending.value}</Text>
         </View>
         <View style={styles.kpiCard}>
-          <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted, textAlign: 'right', width: '100%' }}>وصول تجريبي</Text>
-          <Text role="titleLg" style={{ color: theme.brand, textAlign: 'right', width: '100%', fontSize: 20, fontWeight: '900', marginTop: 4 }}>{kpis.impressions.value}</Text>
+          <Text role="caption" weight="black" style={{ color: theme.textMuted, textAlign: 'right', width: '100%' }}>وصول تجريبي</Text>
+          <Text role="titleMd" weight="black" style={{ color: theme.brand, textAlign: 'right', width: '100%', marginTop: 4 }}>{kpis.impressions.value}</Text>
         </View>
       </View>
 
@@ -745,7 +744,7 @@ export function CampaignsCommandDeckScreen() {
           <Box gap={2} style={{ flex: 1, minHeight: 0, padding: 12 }}>
             {visibleItems.length === 0 ? (
               <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.surfaceInset, borderRadius: 12 }}>
-                <Text style={{ color: theme.textMuted, fontWeight: '800', textAlign: 'center' }}>لا توجد حملات مطابقة للبحث أو الفلتر المختار.</Text>
+                <Text weight="black" style={{ color: theme.textMuted, textAlign: 'center' }}>لا توجد حملات مطابقة للبحث أو الفلتر المختار.</Text>
               </View>
             ) : (
               visibleItems.map(item => (
@@ -763,11 +762,11 @@ export function CampaignsCommandDeckScreen() {
                   <View style={{ flexDirection: 'row', gap: 4 }}>
                     {item.status === 'published' && item.priority === 'critical' && (
                       <View style={[styles.statusBadge, { backgroundColor: theme.warning }]}>
-                        <Text style={[styles.statusText, { color: theme.background }]}>تجاوز المتغيرات</Text>
+                        <Text weight="black" style={[styles.statusText, { color: theme.background }]}>تجاوز المتغيرات</Text>
                       </View>
                     )}
                     <View style={[styles.statusBadge, item.status === 'published' && styles.statusBadgeActive]}>
-                      <Text style={[styles.statusText, item.status === 'published' && styles.statusTextActive]}>{getCampaignStatusLabel(item.status)}</Text>
+                      <Text weight="black" style={[styles.statusText, item.status === 'published' && styles.statusTextActive]}>{getCampaignStatusLabel(item.status)}</Text>
                     </View>
                   </View>
                 </Pressable>

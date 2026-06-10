@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text,
+  radius,
+} from '@bthwani/ui-kit';
 import {
   getWltFieldCommissionStatementsPreview,
   formatWltYer,
@@ -55,16 +57,16 @@ export function WltDshFieldCommissionStatement({
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <Text role="titleMd" style={{ fontWeight: 800 }}>كشف عمولة الميداني</Text>
+            <Text role="titleMd" weight="black">كشف عمولة الميداني</Text>
             <Text role="bodySm" tone="soft" style={{ marginTop: 4 }}>
               {statement.fieldAgentName} ({statement.fieldAgentId}) · دورة {statement.commissionCycleId} · {STATUS_LABEL[statement.status]}
             </Text>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 11, background: 'rgba(0,0,0,0.06)', padding: '4px 10px', borderRadius: 6, fontWeight: 700 }}>
+            <span style={{ fontSize: 11, background: 'rgba(0,0,0,0.06)', padding: '4px 10px', borderRadius: radius.xs, fontWeight: 700 }}>
               دورة: {statement.cycleStart} إلى {statement.cycleEnd}
             </span>
-            <span style={{ fontSize: 11, background: 'var(--bth-success-surface)', color: 'var(--bth-success-text)', padding: '4px 10px', borderRadius: 6, fontWeight: 700 }}>
+            <span style={{ fontSize: 11, background: 'var(--bth-success-surface)', color: 'var(--bth-success-text)', padding: '4px 10px', borderRadius: radius.xs, fontWeight: 700 }}>
               موعد الصرف: {statement.expectedPayoutDate}
             </span>
           </div>
@@ -104,7 +106,7 @@ export function WltDshFieldCommissionStatement({
         {/* Stores Table */}
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <Text role="titleSm" style={{ fontWeight: 800 }}>سجل المتاجر المستقطبة ومبالغ العمولات</Text>
+            <Text role="titleSm" weight="black">سجل المتاجر المستقطبة ومبالغ العمولات</Text>
             <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>اضغط على أي صف لعرض دليل التفعيل وقيود الأستاذ.</span>
           </div>
           <div style={{ overflowX: 'auto' }}>

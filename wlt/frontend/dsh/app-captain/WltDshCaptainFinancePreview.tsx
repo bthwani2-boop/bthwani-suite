@@ -19,6 +19,7 @@ import {
   spacing,
   ActionStrip,
   TextField,
+  radius,
 } from '@bthwani/ui-kit';
 import type {
   WltCaptainFinanceSection,
@@ -43,7 +44,7 @@ function RecordRow({ record }: { record: WltDshFinancePreviewRecord }) {
 
   return (
     <Box gap={2} paddingY={2} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
-      <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12 }}>
+      <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[3] }}>
         <View style={{ flex: 1, gap: 3, alignItems: alignSide }}>
           <Text role="bodyStrong" style={{ textAlign }} numberOfLines={1}>
             {record.title}
@@ -146,8 +147,8 @@ function EligibilitySection({
         <Box
           gap={1}
           style={{
-            paddingVertical: 8,
-            paddingHorizontal: 12,
+            paddingVertical: spacing[2],
+            paddingHorizontal: spacing[3],
             borderRightWidth: isRtl ? 4 : 0,
             borderLeftWidth: isRtl ? 0 : 4,
             borderRightColor: isRtl ? theme.warning : undefined,
@@ -170,7 +171,7 @@ function EligibilitySection({
       )}
 
       {showTopUpForm ? (
-        <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: 12, borderWidth: 1, borderColor: theme.line }}>
+        <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: radius.sm2, borderWidth: 1, borderColor: theme.line }}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }}>إجراء شحن رصيد الضامن</Text>
 
           <TextField
@@ -190,9 +191,9 @@ function EligibilitySection({
                   key={m.id}
                   onPress={() => setSelectedMethod(m.id)}
                   style={{
-                    paddingHorizontal: 12,
+                    paddingHorizontal: spacing[3],
                     paddingVertical: 6,
-                    borderRadius: 8,
+                    borderRadius: radius.xs2,
                     backgroundColor: selectedMethod === m.id ? theme.brand : theme.surfaceInset,
                     borderWidth: 1,
                     borderColor: selectedMethod === m.id ? theme.brand : theme.line,
@@ -206,7 +207,7 @@ function EligibilitySection({
             </Box>
           </Box>
 
-          <Box layoutDirection="row" gap={2} style={{ flexDirection: 'row-reverse', marginTop: 8 }}>
+          <Box layoutDirection="row" gap={2} style={{ flexDirection: 'row-reverse', marginTop: spacing[2] }}>
             <Button
               label="تأكيد عملية الشحن"
               tone="primary"
@@ -249,7 +250,7 @@ function EligibilitySection({
       )}
 
       {records.length > 0 && (
-        <Box gap={2} style={{ marginTop: 8 }}>
+        <Box gap={2} style={{ marginTop: spacing[2] }}>
           <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>سجل عمليات الشحن الأخيرة</Text>
           {records.map((r) => <RecordRow key={r.id} record={r} />)}
         </Box>
@@ -285,8 +286,8 @@ function CodLiabilitySection({ snapshot, records }: { snapshot: WltCaptainFinanc
       <Box
         gap={1}
         style={{
-          paddingVertical: 8,
-          paddingHorizontal: 12,
+          paddingVertical: spacing[2],
+          paddingHorizontal: spacing[3],
           borderRightWidth: isRtl ? 4 : 0,
           borderLeftWidth: isRtl ? 0 : 4,
           borderRightColor: isRtl ? theme.warning : undefined,
@@ -407,8 +408,8 @@ function SettlementSection({
           <Box
             gap={1}
             style={{
-              paddingVertical: 8,
-              paddingHorizontal: 12,
+              paddingVertical: spacing[2],
+              paddingHorizontal: spacing[3],
               borderRightWidth: isRtl ? 4 : 0,
               borderLeftWidth: isRtl ? 0 : 4,
               borderRightColor: isRtl ? theme.success : undefined,
@@ -426,13 +427,13 @@ function SettlementSection({
       <Box
         gap={1}
         style={{
-          paddingVertical: 8,
-          paddingHorizontal: 12,
+          paddingVertical: spacing[2],
+          paddingHorizontal: spacing[3],
           borderRightWidth: isRtl ? 4 : 0,
           borderLeftWidth: isRtl ? 0 : 4,
           borderRightColor: isRtl ? theme.brand : undefined,
           borderLeftColor: isRtl ? undefined : theme.brand,
-          marginTop: 4,
+          marginTop: spacing[1],
         }}
       >
         <Text role="bodyStrong" style={{ textAlign: isRtl ? 'right' : 'left' }}>ذمة COD والتسوية</Text>
@@ -546,7 +547,7 @@ export function WltDshCaptainFinancePreview({
           </ActionStrip>
 
           {/* Developer Reset Section */}
-          <Box padding={4} style={{ marginTop: 24, paddingHorizontal: 16 }}>
+          <Box padding={4} style={{ marginTop: spacing[6], paddingHorizontal: spacing[4] }}>
             <Button
               label="إعادة تعيين بيانات المعاينة"
               tone="ghost"

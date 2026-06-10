@@ -1,7 +1,9 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
-import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, ListItem, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, ListItem, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getMediaReviewItems,
@@ -15,6 +17,7 @@ import {
 } from '../../data/marketing.preview-data';
 import {
   ApprovalStage,
+  resolveApprovalStageMeta,
   translateStage,
   translateEntityType,
   translateOwner,
@@ -108,17 +111,6 @@ function policyTone(p: MediaPolicyKind): MarketingTone {
   }
 }
 
-function getStageMeta(stage: ApprovalStage): { text: string; tone: MarketingTone } {
-  const text = translateStage(stage);
-  switch (stage) {
-    case 'marketing-review': return { text, tone: 'warning' };
-    case 'marketing-approved': return { text, tone: 'brand' };
-    case 'catalog-adopted': return { text, tone: 'success' };
-    case 'needs-fix': return { text, tone: 'danger' };
-    case 'rejected': return { text, tone: 'default' };
-    default: return { text, tone: 'default' };
-  }
-}
 
 function applyFilter(items: MediaReviewRecord[], filter: FilterKind): MediaReviewRecord[] {
   switch (filter) {
@@ -206,12 +198,12 @@ export function MarketingMediaReviewCommandDeckScreen() {
       return (
         <Box gap={3}>
           <Surface padding={4} gap={3}>
-            <Text role="caption" tone="muted" style={{ fontWeight: 700, textAlign: 'right' }}>معاينة الوسيط</Text>
+            <Text role="caption" tone="muted" weight="bold" style={{ textAlign: 'right' }}>معاينة الوسيط</Text>
             <Surface tone="inset" style={{ height: 160, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', backgroundColor: theme.surfaceInset }}>
-              <Text role="caption" tone="muted" style={{ fontWeight: '800' }}>معاينة المحتوى</Text>
+              <Text role="caption" tone="muted" weight="black" style={{ }}>معاينة المحتوى</Text>
             </Surface>
             {selected.mediaKey ? (
-              <Box padding={2} style={{ direction: 'ltr', backgroundColor: theme.overlaySoft, borderRadius: 6 }}>
+              <Box padding={2} style={{ direction: 'ltr', backgroundColor: theme.overlaySoft, borderRadius: radius.xs }}>
                 <Text family="mono" style={{ fontSize: 10 }}>
                   {selected.mediaKey}
                 </Text>
@@ -231,7 +223,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
               items={[
                 { label: 'العنوان', value: selected.title },
                 { label: 'النوع', value: translateEntityType(selected.entityType) },
-                { label: 'الحالة', value: translateStage(selected.stage), tone: getStageMeta(selected.stage).tone },
+                { label: 'الحالة', value: translateStage(selected.stage), tone: resolveApprovalStageMeta(selected.stage).tone },
                 { label: 'المصدر', value: translateOwner(selected.source) },
                 { label: 'المالك التالي', value: translateOwner(selected.nextOwner) },
               ]}
@@ -239,7 +231,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
           </Surface>
 
           <Surface tone={policyTone(selected.mediaPolicy)} padding={4}>
-            <Text role="caption" style={{ fontWeight: 800, opacity: 0.8 }}>سياسة الوسائط</Text>
+            <Text role="caption" weight="black" style={{ opacity: 0.8 }}>سياسة الوسائط</Text>
             <Text role="bodyStrong" style={{ marginTop: 4 }}>{policyLabel(selected.mediaPolicy)}</Text>
             {selected.systemNote ? (
               <Text role="caption" style={{ marginTop: 8, lineHeight: 1.5 }}>{selected.systemNote}</Text>
@@ -258,7 +250,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
     return (
       <Box gap={3}>
         <Surface padding={4} gap={3}>
-          <Text role="caption" tone="muted" style={{ fontWeight: 800 }}>الإجراءات المتوفرة</Text>
+          <Text role="caption" tone="muted" weight="black" style={{ }}>الإجراءات المتوفرة</Text>
 
           {selected.stage === 'marketing-review' ? (
             <Box gap={2}>
@@ -276,14 +268,14 @@ export function MarketingMediaReviewCommandDeckScreen() {
 
           {selected.stage === 'needs-fix' ? (
             <Surface tone="warning" padding={3}>
-              <Text role="caption" style={{ fontWeight: 800 }}>في انتظار تعديل الشريك</Text>
+              <Text role="caption" weight="black" style={{ }}>في انتظار تعديل الشريك</Text>
               <Text role="caption">المالك الحالي: {translateOwner(selected.nextOwner)}</Text>
             </Surface>
           ) : null}
 
           {(selected.stage === 'catalog-adopted' || selected.stage === 'rejected') ? (
             <Surface tone="inset" padding={3}>
-              <Text role="caption" style={{ fontWeight: 800 }}>
+              <Text role="caption" weight="black" style={{ }}>
                 {selected.stage === 'catalog-adopted' ? 'تم الإرسال للكتالوج بنجاح' : 'العنصر مرفوض'}
               </Text>
             </Surface>
@@ -313,9 +305,9 @@ export function MarketingMediaReviewCommandDeckScreen() {
           { label: 'جاهز للكتالوج', value: kpis.catalogReady, color: theme.success },
           { label: 'تعارضات', value: kpis.conflicts, color: theme.warning },
         ].map(k => (
-          <Surface key={k.label} tone="raised" padding={3} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 120, borderRadius: 10, borderLeftWidth: 3, borderLeftColor: k.color }}>
-            <Text role="caption" style={{ fontWeight: 800, textAlign: 'right', color: theme.textMuted }}>{k.label}</Text>
-            <Text role="titleSm" style={{ fontWeight: 900, textAlign: 'right', color: k.color, marginTop: 4, fontSize: 18 }}>{k.value}</Text>
+          <Surface key={k.label} tone="raised" padding={3} style={{ flexGrow: 1, flexShrink: 1, flexBasis: 120, borderRadius: radius.sm, borderLeftWidth: 3, borderLeftColor: k.color }}>
+            <Text role="caption" weight="black" style={{ textAlign: 'right', color: theme.textMuted }}>{k.label}</Text>
+            <Text role="titleSm" weight="black" style={{ textAlign: 'right', color: k.color, marginTop: 4,}}>{k.value}</Text>
           </Surface>
         ))}
       </Box>
@@ -357,7 +349,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
                 <Text tone="muted">لا توجد عناصر مطابقة</Text>
               </Box>
             ) : visibleItems.map(item => {
-                const meta = getStageMeta(item.stage);
+                const meta = resolveApprovalStageMeta(item.stage);
                 return (
                   <ListItem
                     key={item.id}
@@ -367,7 +359,7 @@ export function MarketingMediaReviewCommandDeckScreen() {
                       setInspectorSection('preview');
                       setSelectedId(item.id);
                     }}
-                    badgeLabel={meta.text}
+                    badgeLabel={meta.label}
                     badgeTone={meta.tone}
                     meta={(
                       <Box layoutDirection="row" gap={1}>

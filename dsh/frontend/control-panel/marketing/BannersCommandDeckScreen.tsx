@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 // Authority: control-panel/marketing — BannersCommandDeckScreen (slim entry point).
 // Giant Screen split: types → banner-types.ts | utils → banner-target-utils.ts
@@ -12,12 +12,14 @@ import {
   Box,
   Button,
   SelectField,
+  shadowPresets,
   Surface,
   Tabs,
   Text,
   TextField,
   useDirection,
   useTheme,
+  radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
@@ -329,10 +331,10 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
       <Surface tone="raised" gap={3} style={styles.headerPanel}>
         <View style={StyleSheet.flatten([styles.headerRow, isRtl && styles.rowReverse])}>
           <Box gap={0}>
-            <Text role="caption" style={{ color: theme.brand, fontWeight: '900', letterSpacing: 0.5 }}>
+            <Text role="caption" weight="black" style={{ color: theme.brand, letterSpacing: 0.5 }}>
               لوحة إدارة المحتوى الإعلاني
             </Text>
-            <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground, fontSize: 24 }}>
+            <Text role="titleLg" weight="black" style={{ color: theme.brandHeaderBackground,}}>
               استوديو البنرات
             </Text>
           </Box>
@@ -341,7 +343,7 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
             tone="primary"
             fullWidth={false}
             onPress={handleCreateNew}
-            style={{ backgroundColor: theme.brandHeaderBackground, borderRadius: 10, height: 38 }}
+            style={{ backgroundColor: theme.brandHeaderBackground, borderRadius: radius.sm, height: 38 }}
             disabled={!hasPermission('marketing.edit')}
           />
         </View>
@@ -354,8 +356,8 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
             { label: 'نسبة التفاعل', value: kpis.ctr.value, color: theme.brand, bg: theme.surface },
           ].map((k) => (
             <View key={k.label} style={StyleSheet.flatten([styles.kpiCard, { backgroundColor: k.bg }])}>
-              <Text role="caption" style={{ fontWeight: '800', color: theme.textMuted }}>{k.label}</Text>
-              <Text role="titleSm" style={{ color: k.color, fontWeight: '900', marginTop: 4, fontSize: 18 }}>
+              <Text role="caption" weight="black" style={{ color: theme.textMuted }}>{k.label}</Text>
+              <Text role="titleSm" weight="black" style={{ color: k.color, marginTop: 4,}}>
                 {k.value}
               </Text>
             </View>
@@ -368,7 +370,7 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
         {/* Preview Column */}
         <Surface tone="raised" gap={3} style={styles.previewColumn}>
           <Box gap={3} style={styles.columnBody}>
-            <Text role="titleSm" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+            <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
               المعاينة والحركة
             </Text>
             <BannerPreview draft={draft} templates={BANNER_TEMPLATES} />
@@ -376,7 +378,7 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
             {/* Content Quality Meter */}
             <Box gap={2} style={styles.qualityPanel}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text role="caption" style={{ fontWeight: '900' }}>جودة المحتوى</Text>
+                <Text role="caption" weight="black" style={{ }}>جودة المحتوى</Text>
                 <Text
                   role="caption"
                   style={{ fontWeight: '900', color: quality > 70 ? theme.success : theme.warning }}
@@ -396,7 +398,7 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
 
             {/* Motion Panel */}
             <View style={styles.motionPanel}>
-              <Text role="titleSm" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+              <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
                 حركة البنر
               </Text>
               <SelectField<MarketingBannerMotionStyle>
@@ -496,7 +498,7 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
                   borderRadius: 12,
                 }}
               >
-                <Text style={{ color: theme.textMuted, fontWeight: '800', textAlign: 'center' }}>
+                <Text weight="black" style={{ color: theme.textMuted, textAlign: 'center' }}>
                   لا توجد بنرات مطابقة للبحث أو الفلتر المختار.
                 </Text>
               </View>
@@ -523,8 +525,8 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
                     <Box gap={0} style={{ flex: 1 }}>
                       <Text
                         role="bodySm"
+                        weight="black"
                         style={{
-                          fontWeight: '900',
                           color:
                             selectedId === item.id ? theme.brandHeaderBackground : theme.text,
                         }}
@@ -562,15 +564,15 @@ export default BannersCommandDeckScreen;
 function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
   return StyleSheet.create({
     workspaceRoot: { height: '100%', maxHeight: '100%', overflow: 'hidden' },
-    headerPanel: { borderRadius: 24, padding: 18, backgroundColor: theme.surface, elevation: 2 },
+    headerPanel: { borderRadius: radius.xl, padding: 18, backgroundColor: theme.surface, elevation: 2 },
     headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     rowReverse: { flexDirection: 'row-reverse' },
     kpiGrid: { flexDirection: 'row', gap: 10, marginTop: 4 },
-    kpiCard: { flex: 1, padding: 12, borderRadius: 18, borderWidth: 1, borderColor: theme.line },
+    kpiCard: { flex: 1, padding: 12, borderRadius: radius.lg, borderWidth: 1, borderColor: theme.line },
     studioBody: { flexDirection: 'row', gap: 12, flex: 1, minHeight: 0 },
-    previewColumn: { width: 328, borderRadius: 24, padding: 14, backgroundColor: theme.surface, minHeight: 0 },
-    editorColumn: { flex: 1, borderRadius: 24, padding: 14, backgroundColor: theme.surface, minHeight: 0 },
-    sidebarColumn: { width: 248, borderRadius: 24, padding: 14, backgroundColor: theme.surface, minHeight: 0 },
+    previewColumn: { width: 328, borderRadius: radius.xl, padding: 14, backgroundColor: theme.surface, minHeight: 0 },
+    editorColumn: { flex: 1, borderRadius: radius.xl, padding: 14, backgroundColor: theme.surface, minHeight: 0 },
+    sidebarColumn: { width: 248, borderRadius: radius.xl, padding: 14, backgroundColor: theme.surface, minHeight: 0 },
     columnBody: { flex: 1, minHeight: 0, gap: 12, paddingBottom: 4 },
     sidebarBody: { flex: 1, minHeight: 0, gap: 10, paddingTop: 4, paddingBottom: 4 },
     listCard: {
@@ -584,12 +586,11 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       borderColor: theme.brand,
       backgroundColor: theme.surface,
       elevation: 4,
+      ...shadowPresets.raised,
       shadowColor: theme.brand,
-      shadowOpacity: 0.1,
-      shadowRadius: 10,
     },
-    statusDot: { width: 7, height: 7, borderRadius: 999 },
-    qualityPanel: { padding: 12, backgroundColor: theme.surfaceInset, borderRadius: 14 },
+    statusDot: { width: 7, height: 7, borderRadius: radius.pill },
+    qualityPanel: { padding: 12, backgroundColor: theme.surfaceInset, borderRadius: radius.md },
     qualityTrack: { height: 8, backgroundColor: theme.line, borderRadius: 4, overflow: 'hidden', marginTop: 8 },
     qualityFill: { height: '100%' },
     motionPanel: {

@@ -17,7 +17,9 @@
  */
 
 import React from 'react';
-import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader, WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getCatalogAdoptionItems,
@@ -214,7 +216,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
           <button
             type="button" onClick={onClose}
             style={{
-              appearance: 'none', border: `1px solid ${theme.line}`, borderRadius: 6,
+              appearance: 'none', border: `1px solid ${theme.line}`, borderRadius: radius.xs,
               backgroundColor: theme.surface, color: theme.textMuted,
               cursor: 'pointer', fontSize: 12, padding: '4px 10px', fontWeight: 700,
             }}
@@ -232,7 +234,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
             { label: 'يحتاج تعديل', value: needsFixCount,  color: theme.warning as string },
           ].map((k) => (
             <div key={k.label} style={{
-              borderRadius: 6, padding: '7px 6px', textAlign: 'center',
+              borderRadius: radius.xs, padding: '7px 6px', textAlign: 'center',
               backgroundColor: `${k.color}12`,
               border: `1px solid ${k.color}30`,
             }}>

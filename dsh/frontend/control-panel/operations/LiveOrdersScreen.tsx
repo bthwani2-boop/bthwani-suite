@@ -20,6 +20,7 @@ import { getOperationsActorLabel } from './FulfillmentModeQueueSection';
 import type { DshFulfillmentOperationalMode } from './operations.types';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
+import { DSH_CONTROL_PANEL_TONE_MAP, resolveRuntimeOrderStatusTone } from '../shared/dsh-control-panel-display';
 
 export type LiveOrdersScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'empty';
@@ -27,20 +28,6 @@ export type LiveOrdersScreenProps = {
   subGroup?: string;
   onRetry?: () => void;
 };
-
-const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  warning: 'warning',
-  danger: 'danger',
-  best: 'success',
-  brand: 'neutral',
-};
-
-function resolveRuntimeOrderTone(status: string): 'neutral' | 'success' | 'warning' | 'danger' {
-  if (status === 'FAILED_DELIVERY' || status === 'CANCELLED') return 'danger';
-  if (status === 'CREATED' || status === 'RETURNING_TO_STORE') return 'warning';
-  if (status === 'DELIVERED' || status === 'RETURNED') return 'success';
-  return 'neutral';
-}
 
 type OpsDecision = DshOperationsDecisionKind;
 type DecisionState = Record<string, { decision: OpsDecision; note: string; submitted: boolean; nextLifecycleStatus: DshOrderLifecycleStatus }>;
@@ -166,7 +153,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                 <span style={{ fontSize: '12px', fontWeight: 800 }}>الحالة الحالية:</span>
                 <WebControlPanelStatusTag
                   label={order.status}
-                  tone={TONE_MAP[order.statusTone] ?? 'neutral'}
+                  tone={DSH_CONTROL_PANEL_TONE_MAP[order.statusTone] ?? 'neutral'}
                 />
               </div>
 
@@ -224,7 +211,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                     flex: 1,
                     padding: '8px 12px',
                     background: 'var(--bthwani-control-panel-brand)',
-                    color: 'white',
+                    color: 'var(--bthwani-brand-contrast)',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -300,7 +287,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                     flex: 1,
                     padding: '8px 12px',
                     background: 'var(--bthwani-control-panel-brand)',
-                    color: 'white',
+                    color: 'var(--bthwani-brand-contrast)',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -391,7 +378,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                     entityId={order.id}
                     entityLabel={`متجر: ${order.storeId} — عميل: ${order.clientId}${order.captainId ? ` — كابتن: ${order.captainId}` : ''}`}
                     status={order.status}
-                    statusTone={resolveRuntimeOrderTone(order.status)}
+                    statusTone={resolveRuntimeOrderStatusTone(order.status)}
                     sla={`تاريخ الإنشاء: ${new Date(order.createdAt).toLocaleString('ar-SA', { hour: '2-digit', minute: '2-digit' })}`}
                     onInspect={() => router.push(`/operations?group=exceptions&orderId=${order.id}`)}
                     primaryAction={order.status === 'CREATED' ? {
@@ -407,8 +394,8 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                     entityId={order.id}
                     entityLabel={`${order.destination} — ${getOperationsActorLabel(order.fulfillmentMode)}: ${order.captain}`}
                     status={order.status}
-                    statusTone={TONE_MAP[order.statusTone] ?? 'neutral'}
-                    risk={TONE_MAP[order.statusTone] === 'danger' ? 'danger' : TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}
+                    statusTone={DSH_CONTROL_PANEL_TONE_MAP[order.statusTone] ?? 'neutral'}
+                    risk={DSH_CONTROL_PANEL_TONE_MAP[order.statusTone] === 'danger' ? 'danger' : DSH_CONTROL_PANEL_TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}
                     recommendation={order.suggestion.label}
                     reason={order.suggestion.reason}
                     sla={`ETA: ${order.eta} | ${order.ringLabel}`}

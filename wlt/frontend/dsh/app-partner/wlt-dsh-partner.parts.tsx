@@ -16,6 +16,8 @@ import {
   Divider,
   ActionStrip,
   spacing,
+  radius,
+  typographyRoles,
 } from '@bthwani/ui-kit';
 import type { WltDshPartnerWalletTransaction } from './wlt-dsh-partner.adapter';
 import { useWltDshPartnerWalletPreview } from './useWltDshPartnerWalletPreview';
@@ -221,7 +223,7 @@ function FinancialStreamCard({
           </View>
 
           {/* المبلغ + الحالة + chevron (على اليسار في RTL) */}
-          <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, minWidth: 80 }}>
+          <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: spacing[1], minWidth: 80 }}>
             <Text
               role="bodyStrong"
               style={{ color: resolveToneColor(theme, item.amountTone), textAlign: direction === 'rtl' ? 'left' : 'right' }}
@@ -276,7 +278,7 @@ function SummaryTab({
         tone="raised"
         padding={3}
         style={{
-          borderRadius: 16,
+          borderRadius: radius.md2,
         }}
       >
         <View
@@ -287,11 +289,11 @@ function SummaryTab({
           }}
         >
           {/* Column 1: صافي التسوية */}
-          <View style={{ flex: 1, gap: 4, paddingHorizontal: 8 }}>
+          <View style={{ flex: 1, gap: spacing[1], paddingHorizontal: spacing[2] }}>
             <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
               صافي التسوية
             </Text>
-            <Text role="titleSm" style={{ color: theme.success, textAlign: direction === 'rtl' ? 'right' : 'left', fontWeight: 'bold' }} numberOfLines={1}>
+            <Text role="titleSm" weight="bold" style={{ color: theme.success, textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
               {partnerPreview.netSettlementLabel}
             </Text>
           </View>
@@ -300,11 +302,11 @@ function SummaryTab({
           <View style={{ width: 1, height: 32, backgroundColor: theme.line }} />
 
           {/* Column 2: إجمالي المبيعات */}
-          <View style={{ flex: 1, gap: 4, paddingHorizontal: 8 }}>
+          <View style={{ flex: 1, gap: spacing[1], paddingHorizontal: spacing[2] }}>
             <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
               إجمالي المبيعات
             </Text>
-            <Text role="titleSm" style={{ color: theme.info, textAlign: direction === 'rtl' ? 'right' : 'left', fontWeight: 'bold' }} numberOfLines={1}>
+            <Text role="titleSm" weight="bold" style={{ color: theme.info, textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
               {partnerPreview.grossSalesLabel}
             </Text>
           </View>
@@ -313,11 +315,11 @@ function SummaryTab({
           <View style={{ width: 1, height: 32, backgroundColor: theme.line }} />
 
           {/* Column 3: التسوية القادمة */}
-          <View style={{ flex: 1, gap: 4, paddingHorizontal: 8 }}>
+          <View style={{ flex: 1, gap: spacing[1], paddingHorizontal: spacing[2] }}>
             <Text role="caption" tone="muted" style={{ textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
               التسوية القادمة
             </Text>
-            <Text role="titleSm" style={{ color: theme.warning, textAlign: direction === 'rtl' ? 'right' : 'left', fontWeight: 'bold' }} numberOfLines={1}>
+            <Text role="titleSm" weight="bold" style={{ color: theme.warning, textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
               {partnerPreview.nextSettlementLabel}
             </Text>
           </View>
@@ -329,7 +331,7 @@ function SummaryTab({
         tone="warning"
         padding={2}
         border={false}
-        style={{ borderRadius: 8 }}
+        style={{ borderRadius: radius.xs2 }}
       >
         <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 6, alignItems: 'center' }}>
           <Icon name="warning" tone="warning" size={14} />
@@ -340,7 +342,7 @@ function SummaryTab({
       </Surface>
 
       {/* إجراءات مضغوطة - أزرار عملية أنيقة بجانب بعضها */}
-      <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 12, marginTop: 4 }}>
+      <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: spacing[3], marginTop: spacing[1] }}>
         <Button
           label="تنزيل ملخص مالي"
           tone="secondary"
@@ -508,7 +510,7 @@ function CommissionModeCard({
         >
           <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, flex: 1 }}>
             <Icon name={icon} size={20} tone={enabled ? 'brand' : 'soft'} />
-            <View style={{ flex: 1, gap: 4 }}>
+            <View style={{ flex: 1, gap: spacing[1] }}>
               <Text role="bodyStrong" style={{ textAlign: 'right' }} numberOfLines={1}>
                 {title}
               </Text>
@@ -570,7 +572,7 @@ function ModesTab({
 
   return (
     <Box gap={2}>
-      <Text role="caption" tone="muted" style={{ textAlign: 'right', marginBottom: 4 }}>
+      <Text role="caption" tone="muted" style={{ textAlign: 'right', marginBottom: spacing[1] }}>
         كل وضع تشغيل يحمل أثرًا ماليًا مختلفًا. اضغط لرؤية تفاصيل العمولة وأثر التسوية.
       </Text>
       {modes.map((mode, index) => {
@@ -634,8 +636,8 @@ function CourierTab({
       />
 
       {/* تنبيه الفصل المالي */}
-      <Surface tone="warning" padding={3} gap={2} style={{ borderRadius: 10 }}>
-        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8, alignItems: 'flex-start' }}>
+      <Surface tone="warning" padding={3} gap={2} style={{ borderRadius: radius.sm }}>
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: spacing[2], alignItems: 'flex-start' }}>
           <Icon name="warning" tone="warning" size={16} />
           <Text role="bodySm" tone="warning" style={{ flex: 1, textAlign: 'right' }}>
             تعويض موصل المتجر داخلي من المتجر، وليس تسوية كابتن بثواني. لا تخلط بين الاثنين.
@@ -742,8 +744,8 @@ export function PartnerDshWalletBridgeView({
         style={{
           flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
           alignItems: 'center',
-          gap: 8,
-          paddingHorizontal: 16,
+          gap: spacing[2],
+          paddingHorizontal: spacing[4],
           paddingVertical: 10,
         }}
       >
@@ -766,7 +768,7 @@ export function PartnerDshWalletBridgeView({
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
                 <Badge label="نشط" tone="success" />
-                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#المحفظة</Text>
+                <Text role="bodySm" tone="muted" style={{ fontSize: typographyRoles.overline.fontSize }}>#المحفظة</Text>
               </View>
             </View>
           }
@@ -795,7 +797,7 @@ export function PartnerDshWalletBridgeView({
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
                 <Badge label={partnerPreview.cycleStatus} tone="success" />
-                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#التسوية</Text>
+                <Text role="bodySm" tone="muted" style={{ fontSize: typographyRoles.overline.fontSize }}>#التسوية</Text>
               </View>
             </View>
           }
@@ -823,7 +825,7 @@ export function PartnerDshWalletBridgeView({
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
                 <Badge label="محدث" tone="default" />
-                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#سجل_الحركات</Text>
+                <Text role="bodySm" tone="muted" style={{ fontSize: typographyRoles.overline.fontSize }}>#سجل_الحركات</Text>
               </View>
             </View>
           }
@@ -852,7 +854,7 @@ export function PartnerDshWalletBridgeView({
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
                 <Badge label="٣ أوضاع تشغيل" tone="default" />
-                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#العمولات</Text>
+                <Text role="bodySm" tone="muted" style={{ fontSize: typographyRoles.overline.fontSize }}>#العمولات</Text>
               </View>
             </View>
           }
@@ -877,7 +879,7 @@ export function PartnerDshWalletBridgeView({
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
                 <Badge label="سياسة نشطة" tone="success" />
-                <Text role="bodySm" tone="muted" style={{ fontSize: 11 }}>#توصيل_المتجر</Text>
+                <Text role="bodySm" tone="muted" style={{ fontSize: typographyRoles.overline.fontSize }}>#توصيل_المتجر</Text>
               </View>
             </View>
           }

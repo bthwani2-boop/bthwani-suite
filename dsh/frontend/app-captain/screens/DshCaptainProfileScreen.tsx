@@ -1,5 +1,7 @@
 import React from 'react';
-import { Box, KeyValueList, SectionHeader, Divider } from '@bthwani/ui-kit';
+import { Box, KeyValueList, SectionHeader, Divider,
+  spacing,
+} from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainProfileScreenState, DshCaptainProfileSnapshot } from '../../data/operational-statuses.preview-data';
 
@@ -19,7 +21,7 @@ const demoSnapshot: DshCaptainProfileSnapshot = {
 
 function ProfileSummarySection({ snapshot = demoSnapshot }: { snapshot?: DshCaptainProfileSnapshot }) {
 	return (
-		<Box gap={3} style={{ paddingVertical: 4 }}>
+		<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 			<SectionHeader title="ملف الكابتن" subtitle="اقرأ ملف الكابتن الحالي وحالة الجاهزية للمسار." />
 			<KeyValueList
 				items={[
@@ -35,7 +37,7 @@ function ProfileSummarySection({ snapshot = demoSnapshot }: { snapshot?: DshCapt
 function TierSection({ snapshot = demoSnapshot, mode }: { snapshot?: DshCaptainProfileSnapshot; mode: 'tier-info' | 'tier-evaluate' }) {
 	if (mode === 'tier-info') {
 		return (
-			<Box gap={3} style={{ paddingVertical: 4 }}>
+			<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 				<SectionHeader title="معلومات الطبقة" subtitle="اقرأ مزايا ومتطلبات الطبقة الحالية." />
 				<KeyValueList
 					items={[
@@ -49,7 +51,7 @@ function TierSection({ snapshot = demoSnapshot, mode }: { snapshot?: DshCaptainP
 	}
 
 	return (
-		<Box gap={3} style={{ paddingVertical: 4 }}>
+		<Box gap={3} style={{ paddingVertical: spacing[1] }}>
 			<SectionHeader title="تقييم الطبقة" subtitle="راجع ما إذا كان الكابتن جاهزًا للطبقة التالية." />
 			<KeyValueList
 				items={[

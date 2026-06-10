@@ -61,6 +61,7 @@ import {
   resolveRowDirection,
   useDirection,
   useTheme,
+  spacing,
 } from '@bthwani/ui-kit';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 import {
@@ -445,7 +446,7 @@ function StoreReadinessGate({ storeId }: { storeId: string }) {
 
   return (
     <Surface tone={isReady ? 'default' : 'warning'} padding={2} gap={2} border>
-      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[2] }}>
         <Box style={{ flex: 1, gap: 2 }}>
           <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
             جاهزية المتجر للعميل
@@ -691,7 +692,7 @@ function HierarchyFilterRail({
       ) : null}
 
       {hasActiveFilters && showActiveSummary ? (
-        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 6, paddingHorizontal: 4 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 6, paddingHorizontal: spacing[1] }}>
           <Text role="caption" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
             {activeSummaryParts.join(' › ')}
           </Text>
@@ -716,7 +717,7 @@ function HelpBlock() {
 
   return (
     <Surface tone="inset" padding={1} gap={open ? 1 : 0} border={false}>
-      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[2] }}>
         <Text role="caption" tone="muted" style={{ flex: 1 }} align={direction === 'rtl' ? 'end' : 'start'}>
           كيف أضيف منتجاً؟
         </Text>
@@ -885,7 +886,7 @@ function DenseListRow({
       border
       style={{ borderColor, minHeight: 84 }}
     >
-      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'stretch', gap: 8 }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'stretch', gap: spacing[2] }}>
         <Box
           style={{
             flex: 1.45,
@@ -929,7 +930,7 @@ function DenseListRow({
             minWidth: 78,
             justifyContent: 'center',
             alignItems: 'center',
-            gap: 4,
+            gap: spacing[1],
           }}
         >
           <Text role="caption" tone={denseStatusTone} numberOfLines={1} align="center">
@@ -1088,7 +1089,7 @@ function InventoryCatalogCardPanel({
             </Surface>
           ) : null}
 
-          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: spacing[1] }}>
             <Button
               label={expanded ? 'إخفاء التعديل' : 'تعديل محلي'}
               size="sm"
@@ -1311,11 +1312,11 @@ function InventoryCatalogContent({
 
       {/* Summary tiles */}
       <Surface tone="raised" padding={1} gap={0} border={false}>
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: 4 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: spacing[1] }}>
           {kpiItems.map((item, index) => (
             <Box
               key={item.label}
-              style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 4 }}
+              style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[1] }}
             >
               <Text role="caption" tone="muted" numberOfLines={1}>{item.label}</Text>
               <Text role="label" tone={item.tone} numberOfLines={1}>{item.value}</Text>
@@ -1333,7 +1334,7 @@ function InventoryCatalogContent({
           onChangeText={setQuery}
           placeholder="اسم المنتج، SKU، GTIN، الباركود"
         />
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: spacing[1] }}>
           <Button label="مسح باركود" tone="secondary" size="sm" fullWidth={false}
             onPress={() => handleBarcodeScanPreviewResult(query)} />
           <Button label="إدخال جماعي" tone="secondary" size="sm" fullWidth={false}
@@ -1554,7 +1555,7 @@ export function InventoryCatalogScreen({ onBack, canonicalStoreId = 'store-1001'
         </Text>
       </Surface>
 
-      <Box style={{ flexDirection: resolveRowDirection(direction), gap: 8, justifyContent: 'flex-start', marginVertical: 4 }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2], justifyContent: 'flex-start', marginVertical: 4 }}>
         {props.onNavigateToCategoryManagement ? (
           <Button
             label="إدارة هيكلية الفئات"

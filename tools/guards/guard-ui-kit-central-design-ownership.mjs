@@ -258,6 +258,19 @@ function checkLaneMisuse(relative, text) {
   }
 }
 
+const ALLOWED_VAR_UI_PROFILES = {
+  VAR_UI_APPEARANCE_MODE: new Set(['lightPremium', 'darkGlass']),
+  VAR_UI_FONT_PROFILE: new Set(['arabic-system', 'arabic-premium', 'arabic-readable']),
+  VAR_UI_DENSITY_PROFILE: new Set(['compact', 'comfortable', 'spacious']),
+  VAR_UI_RADIUS_PROFILE: new Set(['soft', 'balanced', 'sharp']),
+  VAR_UI_ELEVATION_PROFILE: new Set(['flat', 'raised', 'floating-light']),
+  VAR_UI_MOTION_PROFILE: new Set(['reduced', 'standard', 'expressive']),
+  VAR_UI_MARKETING_EMPHASIS: new Set(['calm', 'premium', 'campaign']),
+  VAR_UI_CONTROL_PANEL_DENSITY: new Set(['compact', 'balanced']),
+  VAR_UI_MEDIA_LOADING_POLICY: new Set(['eager-critical-only', 'lazy-default', 'on-demand']),
+  VAR_UI_DATA_DENSITY_POLICY: new Set(['summary-first', 'balanced', 'detail-on-demand']),
+};
+
 function checkFreeDesignVars(relative, text) {
   const directHexRegex = /VAR_UI_[A-Z_]*?\s*=\s*['"]#[0-9a-fA-F]{3,8}['"]/g;
   let match;
@@ -268,6 +281,23 @@ function checkFreeDesignVars(relative, text) {
       'Bypassing design policy by defining raw hex values in VAR settings is forbidden.',
       `line ${line}: ${match[0]}`
     );
+  }
+
+  const profileAssignRegex = /(VAR_UI_[A-Z_]+)\s*=\s*['"]([^'"]+)['"]/g;
+  while ((match = profileAssignRegex.exec(text)) !== null) {
+    const varName = match[1];
+    const value = match[2];
+    if (value.startsWith('#')) continue;
+    const allowed = ALLOWED_VAR_UI_PROFILES[varName];
+    if (!allowed) continue;
+    if (!allowed.has(value)) {
+      const line = lineNumber(text, match.index);
+      report.warn(
+        relative,
+        `Non-allowlisted value for ${varName}. Allowed: ${[...allowed].join(' | ')}. Free-form design var values bypass the profile contract.`,
+        `line ${line}: ${varName} = "${value}"`
+      );
+    }
   }
 }
 

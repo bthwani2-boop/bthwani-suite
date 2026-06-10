@@ -1,6 +1,8 @@
 import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
-import { BottomNavBar, Box, Button, ModernPremiumHeader, Surface, Text } from '@bthwani/ui-kit';
+import { BottomNavBar, Box, Button, ModernPremiumHeader, Surface, Text,
+  spacing,
+} from '@bthwani/ui-kit';
 import type {
   DshPartnerOperationalFlowId,
   DshPartnerRoute,
@@ -89,7 +91,7 @@ function PartnerStoreScopeSheet({
   }
 
   return (
-    <Surface tone="raised" padding={5} gap={4} radiusToken="xl" border={false} style={{ margin: 16 }}>
+    <Surface tone="raised" padding={5} gap={4} radiusToken="xl" border={false} style={{ margin: spacing[4] }}>
       <Text role="titleMd">نطاق الفرع</Text>
       {options.map((option) => (
         <Button

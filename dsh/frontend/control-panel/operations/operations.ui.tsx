@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Text, useTheme } from '@bthwani/ui-kit';
@@ -67,7 +67,7 @@ export function OperationsSuggestionCard({
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-          <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground, whiteSpace: 'nowrap' }}>{title}:</Text>
+          <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground, whiteSpace: 'nowrap' }}>{title}:</Text>
           <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, flex: 1, minWidth: 0 }}>{label}</Text>
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>

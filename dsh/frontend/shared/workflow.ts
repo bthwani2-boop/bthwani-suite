@@ -297,6 +297,20 @@ export function translateStage(stage: ApprovalStage | string | undefined): strin
   }
 }
 
+export type ApprovalStageTone = 'warning' | 'brand' | 'success' | 'danger' | 'default';
+
+export function resolveApprovalStageMeta(stage: ApprovalStage | string | undefined): { label: string; tone: ApprovalStageTone } {
+  const label = translateStage(stage);
+  switch (stage) {
+    case 'marketing-review': return { label, tone: 'warning' };
+    case 'marketing-approved': return { label, tone: 'brand' };
+    case 'catalog-adopted': return { label, tone: 'success' };
+    case 'needs-fix': return { label, tone: 'danger' };
+    case 'rejected': return { label, tone: 'default' };
+    default: return { label, tone: 'default' };
+  }
+}
+
 export function translateEntityType(type: ApprovalEntityType | string | undefined): string {
   if (!type) return 'غير معروف';
   switch (type) {

@@ -14,6 +14,7 @@ import {
   useTheme,
   StateView,
   shadowPresets,
+  radius,
 } from '@bthwani/ui-kit';
 
 export type DshRatingScreenProps = {
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
   },
   commentInput: {
     backgroundColor: colorPalette.lightSurface,
-    borderRadius: 12,
+    borderRadius: radius.sm2,
     padding: spacing[4],
     height: 120,
     color: colorPalette.deepBlue,

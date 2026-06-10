@@ -23,6 +23,9 @@ import {
   StoreHero,
   TopBar,
   ListItem,
+  radius,
+  spacing,
+  typographyRoles,
 } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import {
@@ -380,7 +383,7 @@ function PromotionIntentPanel({
           هذه الشاشة تلتقط نية الترويج فقط: اختيار العنصر، وصف العرض، وتحديد حالة الإرسال.
         </Text>
 
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap' }} gap={2}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap' }} gap={2}>
           <Chip label={storeName} tone="brand" />
           <Chip label={branchLabel} tone="info" />
           <Chip label={activeZoneLabel} tone="success" />
@@ -418,7 +421,7 @@ function PromotionIntentPanel({
           <TextField label="ملاحظات النية" value={offerNote} onChangeText={setOfferNote} placeholder="وصف مختصر للعرض أو سبب الترويج" multiline />
         </Box>
 
-        <Box padding={3} gap={2} style={{ backgroundColor: colorPalette.line + '11', borderRadius: 12 }}>
+        <Box padding={3} gap={2} style={{ backgroundColor: colorPalette.line + '11', borderRadius: radius.sm2 }}>
           <Text role="bodyStrong">آخر رسالة</Text>
           <Text role="bodySm" tone="muted">{actionMessage}</Text>
         </Box>
@@ -506,7 +509,7 @@ function SettingsOptionRow({
       style={({ pressed }) => [
         {
           width: '100%',
-          paddingHorizontal: 16,
+          paddingHorizontal: spacing[4],
           paddingVertical: compact ? 10 : 14,
           backgroundColor: pressed ? theme.surfaceInset : theme.surface,
           borderBottomWidth: last ? 0 : 1,
@@ -524,7 +527,7 @@ function SettingsOptionRow({
               style={{
                 width: 40,
                 height: 40,
-                borderRadius: 14,
+                borderRadius: radius.md,
                 alignItems: 'center',
                 justifyContent: 'center',
                 backgroundColor: theme.surfaceInset,
@@ -600,18 +603,18 @@ function HubSectionShell({
         style={{
           flexDirection: rowDirection,
           alignItems: 'center',
-          gap: 12,
-          paddingBottom: 4,
+          gap: spacing[3],
+          paddingBottom: spacing[1],
           borderBottomWidth: 1,
           borderBottomColor: theme.line,
-          marginBottom: 4,
+          marginBottom: spacing[1],
         }}
       >
         <View
           style={{
             width: 40,
             height: 40,
-            borderRadius: 14,
+            borderRadius: radius.md,
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: theme.brandSurface,
@@ -629,7 +632,7 @@ function HubSectionShell({
         </Text>
       </View>
 
-      <View style={{ gap: 16 }}>
+      <View style={{ gap: spacing[4] }}>
         {children}
       </View>
     </MobileScrollView>
@@ -660,11 +663,11 @@ function HubNavRow({
       style={({ pressed }) => ({
         flexDirection: rowDirection,
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: spacing[4],
         paddingVertical: 14,
-        borderRadius: 16,
+        borderRadius: radius.md2,
         backgroundColor: pressed ? theme.surfaceInset : theme.surfaceRaised,
-        gap: 12,
+        gap: spacing[3],
         borderWidth: 1,
         borderColor: theme.line,
       })}
@@ -674,7 +677,7 @@ function HubNavRow({
         style={{
           flexDirection: rowDirection,
           alignItems: 'center',
-          gap: 12,
+          gap: spacing[3],
           flex: 1,
           minWidth: 0,
         }}
@@ -683,7 +686,7 @@ function HubNavRow({
           style={{
             width: 44,
             height: 44,
-            borderRadius: 14,
+            borderRadius: radius.md,
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: theme.brandSurface,
@@ -767,7 +770,7 @@ function OperationsModeRow({
       style={({ pressed }) => [
         {
           width: '100%',
-          paddingHorizontal: 16,
+          paddingHorizontal: spacing[4],
           paddingVertical: 14,
           backgroundColor: pressed ? theme.surfaceInset : theme.surface,
           borderBottomWidth: 1,
@@ -816,7 +819,7 @@ function OperationsModeRow({
           </View>
         </View>
 
-        <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, marginEnd: 10 }}>
+        <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: spacing[1], marginEnd: 10 }}>
           <Chip label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
           <Text role="caption" tone="muted">
             {getWltDshPartnerCommissionLabel(mode.commission)}
@@ -902,7 +905,7 @@ function OperationsPanel({
       />
 
       <Box gap={3} paddingY={2}>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <Box layoutDirection="row" style={{ alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing[3] }}>
           <Box style={{ gap: 2, flex: 1, minWidth: 0, alignItems: 'flex-start' }}>
             <Text role="label" tone="muted" align="start">
               الحالة التشغيلية
@@ -917,13 +920,13 @@ function OperationsPanel({
           <Badge label={storeOpen ? 'مفتوح الآن' : 'مغلق الآن'} tone={storeOpen ? 'success' : 'warning'} />
         </Box>
 
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <SummaryCell label="الحالة" value={storeOpen ? 'مفتوح' : 'مغلق'} tone={storeOpen ? 'success' : 'warning'} />
           <SummaryCell label="الظهور" value={visibilityLabel} tone={listingEnabled ? 'brand' : 'warning'} />
           <SummaryCell label="الأوضاع" value={`${activeModesCount}/3`} tone={activeModesCount > 0 ? 'info' : 'warning'} />
         </Box>
 
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <Chip label={`ساعات العمل: ${todayHoursLabel}`} tone="default" selected />
           <Chip label={`التغطية: ${zoneStatusSummary}`} tone="default" selected />
           {onOpenStoreCourierSetup ? (
@@ -940,7 +943,7 @@ function OperationsPanel({
 
       <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align="start">الظهور ونقاط الخدمة</Text>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <Chip label={`الظهور: ${visibilityLabel}`} tone={listingEnabled ? 'success' : 'warning'} />
           <Chip label={`النطاق: ${branchLabel}`} tone="default" />
           <Chip label={`المنطقة: ${activeZoneLabel}`} tone="default" />
@@ -948,9 +951,9 @@ function OperationsPanel({
           <Chip label={`الحالة: ${getDshPartnerActivationStatusLabel(storeVisibility.activationStatus)}`} tone={storeVisibility.visible ? 'success' : 'warning'} />
         </Box>
 
-        <Box gap={1} style={{ marginTop: 4 }}>
+        <Box gap={1} style={{ marginTop: spacing[1] }}>
           {storeVisibility.checklist.map((check) => (
-            <Box key={check.id} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
+            <Box key={check.id} layoutDirection="row" style={{ alignItems: 'center', gap: spacing[2], paddingVertical: spacing[1] }}>
               <Icon
                 name={check.satisfied ? 'checkmark-circle-outline' : 'close-circle-outline'}
                 size={16}
@@ -983,12 +986,12 @@ function OperationsPanel({
                   style={({ pressed }) => ({
                     flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
                     alignItems: 'center',
-                    paddingVertical: 12,
-                    paddingHorizontal: 4,
+                    paddingVertical: spacing[3],
+                    paddingHorizontal: spacing[1],
                     backgroundColor: pressed ? theme.surfaceInset : undefined,
                   })}
                 >
-                  <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                  <Box layoutDirection="row" style={{ alignItems: 'center', gap: 10, flex: 1 }}>
                     <Icon
                       name={mode.id === 'pickup' ? 'hand-left-outline' : mode.id === 'partner_delivery' ? 'car-outline' : 'bicycle-outline'}
                       size={18}
@@ -999,7 +1002,7 @@ function OperationsPanel({
                       <Text role="bodySm" tone="muted" align="start">{mode.subtitle}</Text>
                     </Box>
                   </Box>
-                  <Box style={{ alignItems: 'center', flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8, marginEnd: 8 }}>
+                  <Box style={{ alignItems: 'center', flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: spacing[2], marginEnd: spacing[2] }}>
                     <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2 }}>
                       <Badge label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
                       <Text role="caption" tone="muted">
@@ -1011,11 +1014,11 @@ function OperationsPanel({
                 </Pressable>
 
                 {isSelected && (
-                  <Box paddingX={4} gap={2} style={{ paddingTop: 2, paddingBottom: 12 }}>
+                  <Box paddingX={4} gap={2} style={{ paddingTop: 2, paddingBottom: spacing[3] }}>
                     <Text role="caption" tone="muted" align="start">
                       حالة الوضع: {mode.enabled ? 'نشط ويستقبل الطلبات' : 'موقف مؤقتًا'}.
                     </Text>
-                    <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8 }}>
+                    <Box layoutDirection="row" style={{ gap: spacing[2] }}>
                       <Button
                         label={mode.enabled ? 'إيقاف الوضع' : 'تفعيل الوضع'}
                         tone="secondary"
@@ -1050,7 +1053,7 @@ function OperationsPanel({
 
       {/* 5) Flat Team Section with inline expansion */}
       <Box gap={3} paddingY={2}>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <Box style={{ gap: 2, alignItems: 'flex-start' }}>
             <Text role="bodyStrong" align="start">الفريق</Text>
             <Text role="caption" tone="muted" align="start">{teamRoleSummary} · {teamStatusSummary}</Text>
@@ -1064,15 +1067,15 @@ function OperationsPanel({
           />
         </Box>
 
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <SummaryCell label="نشط" value={String(activeTeamCount)} tone="success" />
           <SummaryCell label="موقوف" value={String(pausedTeamCount)} tone="warning" />
           <SummaryCell label="قيد المراجعة" value={String(reviewTeamCount)} tone="info" />
         </Box>
 
         {teamPanelOpen && (
-          <Box gap={3} style={{ paddingHorizontal: 4, marginTop: 4 }}>
-            <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+          <Box gap={3} style={{ paddingHorizontal: spacing[1], marginTop: spacing[1] }}>
+            <Box layoutDirection="row" style={{ alignItems: 'center', gap: 6 }}>
               <Icon name="information-circle-outline" size={14} tone="muted" />
               <Text role="caption" tone="muted" align="start" style={{ flex: 1 }}>
                 UI_PREVIEW_ONLY · الأدوار والدعوات هنا محلية حتى يتصل Control Panel.
@@ -1088,17 +1091,17 @@ function OperationsPanel({
                 const isLastSupervisor = member.role === 'supervisor' && member.status === 'active' && activeSupervisorCount <= 1;
 
                 return (
-                  <Box key={member.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: 8 }}>
+                  <Box key={member.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: spacing[2] }}>
                     <Pressable
                       onPress={() => setSelectedMemberId(isMemberSelected ? '' : member.id)}
                       style={({ pressed }) => ({
                         flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
                         alignItems: 'center',
                         backgroundColor: pressed ? theme.surfaceInset : undefined,
-                        padding: 4,
+                        padding: spacing[1],
                       })}
                     >
-                      <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flexShrink: 1, minWidth: 0 }}>
+                      <Box layoutDirection="row" style={{ alignItems: 'center', gap: spacing[2], flexShrink: 1, minWidth: 0 }}>
                         <Icon
                           name={member.role === 'courier' ? 'bicycle-outline' : member.role === 'owner' ? 'shield-checkmark-outline' : member.role === 'supervisor' ? 'person-circle-outline' : 'person-outline'}
                           size={16}
@@ -1109,16 +1112,16 @@ function OperationsPanel({
                           <Text role="caption" tone="muted" align="start">{member.branchAssignment}</Text>
                         </Box>
                       </Box>
-                      <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2, marginStart: 8 }}>
+                      <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2, marginStart: spacing[2] }}>
                         <Badge label={member.roleLabel} tone={roleTone} />
                         <Badge label={member.statusLabel} tone={statusTone} />
                         <Text role="caption" tone="muted">{memberActionLabel}</Text>
                       </Box>
-                      <Icon name={isMemberSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: 8 }} />
+                      <Icon name={isMemberSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: spacing[2] }} />
                     </Pressable>
 
                     {isMemberSelected && (
-                      <Box paddingX={4} gap={2} style={{ paddingTop: 12 }}>
+                      <Box paddingX={4} gap={2} style={{ paddingTop: spacing[3] }}>
                         <KeyValueList
                           dense
                           items={[
@@ -1171,7 +1174,7 @@ function OperationsPanel({
               })}
             </Box>
 
-            <Box gap={3} style={{ marginTop: 8 }}>
+            <Box gap={3} style={{ marginTop: spacing[2] }}>
               <TextField
                 label="اسم العضو أو البريد"
                 placeholder="مثال: staff@bthwani.sa"
@@ -1207,7 +1210,7 @@ function OperationsPanel({
 
       {/* 6) Flat Coverage Zones Section with inline expansion */}
       <Box gap={3} paddingY={2}>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <Box style={{ gap: 2, alignItems: 'flex-start' }}>
             <Text role="bodyStrong" align="start">مناطق التغطية</Text>
             <Text role="caption" tone="muted" align="start">{zoneStatusSummary}</Text>
@@ -1221,15 +1224,15 @@ function OperationsPanel({
           />
         </Box>
 
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <SummaryCell label="نشطة" value={String(activeZoneCount)} tone="success" />
           <SummaryCell label="قيد المراجعة" value={String(pendingZoneCount)} tone="warning" />
           <SummaryCell label="محجوبة" value={String(blockedZoneCount)} tone="danger" />
         </Box>
 
         {coveragePanelOpen && (
-          <Box gap={3} style={{ paddingHorizontal: 4, marginTop: 4 }}>
-            <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+          <Box gap={3} style={{ paddingHorizontal: spacing[1], marginTop: spacing[1] }}>
+            <Box layoutDirection="row" style={{ alignItems: 'center', gap: 6 }}>
               <Icon name="information-circle-outline" size={14} tone="warning" />
               <Text role="caption" tone="warning" align="start" style={{ flex: 1 }}>
                 المناطق تُدار مركزيًا من لوحة التحكم وWLT/Finance. الشريك يطلب مراجعة فقط ولا يبدل السياسة محليًا.
@@ -1246,32 +1249,32 @@ function OperationsPanel({
                 const statusTone = resolveZoneStatusTone(zone.status);
 
                 return (
-                  <Box key={zone.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: 8 }}>
+                  <Box key={zone.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: spacing[2] }}>
                     <Pressable
                       onPress={() => setSelectedZoneId(isZoneSelected ? '' : zone.id)}
                       style={({ pressed }) => ({
                         flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
                         alignItems: 'center',
                         backgroundColor: pressed ? theme.surfaceInset : undefined,
-                        padding: 4,
+                        padding: spacing[1],
                       })}
                     >
-                      <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flexShrink: 1, minWidth: 0 }}>
+                      <Box layoutDirection="row" style={{ alignItems: 'center', gap: spacing[2], flexShrink: 1, minWidth: 0 }}>
                         <Icon name="location-outline" size={16} tone="brand" />
                         <Box style={{ gap: 2, flexShrink: 1, minWidth: 0 }}>
                           <Text role="bodyStrong" align="start">{zone.name}</Text>
                           <Text role="caption" tone="muted" align="start">{zone.branchRelation}</Text>
                         </Box>
                       </Box>
-                      <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2, marginStart: 8 }}>
+                      <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2, marginStart: spacing[2] }}>
                         <Badge label={zone.statusLabel} tone={statusTone} />
                         <Text role="caption" tone="muted">{zone.reviewActionLabel}</Text>
                       </Box>
-                      <Icon name={isZoneSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: 8 }} />
+                      <Icon name={isZoneSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: spacing[2] }} />
                     </Pressable>
 
                     {isZoneSelected && (
-                      <Box paddingX={4} gap={2} style={{ paddingTop: 12 }}>
+                      <Box paddingX={4} gap={2} style={{ paddingTop: spacing[3] }}>
                         <KeyValueList
                           dense
                           items={[
@@ -1381,15 +1384,15 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
       {/* Engagement metrics grid */}
       <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align="start">مؤشرات التفاعل</Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
           <AnalyticsInsightMetric label="حفظ المتجر في المفضلة" value={d.storeFavoritesCount.toLocaleString('ar')} tone="brand" icon="heart-outline" />
           <AnalyticsInsightMetric label="متابعو المتجر" value={d.followersCount.toLocaleString('ar')} tone="info" icon="people-outline" />
         </View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
           <AnalyticsInsightMetric label="حفظ المنتجات في المفضلة" value={d.productFavoritesCount.toLocaleString('ar')} tone="success" icon="bookmark-outline" />
           <AnalyticsInsightMetric label="عدد التقييمات" value={d.totalRatings.toLocaleString('ar')} tone="default" icon="star-half-outline" />
         </View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
           <AnalyticsInsightMetric label="متوسط التقييم" value={`${d.averageRating} ⭐`} tone="brand" icon="star" />
         </View>
       </Box>
@@ -1424,7 +1427,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
           borderStartColor: theme.warning,
         }}
       >
-        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2] }}>
           <Icon name="bulb-outline" size={18} tone="warning" />
           <Text role="bodyStrong" tone="warning">فرصة تسويقية</Text>
         </View>
@@ -1456,7 +1459,7 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
           borderStartColor: theme.brand,
         }}
       >
-        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2] }}>
           <Icon name="trending-up-outline" size={18} tone="brand" />
           <Text role="bodyStrong" tone="brand">توصية ذكية</Text>
         </View>
@@ -1774,17 +1777,17 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   flexDirection: rowDirection,
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  paddingHorizontal: 16,
+                  paddingHorizontal: spacing[4],
                   paddingVertical: 14,
                   backgroundColor: theme.surface,
                 }}
               >
-                <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+                <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[3], flexShrink: 1, minWidth: 0 }}>
                   <View
                     style={{
                       width: 36,
                       height: 36,
-                      borderRadius: 10,
+                      borderRadius: radius.sm,
                       alignItems: 'center',
                       justifyContent: 'center',
                       backgroundColor: theme.surfaceInset,
@@ -1809,17 +1812,17 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   style={{
                     flexDirection: rowDirection,
                     backgroundColor: theme.surfaceInset,
-                    borderRadius: 12,
+                    borderRadius: radius.sm2,
                     padding: 3,
                     borderWidth: 1,
                     borderColor: theme.line,
-                    gap: 4,
+                    gap: spacing[1],
                   }}
                 >
                   <Pressable
                     onPress={() => setAppearanceMode('lightPremium')}
                     style={{
-                      paddingHorizontal: 12,
+                      paddingHorizontal: spacing[3],
                       paddingVertical: 6,
                       borderRadius: 9,
                       backgroundColor: appearanceMode === 'lightPremium' ? theme.brand : 'transparent',
@@ -1828,7 +1831,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                     <Text
                       role="bodyStrong"
                       style={{
-                        fontSize: 12,
+                        fontSize: typographyRoles.caption.fontSize,
                         color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text,
                       }}
                     >
@@ -1838,7 +1841,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   <Pressable
                     onPress={() => setAppearanceMode('darkGlass')}
                     style={{
-                      paddingHorizontal: 12,
+                      paddingHorizontal: spacing[3],
                       paddingVertical: 6,
                       borderRadius: 9,
                       backgroundColor: appearanceMode === 'darkGlass' ? theme.brand : 'transparent',
@@ -1847,7 +1850,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                     <Text
                       role="bodyStrong"
                       style={{
-                        fontSize: 12,
+                        fontSize: typographyRoles.caption.fontSize,
                         color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text,
                       }}
                     >
@@ -1862,7 +1865,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
             {/* Current Preferences */}
             <Box padding={0} gap={0}>
-              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+              <Text role="label" tone="muted" style={{ paddingHorizontal: spacing[4], paddingBottom: spacing[2] }}>
                 التفضيلات الحالية
               </Text>
               {([
@@ -1879,8 +1882,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                     flexDirection: rowDirection,
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
+                    paddingHorizontal: spacing[4],
+                    paddingVertical: spacing[3],
                     backgroundColor: theme.surface,
                     borderBottomWidth: index === arr.length - 1 ? 0 : 1,
                     borderBottomColor: theme.line,
@@ -1898,7 +1901,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
             {/* Notification Preferences */}
             <Box padding={0} gap={0}>
-              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+              <Text role="label" tone="muted" style={{ paddingHorizontal: spacing[4], paddingBottom: spacing[2] }}>
                 إعدادات الإشعارات
               </Text>
               {primaryNotificationRows.map((item) => (
@@ -1920,7 +1923,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   flexDirection: rowDirection,
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  paddingHorizontal: 16,
+                  paddingHorizontal: spacing[4],
                   paddingVertical: 10,
                   backgroundColor: pressed ? theme.surfaceInset : theme.surface,
                   borderBottomWidth: showAdvancedNotifications ? 1 : 0,
@@ -1959,7 +1962,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
             {/* Quick Access */}
             <Box padding={0} gap={0}>
-              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+              <Text role="label" tone="muted" style={{ paddingHorizontal: spacing[4], paddingBottom: spacing[2] }}>
                 الوصول السريع
               </Text>
               {[
@@ -1989,8 +1992,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                     flexDirection: rowDirection,
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
+                    paddingHorizontal: spacing[4],
+                    paddingVertical: spacing[3],
                     backgroundColor: pressed ? theme.surfaceInset : theme.surface,
                     borderBottomWidth: index === arr.length - 1 ? 0 : 1,
                     borderBottomColor: theme.line,
@@ -2091,9 +2094,9 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   alignItems: 'center',
                   gap: 6,
                   backgroundColor: pressed ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)',
-                  paddingVertical: 8,
-                  paddingHorizontal: 12,
-                  borderRadius: 20,
+                  paddingVertical: spacing[2],
+                  paddingHorizontal: spacing[3],
+                  borderRadius: radius.lg2,
                   borderWidth: 1,
                   borderColor: 'rgba(255, 255, 255, 0.2)',
                 },
@@ -2128,7 +2131,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
           <Divider />
           {/* 4) Main Sections Nav — icon + title + subtitle + chevron, RTL-correct */}
-          <View style={{ gap: 8 }}>
+          <View style={{ gap: spacing[2] }}>
             {activeHubNavigationItems.map((item) => (
               <HubNavRow
                 key={item.id}
