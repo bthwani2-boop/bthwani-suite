@@ -1,0 +1,948 @@
+{
+  "package": "BTHWANI_DSH_WLT_JOURNIES_STYLE_ZERO_GAP_CLOSURE_SLICES_V3_1_20260608",
+  "date": "2026-06-08",
+  "target_local_repo": "C:\\bthwani-suite",
+  "github_repo": "bthwani2-boop/bthwani-suite",
+  "github_reference": "fix/docker-local-runtime-standardization",
+  "reference_commit": "fdc3072a3e18e3fb3792dc925f6c505ad654a573",
+  "mode": "documentation/spec package; no GitHub write; no code implementation claim",
+  "install_target": "dsh\\docs\\journies-###-slug",
+  "spelling_note": "Folder prefix intentionally uses user-requested spelling: journies",
+  "journey_count": 15,
+  "slice_count": 84,
+  "journeys": [
+    {
+      "journey_id": "J-000",
+      "folder": "dsh/docs/journies-000-foundation-remote-local-evidence-gate",
+      "slice_count": 5,
+      "folder_name": "journies-000-foundation-remote-local-evidence-gate"
+    },
+    {
+      "journey_id": "J-001",
+      "folder": "dsh/docs/journies-001-store-discovery",
+      "slice_count": 6,
+      "folder_name": "journies-001-store-discovery"
+    },
+    {
+      "journey_id": "J-002",
+      "folder": "dsh/docs/journies-002-catalog-management",
+      "slice_count": 6,
+      "folder_name": "journies-002-catalog-management"
+    },
+    {
+      "journey_id": "J-003",
+      "folder": "dsh/docs/journies-003-checkout-payment-wlt-order",
+      "slice_count": 7,
+      "folder_name": "journies-003-checkout-payment-wlt-order"
+    },
+    {
+      "journey_id": "J-004",
+      "folder": "dsh/docs/journies-004-order-lifecycle-support-refund",
+      "slice_count": 6,
+      "folder_name": "journies-004-order-lifecycle-support-refund"
+    },
+    {
+      "journey_id": "J-005",
+      "folder": "dsh/docs/journies-005-delivery-execution-captain",
+      "slice_count": 7,
+      "folder_name": "journies-005-delivery-execution-captain"
+    },
+    {
+      "journey_id": "J-006",
+      "folder": "dsh/docs/journies-006-partner-onboarding-field-readiness",
+      "slice_count": 7,
+      "folder_name": "journies-006-partner-onboarding-field-readiness"
+    },
+    {
+      "journey_id": "J-007",
+      "folder": "dsh/docs/journies-007-data-media-fixture-governance",
+      "slice_count": 5,
+      "folder_name": "journies-007-data-media-fixture-governance"
+    },
+    {
+      "journey_id": "J-008",
+      "folder": "dsh/docs/journies-008-platform-vars-provider-policy",
+      "slice_count": 4,
+      "folder_name": "journies-008-platform-vars-provider-policy"
+    },
+    {
+      "journey_id": "J-009",
+      "folder": "dsh/docs/journies-009-control-panel-operations-room",
+      "slice_count": 5,
+      "folder_name": "journies-009-control-panel-operations-room"
+    },
+    {
+      "journey_id": "J-010",
+      "folder": "dsh/docs/journies-010-wlt-finance-settlement-boundary",
+      "slice_count": 5,
+      "folder_name": "journies-010-wlt-finance-settlement-boundary"
+    },
+    {
+      "journey_id": "J-011",
+      "folder": "dsh/docs/journies-011-performance-cleanup-refactor",
+      "slice_count": 6,
+      "folder_name": "journies-011-performance-cleanup-refactor"
+    },
+    {
+      "journey_id": "J-012",
+      "folder": "dsh/docs/journies-012-auth-permissions-account-profile",
+      "slice_count": 5,
+      "folder_name": "journies-012-auth-permissions-account-profile"
+    },
+    {
+      "journey_id": "J-013",
+      "folder": "dsh/docs/journies-013-notifications-signal-layer",
+      "slice_count": 5,
+      "folder_name": "journies-013-notifications-signal-layer"
+    },
+    {
+      "journey_id": "J-014",
+      "folder": "dsh/docs/journies-014-final-e2e-regression-readiness",
+      "slice_count": 5,
+      "folder_name": "journies-014-final-e2e-regression-readiness"
+    }
+  ],
+  "slices": [
+    {
+      "journey_id": "J-000",
+      "journey_folder": "dsh/docs/journies-000-foundation-remote-local-evidence-gate",
+      "slice_order": 1,
+      "slice_id": "000A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-000-foundation-remote-local-evidence-gate/DSH-SLICE-000A-remote-branch-and-local-baseline-verification.md",
+      "new_file": "dsh/docs/journies-000-foundation-remote-local-evidence-gate/000a-remote-branch-and-local-baseline-verification.slice1.md",
+      "old_filename": "DSH-SLICE-000A-remote-branch-and-local-baseline-verification.md",
+      "new_filename": "000a-remote-branch-and-local-baseline-verification.slice1.md"
+    },
+    {
+      "journey_id": "J-000",
+      "journey_folder": "dsh/docs/journies-000-foundation-remote-local-evidence-gate",
+      "slice_order": 2,
+      "slice_id": "000B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-000-foundation-remote-local-evidence-gate/DSH-SLICE-000B-local-runtime-stack-baseline.md",
+      "new_file": "dsh/docs/journies-000-foundation-remote-local-evidence-gate/000b-local-runtime-stack-baseline.slice2.md",
+      "old_filename": "DSH-SLICE-000B-local-runtime-stack-baseline.md",
+      "new_filename": "000b-local-runtime-stack-baseline.slice2.md"
+    },
+    {
+      "journey_id": "J-000",
+      "journey_folder": "dsh/docs/journies-000-foundation-remote-local-evidence-gate",
+      "slice_order": 3,
+      "slice_id": "000C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-000-foundation-remote-local-evidence-gate/DSH-SLICE-000C-agents-skills-governance-reading-gate.md",
+      "new_file": "dsh/docs/journies-000-foundation-remote-local-evidence-gate/000c-agents-skills-governance-reading-gate.slice3.md",
+      "old_filename": "DSH-SLICE-000C-agents-skills-governance-reading-gate.md",
+      "new_filename": "000c-agents-skills-governance-reading-gate.slice3.md"
+    },
+    {
+      "journey_id": "J-000",
+      "journey_folder": "dsh/docs/journies-000-foundation-remote-local-evidence-gate",
+      "slice_order": 4,
+      "slice_id": "000D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-000-foundation-remote-local-evidence-gate/DSH-SLICE-000D-architecture-ownership-and-file-inventory.md",
+      "new_file": "dsh/docs/journies-000-foundation-remote-local-evidence-gate/000d-architecture-ownership-and-file-inventory.slice4.md",
+      "old_filename": "DSH-SLICE-000D-architecture-ownership-and-file-inventory.md",
+      "new_filename": "000d-architecture-ownership-and-file-inventory.slice4.md"
+    },
+    {
+      "journey_id": "J-000",
+      "journey_folder": "dsh/docs/journies-000-foundation-remote-local-evidence-gate",
+      "slice_order": 5,
+      "slice_id": "000E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-000-foundation-remote-local-evidence-gate/DSH-SLICE-000E-evidence-folder-and-zip-protocol.md",
+      "new_file": "dsh/docs/journies-000-foundation-remote-local-evidence-gate/000e-evidence-folder-and-zip-protocol.slice5.md",
+      "old_filename": "DSH-SLICE-000E-evidence-folder-and-zip-protocol.md",
+      "new_filename": "000e-evidence-folder-and-zip-protocol.slice5.md"
+    },
+    {
+      "journey_id": "J-001",
+      "journey_folder": "dsh/docs/journies-001-store-discovery",
+      "slice_order": 1,
+      "slice_id": "001A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-001-store-discovery-and-visibility/DSH-SLICE-001A-client-store-list-from-live-api.md",
+      "new_file": "dsh/docs/journies-001-store-discovery/001a-client-store-list-from-live-api.slice1.md",
+      "old_filename": "DSH-SLICE-001A-client-store-list-from-live-api.md",
+      "new_filename": "001a-client-store-list-from-live-api.slice1.md"
+    },
+    {
+      "journey_id": "J-001",
+      "journey_folder": "dsh/docs/journies-001-store-discovery",
+      "slice_order": 2,
+      "slice_id": "001B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-001-store-discovery-and-visibility/DSH-SLICE-001B-store-details-and-serviceability-preview.md",
+      "new_file": "dsh/docs/journies-001-store-discovery/001b-store-details-and-serviceability-preview.slice2.md",
+      "old_filename": "DSH-SLICE-001B-store-details-and-serviceability-preview.md",
+      "new_filename": "001b-store-details-and-serviceability-preview.slice2.md"
+    },
+    {
+      "journey_id": "J-001",
+      "journey_folder": "dsh/docs/journies-001-store-discovery",
+      "slice_order": 3,
+      "slice_id": "001C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-001-store-discovery-and-visibility/DSH-SLICE-001C-partner-readiness-gate.md",
+      "new_file": "dsh/docs/journies-001-store-discovery/001c-partner-readiness-gate.slice3.md",
+      "old_filename": "DSH-SLICE-001C-partner-readiness-gate.md",
+      "new_filename": "001c-partner-readiness-gate.slice3.md"
+    },
+    {
+      "journey_id": "J-001",
+      "journey_folder": "dsh/docs/journies-001-store-discovery",
+      "slice_order": 4,
+      "slice_id": "001D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-001-store-discovery-and-visibility/DSH-SLICE-001D-control-panel-catalog-approval-gate.md",
+      "new_file": "dsh/docs/journies-001-store-discovery/001d-control-panel-catalog-approval-gate.slice4.md",
+      "old_filename": "DSH-SLICE-001D-control-panel-catalog-approval-gate.md",
+      "new_filename": "001d-control-panel-catalog-approval-gate.slice4.md"
+    },
+    {
+      "journey_id": "J-001",
+      "journey_folder": "dsh/docs/journies-001-store-discovery",
+      "slice_order": 5,
+      "slice_id": "001E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-001-store-discovery-and-visibility/DSH-SLICE-001E-control-panel-marketing-visibility-gate.md",
+      "new_file": "dsh/docs/journies-001-store-discovery/001e-control-panel-marketing-visibility-gate.slice5.md",
+      "old_filename": "DSH-SLICE-001E-control-panel-marketing-visibility-gate.md",
+      "new_filename": "001e-control-panel-marketing-visibility-gate.slice5.md"
+    },
+    {
+      "journey_id": "J-001",
+      "journey_folder": "dsh/docs/journies-001-store-discovery",
+      "slice_order": 6,
+      "slice_id": "001F",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-001-store-discovery-and-visibility/DSH-SLICE-001F-cross-surface-visibility-proof.md",
+      "new_file": "dsh/docs/journies-001-store-discovery/001f-cross-surface-visibility-proof.slice6.md",
+      "old_filename": "DSH-SLICE-001F-cross-surface-visibility-proof.md",
+      "new_filename": "001f-cross-surface-visibility-proof.slice6.md"
+    },
+    {
+      "journey_id": "J-002",
+      "journey_folder": "dsh/docs/journies-002-catalog-management",
+      "slice_order": 1,
+      "slice_id": "002A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-002-deep-catalog-management/DSH-SLICE-002A-partner-product-create-and-edit.md",
+      "new_file": "dsh/docs/journies-002-catalog-management/002a-partner-product-create-and-edit.slice1.md",
+      "old_filename": "DSH-SLICE-002A-partner-product-create-and-edit.md",
+      "new_filename": "002a-partner-product-create-and-edit.slice1.md"
+    },
+    {
+      "journey_id": "J-002",
+      "journey_folder": "dsh/docs/journies-002-catalog-management",
+      "slice_order": 2,
+      "slice_id": "002B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-002-deep-catalog-management/DSH-SLICE-002B-category-facet-and-product-media.md",
+      "new_file": "dsh/docs/journies-002-catalog-management/002b-category-facet-and-product-media.slice2.md",
+      "old_filename": "DSH-SLICE-002B-category-facet-and-product-media.md",
+      "new_filename": "002b-category-facet-and-product-media.slice2.md"
+    },
+    {
+      "journey_id": "J-002",
+      "journey_folder": "dsh/docs/journies-002-catalog-management",
+      "slice_order": 3,
+      "slice_id": "002C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-002-deep-catalog-management/DSH-SLICE-002C-control-panel-catalog-review.md",
+      "new_file": "dsh/docs/journies-002-catalog-management/002c-control-panel-catalog-review.slice3.md",
+      "old_filename": "DSH-SLICE-002C-control-panel-catalog-review.md",
+      "new_filename": "002c-control-panel-catalog-review.slice3.md"
+    },
+    {
+      "journey_id": "J-002",
+      "journey_folder": "dsh/docs/journies-002-catalog-management",
+      "slice_order": 4,
+      "slice_id": "002D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-002-deep-catalog-management/DSH-SLICE-002D-catalog-override-and-conflict-resolution.md",
+      "new_file": "dsh/docs/journies-002-catalog-management/002d-catalog-override-and-conflict-resolution.slice4.md",
+      "old_filename": "DSH-SLICE-002D-catalog-override-and-conflict-resolution.md",
+      "new_filename": "002d-catalog-override-and-conflict-resolution.slice4.md"
+    },
+    {
+      "journey_id": "J-002",
+      "journey_folder": "dsh/docs/journies-002-catalog-management",
+      "slice_order": 5,
+      "slice_id": "002E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-002-deep-catalog-management/DSH-SLICE-002E-client-catalog-display-and-detail-on-demand.md",
+      "new_file": "dsh/docs/journies-002-catalog-management/002e-client-catalog-display-and-detail-on-demand.slice5.md",
+      "old_filename": "DSH-SLICE-002E-client-catalog-display-and-detail-on-demand.md",
+      "new_filename": "002e-client-catalog-display-and-detail-on-demand.slice5.md"
+    },
+    {
+      "journey_id": "J-002",
+      "journey_folder": "dsh/docs/journies-002-catalog-management",
+      "slice_order": 6,
+      "slice_id": "002F",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-002-deep-catalog-management/DSH-SLICE-002F-catalog-performance-and-n-1-media-prevention.md",
+      "new_file": "dsh/docs/journies-002-catalog-management/002f-catalog-performance-and-n-1-media-prevention.slice6.md",
+      "old_filename": "DSH-SLICE-002F-catalog-performance-and-n-1-media-prevention.md",
+      "new_filename": "002f-catalog-performance-and-n-1-media-prevention.slice6.md"
+    },
+    {
+      "journey_id": "J-003",
+      "journey_folder": "dsh/docs/journies-003-checkout-payment-wlt-order",
+      "slice_order": 1,
+      "slice_id": "003A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-003-checkout-payment-wlt-bridge-order-creation/DSH-SLICE-003A-cart-serviceability-and-auth-binding.md",
+      "new_file": "dsh/docs/journies-003-checkout-payment-wlt-order/003a-cart-serviceability-and-auth-binding.slice1.md",
+      "old_filename": "DSH-SLICE-003A-cart-serviceability-and-auth-binding.md",
+      "new_filename": "003a-cart-serviceability-and-auth-binding.slice1.md"
+    },
+    {
+      "journey_id": "J-003",
+      "journey_folder": "dsh/docs/journies-003-checkout-payment-wlt-order",
+      "slice_order": 2,
+      "slice_id": "003B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-003-checkout-payment-wlt-bridge-order-creation/DSH-SLICE-003B-checkout-intent-address-and-time-window.md",
+      "new_file": "dsh/docs/journies-003-checkout-payment-wlt-order/003b-checkout-intent-address-and-time-window.slice2.md",
+      "old_filename": "DSH-SLICE-003B-checkout-intent-address-and-time-window.md",
+      "new_filename": "003b-checkout-intent-address-and-time-window.slice2.md"
+    },
+    {
+      "journey_id": "J-003",
+      "journey_folder": "dsh/docs/journies-003-checkout-payment-wlt-order",
+      "slice_order": 3,
+      "slice_id": "003C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-003-checkout-payment-wlt-bridge-order-creation/DSH-SLICE-003C-wlt-payment-bridge-and-money-boundary.md",
+      "new_file": "dsh/docs/journies-003-checkout-payment-wlt-order/003c-wlt-payment-bridge-and-money-boundary.slice3.md",
+      "old_filename": "DSH-SLICE-003C-wlt-payment-bridge-and-money-boundary.md",
+      "new_filename": "003c-wlt-payment-bridge-and-money-boundary.slice3.md"
+    },
+    {
+      "journey_id": "J-003",
+      "journey_folder": "dsh/docs/journies-003-checkout-payment-wlt-order",
+      "slice_order": 4,
+      "slice_id": "003D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-003-checkout-payment-wlt-bridge-order-creation/DSH-SLICE-003D-idempotent-order-creation-handoff.md",
+      "new_file": "dsh/docs/journies-003-checkout-payment-wlt-order/003d-idempotent-order-creation-handoff.slice4.md",
+      "old_filename": "DSH-SLICE-003D-idempotent-order-creation-handoff.md",
+      "new_filename": "003d-idempotent-order-creation-handoff.slice4.md"
+    },
+    {
+      "journey_id": "J-003",
+      "journey_folder": "dsh/docs/journies-003-checkout-payment-wlt-order",
+      "slice_order": 5,
+      "slice_id": "003E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-003-checkout-payment-wlt-bridge-order-creation/DSH-SLICE-003E-payment-failure-and-support-entry.md",
+      "new_file": "dsh/docs/journies-003-checkout-payment-wlt-order/003e-payment-failure-and-support-entry.slice5.md",
+      "old_filename": "DSH-SLICE-003E-payment-failure-and-support-entry.md",
+      "new_filename": "003e-payment-failure-and-support-entry.slice5.md"
+    },
+    {
+      "journey_id": "J-003",
+      "journey_folder": "dsh/docs/journies-003-checkout-payment-wlt-order",
+      "slice_order": 6,
+      "slice_id": "003F",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-003-checkout-payment-wlt-bridge-order-creation/DSH-SLICE-003F-partner-order-intake-after-payment.md",
+      "new_file": "dsh/docs/journies-003-checkout-payment-wlt-order/003f-partner-order-intake-after-payment.slice6.md",
+      "old_filename": "DSH-SLICE-003F-partner-order-intake-after-payment.md",
+      "new_filename": "003f-partner-order-intake-after-payment.slice6.md"
+    },
+    {
+      "journey_id": "J-003",
+      "journey_folder": "dsh/docs/journies-003-checkout-payment-wlt-order",
+      "slice_order": 7,
+      "slice_id": "003G",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-003-checkout-payment-wlt-bridge-order-creation/DSH-SLICE-003G-checkout-control-panel-finance-ops-visibility.md",
+      "new_file": "dsh/docs/journies-003-checkout-payment-wlt-order/003g-checkout-control-panel-finance-ops-visibility.slice7.md",
+      "old_filename": "DSH-SLICE-003G-checkout-control-panel-finance-ops-visibility.md",
+      "new_filename": "003g-checkout-control-panel-finance-ops-visibility.slice7.md"
+    },
+    {
+      "journey_id": "J-004",
+      "journey_folder": "dsh/docs/journies-004-order-lifecycle-support-refund",
+      "slice_order": 1,
+      "slice_id": "004A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-004-order-lifecycle-support-cancellation-refund/DSH-SLICE-004A-client-order-tracking-and-status-timeline.md",
+      "new_file": "dsh/docs/journies-004-order-lifecycle-support-refund/004a-client-order-tracking-and-status-timeline.slice1.md",
+      "old_filename": "DSH-SLICE-004A-client-order-tracking-and-status-timeline.md",
+      "new_filename": "004a-client-order-tracking-and-status-timeline.slice1.md"
+    },
+    {
+      "journey_id": "J-004",
+      "journey_folder": "dsh/docs/journies-004-order-lifecycle-support-refund",
+      "slice_order": 2,
+      "slice_id": "004B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-004-order-lifecycle-support-cancellation-refund/DSH-SLICE-004B-partner-prepare-and-handoff-lifecycle.md",
+      "new_file": "dsh/docs/journies-004-order-lifecycle-support-refund/004b-partner-prepare-and-handoff-lifecycle.slice2.md",
+      "old_filename": "DSH-SLICE-004B-partner-prepare-and-handoff-lifecycle.md",
+      "new_filename": "004b-partner-prepare-and-handoff-lifecycle.slice2.md"
+    },
+    {
+      "journey_id": "J-004",
+      "journey_folder": "dsh/docs/journies-004-order-lifecycle-support-refund",
+      "slice_order": 3,
+      "slice_id": "004C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-004-order-lifecycle-support-cancellation-refund/DSH-SLICE-004C-control-panel-support-case-and-exception-queue.md",
+      "new_file": "dsh/docs/journies-004-order-lifecycle-support-refund/004c-control-panel-support-case-and-exception-queue.slice3.md",
+      "old_filename": "DSH-SLICE-004C-control-panel-support-case-and-exception-queue.md",
+      "new_filename": "004c-control-panel-support-case-and-exception-queue.slice3.md"
+    },
+    {
+      "journey_id": "J-004",
+      "journey_folder": "dsh/docs/journies-004-order-lifecycle-support-refund",
+      "slice_order": 4,
+      "slice_id": "004D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-004-order-lifecycle-support-cancellation-refund/DSH-SLICE-004D-cancellation-rules-and-state-guards.md",
+      "new_file": "dsh/docs/journies-004-order-lifecycle-support-refund/004d-cancellation-rules-and-state-guards.slice4.md",
+      "old_filename": "DSH-SLICE-004D-cancellation-rules-and-state-guards.md",
+      "new_filename": "004d-cancellation-rules-and-state-guards.slice4.md"
+    },
+    {
+      "journey_id": "J-004",
+      "journey_folder": "dsh/docs/journies-004-order-lifecycle-support-refund",
+      "slice_order": 5,
+      "slice_id": "004E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-004-order-lifecycle-support-cancellation-refund/DSH-SLICE-004E-refund-request-bridge-to-wlt.md",
+      "new_file": "dsh/docs/journies-004-order-lifecycle-support-refund/004e-refund-request-bridge-to-wlt.slice5.md",
+      "old_filename": "DSH-SLICE-004E-refund-request-bridge-to-wlt.md",
+      "new_filename": "004e-refund-request-bridge-to-wlt.slice5.md"
+    },
+    {
+      "journey_id": "J-004",
+      "journey_folder": "dsh/docs/journies-004-order-lifecycle-support-refund",
+      "slice_order": 6,
+      "slice_id": "004F",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-004-order-lifecycle-support-cancellation-refund/DSH-SLICE-004F-audit-trail-and-customer-partner-captain-notes.md",
+      "new_file": "dsh/docs/journies-004-order-lifecycle-support-refund/004f-audit-trail-and-customer-partner-captain-notes.slice6.md",
+      "old_filename": "DSH-SLICE-004F-audit-trail-and-customer-partner-captain-notes.md",
+      "new_filename": "004f-audit-trail-and-customer-partner-captain-notes.slice6.md"
+    },
+    {
+      "journey_id": "J-005",
+      "journey_folder": "dsh/docs/journies-005-delivery-execution-captain",
+      "slice_order": 1,
+      "slice_id": "005A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-005-delivery-execution-and-captain-operations/DSH-SLICE-005A-dispatch-and-assignment.md",
+      "new_file": "dsh/docs/journies-005-delivery-execution-captain/005a-dispatch-and-assignment.slice1.md",
+      "old_filename": "DSH-SLICE-005A-dispatch-and-assignment.md",
+      "new_filename": "005a-dispatch-and-assignment.slice1.md"
+    },
+    {
+      "journey_id": "J-005",
+      "journey_folder": "dsh/docs/journies-005-delivery-execution-captain",
+      "slice_order": 2,
+      "slice_id": "005B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-005-delivery-execution-and-captain-operations/DSH-SLICE-005B-captain-accept-decline-and-availability.md",
+      "new_file": "dsh/docs/journies-005-delivery-execution-captain/005b-captain-accept-decline-and-availability.slice2.md",
+      "old_filename": "DSH-SLICE-005B-captain-accept-decline-and-availability.md",
+      "new_filename": "005b-captain-accept-decline-and-availability.slice2.md"
+    },
+    {
+      "journey_id": "J-005",
+      "journey_folder": "dsh/docs/journies-005-delivery-execution-captain",
+      "slice_order": 3,
+      "slice_id": "005C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-005-delivery-execution-and-captain-operations/DSH-SLICE-005C-pickup-confirmation-and-partner-handoff.md",
+      "new_file": "dsh/docs/journies-005-delivery-execution-captain/005c-pickup-confirmation-and-partner-handoff.slice3.md",
+      "old_filename": "DSH-SLICE-005C-pickup-confirmation-and-partner-handoff.md",
+      "new_filename": "005c-pickup-confirmation-and-partner-handoff.slice3.md"
+    },
+    {
+      "journey_id": "J-005",
+      "journey_folder": "dsh/docs/journies-005-delivery-execution-captain",
+      "slice_order": 4,
+      "slice_id": "005D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-005-delivery-execution-and-captain-operations/DSH-SLICE-005D-location-tracking-and-client-visibility.md",
+      "new_file": "dsh/docs/journies-005-delivery-execution-captain/005d-location-tracking-and-client-visibility.slice4.md",
+      "old_filename": "DSH-SLICE-005D-location-tracking-and-client-visibility.md",
+      "new_filename": "005d-location-tracking-and-client-visibility.slice4.md"
+    },
+    {
+      "journey_id": "J-005",
+      "journey_folder": "dsh/docs/journies-005-delivery-execution-captain",
+      "slice_order": 5,
+      "slice_id": "005E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-005-delivery-execution-and-captain-operations/DSH-SLICE-005E-proof-of-delivery-and-delivery-close.md",
+      "new_file": "dsh/docs/journies-005-delivery-execution-captain/005e-proof-of-delivery-and-delivery-close.slice5.md",
+      "old_filename": "DSH-SLICE-005E-proof-of-delivery-and-delivery-close.md",
+      "new_filename": "005e-proof-of-delivery-and-delivery-close.slice5.md"
+    },
+    {
+      "journey_id": "J-005",
+      "journey_folder": "dsh/docs/journies-005-delivery-execution-captain",
+      "slice_order": 6,
+      "slice_id": "005F",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-005-delivery-execution-and-captain-operations/DSH-SLICE-005F-failed-delivery-return-and-exception-handling.md",
+      "new_file": "dsh/docs/journies-005-delivery-execution-captain/005f-failed-delivery-return-and-exception-handling.slice6.md",
+      "old_filename": "DSH-SLICE-005F-failed-delivery-return-and-exception-handling.md",
+      "new_filename": "005f-failed-delivery-return-and-exception-handling.slice6.md"
+    },
+    {
+      "journey_id": "J-005",
+      "journey_folder": "dsh/docs/journies-005-delivery-execution-captain",
+      "slice_order": 7,
+      "slice_id": "005G",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-005-delivery-execution-and-captain-operations/DSH-SLICE-005G-payout-read-only-bridge.md",
+      "new_file": "dsh/docs/journies-005-delivery-execution-captain/005g-payout-read-only-bridge.slice7.md",
+      "old_filename": "DSH-SLICE-005G-payout-read-only-bridge.md",
+      "new_filename": "005g-payout-read-only-bridge.slice7.md"
+    },
+    {
+      "journey_id": "J-006",
+      "journey_folder": "dsh/docs/journies-006-partner-onboarding-field-readiness",
+      "slice_order": 1,
+      "slice_id": "006A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-006-partner-onboarding-and-field-readiness/DSH-SLICE-006A-partner-join-request-and-lead-intake.md",
+      "new_file": "dsh/docs/journies-006-partner-onboarding-field-readiness/006a-partner-join-request-and-lead-intake.slice1.md",
+      "old_filename": "DSH-SLICE-006A-partner-join-request-and-lead-intake.md",
+      "new_filename": "006a-partner-join-request-and-lead-intake.slice1.md"
+    },
+    {
+      "journey_id": "J-006",
+      "journey_folder": "dsh/docs/journies-006-partner-onboarding-field-readiness",
+      "slice_order": 2,
+      "slice_id": "006B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-006-partner-onboarding-and-field-readiness/DSH-SLICE-006B-control-panel-lead-triage-and-field-assignment.md",
+      "new_file": "dsh/docs/journies-006-partner-onboarding-field-readiness/006b-control-panel-lead-triage-and-field-assignment.slice2.md",
+      "old_filename": "DSH-SLICE-006B-control-panel-lead-triage-and-field-assignment.md",
+      "new_filename": "006b-control-panel-lead-triage-and-field-assignment.slice2.md"
+    },
+    {
+      "journey_id": "J-006",
+      "journey_folder": "dsh/docs/journies-006-partner-onboarding-field-readiness",
+      "slice_order": 3,
+      "slice_id": "006C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-006-partner-onboarding-and-field-readiness/DSH-SLICE-006C-field-visit-execution-and-notes.md",
+      "new_file": "dsh/docs/journies-006-partner-onboarding-field-readiness/006c-field-visit-execution-and-notes.slice3.md",
+      "old_filename": "DSH-SLICE-006C-field-visit-execution-and-notes.md",
+      "new_filename": "006c-field-visit-execution-and-notes.slice3.md"
+    },
+    {
+      "journey_id": "J-006",
+      "journey_folder": "dsh/docs/journies-006-partner-onboarding-field-readiness",
+      "slice_order": 4,
+      "slice_id": "006D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-006-partner-onboarding-and-field-readiness/DSH-SLICE-006D-document-capture-and-media-reference.md",
+      "new_file": "dsh/docs/journies-006-partner-onboarding-field-readiness/006d-document-capture-and-media-reference.slice4.md",
+      "old_filename": "DSH-SLICE-006D-document-capture-and-media-reference.md",
+      "new_filename": "006d-document-capture-and-media-reference.slice4.md"
+    },
+    {
+      "journey_id": "J-006",
+      "journey_folder": "dsh/docs/journies-006-partner-onboarding-field-readiness",
+      "slice_order": 5,
+      "slice_id": "006E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-006-partner-onboarding-and-field-readiness/DSH-SLICE-006E-control-panel-approval-rejection-escalation.md",
+      "new_file": "dsh/docs/journies-006-partner-onboarding-field-readiness/006e-control-panel-approval-rejection-escalation.slice5.md",
+      "old_filename": "DSH-SLICE-006E-control-panel-approval-rejection-escalation.md",
+      "new_filename": "006e-control-panel-approval-rejection-escalation.slice5.md"
+    },
+    {
+      "journey_id": "J-006",
+      "journey_folder": "dsh/docs/journies-006-partner-onboarding-field-readiness",
+      "slice_order": 6,
+      "slice_id": "006F",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-006-partner-onboarding-and-field-readiness/DSH-SLICE-006F-partner-activation-and-first-catalog-readiness.md",
+      "new_file": "dsh/docs/journies-006-partner-onboarding-field-readiness/006f-partner-activation-and-first-catalog-readiness.slice6.md",
+      "old_filename": "DSH-SLICE-006F-partner-activation-and-first-catalog-readiness.md",
+      "new_filename": "006f-partner-activation-and-first-catalog-readiness.slice6.md"
+    },
+    {
+      "journey_id": "J-006",
+      "journey_folder": "dsh/docs/journies-006-partner-onboarding-field-readiness",
+      "slice_order": 7,
+      "slice_id": "006G",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-006-partner-onboarding-and-field-readiness/DSH-SLICE-006G-end-to-end-onboarding-closure-proof.md",
+      "new_file": "dsh/docs/journies-006-partner-onboarding-field-readiness/006g-end-to-end-onboarding-closure-proof.slice7.md",
+      "old_filename": "DSH-SLICE-006G-end-to-end-onboarding-closure-proof.md",
+      "new_filename": "006g-end-to-end-onboarding-closure-proof.slice7.md"
+    },
+    {
+      "journey_id": "J-007",
+      "journey_folder": "dsh/docs/journies-007-data-media-fixture-governance",
+      "slice_order": 1,
+      "slice_id": "007A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-007-data-media-fixture-seed-governance/DSH-SLICE-007A-central-data-inventory.md",
+      "new_file": "dsh/docs/journies-007-data-media-fixture-governance/007a-central-data-inventory.slice1.md",
+      "old_filename": "DSH-SLICE-007A-central-data-inventory.md",
+      "new_filename": "007a-central-data-inventory.slice1.md"
+    },
+    {
+      "journey_id": "J-007",
+      "journey_folder": "dsh/docs/journies-007-data-media-fixture-governance",
+      "slice_order": 2,
+      "slice_id": "007B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-007-data-media-fixture-seed-governance/DSH-SLICE-007B-central-media-fixture-inventory.md",
+      "new_file": "dsh/docs/journies-007-data-media-fixture-governance/007b-central-media-fixture-inventory.slice2.md",
+      "old_filename": "DSH-SLICE-007B-central-media-fixture-inventory.md",
+      "new_filename": "007b-central-media-fixture-inventory.slice2.md"
+    },
+    {
+      "journey_id": "J-007",
+      "journey_folder": "dsh/docs/journies-007-data-media-fixture-governance",
+      "slice_order": 3,
+      "slice_id": "007C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-007-data-media-fixture-seed-governance/DSH-SLICE-007C-duplicate-local-fixture-cleanup.md",
+      "new_file": "dsh/docs/journies-007-data-media-fixture-governance/007c-duplicate-local-fixture-cleanup.slice3.md",
+      "old_filename": "DSH-SLICE-007C-duplicate-local-fixture-cleanup.md",
+      "new_filename": "007c-duplicate-local-fixture-cleanup.slice3.md"
+    },
+    {
+      "journey_id": "J-007",
+      "journey_folder": "dsh/docs/journies-007-data-media-fixture-governance",
+      "slice_order": 4,
+      "slice_id": "007D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-007-data-media-fixture-seed-governance/DSH-SLICE-007D-id-mediakey-and-reference-contract.md",
+      "new_file": "dsh/docs/journies-007-data-media-fixture-governance/007d-id-mediakey-and-reference-contract.slice4.md",
+      "old_filename": "DSH-SLICE-007D-id-mediakey-and-reference-contract.md",
+      "new_filename": "007d-id-mediakey-and-reference-contract.slice4.md"
+    },
+    {
+      "journey_id": "J-007",
+      "journey_folder": "dsh/docs/journies-007-data-media-fixture-governance",
+      "slice_order": 5,
+      "slice_id": "007E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-007-data-media-fixture-seed-governance/DSH-SLICE-007E-seed-reset-and-runtime-fixture-exit-path.md",
+      "new_file": "dsh/docs/journies-007-data-media-fixture-governance/007e-seed-reset-and-runtime-fixture-exit-path.slice5.md",
+      "old_filename": "DSH-SLICE-007E-seed-reset-and-runtime-fixture-exit-path.md",
+      "new_filename": "007e-seed-reset-and-runtime-fixture-exit-path.slice5.md"
+    },
+    {
+      "journey_id": "J-008",
+      "journey_folder": "dsh/docs/journies-008-platform-vars-provider-policy",
+      "slice_order": 1,
+      "slice_id": "008A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-008-platform-vars-provider-policy/DSH-SLICE-008A-vars-ownership-and-scope-model.md",
+      "new_file": "dsh/docs/journies-008-platform-vars-provider-policy/008a-vars-ownership-and-scope-model.slice1.md",
+      "old_filename": "DSH-SLICE-008A-vars-ownership-and-scope-model.md",
+      "new_filename": "008a-vars-ownership-and-scope-model.slice1.md"
+    },
+    {
+      "journey_id": "J-008",
+      "journey_folder": "dsh/docs/journies-008-platform-vars-provider-policy",
+      "slice_order": 2,
+      "slice_id": "008B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-008-platform-vars-provider-policy/DSH-SLICE-008B-provider-policy-preview-and-runtime-boundary.md",
+      "new_file": "dsh/docs/journies-008-platform-vars-provider-policy/008b-provider-policy-preview-and-runtime-boundary.slice2.md",
+      "old_filename": "DSH-SLICE-008B-provider-policy-preview-and-runtime-boundary.md",
+      "new_filename": "008b-provider-policy-preview-and-runtime-boundary.slice2.md"
+    },
+    {
+      "journey_id": "J-008",
+      "journey_folder": "dsh/docs/journies-008-platform-vars-provider-policy",
+      "slice_order": 3,
+      "slice_id": "008C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-008-platform-vars-provider-policy/DSH-SLICE-008C-feature-flag-rollout-and-experiment-guard.md",
+      "new_file": "dsh/docs/journies-008-platform-vars-provider-policy/008c-feature-flag-rollout-and-experiment-guard.slice3.md",
+      "old_filename": "DSH-SLICE-008C-feature-flag-rollout-and-experiment-guard.md",
+      "new_filename": "008c-feature-flag-rollout-and-experiment-guard.slice3.md"
+    },
+    {
+      "journey_id": "J-008",
+      "journey_folder": "dsh/docs/journies-008-platform-vars-provider-policy",
+      "slice_order": 4,
+      "slice_id": "008D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-008-platform-vars-provider-policy/DSH-SLICE-008D-simulation-impact-and-rollback-audit.md",
+      "new_file": "dsh/docs/journies-008-platform-vars-provider-policy/008d-simulation-impact-and-rollback-audit.slice4.md",
+      "old_filename": "DSH-SLICE-008D-simulation-impact-and-rollback-audit.md",
+      "new_filename": "008d-simulation-impact-and-rollback-audit.slice4.md"
+    },
+    {
+      "journey_id": "J-009",
+      "journey_folder": "dsh/docs/journies-009-control-panel-operations-room",
+      "slice_order": 1,
+      "slice_id": "009A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-009-control-panel-operations-room/DSH-SLICE-009A-operations-dashboard-live-summary.md",
+      "new_file": "dsh/docs/journies-009-control-panel-operations-room/009a-operations-dashboard-live-summary.slice1.md",
+      "old_filename": "DSH-SLICE-009A-operations-dashboard-live-summary.md",
+      "new_filename": "009a-operations-dashboard-live-summary.slice1.md"
+    },
+    {
+      "journey_id": "J-009",
+      "journey_folder": "dsh/docs/journies-009-control-panel-operations-room",
+      "slice_order": 2,
+      "slice_id": "009B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-009-control-panel-operations-room/DSH-SLICE-009B-order-command-actions-and-permission-guard.md",
+      "new_file": "dsh/docs/journies-009-control-panel-operations-room/009b-order-command-actions-and-permission-guard.slice2.md",
+      "old_filename": "DSH-SLICE-009B-order-command-actions-and-permission-guard.md",
+      "new_filename": "009b-order-command-actions-and-permission-guard.slice2.md"
+    },
+    {
+      "journey_id": "J-009",
+      "journey_folder": "dsh/docs/journies-009-control-panel-operations-room",
+      "slice_order": 3,
+      "slice_id": "009C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-009-control-panel-operations-room/DSH-SLICE-009C-exception-sla-queue.md",
+      "new_file": "dsh/docs/journies-009-control-panel-operations-room/009c-exception-sla-queue.slice3.md",
+      "old_filename": "DSH-SLICE-009C-exception-sla-queue.md",
+      "new_filename": "009c-exception-sla-queue.slice3.md"
+    },
+    {
+      "journey_id": "J-009",
+      "journey_folder": "dsh/docs/journies-009-control-panel-operations-room",
+      "slice_order": 4,
+      "slice_id": "009D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-009-control-panel-operations-room/DSH-SLICE-009D-audit-log-and-rollback-visibility.md",
+      "new_file": "dsh/docs/journies-009-control-panel-operations-room/009d-audit-log-and-rollback-visibility.slice4.md",
+      "old_filename": "DSH-SLICE-009D-audit-log-and-rollback-visibility.md",
+      "new_filename": "009d-audit-log-and-rollback-visibility.slice4.md"
+    },
+    {
+      "journey_id": "J-009",
+      "journey_folder": "dsh/docs/journies-009-control-panel-operations-room",
+      "slice_order": 5,
+      "slice_id": "009E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-009-control-panel-operations-room/DSH-SLICE-009E-finance-read-only-wlt-panel.md",
+      "new_file": "dsh/docs/journies-009-control-panel-operations-room/009e-finance-read-only-wlt-panel.slice5.md",
+      "old_filename": "DSH-SLICE-009E-finance-read-only-wlt-panel.md",
+      "new_filename": "009e-finance-read-only-wlt-panel.slice5.md"
+    },
+    {
+      "journey_id": "J-010",
+      "journey_folder": "dsh/docs/journies-010-wlt-finance-settlement-boundary",
+      "slice_order": 1,
+      "slice_id": "010A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-010-wlt-finance-settlement-ledger-boundary/DSH-SLICE-010A-wallet-and-payment-read-only-boundary.md",
+      "new_file": "dsh/docs/journies-010-wlt-finance-settlement-boundary/010a-wallet-and-payment-read-only-boundary.slice1.md",
+      "old_filename": "DSH-SLICE-010A-wallet-and-payment-read-only-boundary.md",
+      "new_filename": "010a-wallet-and-payment-read-only-boundary.slice1.md"
+    },
+    {
+      "journey_id": "J-010",
+      "journey_folder": "dsh/docs/journies-010-wlt-finance-settlement-boundary",
+      "slice_order": 2,
+      "slice_id": "010B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-010-wlt-finance-settlement-ledger-boundary/DSH-SLICE-010B-ledger-and-financial-audit-ownership.md",
+      "new_file": "dsh/docs/journies-010-wlt-finance-settlement-boundary/010b-ledger-and-financial-audit-ownership.slice2.md",
+      "old_filename": "DSH-SLICE-010B-ledger-and-financial-audit-ownership.md",
+      "new_filename": "010b-ledger-and-financial-audit-ownership.slice2.md"
+    },
+    {
+      "journey_id": "J-010",
+      "journey_folder": "dsh/docs/journies-010-wlt-finance-settlement-boundary",
+      "slice_order": 3,
+      "slice_id": "010C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-010-wlt-finance-settlement-ledger-boundary/DSH-SLICE-010C-refund-and-reversal-rules.md",
+      "new_file": "dsh/docs/journies-010-wlt-finance-settlement-boundary/010c-refund-and-reversal-rules.slice3.md",
+      "old_filename": "DSH-SLICE-010C-refund-and-reversal-rules.md",
+      "new_filename": "010c-refund-and-reversal-rules.slice3.md"
+    },
+    {
+      "journey_id": "J-010",
+      "journey_folder": "dsh/docs/journies-010-wlt-finance-settlement-boundary",
+      "slice_order": 4,
+      "slice_id": "010D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-010-wlt-finance-settlement-ledger-boundary/DSH-SLICE-010D-payout-and-settlement-rules.md",
+      "new_file": "dsh/docs/journies-010-wlt-finance-settlement-boundary/010d-payout-and-settlement-rules.slice4.md",
+      "old_filename": "DSH-SLICE-010D-payout-and-settlement-rules.md",
+      "new_filename": "010d-payout-and-settlement-rules.slice4.md"
+    },
+    {
+      "journey_id": "J-010",
+      "journey_folder": "dsh/docs/journies-010-wlt-finance-settlement-boundary",
+      "slice_order": 5,
+      "slice_id": "010E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-010-wlt-finance-settlement-ledger-boundary/DSH-SLICE-010E-reconciliation-and-cross-service-finance-view.md",
+      "new_file": "dsh/docs/journies-010-wlt-finance-settlement-boundary/010e-reconciliation-and-cross-service-finance-view.slice5.md",
+      "old_filename": "DSH-SLICE-010E-reconciliation-and-cross-service-finance-view.md",
+      "new_filename": "010e-reconciliation-and-cross-service-finance-view.slice5.md"
+    },
+    {
+      "journey_id": "J-011",
+      "journey_folder": "dsh/docs/journies-011-performance-cleanup-refactor",
+      "slice_order": 1,
+      "slice_id": "011A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-011-performance-cleanup-refactor-maintainability/DSH-SLICE-011A-dshclientsurface-decomposition-plan.md",
+      "new_file": "dsh/docs/journies-011-performance-cleanup-refactor/011a-dshclientsurface-decomposition-plan.slice1.md",
+      "old_filename": "DSH-SLICE-011A-dshclientsurface-decomposition-plan.md",
+      "new_filename": "011a-dshclientsurface-decomposition-plan.slice1.md"
+    },
+    {
+      "journey_id": "J-011",
+      "journey_folder": "dsh/docs/journies-011-performance-cleanup-refactor",
+      "slice_order": 2,
+      "slice_id": "011B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-011-performance-cleanup-refactor-maintainability/DSH-SLICE-011B-backend-repository-interface-split.md",
+      "new_file": "dsh/docs/journies-011-performance-cleanup-refactor/011b-backend-repository-interface-split.slice2.md",
+      "old_filename": "DSH-SLICE-011B-backend-repository-interface-split.md",
+      "new_filename": "011b-backend-repository-interface-split.slice2.md"
+    },
+    {
+      "journey_id": "J-011",
+      "journey_folder": "dsh/docs/journies-011-performance-cleanup-refactor",
+      "slice_order": 3,
+      "slice_id": "011C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-011-performance-cleanup-refactor-maintainability/DSH-SLICE-011C-n-1-media-and-product-query-prevention.md",
+      "new_file": "dsh/docs/journies-011-performance-cleanup-refactor/011c-n-1-media-and-product-query-prevention.slice3.md",
+      "old_filename": "DSH-SLICE-011C-n-1-media-and-product-query-prevention.md",
+      "new_filename": "011c-n-1-media-and-product-query-prevention.slice3.md"
+    },
+    {
+      "journey_id": "J-011",
+      "journey_folder": "dsh/docs/journies-011-performance-cleanup-refactor",
+      "slice_order": 4,
+      "slice_id": "011D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-011-performance-cleanup-refactor-maintainability/DSH-SLICE-011D-polling-backoff-websocket-strategy.md",
+      "new_file": "dsh/docs/journies-011-performance-cleanup-refactor/011d-polling-backoff-websocket-strategy.slice4.md",
+      "old_filename": "DSH-SLICE-011D-polling-backoff-websocket-strategy.md",
+      "new_filename": "011d-polling-backoff-websocket-strategy.slice4.md"
+    },
+    {
+      "journey_id": "J-011",
+      "journey_folder": "dsh/docs/journies-011-performance-cleanup-refactor",
+      "slice_order": 5,
+      "slice_id": "011E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-011-performance-cleanup-refactor-maintainability/DSH-SLICE-011E-dead-code-duplication-noise-scan.md",
+      "new_file": "dsh/docs/journies-011-performance-cleanup-refactor/011e-dead-code-duplication-noise-scan.slice5.md",
+      "old_filename": "DSH-SLICE-011E-dead-code-duplication-noise-scan.md",
+      "new_filename": "011e-dead-code-duplication-noise-scan.slice5.md"
+    },
+    {
+      "journey_id": "J-011",
+      "journey_folder": "dsh/docs/journies-011-performance-cleanup-refactor",
+      "slice_order": 6,
+      "slice_id": "011F",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-011-performance-cleanup-refactor-maintainability/DSH-SLICE-011F-index-and-query-performance-gate.md",
+      "new_file": "dsh/docs/journies-011-performance-cleanup-refactor/011f-index-and-query-performance-gate.slice6.md",
+      "old_filename": "DSH-SLICE-011F-index-and-query-performance-gate.md",
+      "new_filename": "011f-index-and-query-performance-gate.slice6.md"
+    },
+    {
+      "journey_id": "J-012",
+      "journey_folder": "dsh/docs/journies-012-auth-permissions-account-profile",
+      "slice_order": 1,
+      "slice_id": "012A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-012-auth-permissions-account-profile-dependency/DSH-SLICE-012A-auth-openapi-and-runtime-baseline.md",
+      "new_file": "dsh/docs/journies-012-auth-permissions-account-profile/012a-auth-openapi-and-runtime-baseline.slice1.md",
+      "old_filename": "DSH-SLICE-012A-auth-openapi-and-runtime-baseline.md",
+      "new_filename": "012a-auth-openapi-and-runtime-baseline.slice1.md"
+    },
+    {
+      "journey_id": "J-012",
+      "journey_folder": "dsh/docs/journies-012-auth-permissions-account-profile",
+      "slice_order": 2,
+      "slice_id": "012B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-012-auth-permissions-account-profile-dependency/DSH-SLICE-012B-client-session-and-profile-binding.md",
+      "new_file": "dsh/docs/journies-012-auth-permissions-account-profile/012b-client-session-and-profile-binding.slice2.md",
+      "old_filename": "DSH-SLICE-012B-client-session-and-profile-binding.md",
+      "new_filename": "012b-client-session-and-profile-binding.slice2.md"
+    },
+    {
+      "journey_id": "J-012",
+      "journey_folder": "dsh/docs/journies-012-auth-permissions-account-profile",
+      "slice_order": 3,
+      "slice_id": "012C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-012-auth-permissions-account-profile-dependency/DSH-SLICE-012C-partner-captain-field-role-boundaries.md",
+      "new_file": "dsh/docs/journies-012-auth-permissions-account-profile/012c-partner-captain-field-role-boundaries.slice3.md",
+      "old_filename": "DSH-SLICE-012C-partner-captain-field-role-boundaries.md",
+      "new_filename": "012c-partner-captain-field-role-boundaries.slice3.md"
+    },
+    {
+      "journey_id": "J-012",
+      "journey_folder": "dsh/docs/journies-012-auth-permissions-account-profile",
+      "slice_order": 4,
+      "slice_id": "012D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-012-auth-permissions-account-profile-dependency/DSH-SLICE-012D-control-panel-operator-rbac.md",
+      "new_file": "dsh/docs/journies-012-auth-permissions-account-profile/012d-control-panel-operator-rbac.slice4.md",
+      "old_filename": "DSH-SLICE-012D-control-panel-operator-rbac.md",
+      "new_filename": "012d-control-panel-operator-rbac.slice4.md"
+    },
+    {
+      "journey_id": "J-012",
+      "journey_folder": "dsh/docs/journies-012-auth-permissions-account-profile",
+      "slice_order": 5,
+      "slice_id": "012E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-012-auth-permissions-account-profile-dependency/DSH-SLICE-012E-expired-token-offline-retry-ux.md",
+      "new_file": "dsh/docs/journies-012-auth-permissions-account-profile/012e-expired-token-offline-retry-ux.slice5.md",
+      "old_filename": "DSH-SLICE-012E-expired-token-offline-retry-ux.md",
+      "new_filename": "012e-expired-token-offline-retry-ux.slice5.md"
+    },
+    {
+      "journey_id": "J-013",
+      "journey_folder": "dsh/docs/journies-013-notifications-signal-layer",
+      "slice_order": 1,
+      "slice_id": "013A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-013-notifications-and-signal-layer/DSH-SLICE-013A-order-state-notifications.md",
+      "new_file": "dsh/docs/journies-013-notifications-signal-layer/013a-order-state-notifications.slice1.md",
+      "old_filename": "DSH-SLICE-013A-order-state-notifications.md",
+      "new_filename": "013a-order-state-notifications.slice1.md"
+    },
+    {
+      "journey_id": "J-013",
+      "journey_folder": "dsh/docs/journies-013-notifications-signal-layer",
+      "slice_order": 2,
+      "slice_id": "013B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-013-notifications-and-signal-layer/DSH-SLICE-013B-support-exception-signals.md",
+      "new_file": "dsh/docs/journies-013-notifications-signal-layer/013b-support-exception-signals.slice2.md",
+      "old_filename": "DSH-SLICE-013B-support-exception-signals.md",
+      "new_filename": "013b-support-exception-signals.slice2.md"
+    },
+    {
+      "journey_id": "J-013",
+      "journey_folder": "dsh/docs/journies-013-notifications-signal-layer",
+      "slice_order": 3,
+      "slice_id": "013C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-013-notifications-and-signal-layer/DSH-SLICE-013C-field-and-partner-onboarding-notifications.md",
+      "new_file": "dsh/docs/journies-013-notifications-signal-layer/013c-field-and-partner-onboarding-notifications.slice3.md",
+      "old_filename": "DSH-SLICE-013C-field-and-partner-onboarding-notifications.md",
+      "new_filename": "013c-field-and-partner-onboarding-notifications.slice3.md"
+    },
+    {
+      "journey_id": "J-013",
+      "journey_folder": "dsh/docs/journies-013-notifications-signal-layer",
+      "slice_order": 4,
+      "slice_id": "013D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-013-notifications-and-signal-layer/DSH-SLICE-013D-notification-preference-and-read-state.md",
+      "new_file": "dsh/docs/journies-013-notifications-signal-layer/013d-notification-preference-and-read-state.slice4.md",
+      "old_filename": "DSH-SLICE-013D-notification-preference-and-read-state.md",
+      "new_filename": "013d-notification-preference-and-read-state.slice4.md"
+    },
+    {
+      "journey_id": "J-013",
+      "journey_folder": "dsh/docs/journies-013-notifications-signal-layer",
+      "slice_order": 5,
+      "slice_id": "013E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-013-notifications-and-signal-layer/DSH-SLICE-013E-finance-notification-boundary.md",
+      "new_file": "dsh/docs/journies-013-notifications-signal-layer/013e-finance-notification-boundary.slice5.md",
+      "old_filename": "DSH-SLICE-013E-finance-notification-boundary.md",
+      "new_filename": "013e-finance-notification-boundary.slice5.md"
+    },
+    {
+      "journey_id": "J-014",
+      "journey_folder": "dsh/docs/journies-014-final-e2e-regression-readiness",
+      "slice_order": 1,
+      "slice_id": "014A",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-014-final-end-to-end-regression-and-release-readiness-gate/DSH-SLICE-014A-full-client-order-happy-path.md",
+      "new_file": "dsh/docs/journies-014-final-e2e-regression-readiness/014a-full-client-order-happy-path.slice1.md",
+      "old_filename": "DSH-SLICE-014A-full-client-order-happy-path.md",
+      "new_filename": "014a-full-client-order-happy-path.slice1.md"
+    },
+    {
+      "journey_id": "J-014",
+      "journey_folder": "dsh/docs/journies-014-final-e2e-regression-readiness",
+      "slice_order": 2,
+      "slice_id": "014B",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-014-final-end-to-end-regression-and-release-readiness-gate/DSH-SLICE-014B-failure-and-recovery-regression.md",
+      "new_file": "dsh/docs/journies-014-final-e2e-regression-readiness/014b-failure-and-recovery-regression.slice2.md",
+      "old_filename": "DSH-SLICE-014B-failure-and-recovery-regression.md",
+      "new_filename": "014b-failure-and-recovery-regression.slice2.md"
+    },
+    {
+      "journey_id": "J-014",
+      "journey_folder": "dsh/docs/journies-014-final-e2e-regression-readiness",
+      "slice_order": 3,
+      "slice_id": "014C",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-014-final-end-to-end-regression-and-release-readiness-gate/DSH-SLICE-014C-visual-rtl-and-design-system-regression.md",
+      "new_file": "dsh/docs/journies-014-final-e2e-regression-readiness/014c-visual-rtl-and-design-system-regression.slice3.md",
+      "old_filename": "DSH-SLICE-014C-visual-rtl-and-design-system-regression.md",
+      "new_filename": "014c-visual-rtl-and-design-system-regression.slice3.md"
+    },
+    {
+      "journey_id": "J-014",
+      "journey_folder": "dsh/docs/journies-014-final-e2e-regression-readiness",
+      "slice_order": 4,
+      "slice_id": "014D",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-014-final-end-to-end-regression-and-release-readiness-gate/DSH-SLICE-014D-performance-smoke-and-heavy-file-regression.md",
+      "new_file": "dsh/docs/journies-014-final-e2e-regression-readiness/014d-performance-smoke-and-heavy-file-regression.slice4.md",
+      "old_filename": "DSH-SLICE-014D-performance-smoke-and-heavy-file-regression.md",
+      "new_filename": "014d-performance-smoke-and-heavy-file-regression.slice4.md"
+    },
+    {
+      "journey_id": "J-014",
+      "journey_folder": "dsh/docs/journies-014-final-e2e-regression-readiness",
+      "slice_order": 5,
+      "slice_id": "014E",
+      "source_file": "dsh/docs/slices/human-sequential-closure-v3/slices/J-014-final-end-to-end-regression-and-release-readiness-gate/DSH-SLICE-014E-evidence-zip-and-pr-readiness-decision.md",
+      "new_file": "dsh/docs/journies-014-final-e2e-regression-readiness/014e-evidence-zip-and-pr-readiness-decision.slice5.md",
+      "old_filename": "DSH-SLICE-014E-evidence-zip-and-pr-readiness-decision.md",
+      "new_filename": "014e-evidence-zip-and-pr-readiness-decision.slice5.md"
+    }
+  ],
+  "zero_gap_boundary": "Package provides exhaustive human execution inventory; actual repo zero-gap closure requires local runtime/Git/visual evidence."
+}
