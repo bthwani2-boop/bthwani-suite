@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Dimensions, Image, Modal, Platform, Pressable, ScrollView, View } from 'react-native';
 import {
   Button,
@@ -222,18 +222,7 @@ function toEnglishDigits(str: string): string {
     .replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 1776));
 }
 
-function formatDshPrice(value: number) {
-  try {
-    const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value);
-    return `${formatted} ر.ي.`;
-  } catch {
-    return `${value} ر.ي.`;
-  }
-}
 
-function formatDshPriceMinorUnits(value: number) {
-  return formatDshPrice(value / 100);
-}
 
 function resolveCartItemPriceValue(item: CartItem): number {
   if (typeof item.priceValue === 'number' && Number.isFinite(item.priceValue)) {

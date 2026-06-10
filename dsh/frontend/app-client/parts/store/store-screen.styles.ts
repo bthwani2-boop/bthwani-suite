@@ -321,7 +321,7 @@ export const styles = StyleSheet.create({
   },
   storeStateNoticeDescription: {
     color: stylesTokens.muted,
-    fontSize: typographyRoles.overline.fontSize.5,
+    fontSize: typographyRoles.overline.fontSize,
     lineHeight: typographyRoles.label.lineHeight,
   },
   storeStateNoticeAction: {
