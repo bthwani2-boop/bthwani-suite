@@ -1,0 +1,27 @@
+﻿{
+  "status": "CURRENT_REPO_PATHS",
+  "repo": "C:\\bthwani-suite",
+  "live_roots": [
+    ".\\ui-kit",
+    ".\\dsh",
+    ".\\wlt",
+    ".\\control-panel\\runtime",
+    ".\\app-client\\runtime",
+    ".\\app-partner\\runtime",
+    ".\\app-captain\\runtime",
+    ".\\app-field\\runtime",
+    ".\\webapp\\runtime",
+    ".\\website\\runtime"
+  ],
+  "forbidden_runtime_roots": [
+    ".\\.tamagui",
+    ".\\graphify-out",
+    ".\\tools\\registry\\runs",
+    ".\\tools\\analysis"
+  ],
+  "legacy_wrong_roots": [
+    ".\\packages\\ui-kit",
+    ".\\apps",
+    ".\\packages\\surfaces"
+  ]
+}
