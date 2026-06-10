@@ -5,7 +5,7 @@ import { Badge, Box, Button, Divider, colorPalette, Icon, MobileScrollView, Mode
 } from '@bthwani/ui-kit';
 import { FieldStoreCard } from '../parts/FieldStoreCard';
 import { DSH_FIELD_BINDING_CONTRACTS } from '../contracts/dsh-field-binding.contracts';
-import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from '../../data/stores.preview-data';
+import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from '../../shared/field-store-model';
 
 function resolveStoresBindingLabel() {
   return 'جسر قائمة المتاجر';

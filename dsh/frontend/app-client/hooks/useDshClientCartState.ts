@@ -15,16 +15,17 @@ import {
 } from '../contracts/dsh-client-binding.contracts';
 import { performReorderMapping } from '../adapters/dshClientOrderAdapters';
 import type { DshRoute } from '../dsh-client.types';
+import type { DshDiscoveryStore } from '../../shared/dshStoreProductCardModel';
 
 type UseDshClientCartStateOptions = {
-  activeStore: any;
+  activeStore: DshDiscoveryStore;
   activeCanonicalStoreId: string | undefined;
   setActiveCanonicalStoreId: React.Dispatch<React.SetStateAction<string | undefined>>;
   activeCanonicalProductId: string | undefined;
   setActiveCanonicalProductId: React.Dispatch<React.SetStateAction<string | undefined>>;
   setActiveStoreId: React.Dispatch<React.SetStateAction<string>>;
   setRoute: React.Dispatch<React.SetStateAction<DshRoute>>;
-  clientVisibleDiscoveryStores: any[];
+  clientVisibleDiscoveryStores: DshDiscoveryStore[];
   defaultFulfillmentMode: DshFulfillmentDeliveryMode;
 };
 
@@ -113,6 +114,7 @@ export function useDshClientCartState({
     if (!order) return;
 
     const mapped = performReorderMapping(order, clientVisibleDiscoveryStores);
+    if (!mapped.matchedStore) return;
 
     setActiveStoreId(mapped.matchedStore.id);
     setActiveCanonicalStoreId(mapped.matchedStore.canonicalStoreId);

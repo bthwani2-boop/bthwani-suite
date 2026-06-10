@@ -2,6 +2,8 @@ import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 
 import type { DshFulfillmentDeliveryMode } from './dsh-client-binding.contracts';
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { useStoreState } from '../hooks/useStoreState';
+import type { useStoreDerivedItems } from '../hooks/useStoreDerivedItems';
 
 export type DshStoreGetScreenProps = {
   appearanceMode?: BThwaniAppearanceMode;
@@ -57,8 +59,8 @@ export type DshStoreGetScreenProps = {
 export type DshStoreGetScreenShellProps = DshStoreGetScreenProps & {
   appearanceMode: BThwaniAppearanceMode;
   isRTL: boolean;
-  storeState: any;
-  derivedItems: any;
+  storeState: ReturnType<typeof useStoreState>;
+  derivedItems: ReturnType<typeof useStoreDerivedItems>;
   visibleItems: DshStoreGetMenuItem[];
   previewItems: DshStoreGetMenuItem[];
 };

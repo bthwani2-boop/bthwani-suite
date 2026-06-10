@@ -12,7 +12,6 @@
  * Surfaces must not define product identity independently.
  */
 import React from 'react';
-import { getCanonicalPreviewProductCard } from '../../data/canonical.preview-data';
 import type { DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
 import { createDshMediaApiHttpClient } from '../../shared/dsh-media-api.client';
 import { resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
@@ -28,10 +27,6 @@ import {
   DSH_OPERATIONAL_FACETS,
   isDshOperationalFacet,
 } from '../../shared/catalog';
-import {
-  buildCentralPartnerInventoryItems,
-  CENTRAL_PRODUCT_DETAIL_LOOKUP,
-} from '../../shared/catalog-central-adapter';
 import {
   createDshStoreVisibilityHttpClient,
   resolveDshStoreVisibilityBaseUrl,
@@ -218,11 +213,7 @@ function applyHierarchyFilter(
 
 type InventoryCatalogDetailMap = Record<string, InventoryCatalogItemDetail>;
 
-// Detail lookup — partner operational data only.
-// Uses CENTRAL_PRODUCT_DETAIL_LOOKUP from shared adapter as the base,
-// plus the legacy prd-* ids that were previously hardcoded here.
-// PREVIEW_DERIVED_ONLY — not canonical, not runtime binding.
-const DETAIL_LOOKUP: InventoryCatalogDetailMap = CENTRAL_PRODUCT_DETAIL_LOOKUP;
+const DETAIL_LOOKUP: InventoryCatalogDetailMap = {};
 
 function getItemDetail(id: string): InventoryCatalogItemDetail | undefined {
   return DETAIL_LOOKUP[id];
@@ -260,16 +251,9 @@ function mapCanonicalToListItem(product: DshCanonicalProductCard): InventoryCata
   };
 }
 
-const canonicalPreviewListItems: readonly InventoryCatalogListItem[] = (() => {
-  const p = getCanonicalPreviewProductCard('canonical-product-field-lead-5-featured');
-  return p ? [mapCanonicalToListItem(p)] : [];
-})();
+const canonicalPreviewListItems: readonly InventoryCatalogListItem[] = [];
 
-// Central data-derived inventory items — sourced from dsh/frontend/data/products.preview-data.ts
-// via buildCentralPartnerInventoryItems adapter.
-// These replace the previously hardcoded prd-* items.
-// UI_PREVIEW_ONLY — not runtime truth.
-const centralInventoryItems: readonly InventoryCatalogListItem[] = buildCentralPartnerInventoryItems();
+const centralInventoryItems: readonly InventoryCatalogListItem[] = [];
 
 function dedupeItems(items: ReadonlyArray<InventoryCatalogListItem>) {
   const seen = new Set<string>();

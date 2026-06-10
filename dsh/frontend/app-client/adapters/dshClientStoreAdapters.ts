@@ -1,6 +1,9 @@
 import { buildStoreTags, buildStoreDeliveryModes } from '../../shared/dsh-store-builders';
+import type { DshGetDiscoveryStoreResponse } from '../shared/dsh-discovery-stores-client';
+import type { DshDiscoveryStore } from '../../shared/dshStoreProductCardModel';
+import type { DshProductRecord } from '../../shared/dsh-product-api.client';
 
-export function mapProductRecordToItem(p: any) {
+export function mapProductRecordToItem(p: DshProductRecord) {
   const isAvailable = p.available_override !== false;
   let clientVisibilityStatus: 'visible' | 'unavailable' | 'hidden' | 'removed' = 'hidden';
   if (p.approval_status === 'catalog_adopted' || p.approval_status === 'client_visible') {
@@ -24,66 +27,67 @@ export function mapProductRecordToItem(p: any) {
 }
 
 export function mapStoreDetailToScreenStore(
-  activeStoreDetail: any | null,
-  activeStore: any,
-  activeStoreTags: any,
-  activeStoreDeliveryModes: any,
-  activeStoreCategories: any,
+  activeStoreDetail: DshGetDiscoveryStoreResponse | null,
+  activeStore: DshDiscoveryStore,
+  activeStoreTags: ReturnType<typeof buildStoreTags>,
+  activeStoreDeliveryModes: ReturnType<typeof buildStoreDeliveryModes>,
+  activeStoreCategories: unknown,
 ) {
-  const s = activeStoreDetail || activeStore;
+  const s = (activeStoreDetail ?? activeStore) as Record<string, unknown>;
+  const str = (v: unknown, fallback = '') => (typeof v === 'string' ? v : fallback);
   const tags = activeStoreDetail ? buildStoreTags({
-    id: s.id,
-    name: s.name,
-    subtitle: s.address || '',
-    statusLabel: s.status_label || '',
-    meta: s.delivery_label || '',
+    id: str(s['id']),
+    name: str(s['name']),
+    subtitle: str(s['address']),
+    statusLabel: str(s['status_label']),
+    meta: str(s['delivery_label']),
     etaMinutes: 0,
-    distanceKm: Number.parseFloat(s.distance_label) || 0,
-    rating: s.rating ?? 0,
-    isOffer: s.has_offer || false,
+    distanceKm: Number.parseFloat(str(s['distance_label'])) || 0,
+    rating: typeof s['rating'] === 'number' ? s['rating'] : 0,
+    isOffer: Boolean(s['has_offer']),
     isFavorite: false,
     isFollowing: false,
-    imageUri: s.image_url || '',
-    deliveryLabel: s.delivery_label || '',
-    serviceLabel: s.service_label || '',
+    imageUri: str(s['image_url']),
+    deliveryLabel: str(s['delivery_label']),
+    serviceLabel: str(s['service_label']),
     followerCount: 0,
     multiplierLabel: 'x1',
     subscriptionPackageChips: [],
-    offerLabel: s.offer_label || '',
+    offerLabel: str(s['offer_label']),
     hasBthwaniPro: false,
     hasNewProducts: false,
     hasCouponAvailable: false,
-    supportsPickup: s.supports_pickup === true,
-    supportsPartnerDelivery: s.supports_partner_delivery === true,
-    publishStage: s.publish_stage || '',
-    logoImageUri: s.logo_image_url || '',
-  } as any) : activeStoreTags;
+    supportsPickup: s['supports_pickup'] === true,
+    supportsPartnerDelivery: s['supports_partner_delivery'] === true,
+    publishStage: str(s['publish_stage']),
+    logoImageUri: str(s['logo_image_url']),
+  } as Parameters<typeof buildStoreTags>[0]) : activeStoreTags;
 
   const deliveryModes = activeStoreDetail ? buildStoreDeliveryModes({
-    meta: s.delivery_label || '',
-    supportsPickup: s.supports_pickup === true,
-    supportsPartnerDelivery: s.supports_partner_delivery === true,
+    meta: str(s['delivery_label']),
+    supportsPickup: s['supports_pickup'] === true,
+    supportsPartnerDelivery: s['supports_partner_delivery'] === true,
   }) : activeStoreDeliveryModes;
 
   return {
-    id: s.id,
-    name: s.name,
-    subtitle: s.address || s.subtitle || '',
-    statusLabel: s.status_label || s.statusLabel || '',
-    etaLabel: s.delivery_label || s.meta || s.etaLabel || '',
-    deliveryFeeLabel: s.deliveryFeeLabel ?? 'رسوم التوصيل 12 ر.ي',
-    followersCount: s.followerCount || 0,
-    priceMatchLabel: s.priceMatchLabel ?? 'الأسعار مطابقة للمطعم',
-    imageUri: s.image_url || s.imageUri || '',
-    deliveryLabel: s.delivery_label || s.deliveryLabel || '',
-    serviceLabel: s.service_label || s.serviceLabel || '',
-    subscriptionPackageChips: s.subscriptionPackageChips || [],
-    hasBthwaniPro: s.hasBthwaniPro || false,
-    tags: tags,
+    id: str(s['id']),
+    name: str(s['name']),
+    subtitle: str(s['address']) || str(s['subtitle']),
+    statusLabel: str(s['status_label']) || str(s['statusLabel']),
+    etaLabel: str(s['delivery_label']) || str(s['meta']) || str(s['etaLabel']),
+    deliveryFeeLabel: str(s['deliveryFeeLabel']) || 'رسوم التوصيل 12 ر.ي',
+    followersCount: (typeof s['followerCount'] === 'number' ? s['followerCount'] : 0),
+    priceMatchLabel: str(s['priceMatchLabel']) || 'الأسعار مطابقة للمطعم',
+    imageUri: str(s['image_url']) || str(s['imageUri']),
+    deliveryLabel: str(s['delivery_label']) || str(s['deliveryLabel']),
+    serviceLabel: str(s['service_label']) || str(s['serviceLabel']),
+    subscriptionPackageChips: (Array.isArray(s['subscriptionPackageChips']) ? s['subscriptionPackageChips'] : []) as string[],
+    hasBthwaniPro: Boolean(s['hasBthwaniPro']),
+    tags,
     categories: activeStoreCategories,
-    deliveryModes: deliveryModes,
-    contactNumber: s.contact_number || s.contactNumber || '',
-    openingHours: s.opening_hours || s.openingHours || '',
-    catalogSummary: s.catalog_summary || s.catalogSummary || '',
+    deliveryModes,
+    contactNumber: str(s['contact_number']) || str(s['contactNumber']),
+    openingHours: str(s['opening_hours']) || str(s['openingHours']),
+    catalogSummary: str(s['catalog_summary']) || str(s['catalogSummary']),
   };
 }

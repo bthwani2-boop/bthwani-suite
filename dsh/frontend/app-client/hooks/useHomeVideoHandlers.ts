@@ -1,6 +1,7 @@
 import * as React from 'react';
-import type { MarketingGrowthRecord } from '../../data/marketing.preview-data';
 import type { MarketingVideoRecord } from '../../data/marketing.preview-data';
+import type { DshHomeCategory } from '../contracts/dsh-home-types';
+import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
 import { resolveHomeCategoryContext } from '../shared/home-promo-mappers';
 import { getMarketingVideoVisibilityRecord, isMarketingRenderable } from '../../shared/marketing-visibility.contract';
 
@@ -21,9 +22,9 @@ export function useHomeVideoHandlers({
   onOpenBenefits,
   onOpenSearch,
 }: {
-  categoryItems: any[];
+  categoryItems: DshHomeCategory[];
   approvedVideoShorts: MarketingVideoRecord[];
-  resolveTargetPartnerStatus: (type: string, id: string) => any;
+  resolveTargetPartnerStatus: (type: string, id?: string) => DshPartnerActivationStatus | undefined;
   setActiveCategoryId: (id: string) => void;
   setActiveSubcategoryId: (id: string | null) => void;
   setShortsVisible: (v: boolean) => void;
@@ -38,14 +39,14 @@ export function useHomeVideoHandlers({
   onOpenSearch?: () => void;
 }) {
   const resolveVideoCtaPress = React.useCallback(
-    (item: MarketingGrowthRecord) => {
+    (item: MarketingVideoRecord) => {
       onVideoCtaClick?.(item.id);
       setShortsVisible(false);
 
-      const target = item.routeTarget as string;
+      const target = item.targetType as string;
 
       if (target === 'main_category' || target === 'sub_category') {
-        const nextHomeContext = resolveHomeCategoryContext(categoryItems, item.routeTargetId);
+        const nextHomeContext = resolveHomeCategoryContext(categoryItems, item.targetId);
 
         if (nextHomeContext) {
           setActiveCategoryId(nextHomeContext.categoryId);
@@ -53,7 +54,7 @@ export function useHomeVideoHandlers({
           return;
         }
 
-        if (item.routeTargetId === 'shein' && onOpenSheinInfo) {
+        if (item.targetId === 'shein' && onOpenSheinInfo) {
           onOpenSheinInfo();
           return;
         }
@@ -63,8 +64,8 @@ export function useHomeVideoHandlers({
       }
 
       if (target === 'store') {
-        if (item.routeTargetId && onOpenStore) {
-          onOpenStore(item.routeTargetId);
+        if (item.targetId && onOpenStore) {
+          onOpenStore(item.targetId);
           return;
         }
 
@@ -73,13 +74,13 @@ export function useHomeVideoHandlers({
       }
 
       if (target === 'store_category') {
-        if (item.routeTargetId && item.routeTargetExtra && onOpenStoreCategory) {
-          onOpenStoreCategory(item.routeTargetId, item.routeTargetExtra);
+        if (item.targetId && item.targetExtra && onOpenStoreCategory) {
+          onOpenStoreCategory(item.targetId, item.targetExtra);
           return;
         }
 
-        if (item.routeTargetId && onOpenStore) {
-          onOpenStore(item.routeTargetId);
+        if (item.targetId && onOpenStore) {
+          onOpenStore(item.targetId);
           return;
         }
 
@@ -88,13 +89,13 @@ export function useHomeVideoHandlers({
       }
 
       if (target === 'product') {
-        if (item.routeTargetExtra && item.routeTargetId && onOpenProduct) {
-          onOpenProduct(item.routeTargetExtra, item.routeTargetId);
+        if (item.targetExtra && item.targetId && onOpenProduct) {
+          onOpenProduct(item.targetExtra, item.targetId);
           return;
         }
 
-        if (item.routeTargetExtra && onOpenStore) {
-          onOpenStore(item.routeTargetExtra);
+        if (item.targetExtra && onOpenStore) {
+          onOpenStore(item.targetExtra);
           return;
         }
 

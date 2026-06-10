@@ -10,8 +10,9 @@ import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibil
 import {
   getHomePromoVisibilityRecord,
   isMarketingRenderable,
-  type HomePromoRecord,
 } from '../../shared/marketing-visibility.contract';
+import type { HomePromoRecord } from '../../data/marketing.preview-data';
+import type { HomeStoreCardEntry } from '../parts/home/HomeStoreFeedSection';
 import { resolveHomePromoPublishStage } from '../shared/home-promo-mappers';
 import { resolveHomeStoresForCategory } from '../shared/home-search-helpers';
 import { resolveDshImageSource } from '../shared/resolve-image-source';
@@ -36,12 +37,12 @@ type UseHomeDerivedStoresResult = {
   resolvedStores: DshHomeGetStore[];
   storePagerItems: StorePagerPage[];
   activeStorePage: StorePagerPage | null;
-  activeHomeStoreCards: any[];
+  activeHomeStoreCards: HomeStoreCardEntry[];
   resolveTargetPartnerStatus: (targetType: string, targetId?: string) => DshPartnerActivationStatus | undefined;
   resolvedHomePromos: HomePromoRecord[];
 };
 
-function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string): any {
+function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string): ReturnType<typeof resolveDshImageSource> | undefined {
   if (!canRenderInClientSurface(publishStage, 'store')) {
     return undefined;
   }

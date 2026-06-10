@@ -12,13 +12,7 @@ import {
   useTheme,
   spacing,
 } from '@bthwani/ui-kit';
-import {
-  getPartnerOfferItems,
-  upsertPartnerOfferItem,
-  type PartnerOfferRecord,
-  type PartnerOfferStatus,
-  type PartnerOfferType,
-} from '../../data/offers.preview-data';
+import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType } from '../../data/offers.preview-data';
 import {
   getPartnerOfferVisibilityRecord,
 } from '../../shared/marketing-visibility.contract';
@@ -165,10 +159,6 @@ export function PromotionsScreen({
   const [form, setForm] = React.useState<IntakeFormState>(INITIAL_FORM);
   const [statusMessage, setStatusMessage] = React.useState('');
 
-  React.useEffect(() => {
-    const all = getPartnerOfferItems();
-    setOffers(all.filter((offer) => offer.partnerName === storeName || offer.storeLabel === storeName));
-  }, [storeName]);
 
   if (state !== 'ready') {
     return renderState(state);
@@ -195,7 +185,8 @@ export function PromotionsScreen({
       return;
     }
 
-    upsertPartnerOfferItem({
+    const newOffer: PartnerOfferRecord = {
+      id: `offer-${Date.now()}`,
       title: form.title.trim(),
       partnerName: storeName,
       storeLabel: storeName,
@@ -209,10 +200,8 @@ export function PromotionsScreen({
       valueLabel: form.valueLabel.trim(),
       eligibility: form.eligibility.trim() || 'الكل',
       displayBadge: form.valueLabel.trim(),
-    });
-
-    const updated = getPartnerOfferItems();
-  setOffers(updated.filter((offer) => offer.partnerName === storeName || offer.storeLabel === storeName));
+    };
+    setOffers((prev) => [...prev, newOffer]);
     setForm(INITIAL_FORM);
     setActiveTab('pending');
     setStatusMessage('تم إرسال العرض للمراجعة التسويقية.');

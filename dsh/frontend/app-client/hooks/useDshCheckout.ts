@@ -20,13 +20,13 @@ function parsePriceFallback(priceLabel?: string): number {
   return match ? parseFloat(match[0]) : 10.0;
 }
 
-type WalletPreview = {
+export type WalletPreview = {
   balance: number | null;
   requestPayment: (amount: number, intentId?: string) => Promise<{ success: boolean; txId?: string; error?: string }>;
   refresh: () => Promise<void>;
 };
 
-type ActiveStore = { id: string; name: string; subtitle?: string };
+export type ActiveStore = { id: string; name: string; subtitle?: string };
 
 type UseDshCheckoutOptions = {
   cartItems: HostCartItem[];

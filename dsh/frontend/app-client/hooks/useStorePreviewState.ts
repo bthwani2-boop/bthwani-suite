@@ -1,16 +1,23 @@
 import * as React from 'react';
 import { Animated } from 'react-native';
+import type { DshStoreFixtureItem } from '../../shared/dshStoreProductCardModel';
+
+type UseStorePreviewStateOptions = {
+  setPreviewItem: React.Dispatch<React.SetStateAction<DshStoreFixtureItem | null>>;
+  setPreviewActiveIndex: React.Dispatch<React.SetStateAction<number>>;
+  previewItems: DshStoreFixtureItem[];
+};
 
 export function useStorePreviewState({
   setPreviewItem,
   setPreviewActiveIndex,
   previewItems,
-}: any) {
+}: UseStorePreviewStateOptions) {
   const previewAnim = React.useRef(new Animated.Value(0)).current;
 
-  const openImagePreview = React.useCallback((item: any) => {
-    const items: any[] = Array.isArray(previewItems) ? previewItems : [];
-    const activeIdx = items.findIndex((i: any) => i.id === item.id);
+  const openImagePreview = React.useCallback((item: DshStoreFixtureItem) => {
+    const items = Array.isArray(previewItems) ? previewItems : [];
+    const activeIdx = items.findIndex((i) => i.id === item.id);
     setPreviewActiveIndex(Math.max(0, activeIdx));
     setPreviewItem(item);
     Animated.spring(previewAnim, {

@@ -3,13 +3,15 @@ import { resolveDshDiscoveryStoresRuntimeConfig } from '../shared/dsh-discovery-
 import {
   createDshOrderLifecycleHttpClient,
   type DshOrderItemInput,
+  type DshCheckoutAuthContext,
 } from '../../shared';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostOrderSummary, HostCartItem } from '../dsh-client.navigation-bridge';
 import { hostClientStates, initialOrders } from '../dsh-client.navigation-bridge';
 import { mapLiveOrderToSummary } from '../adapters/dshClientOrderAdapters';
-import { useDshCheckout } from './useDshCheckout';
+import { useDshCheckout, type WalletPreview, type ActiveStore } from './useDshCheckout';
 import type { DshRoute } from '../dsh-client.types';
+import type { DshClientState } from '../../shared/client-state';
 
 function parsePrice(priceLabel?: string): number {
   if (!priceLabel) return 10.0;
@@ -20,19 +22,19 @@ function parsePrice(priceLabel?: string): number {
 type UseDshClientOrderExecutionOptions = {
   cartItems: HostCartItem[];
   setCartItems: React.Dispatch<React.SetStateAction<HostCartItem[]>>;
-  activeStore: any;
+  activeStore: ActiveStore;
   selectedFulfillmentMode: DshFulfillmentDeliveryMode;
   setSelectedFulfillmentMode: (mode: DshFulfillmentDeliveryMode) => void;
-  checkoutAuth: any;
-  walletPreview: any;
+  checkoutAuth: DshCheckoutAuthContext;
+  walletPreview: WalletPreview;
   createOrderValues: CreateOrderValues;
   setCreateOrderValues: React.Dispatch<React.SetStateAction<CreateOrderValues>>;
   setRoute: React.Dispatch<React.SetStateAction<DshRoute>>;
-  openTrackedOrder: any;
+  openTrackedOrder: (orderId?: string, opts?: Record<string, unknown>) => void;
   setOrdersListState: React.Dispatch<React.SetStateAction<HostOrderSummary[]>>;
   setSelectedOrderId: React.Dispatch<React.SetStateAction<string>>;
-  setTrackingClientState: React.Dispatch<React.SetStateAction<any>>;
-  setTrackingOrderOverride: React.Dispatch<React.SetStateAction<any>>;
+  setTrackingClientState: React.Dispatch<React.SetStateAction<DshClientState>>;
+  setTrackingOrderOverride: React.Dispatch<React.SetStateAction<Partial<CreateOrderValues> | null>>;
 };
 
 export function useDshClientOrderExecution({

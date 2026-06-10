@@ -18,10 +18,7 @@ import {
   radius,
   borders,
 } from '@bthwani/ui-kit';
-import {
-  getOperationsSupportFlowPreview,
-  getOperationsSupportFlowsForSurface,
-} from '../../data/support.preview-data';
+import { getOperationsSupportFlowPreview, getOperationsSupportFlowsForSurface } from '../../shared/support-flows';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 

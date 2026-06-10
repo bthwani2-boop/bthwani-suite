@@ -11,14 +11,56 @@ import {
 } from '@bthwani/ui-kit';
 
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
+import type { DshFulfillmentDeliveryMode } from '../../contracts/dsh-client-binding.contracts';
+import type { useStoreShellDerivedState } from '../../hooks/useStoreShellDerivedState';
+import type { useStoreAppearanceChrome } from './store-appearance-chrome';
+import type { DshStoreGetScreenProps } from '../../contracts/dsh-store-screen-props';
 import {
   isDeliveryBenefitLabel,
   normalizeDisplayText,
   normalizeTagLabel,
+  type StoreScreenDeliveryLabels,
 } from '../../shared/store-formatting';
 import { isNewItem, isOfferItem } from '../../shared/store-search-helpers';
 import { resolveDshStoreMenuItemImageSource } from './StoreMenuItemCard';
-import { stylesTokens } from './store-screen.styles';
+import { stylesTokens, styles as storeScreenStyles } from './store-screen.styles';
+
+type StoreDeliveryModeOption = { id: DshFulfillmentDeliveryMode; label: string; icon: string };
+
+type StoreHeroSectionProps = {
+  store: DshStoreGetScreenProps['store'];
+  storeText: { get: StoreScreenDeliveryLabels };
+  visibleItems: DshStoreGetMenuItem[];
+  clientVisibleItems: DshStoreGetMenuItem[];
+  menuItems: DshStoreGetMenuItem[];
+  normalizedStoreName: string;
+  normalizedEtaLabel: string;
+  storeCoverImageSource: ReturnType<typeof useStoreShellDerivedState>['storeCoverImageSource'];
+  storeLogoImageSource: ReturnType<typeof useStoreShellDerivedState>['storeLogoImageSource'];
+  operationalState: ReturnType<typeof useStoreShellDerivedState>['operationalState'];
+  operationalStateMeta: ReturnType<typeof useStoreShellDerivedState>['operationalStateMeta'];
+  showOperationalNotice: boolean;
+  supportActionLabel: string;
+  onSupport?: () => void;
+  onOpenCart?: (mode?: DshFulfillmentDeliveryMode) => void;
+  onOpenItems?: () => void;
+  onOpenBenefits?: () => void;
+  openInlineSearch: () => void;
+  handleStoreShare: ReturnType<typeof useStoreShellDerivedState>['handleStoreShare'];
+  openStoreItemPreview: ReturnType<typeof useStoreShellDerivedState>['openStoreItemPreview'];
+  changeCategory: (id: string) => void;
+  setSelectedMode: (mode: DshFulfillmentDeliveryMode) => void;
+  selectedMode: DshFulfillmentDeliveryMode;
+  deliveryModes: StoreDeliveryModeOption[];
+  scrollY: import('react-native').Animated.Value;
+  stickyThreshold: number;
+  setStickyThreshold: (v: number) => void;
+  viewportWidth: number;
+  appearanceChrome: ReturnType<typeof useStoreAppearanceChrome>;
+  isRTL: boolean;
+  styles: typeof storeScreenStyles;
+  onBack?: () => void;
+};
 
 export const StoreHeroSection = React.memo(function StoreHeroSection({
   store,
@@ -53,7 +95,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
   isRTL,
   styles,
   onBack,
-}: any) {
+}: StoreHeroSectionProps) {
   const isProBlocked = store?.commercialSourceMap?.['hasBthwaniPro']?.conflictSeverity === 'blocker';
   const benefitChips = React.useMemo(
     () =>
@@ -184,13 +226,13 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
         coverImage={storeCoverImageSource}
         logoImage={storeLogoImageSource}
         name={normalizedStoreName}
-        locationLabel={store.locationLabel || 'حي العليا · الرياض'}
+        locationLabel={store?.locationLabel || 'حي العليا · الرياض'}
         isOpen={operationalState === 'store_open'}
-        hasBthwaniPro={store.hasBthwaniPro}
-        distanceLabel={store.distanceLabel || '2.1 كم'}
-        deliveryTimeLabel={store.deliveryTimeLabel || normalizedEtaLabel}
-        rating={store.rating}
-        contactNumber={store.contactNumber}
+        hasBthwaniPro={store?.hasBthwaniPro}
+        distanceLabel={store?.distanceLabel || '2.1 كم'}
+        deliveryTimeLabel={store?.deliveryTimeLabel || normalizedEtaLabel}
+        rating={store?.rating}
+        contactNumber={store?.contactNumber}
         onSearchPress={openInlineSearch}
         onCartPress={() => {
           if (onOpenCart) onOpenCart(selectedMode);
@@ -201,7 +243,7 @@ export const StoreHeroSection = React.memo(function StoreHeroSection({
         scrollY={scrollY}
         deliveryModes={deliveryModes}
         selectedMode={selectedMode}
-        onModeChange={setSelectedMode}
+        onModeChange={(id: string) => setSelectedMode(id as DshFulfillmentDeliveryMode)}
       />
 
       {store && (store.openingHours || store.catalogSummary) ? (

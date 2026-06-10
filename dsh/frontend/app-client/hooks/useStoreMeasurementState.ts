@@ -1,4 +1,28 @@
 import * as React from 'react';
+import type { DshStoreFixtureItem } from '../../shared/dshStoreProductCardModel';
+import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
+
+type MeasurementPickerAnchor = {
+  nativeEvent?: { pageX: number; pageY: number };
+  x?: number;
+  y?: number;
+};
+
+type UseStoreMeasurementStateOptions = {
+  setPickerItem: React.Dispatch<React.SetStateAction<DshStoreFixtureItem | null>>;
+  setSelectedMeasureOption: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedMeasureQty: React.Dispatch<React.SetStateAction<number>>;
+  setPickerAnchor: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
+  setIsAddedToCart: React.Dispatch<React.SetStateAction<boolean>>;
+  setAddedItemLabel: React.Dispatch<React.SetStateAction<string>>;
+  onAddItemToCart?: (item: DshStoreFixtureItem, payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string }) => void;
+  onOpenCart?: (mode?: DshFulfillmentDeliveryMode) => void;
+  pickerItem: DshStoreFixtureItem | null;
+  selectedMeasureOption: string | null;
+  selectedMeasureQty: number;
+  selectedMode: DshFulfillmentDeliveryMode;
+  resolveMeasurementOptions: (item: DshStoreFixtureItem) => readonly string[];
+};
 
 export function useStoreMeasurementState({
   setPickerItem,
@@ -14,8 +38,8 @@ export function useStoreMeasurementState({
   selectedMeasureQty,
   selectedMode,
   resolveMeasurementOptions,
-}: any) {
-  const openMeasurementPicker = React.useCallback((item: any, anchor?: any) => {
+}: UseStoreMeasurementStateOptions) {
+  const openMeasurementPicker = React.useCallback((item: DshStoreFixtureItem, anchor?: MeasurementPickerAnchor) => {
     const options = resolveMeasurementOptions(item);
     setPickerItem(item);
     setSelectedMeasureOption(options[0] ?? null);
@@ -27,7 +51,7 @@ export function useStoreMeasurementState({
         y: anchor.nativeEvent.pageY,
       });
     } else if (anchor && Number.isFinite(anchor.x) && Number.isFinite(anchor.y)) {
-      setPickerAnchor(anchor);
+      setPickerAnchor({ x: anchor.x as number, y: anchor.y as number });
     } else {
       setPickerAnchor({ x: 32, y: 360 });
     }

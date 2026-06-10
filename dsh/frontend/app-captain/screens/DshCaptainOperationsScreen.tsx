@@ -6,10 +6,7 @@ import { Badge, Box, Button, Divider, KeyValueList, MobileScrollView, Text, Text
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainOrderStage } from '../../shared/dsh-order-preview.contract';
 import type { DshCaptainProfileSnapshot } from '../../data/operational-statuses.preview-data';
-import {
-	getOperationsSupportFlowsForSurface,
-	type DshOperationsSupportFlowId,
-} from '../../data/support.preview-data';
+import { getOperationsSupportFlowsForSurface, type DshOperationsSupportFlowId } from '../../shared/support-flows';
 import { type DshCaptainRegistryFlowId } from '../contracts/dshCaptainBinding.contracts';
 
 

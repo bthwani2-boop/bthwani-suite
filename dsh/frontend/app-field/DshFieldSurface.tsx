@@ -22,7 +22,7 @@ import {
   submitFieldStoreForReview,
   touchFieldStoreDraft,
   type FieldStoreFile,
-} from '../data/stores.preview-data';
+} from '../shared/field-store-model';
 import {
   createDshFieldVisitHttpClient,
   createDshFieldStoreOnboardingHttpClient,

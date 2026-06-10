@@ -59,6 +59,7 @@ Core laws:
 - Any reusable design belongs in approved design system / `@bthwani/ui-kit`.
 - No new UI-kit files unless the need is non-negotiable, proven by evidence, and human-approved.
 - Service/application/domain specialization belongs in `governance/`; `.agents` skills remain general.
+- Adhere strictly to the [bthwani-graphify-query-first](file:///c:/bthwani-suite/.agents/skills/bthwani-graphify-query-first/SKILL.md) skill as much as possible for every task to maximize token utility and query precision.
 - Do not claim `PASS`, `CLOSED`, `FINAL`, `READY`, or `100%` without Git diff, verification, and evidence.
 
 Smart Execution Budget:
@@ -133,13 +134,21 @@ Use these project-owned skills when relevant:
 
 ## graphify
 
-This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+This project has a knowledge graph at `graphify-out/` with god nodes, community structure, and cross-file relationships.
 
-When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"` before doing anything else.
+### Mandatory Adherence & Optimization (Every Task)
 
-Rules:
-- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
-- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
-- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
-- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+All agents must strictly adhere to the [bthwani-graphify-query-first](file:///c:/bthwani-suite/.agents/skills/bthwani-graphify-query-first/SKILL.md) skill in **every task**. This is a highly critical and practical rule designed to minimize token usage, prevent reading unrelated files, and maintain strict codebase boundaries.
+
+To achieve maximum utility:
+- **Query First**: Never run raw directory-wide `grep`, `rg`, or grep-search tools as a starting point. Always run `graphify query` or `graphify explain` first to locate the exact subgraph and target files.
+- **Explain and Path**: If looking for cross-file impacts, dependencies, or structural relationships, use `graphify path "<A>" "<B>"` or `graphify explain "<concept>"` to get a scoped view.
+- **Maintain Graph Freshness**: Run `graphify update .` immediately after modifying code to ensure successive agent steps have access to an accurate knowledge graph.
+
+### Usage Rules:
+- When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"` before doing anything else.
+- For codebase questions, first run `graphify query "<question>"` when `graphify-out/graph.json` exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than `GRAPH_REPORT.md` or raw grep output.
+- Dirty `graphify-out/` files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- If `graphify-out/wiki/index.md` exists, use it for broad navigation instead of raw source browsing.
+- Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).

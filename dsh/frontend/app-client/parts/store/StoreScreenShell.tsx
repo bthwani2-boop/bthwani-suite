@@ -84,19 +84,19 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
   } = useStoreShellDerivedState(store, openImagePreview, setFavoriteIds);
 
   React.useEffect(() => {
-    if (deliveryModes.length && !deliveryModes.some((mode: any) => mode.id === selectedMode)) {
+    if (deliveryModes.length && !deliveryModes.some((mode) => mode.id === selectedMode)) {
       setSelectedMode(deliveryModes[0].id);
     }
   }, [deliveryModes, selectedMode, setSelectedMode]);
   React.useEffect(() => {
-    if (categories.length && !categories.some((category: any) => category.id === selectedCategory)) {
+    if (categories.length && !categories.some((category) => category.id === selectedCategory)) {
       setSelectedCategory(categories[0]?.id ?? 'all');
     }
   }, [categories, selectedCategory, setSelectedCategory]);
 
-  const listRef = React.useRef<any>(null);
+  const listRef = React.useRef<import('react-native').FlatList<import('../../../shared/dshStoreProductCardModel').DshStoreFixtureItem> | null>(null);
   const scrollY = React.useRef(new Animated.Value(0)).current;
-  const previewListRef = React.useRef<any>(null);
+  const previewListRef = React.useRef<import('react-native').FlatList<import('../../../shared/dshStoreProductCardModel').DshStoreFixtureItem> | null>(null);
   const previewScrollY = React.useRef(new Animated.Value(0)).current;
 
   const { openInlineSearch, closeInlineSearch } = useStoreInlineSearch({ headerSearchVisible, setHeaderSearchVisible, headerSearchQuery, setHeaderSearchQuery });
@@ -149,7 +149,6 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
       clientVisibleItems={clientVisibleItems}
       menuItems={menuItems}
       normalizedStoreName={normalizedStoreName}
-      normalizedStoreSubtitle={normalizedStoreSubtitle}
       normalizedEtaLabel={normalizedEtaLabel}
       storeCoverImageSource={storeCoverImageSource}
       storeLogoImageSource={storeLogoImageSource}
@@ -172,13 +171,12 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
       setStickyThreshold={setStickyThreshold}
       viewportWidth={viewportWidth}
       appearanceChrome={appearanceChrome}
-      isDarkGlass={isDarkGlass}
       isRTL={isRTL}
       styles={styles}
       openInlineSearch={openInlineSearch}
       onBack={_onBack}
     />
-  ), [appearanceChrome, changeCategory, clientVisibleItems, deliveryModes, handleStoreShare, isDarkGlass, isRTL, menuItems, normalizedEtaLabel, normalizedStoreName, normalizedStoreSubtitle, onOpenBenefits, onOpenCart, onOpenItems, onSupport, openInlineSearch, openStoreItemPreview, operationalState, operationalStateMeta, scrollY, selectedMode, setSelectedMode, setStickyThreshold, showOperationalNotice, stickyThreshold, store, storeCoverImageSource, storeLogoImageSource, storeText, supportActionLabel, visibleItems, viewportWidth, _onBack]);
+  ), [appearanceChrome, changeCategory, clientVisibleItems, deliveryModes, handleStoreShare, isRTL, menuItems, normalizedEtaLabel, normalizedStoreName, onOpenBenefits, onOpenCart, onOpenItems, onSupport, openInlineSearch, openStoreItemPreview, operationalState, operationalStateMeta, scrollY, selectedMode, setSelectedMode, setStickyThreshold, showOperationalNotice, stickyThreshold, store, storeCoverImageSource, storeLogoImageSource, storeText, supportActionLabel, visibleItems, viewportWidth, _onBack]);
 
   if (state !== 'ready') {
     return (

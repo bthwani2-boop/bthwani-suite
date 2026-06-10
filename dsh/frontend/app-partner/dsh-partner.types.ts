@@ -262,4 +262,5 @@ export type DshPartnerHubSurfaceProps = {
   canonicalStoreId?: string;
   dshAuthBearerToken?: string | null;
   dshClientId?: string | null;
+  walletBalanceLabel?: string;
 };

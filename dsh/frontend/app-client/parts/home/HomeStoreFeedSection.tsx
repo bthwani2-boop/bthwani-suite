@@ -5,6 +5,7 @@ import { Box, StoreCardPremium, type StoreCardPremiumItem } from '@bthwani/ui-ki
 import { DshAwnakOrderCreateScreen } from '../AwnakOrderCreateScreen';
 import { DshSheinOrderCreateScreen } from '../SheinOrderCreateScreen';
 import { EmptyFeed } from './HomeStoreFeed';
+import type { HomeScreenShellProps } from './HomeScreenShell';
 
 export type HomeStoreCardEntry = {
   item: StoreCardPremiumItem;
@@ -90,7 +91,10 @@ export const HomeStoreFeedSection = React.memo(function HomeStoreFeedSection({
   derivedStores,
   debouncedInlineSearchQuery,
   selectCategoryPage,
-}: any) {
+}: Pick<HomeScreenShellProps, 'props' | 'styles' | 'derivedStores' | 'debouncedInlineSearchQuery' | 'selectCategoryPage'> & {
+  entry: HomeStoreCardEntry | 'empty';
+  setLocalFavoriteToggles: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+}) {
   if (entry === 'empty') {
     if (derivedStores.activeStorePage?.renderMode === 'manual-order') {
       return (

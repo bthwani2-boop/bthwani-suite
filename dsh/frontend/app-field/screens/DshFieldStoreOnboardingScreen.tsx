@@ -37,9 +37,9 @@ import {
   type FieldOnboardingSectionId,
   type FieldStoreFile,
   type FieldDocumentPreviewStatus,
-} from '../../data/stores.preview-data';
+} from '../../shared/field-store-model';
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
-import { getOperationsSupportFlowsForSurface } from '../../data/support.preview-data';
+import { getOperationsSupportFlowsForSurface } from '../../shared/support-flows';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 

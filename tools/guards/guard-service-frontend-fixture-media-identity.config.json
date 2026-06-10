@@ -478,7 +478,10 @@
     "dsh/frontend/app-partner/parts/PartnerOrderIssuePanel.tsx",
     "dsh/frontend/shared/client-state.ts",
     "dsh/frontend/shared/home-service-config.ts",
-    "dsh/frontend/shared/support-flows.ts"
+    "dsh/frontend/shared/support-flows.ts",
+    "dsh/frontend/app-field/storage/field-onboarding.storage.ts",
+    "dsh/frontend/app-client/parts/home/HomePromoSection.tsx",
+    "dsh/frontend/app-client/parts/store/StoreMenuListSection.tsx"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

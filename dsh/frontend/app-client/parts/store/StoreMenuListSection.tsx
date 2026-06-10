@@ -8,10 +8,13 @@ import {
   type BThwaniFilterRailItem,
 } from '@bthwani/ui-kit';
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
+import type { DshStoreSearchCategory } from '../../shared/store-search-helpers';
+import type { DshFulfillmentDeliveryMode } from '../../contracts/dsh-client-binding.contracts';
 import { MenuItemCard } from './StoreMenuItemCard';
 import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../../../shared/category-icons';
 import { normalizeDisplayText } from '../../shared/store-formatting';
 import { StoreFilterRailSection } from './StoreFilterRailSection';
+import type { styles as storeScreenStyles } from './store-screen.styles';
 
 const STORE_MENU_CARD_HEIGHT = 126;
 const STORE_MENU_CARD_GAP = 2;
@@ -84,6 +87,29 @@ export const StoreMenuListItem = React.memo(function StoreMenuListItem({
   );
 });
 
+type StoreMenuListSectionProps = {
+  listRef: React.RefObject<import('react-native').FlatList<DshStoreGetMenuItem> | null>;
+  scrollY: import('react-native').Animated.Value;
+  visibleItems: DshStoreGetMenuItem[];
+  categories: DshStoreSearchCategory[];
+  selectedCategory: string;
+  changeCategory: (id: string) => void;
+  listHeader: React.ReactElement;
+  headerSearchQuery: string;
+  normalizedStoreName: string;
+  storeText: { get: { emptyCategoryTitle: string; emptyCategoryDescription: string } };
+  storeLogoImageSource: import('react-native').ImageSourcePropType | string | null | undefined;
+  favoriteIds: ReadonlySet<string>;
+  openMeasurementPicker: (item: DshStoreGetMenuItem, anchor?: { x: number; y: number }) => void;
+  openImagePreview: (item: DshStoreGetMenuItem) => void;
+  handleToggleFavorite: (itemId: string) => void;
+  isDarkGlass: boolean;
+  stickyThreshold: number;
+  appearanceChrome: ReturnType<typeof import('./store-appearance-chrome').useStoreAppearanceChrome>;
+  tokens: { glassMutedText: string };
+  styles: typeof storeScreenStyles;
+};
+
 export const StoreMenuListSection = React.memo(function StoreMenuListSection({
   listRef,
   scrollY,
@@ -105,10 +131,10 @@ export const StoreMenuListSection = React.memo(function StoreMenuListSection({
   appearanceChrome,
   tokens,
   styles,
-}: any) {
+}: StoreMenuListSectionProps) {
   const categoryRailItems = React.useMemo<BThwaniFilterRailItem[]>(
     () =>
-      categories.map((category: any) => ({
+      categories.map((category) => ({
         id: category.id,
         label: normalizeDisplayText(category.label),
         icon: CATEGORY_ICON[category.id]

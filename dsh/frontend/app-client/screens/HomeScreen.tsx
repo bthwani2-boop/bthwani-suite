@@ -15,7 +15,7 @@ import { HomeScreenShell } from '../parts/home/HomeScreenShell';
 import { buildHomeScreenStyles } from '../parts/home/home-screen.styles';
 import type { DshHomeGetPromo, DshHomeGetStore } from '../contracts/dsh-home-types';
 import type { DshHomeGetScreenProps } from '../contracts/dsh-home-screen-props';
-function resolveDshHomeBannerImageSource(imageUrl?: string): any {
+function resolveDshHomeBannerImageSource(imageUrl?: string): ReturnType<typeof resolveDshImageSource> {
   return resolveDshImageSource(imageUrl);
 }
 
@@ -37,7 +37,7 @@ export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent(
   const { theme } = useTheme();
   const uiText = useUiText();
   const styles = React.useMemo(() => buildHomeScreenStyles(direction, theme), [direction, theme]);
-  const categoriesAnchorRef = React.useRef<any>(null);
+  const categoriesAnchorRef = React.useRef<null>(null);
 
   const homeState = useHomeState();
   const favoriteToggles = favoriteOverrides ?? homeState.localFavoriteToggles;

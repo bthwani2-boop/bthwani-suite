@@ -11,7 +11,7 @@ type UseHomePromoHandlersParams = {
   categoryItems: DshHomeCategory[];
   promos?: DshHomeGetPromo[];
   activePromoIndex?: number;
-  resolveBannerImageSource?: (imageUrl?: string) => any;
+  resolveBannerImageSource?: (imageUrl?: string) => unknown;
   setActiveCategoryId: (id: string) => void;
   setActiveSubcategoryId: (id: string | null) => void;
   setActiveFilter: (filter: DiscoveryFilter) => void;
@@ -30,9 +30,20 @@ type UseHomePromoHandlersParams = {
   onOpenStoreCategory?: (storeId: string, categoryId: string) => void;
 };
 
+type BannerItem = {
+  id: string | undefined;
+  title?: string;
+  subtitle?: string;
+  badge?: string;
+  cta?: string;
+  image: unknown;
+  accentColor: string | undefined;
+  onPress: () => void;
+};
+
 type UseHomePromoHandlersResult = {
-  activePromo: any;
-  bannerItems: any[];
+  activePromo: BannerItem | null;
+  bannerItems: BannerItem[];
   resolveBannerPress: (promo: DshHomeGetPromo) => () => void;
   promoImpressionIdsRef: React.MutableRefObject<Set<string>>;
   tickerAction?: () => void;

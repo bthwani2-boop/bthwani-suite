@@ -2,13 +2,21 @@ import * as React from 'react';
 import { View } from 'react-native';
 import { StateView } from '@bthwani/ui-kit';
 
+type StoreNonReadyStateProps = {
+  state: string;
+  storeText: { states: { storeEmptyTitle: string; storeEmptyDescription: string; storeErrorTitle: string; storeErrorDescription: string; retry: string; contextMissingTitle: string; contextMissingDescription: string } };
+  onRetry?: () => void;
+  screenBackground?: string;
+  styles: { blockingState: object };
+};
+
 export function StoreNonReadyState({
   state,
   storeText,
   onRetry,
   screenBackground,
   styles,
-}: any) {
+}: StoreNonReadyStateProps) {
   if (state === 'loading') {
     return (
       <View style={[styles.blockingState, { backgroundColor: screenBackground }]}>
@@ -68,7 +76,7 @@ export function StoreNonReadyState({
   );
 }
 
-export function StoreMissingState({ storeText }: any) {
+export function StoreMissingState({ storeText }: { storeText: StoreNonReadyStateProps['storeText'] }) {
   return (
     <StateView
       stateId="blockingError"
@@ -78,7 +86,7 @@ export function StoreMissingState({ storeText }: any) {
   );
 }
 
-export function StoreVisibilityBlockedState({ storeVisibility, onBack }: any) {
+export function StoreVisibilityBlockedState({ storeVisibility, onBack }: { storeVisibility: { blockedReason?: string }; onBack?: () => void }) {
   return (
     <StateView
       stateId="blockingError"

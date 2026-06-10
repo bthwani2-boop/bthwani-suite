@@ -5,8 +5,21 @@ import { BannerCarousel, Icon, Text, colorPalette, spacing } from '@bthwani/ui-k
 import { CategoryHubIcon, CategoryIconImage, CategorySelectorItem } from './HomeCategoryCarousel';
 import { normalizeHomePromoActionType } from '../../shared/home-promo-mappers';
 import type { DshHomeGetPromo } from '../../contracts/dsh-home-types';
+import type { HomeScreenShellProps } from './HomeScreenShell';
 
 const ACTIVE_PROMO_INTERVAL_MS = 5000;
+
+type HomePromoSectionProps = Pick<HomeScreenShellProps, 'props' | 'theme' | 'styles' | 'homeState' | 'promoHandlers' | 'activeHomePromo' | 'categoriesAnchorRef'> & {
+  bannerItems: HomeScreenShellProps['promoHandlers']['bannerItems'];
+  selectedCategoryFixture: HomeScreenShellProps['filterRail']['selectedCategoryFixture'];
+  selectedCategoryLabel: string;
+  selectedSubcategoryCards: Array<{ id: string; emoji?: string; title: string; subtitle?: string }>;
+  activeCategoryDialItem: HomeScreenShellProps['filterRail']['activeCategoryDialItem'];
+  openCategoriesDial: () => void;
+  containerWidth: number;
+  cardHeight: number;
+  resolvedItemGap: number;
+};
 
 export const HomePromoSection = React.memo(function HomePromoSection({
   props,
@@ -25,12 +38,12 @@ export const HomePromoSection = React.memo(function HomePromoSection({
   containerWidth,
   cardHeight,
   resolvedItemGap,
-}: any) {
+}: HomePromoSectionProps) {
   return (
     <>
       {homeState.inlineSearchVisible ? null : bannerItems.length ? (
         <BannerCarousel
-          banners={bannerItems}
+          banners={bannerItems as import('@bthwani/ui-kit').BannerCarouselItem[]}
           variant="secondary"
           height={cardHeight + spacing[6]}
           fullBleed={false}
@@ -152,7 +165,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
               contentContainerStyle={styles.categoriesSelectorScrollContent}
               style={styles.categoriesSelectorScroll}
             >
-              {selectedSubcategoryCards.map((subcategory: any) => (
+              {selectedSubcategoryCards.map((subcategory) => (
                 <Pressable
                   key={subcategory.id}
                   style={[

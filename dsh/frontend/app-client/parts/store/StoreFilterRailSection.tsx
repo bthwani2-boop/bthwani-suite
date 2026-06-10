@@ -3,6 +3,20 @@ import { Animated, Platform, View } from 'react-native';
 import { BThwaniFilterRail, Text,
   spacing,
 } from '@bthwani/ui-kit';
+import type { useStoreAppearanceChrome } from './store-appearance-chrome';
+import type { styles as storeScreenStyles } from './store-screen.styles';
+
+type StoreFilterRailSectionProps = {
+  categoryRailItems: import('@bthwani/ui-kit').BThwaniFilterRailItem[];
+  selectedCategory: string;
+  changeCategory: (id: string) => void;
+  isDarkGlass: boolean;
+  scrollY: Animated.Value;
+  stickyThreshold: number;
+  appearanceChrome: ReturnType<typeof useStoreAppearanceChrome>;
+  styles: typeof storeScreenStyles;
+  mode?: 'inline' | 'sticky';
+};
 
 export const StoreFilterRailSection = React.memo(function StoreFilterRailSection({
   categoryRailItems,
@@ -14,7 +28,7 @@ export const StoreFilterRailSection = React.memo(function StoreFilterRailSection
   appearanceChrome,
   styles,
   mode = 'inline',
-}: any) {
+}: StoreFilterRailSectionProps) {
   if (mode === 'sticky') {
     return (
       <Animated.View

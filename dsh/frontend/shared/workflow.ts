@@ -1017,9 +1017,24 @@ const PENDING_APPROVAL_LOOKUP: Record<string, { customerName: string; storeName:
   'PA-0082': { customerName: 'سارة خالد', storeName: 'برغر لاب' },
 };
 
-let _globalUiAuditRows: any[] = [];
+type UiAuditRow = {
+  id: string;
+  who: string;
+  why: string;
+  when: string;
+  permissionResult: string;
+  slaBreachReason: string;
+  supportTicketLink: string;
+  proofRequired: string;
+  evidenceState: string;
+  resolutionPath: string;
+  note: string;
+  statusTone: string;
+};
 
-export function getDynamicUiAudits(): any[] {
+let _globalUiAuditRows: UiAuditRow[] = [];
+
+export function getDynamicUiAudits(): UiAuditRow[] {
   return _globalUiAuditRows;
 }
 

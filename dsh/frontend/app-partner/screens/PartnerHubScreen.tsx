@@ -34,10 +34,10 @@ import {
   wltDshPartnerUiCopy,
 } from '../../../../wlt/frontend/dsh/app-partner/wlt-dsh-partner.ui-copy';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
-import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../data/canonical.preview-data';
+import type { DshCanonicalStoreCard } from '../../shared/dshStoreProductCardModel';
 import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
-import { WltDshPartnerBridge, wltDshPartnerPreviewData } from '../../../../wlt/frontend/dsh/app-partner';
+import { WltDshPartnerBridge } from '../../../../wlt/frontend/dsh/app-partner';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
@@ -1512,6 +1512,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     canonicalStoreId,
     dshAuthBearerToken,
     dshClientId,
+    walletBalanceLabel,
     // ML-T1: partner lifecycle stage for readiness status summary (read-only, summary-only per on-demand contract)
     partnerLifecycleStage = 'partner-review' as DshPartnerLifecycleStage,
   } = props as DshPartnerHubSurfaceProps & { partnerLifecycleStage?: DshPartnerLifecycleStage; dshAuthBearerToken?: string | null; dshClientId?: string | null };
@@ -1543,10 +1544,9 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   const [showAdvancedNotifications, setShowAdvancedNotifications] = React.useState<boolean>(false);
   const activeSection = section ?? internalSection;
   const updateSection = onSectionChange ?? setInternalSection;
-  const activeCanonicalStore = React.useMemo(() => {
-    const activeCanonicalStoreId = canonicalStoreId ?? canonicalPreviewStores[0]?.id;
-    return activeCanonicalStoreId ? getCanonicalPreviewStoreCard(activeCanonicalStoreId) : undefined;
-  }, [canonicalStoreId]);
+  const activeCanonicalStore = React.useMemo((): DshCanonicalStoreCard | undefined => {
+    return undefined;
+  }, []);
   const resolvedActiveZoneLabel = activeCanonicalStore?.zoneLabel ?? activeZoneLabel;
 
   React.useEffect(() => {
@@ -2118,7 +2118,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
             <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <View style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
                 <Text role="caption" tone="muted">رصيد المتجر الحالي</Text>
-                <Text role="titleLg" tone="brand">{wltDshPartnerPreviewData.wallet.balanceLabel}</Text>
+                <Text role="titleLg" tone="brand">{walletBalanceLabel ?? '—'}</Text>
               </View>
               <Button
                 label="عرض المحفظة"

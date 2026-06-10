@@ -4,10 +4,13 @@ import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } from
 import { createDshProductApiHttpClient } from '../../shared/dsh-product-api.transport';
 import { mapProductRecordToItem } from '../adapters/dshClientStoreAdapters';
 import type { DshRoute } from '../dsh-client.types';
+import type { DshDiscoveryStore } from '../../shared/dshStoreProductCardModel';
+import type { DshGetDiscoveryStoreResponse } from '../shared/dsh-discovery-stores-client';
+import type { DshStoreFixtureItem } from '../../shared/dshStoreProductCardModel';
 
 type UseDshClientStoreStateOptions = {
   route: DshRoute;
-  clientVisibleDiscoveryStores: any[];
+  clientVisibleDiscoveryStores: DshDiscoveryStore[];
 };
 
 export function useDshClientStoreState({
@@ -15,9 +18,9 @@ export function useDshClientStoreState({
   clientVisibleDiscoveryStores,
 }: UseDshClientStoreStateOptions) {
   const [activeStoreId, setActiveStoreId] = React.useState<string>('store-1001');
-  const [activeStoreDetail, setActiveStoreDetail] = React.useState<any | null>(null);
+  const [activeStoreDetail, setActiveStoreDetail] = React.useState<DshGetDiscoveryStoreResponse | null>(null);
   const [storeDetailState, setStoreDetailState] = React.useState<'loading' | 'ready' | 'empty' | 'error' | 'offline' | 'not-found'>('loading');
-  const [activeStoreItemsState, setActiveStoreItemsState] = React.useState<any[]>([]);
+  const [activeStoreItemsState, setActiveStoreItemsState] = React.useState<DshStoreFixtureItem[]>([]);
   const [activeCanonicalStoreId, setActiveCanonicalStoreId] = React.useState<string | undefined>('store-1001');
   const [activeCanonicalProductId, setActiveCanonicalProductId] = React.useState<string | undefined>(undefined);
   const [selectedItemId, setSelectedItemId] = React.useState<string>('');

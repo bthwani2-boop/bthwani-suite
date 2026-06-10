@@ -469,7 +469,7 @@ function RecommendedSection({
   const isRTL = direction === 'rtl';
 
   // Display a subset of products in horizontal view
-  const horizontalProducts: any[] = [];
+  const horizontalProducts: RecommendationProduct[] = [];
 
   return (
     <View style={{ gap: spacing[2] }}>

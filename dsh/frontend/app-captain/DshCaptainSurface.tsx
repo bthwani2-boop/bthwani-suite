@@ -22,7 +22,7 @@ import { Badge, borders, BottomNavBar, Box, Button, colorPalette, Divider, Icon,
 } from '@bthwani/ui-kit';
 import type { DshCaptainBellEvent } from '../shared/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
-import { wltDshCaptainUiCopy } from '../../../wlt/frontend/dsh/app-captain/wlt-dsh-captain.ui-copy';
+import { wltDshCaptainUiCopy, buildWltDshCaptainTopBarLocationLabel } from '../../../wlt/frontend/dsh/app-captain/wlt-dsh-captain.ui-copy';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
 import {
   CaptainDeliveryConfirmSheet,
@@ -421,7 +421,7 @@ export function DshCaptainSurface(props: DshCaptainSurfaceProps) {
   );
 }
 
-function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }: DshCaptainSurfaceProps) {
+function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID, walletBalanceLabel }: DshCaptainSurfaceProps) {
   const { theme } = useTheme();
   const { dshAuthBearerToken, dshClientId } = usePlatformVars();
   const {
@@ -1037,7 +1037,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
             </View>
             <View style={{ flex: 1, minWidth: 80, alignItems: 'center', gap: 1 }}>
               <Text role="caption" tone="muted">{wltDshCaptainUiCopy.summaryLabel}</Text>
-              <Text role="bodyStrong" tone="success">{wltDshCaptainUiCopy.walletBalanceLabel}</Text>
+              <Text role="bodyStrong" tone="success">{walletBalanceLabel ?? '—'}</Text>
             </View>
           </Box>
         </Box>
@@ -1433,7 +1433,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID }:
   const topBar = (
     <ModernPremiumHeader
       title={isStoreCourierMode ? 'موصل المتجر' : captainDisplayName}
-      locationLabel={isStoreCourierMode ? 'وضع موصل المتجر — طلبات المتجر فقط' : wltDshCaptainUiCopy.topBarLocationLabel}
+      locationLabel={isStoreCourierMode ? 'وضع موصل المتجر — طلبات المتجر فقط' : buildWltDshCaptainTopBarLocationLabel(walletBalanceLabel)}
       actions={[
         {
           id: 'account',

@@ -13,6 +13,8 @@ import { ServiceOrbitCarousel, colorPalette, radius, spacing, useDirection, with
 import { Text } from '@bthwani/ui-kit';
 
 import type { DshServiceId } from '../../contracts/dsh-home-types';
+import type { HomeScreenShellProps } from './HomeScreenShell';
+import type { DshHomeServiceDialItem } from '../../../shared/home-service-config';
 import { DSH_HOME_SERVICE_DIAL_ITEMS as dshHomeServiceDialFixtures } from '../../../shared/home-service-config';
 import { resolveDshImageSource } from '../../../shared/resolve-dsh-image-source';
 
@@ -147,7 +149,7 @@ export const HomeCategoryDialSection = React.memo(function HomeCategoryDialSecti
   homeState,
   categoriesDialItems,
   selectCategoryPage,
-}: any) {
+}: Pick<HomeScreenShellProps, 'props' | 'homeState' | 'selectCategoryPage'> & { categoriesDialItems: DshCategoryDialItem[] }) {
   return (
     <DshCategoryOrbitCarouselBase
       visible={homeState.categoriesSheetVisible}
@@ -171,7 +173,7 @@ export const HomeCategoryDialSection = React.memo(function HomeCategoryDialSecti
 export const HomeServiceDialSection = React.memo(function HomeServiceDialSection({
   props,
   homeState,
-}: any) {
+}: Pick<HomeScreenShellProps, 'props' | 'homeState'>) {
   return (
     <ServiceOrbitCarousel
       visible={homeState.serviceDialVisible}
@@ -183,7 +185,7 @@ export const HomeServiceDialSection = React.memo(function HomeServiceDialSection
       }}
       items={dshHomeServiceDialFixtures}
       onClose={() => homeState.setServiceDialVisible(false)}
-      onSelect={(item: any) => {
+      onSelect={(item: { key: string }) => {
         homeState.setServiceDialVisible(false);
         if (item.key === 'dsh') return;
         if (item.key === 'wlt') {

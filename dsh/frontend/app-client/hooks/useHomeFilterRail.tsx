@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { StyleProp, ImageStyle, TextStyle } from 'react-native';
 import { Icon, type BThwaniFilterRailItem } from '@bthwani/ui-kit';
 import { CategoryIconImage } from '../parts/home/HomeCategoryCarousel';
 import {
@@ -29,8 +30,8 @@ export function useHomeFilterRail({
   onOpenCategory,
   onOpenSheinInfo,
 }: {
-  theme: any;
-  styles: any;
+  theme: { textInverse: string; textMuted: string };
+  styles: { filterChipIcon: StyleProp<ImageStyle | TextStyle> };
   categoryItems: DshHomeCategory[];
   activeFilter: DiscoveryFilter;
   setActiveFilter: (val: DiscoveryFilter) => void;
@@ -112,7 +113,7 @@ export function useHomeFilterRail({
       {
         id: buildHomeCategoryFilterId('all'),
         label: 'الكل',
-        icon: ({ selected }: any) => (
+        icon: ({ selected }: { selected: boolean }) => (
           <Icon
             name="menu-outline"
             size={16}

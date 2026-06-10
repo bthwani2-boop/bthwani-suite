@@ -1,12 +1,18 @@
 import * as React from 'react';
 import { useDebounce } from './useDebounce';
 
+type UseStoreInlineSearchOptions = {
+  headerSearchVisible: boolean;
+  setHeaderSearchVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  headerSearchQuery: string;
+  setHeaderSearchQuery: React.Dispatch<React.SetStateAction<string>>;
+};
+
 export function useStoreInlineSearch({
-  headerSearchVisible,
   setHeaderSearchVisible,
   headerSearchQuery,
   setHeaderSearchQuery,
-}: any) {
+}: UseStoreInlineSearchOptions) {
   const debouncedInlineSearchQuery = useDebounce(headerSearchQuery, 250);
 
   const openInlineSearch = React.useCallback(() => {

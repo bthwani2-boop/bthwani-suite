@@ -1,10 +1,12 @@
 import { hostClientStates } from '../dsh-client.navigation-bridge';
 import type { HostOrderSummary, HostCartItem } from '../dsh-client.navigation-bridge';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
+import type { ActiveStore } from '../hooks/useDshCheckout';
+import type { DshDiscoveryStore } from '../../shared/dshStoreProductCardModel';
 
 export function mapLiveOrderToSummary(
-  liveOrder: any,
-  activeStore: any,
+  liveOrder: { id: string },
+  activeStore: ActiveStore,
   totalPrice: number,
   fulfillmentMode: DshFulfillmentDeliveryMode,
   dropoffAddress: string,
@@ -30,9 +32,9 @@ export function mapLiveOrderToSummary(
 
 export function performReorderMapping(
   order: HostOrderSummary,
-  clientVisibleDiscoveryStores: any[],
+  clientVisibleDiscoveryStores: DshDiscoveryStore[],
 ): {
-  matchedStore: any;
+  matchedStore: DshDiscoveryStore | null;
   newCartItems: HostCartItem[];
   fulfillmentMode: DshFulfillmentDeliveryMode;
   pickupAddress: string;

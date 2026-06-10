@@ -11,7 +11,7 @@ import {
   resolveFieldStoreStatusLabel,
   resolveFieldStoreStatusTone,
   type FieldStoreFile,
-} from '../../data/stores.preview-data';
+} from '../../shared/field-store-model';
 
 type FieldStoreCardProps = {
   store: FieldStoreFile;

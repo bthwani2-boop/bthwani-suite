@@ -8,6 +8,8 @@ import { HomeCategoryDialSection, HomeServiceDialSection } from './HomeOrbitSect
 import { HomePromoSection } from './HomePromoSection';
 import { HomeStoreFeedSection, type HomeStoreCardEntry } from './HomeStoreFeedSection';
 import { HomeVideoReelsSection } from './HomeVideoReelsSection';
+import type { useTheme, useUiText } from '@bthwani/ui-kit';
+import type { HomePromoRecord } from '../../../data/marketing.preview-data';
 import type { DshHomeCategory } from '../../contracts/dsh-home-types';
 import type { DshHomeGetScreenProps } from '../../contracts/dsh-home-screen-props';
 import type { useHomeState } from '../../hooks/useHomeState';
@@ -16,6 +18,7 @@ import type { useHomePromoHandlers } from '../../hooks/useHomePromoHandlers';
 import type { useHomeFilterRail } from '../../hooks/useHomeFilterRail';
 import type { useHomeVideoHandlers } from '../../hooks/useHomeVideoHandlers';
 import type { useHomeTickerState } from '../../hooks/useHomeTickerState';
+import type { buildHomeScreenStyles } from './home-screen.styles';
 
 export interface HomeScreenShellProps {
   props: DshHomeGetScreenProps;
@@ -23,10 +26,10 @@ export interface HomeScreenShellProps {
   onRetry?: () => void;
   isRtl: boolean;
   viewportWidth: number;
-  theme: any;
-  uiText: any;
-  styles: any;
-  categoriesAnchorRef: React.RefObject<any>;
+  theme: ReturnType<typeof useTheme>['theme'];
+  uiText: ReturnType<typeof useUiText>;
+  styles: ReturnType<typeof buildHomeScreenStyles>;
+  categoriesAnchorRef: React.RefObject<InstanceType<typeof View> | null>;
   homeState: ReturnType<typeof useHomeState>;
   derivedStores: ReturnType<typeof useHomeDerivedStores>;
   promoHandlers: ReturnType<typeof useHomePromoHandlers>;
@@ -37,7 +40,7 @@ export interface HomeScreenShellProps {
   handleOpenMySpace: () => void;
   handleOpenCartFromHeader: () => void;
   selectCategoryPage: (categoryId: string, animated?: boolean) => void;
-  activeHomePromo: any;
+  activeHomePromo: HomePromoRecord | null;
   openInlineSearch: () => void;
   closeInlineSearch: () => void;
   openServiceDial: () => void;
@@ -117,7 +120,7 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
   }, [fallbackCategoriesDialLayout, homeState, categoriesAnchorRef]);
 
   const listData = React.useMemo(
-    () => derivedStores.activeHomeStoreCards.length ? derivedStores.activeHomeStoreCards : ['empty'],
+    () => derivedStores.activeHomeStoreCards.length ? derivedStores.activeHomeStoreCards : (['empty'] as const),
     [derivedStores.activeHomeStoreCards],
   );
   const containerWidth = viewportWidth;

@@ -6,9 +6,35 @@ import { Icon, Text,
 } from '@bthwani/ui-kit';
 
 import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
+import type { useStoreAppearanceChrome } from './store-appearance-chrome';
+import type { DshStoreGetScreenProps } from '../../contracts/dsh-store-screen-props';
 import { normalizeDisplayText } from '../../shared/store-formatting';
 import { resolveDshStoreMenuItemImageSource } from './StoreMenuItemCard';
-import { stylesTokens } from './store-screen.styles';
+import { stylesTokens, styles as storeScreenStyles } from './store-screen.styles';
+
+type StoreImagePreviewSheetProps = {
+  previewItem: DshStoreGetMenuItem | null | undefined;
+  previewItems: DshStoreGetMenuItem[];
+  previewAnim: Animated.Value;
+  previewPanResponder: { panHandlers: object };
+  previewListRef: React.RefObject<Animated.FlatList<DshStoreGetMenuItem> | null>;
+  previewScrollY: Animated.Value;
+  viewportHeight: number;
+  viewportWidth: number;
+  previewActiveIndex: number;
+  setPreviewActiveIndex: (index: number) => void;
+  setPreviewItem: (item: DshStoreGetMenuItem | null) => void;
+  closeImagePreview: () => void;
+  appearanceChrome: ReturnType<typeof useStoreAppearanceChrome>;
+  styles: typeof storeScreenStyles;
+  isRTL: boolean;
+  favoriteIds: Set<string>;
+  store: DshStoreGetScreenProps['store'];
+  normalizedStoreName: string;
+  storeLogoImageSource: import('react-native').ImageSourcePropType | null | undefined;
+  handleToggleFavorite: (id: string) => void;
+  openMeasurementPicker: (item: DshStoreGetMenuItem, position: { x: number; y: number }) => void;
+};
 
 const STORE_PREVIEW_INITIAL_NUM_TO_RENDER = 3;
 const STORE_PREVIEW_MAX_TO_RENDER_PER_BATCH = 3;
@@ -37,7 +63,7 @@ export function StoreImagePreviewSheet({
   storeLogoImageSource,
   handleToggleFavorite,
   openMeasurementPicker,
-}: any) {
+}: StoreImagePreviewSheetProps) {
   const previewItemWidth = viewportWidth * 0.92;
   const previewItemHeight = viewportHeight * 0.54;
   const previewSnapInterval = previewItemHeight + STORE_PREVIEW_ITEM_GAP;
@@ -175,7 +201,7 @@ export function StoreImagePreviewSheet({
             ref={previewListRef}
             data={previewItems}
             renderItem={renderPreviewItem}
-            keyExtractor={(item: any) => `preview-${item.id}`}
+            keyExtractor={(item: DshStoreGetMenuItem) => `preview-${item.id}`}
             horizontal={false}
             initialNumToRender={STORE_PREVIEW_INITIAL_NUM_TO_RENDER}
             maxToRenderPerBatch={STORE_PREVIEW_MAX_TO_RENDER_PER_BATCH}
@@ -198,7 +224,7 @@ export function StoreImagePreviewSheet({
               offset: previewSnapInterval * index,
               index,
             })}
-            onMomentumScrollEnd={(event: any) => {
+            onMomentumScrollEnd={(event: { nativeEvent: { contentOffset: { y: number } } }) => {
               const index = Math.round(event.nativeEvent.contentOffset.y / previewSnapInterval);
               if (index >= 0 && index < previewItems.length) {
                 setPreviewActiveIndex(index);

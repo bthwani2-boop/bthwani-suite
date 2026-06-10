@@ -40,6 +40,7 @@ export type DshCaptainSurfaceProps = {
   captainId?: string;
   onExit?: () => void;
   onOpenService?: (serviceId: string) => void;
+  walletBalanceLabel?: string;
 };
 
 
