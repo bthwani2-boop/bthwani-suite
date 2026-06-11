@@ -155,8 +155,14 @@ function Invoke-ExternalLogged {
 
   Add-Log "RUN: $Exe $($CommandArgs -join ' ')"
 
-  & $Exe @CommandArgs *>&1 | Tee-Object -FilePath $OutFile
-  $Code = $LASTEXITCODE
+  $OldPreference = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    & $Exe @CommandArgs *>&1 | Tee-Object -FilePath $OutFile
+    $Code = $LASTEXITCODE
+  } finally {
+    $ErrorActionPreference = $OldPreference
+  }
 
   if ($null -eq $Code) { $Code = 0 }
 

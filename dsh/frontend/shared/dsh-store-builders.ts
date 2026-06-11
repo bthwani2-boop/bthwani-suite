@@ -43,7 +43,32 @@ export function buildStoreCategories(items: DshStoreFixtureItem[]) {
   }));
 }
 
-export function buildStoreDeliveryModes(store: Pick<DshDiscoveryStore, 'meta' | 'supportsPickup' | 'supportsPartnerDelivery'>): StoreDeliveryModeEntry[] {
+export function buildStoreDeliveryModes(store: Pick<DshDiscoveryStore, 'meta' | 'supportsPickup' | 'supportsPartnerDelivery'> | undefined | null): StoreDeliveryModeEntry[] {
+  if (!store) {
+    return [
+      {
+        id: 'bthwani_delivery',
+        name: 'توصيل بثواني',
+        isAvailable: false,
+        estimatedTime: '',
+        fee: 12,
+      },
+      {
+        id: 'partner_delivery',
+        name: 'توصيل المتجر',
+        isAvailable: false,
+        estimatedTime: '',
+        fee: 0,
+      },
+      {
+        id: 'pickup',
+        name: 'استلم بنفسك',
+        isAvailable: false,
+        estimatedTime: '15 دقيقة',
+        fee: 0,
+      },
+    ];
+  }
   return [
     {
       id: 'bthwani_delivery',
@@ -69,7 +94,10 @@ export function buildStoreDeliveryModes(store: Pick<DshDiscoveryStore, 'meta' | 
   ];
 }
 
-export function buildStoreTags(store: DshDiscoveryStore) {
+export function buildStoreTags(store: DshDiscoveryStore | undefined | null) {
+  if (!store) {
+    return [];
+  }
   return [
     store.hasBthwaniPro ? 'بثواني برو' : null,
     store.isOffer ? 'عرض مباشر' : null,

@@ -47,7 +47,16 @@ export function useDshClientCartState({
   const [storeItemsEntryOrigin, setStoreItemsEntryOrigin] = React.useState<'home' | 'store-get'>('home');
 
   const addItemToHostCart = React.useCallback((
-    item: HostCartItem & { name?: string },
+    item: {
+      id: string;
+      name?: string;
+      title?: string;
+      priceLabel?: string;
+      canonicalStoreId?: string;
+      canonicalProductId?: string;
+      sourceRecordId?: string;
+      publishStage?: string;
+    },
     _payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string },
   ) => {
     setReorderAlertMessage(undefined);

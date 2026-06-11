@@ -481,7 +481,8 @@
     "dsh/frontend/shared/support-flows.ts",
     "dsh/frontend/app-field/storage/field-onboarding.storage.ts",
     "dsh/frontend/app-client/parts/home/HomePromoSection.tsx",
-    "dsh/frontend/app-client/parts/store/StoreMenuListSection.tsx"
+    "dsh/frontend/app-client/parts/store/StoreMenuListSection.tsx",
+    "dsh/frontend/shared/dsh-store-builders.ts"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

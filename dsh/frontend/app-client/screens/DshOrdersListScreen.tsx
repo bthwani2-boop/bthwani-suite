@@ -38,7 +38,9 @@ export function DshOrdersListScreen({
     : items;
 
   const sortedItems = [...visibleItems].sort((a, b) => {
-    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+    const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    return timeB - timeA;
   });
 
   return (

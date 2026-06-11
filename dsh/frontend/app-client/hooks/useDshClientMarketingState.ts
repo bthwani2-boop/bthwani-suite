@@ -1,7 +1,13 @@
 import React from 'react';
 import { publishedPromoCategoryIds } from '../dsh-client.navigation-bridge';
 import type { DshHomeGetPromo } from '../contracts/dsh-home-types';
-import type { MarketingGrowthRecord } from '../../data/marketing.preview-data';
+import {
+  getLiveMarketingGrowthItems,
+  getPublishedMarketingHomePromos,
+  getPublishedHomePromos,
+  getLiveMarketingVideoItems,
+  type MarketingGrowthRecord,
+} from '../../data/marketing.preview-data';
 
 type UseDshClientMarketingStateOptions = {
   hasStoreTarget: (storeId?: string) => boolean;
@@ -47,18 +53,15 @@ export function useDshClientMarketingState({
     return false;
   }, [hasProductTarget, hasStoreCategoryTarget, hasStoreTarget]);
 
-  // Marketing data will come from GET /marketing/promos API — empty until endpoint is built.
-  const liveMarketingPrograms = React.useMemo<MarketingGrowthRecord[]>(() => [], []);
+  const liveMarketingPrograms = React.useMemo(() => getLiveMarketingGrowthItems('client'), []);
 
   const liveMarketingShorts = React.useMemo(
-    () => liveMarketingPrograms
-      .filter((item) => item.family === 'shorts')
-      .filter(isMarketingGrowthRouteValid),
-    [isMarketingGrowthRouteValid, liveMarketingPrograms],
+    () => getLiveMarketingVideoItems('client'),
+    [],
   );
 
-  const homeMarketingPromos = React.useMemo<DshHomeGetPromo[]>(() => [], []);
-  const homePromos = React.useMemo(() => [], []);
+  const homeMarketingPromos = React.useMemo(() => getPublishedMarketingHomePromos('home') as DshHomeGetPromo[], []);
+  const homePromos = React.useMemo(() => getPublishedHomePromos(), []);
 
   return {
     isMarketingGrowthRouteValid,

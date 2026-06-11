@@ -11,13 +11,14 @@ import type {
   DshHomeCategory,
   DshHomeGetPromo,
   DshHomeGetStore,
+  DshHomeRecentOrder,
 } from './contracts/dsh-home-types';
 import { DshMySpaceScreen } from './screens/MySpaceScreen';
 import { DshNotificationsScreen } from './screens/NotificationsScreen';
 import { DshBenefitsHubScreen } from './screens/BenefitsScreen';
 import { DshOrdersListScreen } from './screens/DshOrdersListScreen';
 import { DshTrackingScreen } from './screens/DshTrackingScreen';
-import { DshStoreGetScreen } from './screens/StoreScreen';
+import { DshStoreGetScreen, type DshStoreGetScreenProps } from './screens/StoreScreen';
 import { DshStoreItemsScreen } from './screens/StoreItemsScreen';
 import { DshCartGetScreen } from './screens/CartScreen';
 import { DshCheckoutIntentScreen } from './screens/DshCheckoutIntentScreen';
@@ -46,7 +47,7 @@ import type { DshDiscoveryStoresBridgeResult } from './shared/dsh-discovery-stor
 import type { DshClientState } from './dsh-client.types';
 import type { DshCheckoutAuthContext } from '../shared/dsh-checkout-client';
 import type { ActiveStore } from './hooks/useDshCheckout';
-import type { DshStoreFixtureItem } from '../shared/dshStoreProductCardModel';
+import type { DshStoreFixtureItem, DshDiscoveryStore } from '../shared/dshStoreProductCardModel';
 import type { WltDshWalletPreviewState } from '../../../wlt/frontend/dsh/app-client/wlt-dsh-client.types';
 
 function parsePrice(priceLabel?: string): number {
@@ -81,14 +82,14 @@ type DshClientRouteRendererProps = {
   openCreateOrderJourney: () => void;
   returnHome: () => void;
   storeDetailState: 'loading' | 'ready' | 'empty' | 'error' | 'offline' | 'not-found';
-  activeStoreScreenStore: ActiveStore | undefined;
+  activeStoreScreenStore: DshStoreGetScreenProps['store'] | undefined;
   activeStoreItems: DshStoreFixtureItem[];
-  addItemToHostCart: (item: HostCartItem & { name?: string }, payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string }) => void;
+  addItemToHostCart: (item: { id: string; name?: string; title?: string; priceLabel?: string; canonicalStoreId?: string; canonicalProductId?: string; sourceRecordId?: string; publishStage?: string }, payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string }) => void;
   handleOpenActiveStoreItems: () => void;
   handleOpenActiveStoreCart: (mode?: DshFulfillmentDeliveryMode) => void;
-  fetchStoreDetail: (storeId: string, store: unknown, limit: number) => () => void;
+  fetchStoreDetail: (storeId: string, store: unknown, limit?: number) => () => void;
   activeStoreId: string;
-  activeStore: ActiveStore;
+  activeStore: DshDiscoveryStore;
   itemsQuery: string;
   setItemsQuery: (q: string) => void;
   itemsCategory: string;
@@ -97,7 +98,7 @@ type DshClientRouteRendererProps = {
   setSelectedItemId: (id: string) => void;
   checkoutClientMemo: import('../shared/dsh-checkout-client').DshCheckoutClient | undefined;
   checkoutAuth: DshCheckoutAuthContext;
-  onOpenService: () => void;
+  onOpenService?: (serviceId: string) => void;
   selectedOperationScreen: ClientOperationScreenId;
   returnOrdersList: () => void;
   filteredOrders: HostOrderSummary[];
@@ -117,12 +118,12 @@ type DshClientRouteRendererProps = {
   serviceDialTrigger: number;
   favoriteOverrides: Record<string, boolean>;
   handleToggleFavorite: (storeId: string) => void;
-  homeMarketingPromos: HomePromoRecord[];
-  homePromos: DshHomeGetPromo[];
+  homeMarketingPromos: DshHomeGetPromo[];
+  homePromos: HomePromoRecord[];
   liveMarketingShorts: MarketingVideoRecord[];
   clientVisibleHomeStores: DshHomeGetStore[];
-  homeRecentOrders: HostOrderSummary[];
-  onExit: () => void;
+  homeRecentOrders: DshHomeRecentOrder[];
+  onExit?: () => void;
   handleOpenHomeCategory: (categoryId: string) => void;
   handleOpenHomeStoreCategory: (storeId: string, categoryId: string) => void;
   handleOpenHomeProduct: (storeId: string, itemId: string) => void;
@@ -139,7 +140,7 @@ type DshClientRouteRendererProps = {
   handleOpenHomeStore: (storeId: string) => void;
   homeSearchAutoOpenToken: number;
   handleRegisterBackHandler: ((handler: (() => boolean) | null) => void) | undefined;
-  renderApprovedVideoReelsViewer: ((props: Record<string, unknown>) => React.ReactNode) | undefined;
+  renderApprovedVideoReelsViewer: ((props: any) => React.ReactNode) | undefined;
   setHomeRetryToken: React.Dispatch<React.SetStateAction<number>>;
   openSupportFlow: () => void;
 };

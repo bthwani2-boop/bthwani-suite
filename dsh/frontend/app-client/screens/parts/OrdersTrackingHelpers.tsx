@@ -76,10 +76,10 @@ export type CreateOrderValues = Pick<
 
 export type DshOrderListItem = {
   id: string;
-  orderNumber: string;
+  orderNumber?: string;
   title: string;
   statusLabel: string;
-  timestamp: string;
+  timestamp?: string;
   total?: string;
   isActive?: boolean;
   fulfillmentMode?: DshFulfillmentDeliveryMode;
@@ -459,7 +459,8 @@ export function formatOrderTime(isoString: string) {
   }
 }
 
-export function formatRelativeTime(isoString: string): string {
+export function formatRelativeTime(isoString?: string): string {
+  if (!isoString) return '';
   try {
     const now = new Date();
     const d = new Date(isoString);

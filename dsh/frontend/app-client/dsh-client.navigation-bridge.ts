@@ -26,6 +26,7 @@ export type HostOrderSummary = {
   summary?: string;
   total?: string;
   location?: string;
+  timestamp?: string;
 };
 
 export type HostCartItem = {

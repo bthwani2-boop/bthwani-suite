@@ -45,7 +45,7 @@ export function useDshClientStoreState({
   const fetchStoreDetail = React.useCallback((
     storeId: string,
     _store: unknown,
-    limit: number,
+    limit: number = 15,
   ) => {
     const config = resolveDshDiscoveryStoresRuntimeConfig();
     if (!config) {
