@@ -29,13 +29,19 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
   const dynamicAudits = getDynamicUiAudits();
   const allAudits = [...dynamicAudits, ...preview.audits];
 
+  const [retryCount, setRetryCount] = React.useState(0);
   const [runtimeAuditState, setRuntimeAuditState] = React.useState<{
     orders: readonly DshRuntimeOrderRow[];
-    loaded: boolean;
-  }>({ orders: [], loaded: false });
+    isLoading: boolean;
+    error: string | null;
+    offline: boolean;
+  }>({ orders: [], isLoading: true, error: null, offline: false });
+
+  const retry = React.useCallback(() => setRetryCount((n) => n + 1), []);
 
   React.useEffect(() => {
     let cancelled = false;
+    setRuntimeAuditState((s) => ({ ...s, isLoading: true, error: null, offline: false }));
     fetchDshRuntimeOrders({ limit: 50 }).then((result) => {
       if (cancelled) return;
       if (result.kind === 'ok') {
@@ -45,17 +51,24 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
           o.status === 'RETURNED' ||
           o.status === 'CANCELLED'
         );
-        setRuntimeAuditState({ orders: auditNeeded, loaded: true });
+        setRuntimeAuditState({ orders: auditNeeded, isLoading: false, error: null, offline: false });
+      } else if (result.kind === 'offline') {
+        setRuntimeAuditState({ orders: [], isLoading: false, error: null, offline: true });
+      } else {
+        setRuntimeAuditState({ orders: [], isLoading: false, error: result.message, offline: false });
       }
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [retryCount]);
+
+  const isEmpty = !runtimeAuditState.isLoading && !runtimeAuditState.error && !runtimeAuditState.offline && runtimeAuditState.orders.length === 0;
+  const loaded = !runtimeAuditState.isLoading && !runtimeAuditState.error && !runtimeAuditState.offline;
 
   const summaryKpi = [
-    { id: 'runtime-audit', label: 'تدقيقات Runtime', value: runtimeAuditState.loaded ? String(runtimeAuditState.orders.length) : '—', tone: 'warning' as const },
+    { id: 'runtime-audit', label: 'تدقيقات Runtime', value: loaded ? String(runtimeAuditState.orders.length) : '—', tone: 'warning' as const },
     { id: 'audits', label: 'التدقيقات اليدوية', value: String(preview.summary.manualAudits + dynamicAudits.length), tone: 'neutral' as const },
     { id: 'sla', label: 'خطر SLA', value: String(preview.summary.slaRisk), tone: 'danger' as const },
-    { id: 'source', label: 'مصدر البيانات', value: runtimeAuditState.loaded ? 'DSH Runtime' : 'Preview', tone: runtimeAuditState.loaded ? 'success' as const : 'warning' as const },
+    { id: 'source', label: 'مصدر البيانات', value: loaded ? 'DSH Runtime' : runtimeAuditState.offline ? 'Offline' : runtimeAuditState.error ? 'Error' : 'Loading…', tone: loaded ? 'success' as const : 'warning' as const },
   ];
 
   return (
@@ -79,11 +92,23 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
         </div>
       </div>
 
+      {(runtimeAuditState.error || runtimeAuditState.offline) && (
+        <div style={{ padding: '8px 12px', background: 'var(--bthwani-control-panel-surface)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{ fontSize: '12px', color: 'var(--bthwani-control-panel-text-muted)' }}>
+            {runtimeAuditState.offline ? 'لا يوجد اتصال بالشبكة — network offline' : `خطأ: ${runtimeAuditState.error}`}
+          </span>
+          <button type="button" onClick={retry} style={{ fontSize: '12px', color: 'var(--bthwani-control-panel-brand)', background: 'none', border: 'none', cursor: 'pointer' }}>إعادة المحاولة</button>
+        </div>
+      )}
+      {isEmpty && (
+        <div style={{ padding: '8px 12px', color: 'var(--bthwani-control-panel-text-muted)', fontSize: '12px' }}>لا توجد طلبات تحتاج تدقيقاً — empty queue</div>
+      )}
+
       {/* ── Split Layout ── */}
       <div className={styles.surfaceSplitGrid}>
         <Box gap={3}>
           {/* Runtime Audit Queue — real orders needing audit from DSH backend */}
-          {runtimeAuditState.loaded && runtimeAuditState.orders.length > 0 && (
+          {loaded && runtimeAuditState.orders.length > 0 && (
             <WebControlPanelQueue
               title="تدقيق Runtime — طلبات تحتاج مراجعة"
               meta={`${runtimeAuditState.orders.length} طلب من DSH`}
@@ -130,7 +155,7 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
           )}
 
           <WebControlPanelQueue
-            title={runtimeAuditState.loaded ? 'سجل التدقيق والمتابعة (Preview)' : 'سجل التدقيق والمتابعة'}
+            title={loaded ? 'سجل التدقيق والمتابعة (Preview)' : 'سجل التدقيق والمتابعة'}
             meta={`${allAudits.length} تدقيقات نشطة`}
           >
             {/* Table Column Headers */}

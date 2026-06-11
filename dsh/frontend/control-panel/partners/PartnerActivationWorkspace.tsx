@@ -263,7 +263,7 @@ export function ControlPanelDshPartnerActivationScreen() {
             title="تعليمات تفعيل الشريك"
             reason={actionMessage}
             confidence={allReady ? 'high' : 'low'}
-            auditTag="UI_PREVIEW_ONLY"
+            auditTag="NEEDS_BINDING_LATER"
           />
           <Surface tone="raised" padding={4} gap={2} radiusToken="lg">
             <Text role="titleSm" tone="default">ملاحظة تشغيلية</Text>

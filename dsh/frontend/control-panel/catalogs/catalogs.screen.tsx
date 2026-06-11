@@ -293,7 +293,7 @@ export function ControlPanelDshCatalogScreen({
       {actionMessage ? (
         <div role="status" aria-live="polite" style={{ padding: '8px 14px', backgroundColor: theme.surfaceInset, borderBottom: `1px solid ${theme.line}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexShrink: 0 }}>
           <span style={{ fontSize: '11px', color: theme.brandHeaderBackground, fontWeight: 600 }}>{actionMessage}</span>
-          <span style={{ fontSize: '10px', color: theme.textMuted }}>UI_PREVIEW_ONLY</span>
+          <span style={{ fontSize: '10px', color: theme.textMuted }}>ربط API قيد التنفيذ</span>
           <button type="button" onClick={() => setActionMessage(null)} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '12px', cursor: 'pointer', padding: '0 4px' }}>x</button>
         </div>
       ) : null}
@@ -370,7 +370,7 @@ export function ControlPanelDshCatalogScreen({
                                     type: 'visibility-change',
                                     productIds: readyProducts.map((p) => p.id),
                                     label: 'نشر الكتالوج بالكامل للعميل',
-                                    note: 'UI_PREVIEW_ONLY: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
+                                    note: 'محاكاة محلية: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
                                     apiBoundary: 'POST /catalog/products/publish',
                                   }));
                                   setActionMessage('تم تسجيل مقترح نشر المنتجات الجاهزة للعميل');

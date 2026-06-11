@@ -9,7 +9,7 @@ import type { DshSurfaceId } from '../shared/dsh-flow-registry';
 import { canonicalProductId, canonicalStoreId } from './canonical.preview-data';
 
 export const dshOperationalPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -55,7 +55,7 @@ export type DshOperationalPreviewRecord = {
 function previewRecord(record: Omit<DshOperationalPreviewRecord, 'dataClassification' | 'runtimeTruth' | 'backendSource' | 'bindingSource'>): DshOperationalPreviewRecord {
   return {
     ...record,
-    dataClassification: 'UI_PREVIEW_ONLY',
+    dataClassification: 'SCAFFOLD',
     runtimeTruth: false,
     backendSource: false,
     bindingSource: false,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform, View } from 'react-native';
-import { usePlatformVars, FeatureFlagProvider, PlatformVarsProvider, useFeatureFlag } from '../shared';
+import { usePlatformVars, FeatureFlagProvider, PlatformVarsProvider, useFeatureFlag, listNotifications, resolveDshAuthBaseUrl } from '../shared';
+import type { DshSignalSummary, DshSignalEventKind, DshSignalEntityType } from '../shared';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
 import type { DshClientSurfaceProps, DshRoute } from './dsh-client.types';
 import { useDshNavigation, useDshOrderTracking } from './hooks';
@@ -215,6 +216,38 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
 
   const [selectedOperationScreen, setSelectedOperationScreen] = React.useState<ClientOperationScreenId>('entitlements-get');
   const [serviceDialTrigger, setServiceDialTrigger] = React.useState(0);
+
+  // J-013: Bell notifications — fetch from GET /notifications when bell route is active
+  const [bellSignalEvents, setBellSignalEvents] = React.useState<readonly DshSignalSummary[]>([]);
+  React.useEffect(() => {
+    if (route !== 'bell') return undefined;
+    const authBaseUrl = resolveDshAuthBaseUrl();
+    const dshBase = checkoutAuth.bearerToken
+      ? (typeof process !== 'undefined' ? process.env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? process.env?.NEXT_PUBLIC_DSH_API_BASE_URL ?? null : null)
+      : null;
+    const baseUrl = dshBase?.trim() || authBaseUrl?.replace(':18082', ':8080') || null;
+    if (!baseUrl) return undefined;
+    let cancelled = false;
+    listNotifications(
+      { baseUrl, bearerToken: checkoutAuth.bearerToken, devClientId: checkoutAuth.clientId },
+      { limit: 30, unread_only: false },
+    ).then((resp) => {
+      if (cancelled) return;
+      const summaries: DshSignalSummary[] = resp.notifications.map((n) => ({
+        eventId: n.id,
+        kind: n.kind as DshSignalEventKind,
+        priority: n.priority,
+        title: n.title,
+        entityId: n.entity_id ?? '',
+        entityType: (n.entity_type ?? 'order') as DshSignalEntityType,
+        readState: n.is_read ? 'read' : 'unread',
+        routeId: n.action_route ?? 'orders-list',
+        emittedAt: n.created_at,
+      }));
+      setBellSignalEvents(summaries);
+    }).catch(() => { /* non-fatal — bell shows empty state */ });
+    return () => { cancelled = true; };
+  }, [route, checkoutAuth]);
 
   // Command routing reset to tracking default
   React.useEffect(() => {
@@ -453,6 +486,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
           renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer}
           setHomeRetryToken={setHomeRetryToken}
           openSupportFlow={openSupportFlow}
+          bellSignalEvents={bellSignalEvents}
         />
       </View>
       <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>

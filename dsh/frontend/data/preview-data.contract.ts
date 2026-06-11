@@ -1,5 +1,5 @@
 /**
- * UI_PREVIEW_ONLY canonical preview data contract.
+ * DEV_ONLY_FIXTURE canonical preview data contract.
  * This file owns lightweight ID brands and graph references only. It has no payload.
  */
 export type DshPreviewEntityId = string;
@@ -36,7 +36,7 @@ export type DshGeoZoneId = string;
 export type DshRecommendationId = string;
 
 export type DshPreviewDataContract = {
-  readonly dataKind: 'UI_PREVIEW_ONLY';
+  readonly dataKind: 'DEV_ONLY_FIXTURE';
   readonly runtimeTruth: false;
   readonly backendSource: false;
   readonly bindingSource: false;
@@ -48,7 +48,7 @@ export type DshPreviewRef<TKind extends string, TId extends string = string> = {
 };
 
 export const dshCanonicalPreviewDataContract: DshPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

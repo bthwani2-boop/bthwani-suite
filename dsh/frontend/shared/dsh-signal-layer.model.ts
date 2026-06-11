@@ -1,5 +1,5 @@
 /**
- * P0-08 — DSH Signal Layer Model (UI_PREVIEW_ONLY)
+ * P0-08 — DSH Signal Layer Model
  *
  * Centralized signal type contract for all DSH actor surfaces.
  * On-demand retrieval enforced: lists show summaries only; details open on explicit action.
@@ -143,7 +143,7 @@ export type DshSignalEvent = {
   readonly readState: 'unread' | 'read';
   readonly auditRequired: boolean;
   readonly onDemandPolicy: DshSignalOnDemandPolicy;
-  /** ISO display label — UI_PREVIEW_ONLY (not runtime UTC) */
+  /** ISO display label — NOT live UTC (scaffold) */
   readonly emittedAt: string;
 };
 

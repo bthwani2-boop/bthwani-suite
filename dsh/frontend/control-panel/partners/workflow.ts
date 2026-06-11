@@ -33,14 +33,14 @@ export type DshPartnerIntakeMetric = {
 
 // Data moved to central preview data
 
-// UI_PREVIEW_ONLY — commission and settlement figures are WLT-owned, not authoritative here
+// SCAFFOLD — commission and settlement figures are WLT-owned, not authoritative here
 export type DshPartnerFulfillmentMode = DshFulfillmentDeliveryMode;
 
 export type DshPartnerModeAgreement = {
   mode: DshPartnerFulfillmentMode;
   modeLabel: string;
   enabled: boolean;
-  /** UI_PREVIEW_ONLY — actual rate lives in WLT commission engine */
+  /** SCAFFOLD — actual rate lives in WLT commission engine */
   commissionRatePreview: string;
   settlementBasis: string;
   operationalReadiness: 'ready' | 'pending' | 'unavailable';

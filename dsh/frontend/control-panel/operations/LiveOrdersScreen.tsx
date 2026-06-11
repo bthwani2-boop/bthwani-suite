@@ -47,22 +47,30 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   const [selectedItemId, setSelectedItemId] = React.useState<SelectedItem>(null);
   const [decisions, setDecisions] = React.useState<DecisionState>(() => getLiveOrderDecisions() as any);
   const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
+  const [retryCount, setRuntimeRetryCount] = React.useState(0);
+  const retry = React.useCallback(() => setRuntimeRetryCount((n) => n + 1), []);
   const [runtimeState, setRuntimeState] = React.useState<{
     orders: readonly DshRuntimeOrderRow[];
     total: number;
     loaded: boolean;
-  }>({ orders: [], total: 0, loaded: false });
+    offline: boolean;
+    error: string | null;
+  }>({ orders: [], total: 0, loaded: false, offline: false, error: null });
 
   React.useEffect(() => {
     let cancelled = false;
     fetchDshRuntimeOrders({ limit: 100 }).then((result) => {
       if (cancelled) return;
       if (result.kind === 'ok') {
-        setRuntimeState({ orders: result.orders, total: result.total, loaded: true });
+        setRuntimeState({ orders: result.orders, total: result.total, loaded: true, offline: false, error: null });
+      } else if (result.kind === 'offline') {
+        setRuntimeState((s) => ({ ...s, offline: true, loaded: false }));
+      } else {
+        setRuntimeState((s) => ({ ...s, error: result.message, loaded: false }));
       }
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [retryCount]);
 
   const handleDecision = React.useCallback((orderId: string, decision: OpsDecision, note: string) => {
     const nextStatus = mapOperationsDecisionToLifecycle(decision);

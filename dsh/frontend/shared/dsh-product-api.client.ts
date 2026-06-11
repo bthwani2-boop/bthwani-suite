@@ -216,6 +216,12 @@ export type DshProductApiClient = {
     options?: { limit?: number; offset?: number },
   ): Promise<DshListProductsResponse>;
 
+  listAllProducts(options?: {
+    approvalStatus?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<DshListProductsResponse>;
+
   createCategory(
     storeId: string,
     req: DshCreateCategoryRequest,
@@ -277,6 +283,16 @@ export function createDshProductApiClient(
       if (options.offset !== undefined) params.set('offset', String(options.offset));
       const qs = params.toString();
       const path = qs ? `/stores/${storeId}/products?${qs}` : `/stores/${storeId}/products`;
+      return transport.get(path) as Promise<DshListProductsResponse>;
+    },
+
+    listAllProducts: (options = {}) => {
+      const params = new URLSearchParams();
+      if (options.approvalStatus !== undefined) params.set('approval_status', options.approvalStatus);
+      if (options.limit !== undefined) params.set('limit', String(options.limit));
+      if (options.offset !== undefined) params.set('offset', String(options.offset));
+      const qs = params.toString();
+      const path = qs ? `/products?${qs}` : '/products';
       return transport.get(path) as Promise<DshListProductsResponse>;
     },
 

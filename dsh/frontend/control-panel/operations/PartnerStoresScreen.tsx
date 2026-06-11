@@ -20,7 +20,67 @@ export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
 
 import { PARTNER_STORES_PREVIEW } from '../../data';
 
-const STORES = [
+// Minimal API response shape from GET /stores (DiscoveryStore in dsh.openapi.yaml)
+type ApiDiscoveryStore = {
+  id: string;
+  name: string;
+  address: string;
+  status_label: string;
+  status_tone: 'open' | 'closed';
+  delivery_label: string;
+  service_label: string;
+  has_offer: boolean;
+  publish_stage: string;
+};
+
+type ApiDiscoveryStoresResponse = {
+  stores: ApiDiscoveryStore[];
+  pagination: { limit: number; offset: number; total: number };
+};
+
+type CpStoreRow = {
+  id: string;
+  name: string;
+  branch: string;
+  status: string;
+  deliveryMode: 'bthwani_delivery' | 'partner_delivery';
+  prepTime: string;
+  readyOrders: number;
+  issue: string;
+  suggestion: {
+    label: string;
+    reason: string;
+    confidence: 'high' | 'medium' | 'low';
+    action: string;
+    secondary: string | null;
+    auditRequired: boolean;
+  };
+  statusTone: 'success' | 'warning' | 'danger' | 'neutral';
+};
+
+function mapApiStoreToCpRow(s: ApiDiscoveryStore): CpStoreRow {
+  return {
+    id: s.id,
+    name: s.name,
+    branch: s.address,
+    status: s.status_tone === 'open' ? 'مفتوح' : 'مغلق',
+    deliveryMode: 'bthwani_delivery',
+    prepTime: '—',
+    readyOrders: 0,
+    issue: '',
+    suggestion: {
+      label: 'راجع بوابات الرؤية',
+      reason: `${s.service_label} — ${s.delivery_label}`,
+      confidence: 'high',
+      action: 'عرض التفاصيل',
+      secondary: null,
+      auditRequired: false,
+    },
+    statusTone: s.status_tone === 'open' ? 'success' : 'neutral',
+  };
+}
+
+const PREVIEW_STORES: CpStoreRow[] = [
   ...PARTNER_STORES_PREVIEW,
   {
     id: 'store-1001',
@@ -48,17 +108,53 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
   const searchParams = useSearchParams();
   const urlStoreId = searchParams.get('orderId') ?? null;
   const [selectedStoreId, setSelectedStoreId] = React.useState<string | null>(null);
+  const [storesSource, setStoresSource] = React.useState<'preview' | 'api' | 'api-error' | 'offline'>('preview');
+  const [retryCount, setRetryCount] = React.useState(0);
+  const retry = React.useCallback(() => setRetryCount((n) => n + 1), []);
 
   const [rows, setRows] = React.useState(() =>
-    STORES.map((store) => ({
+    PREVIEW_STORES.map((store) => ({
       ...store,
       customStatus: null as string | null,
       customStatusTone: null as 'warning' | 'success' | 'danger' | 'neutral' | null,
     }))
   );
 
+  // Fetch live stores from GET /stores — replaces preview list when API is reachable
   React.useEffect(() => {
-    if (urlStoreId && STORES.some((s) => s.id === urlStoreId)) {
+    const baseUrl = resolveDshStoreVisibilityBaseUrl();
+    if (!baseUrl) return;
+
+    let cancelled = false;
+    const fetchFn = globalThis.fetch;
+    fetchFn(`${baseUrl}/stores?limit=100`, {
+      headers: { Accept: 'application/json' },
+    })
+      .then((res) => res.json() as Promise<ApiDiscoveryStoresResponse>)
+      .then((data) => {
+        if (cancelled) return;
+        const isEmpty = !Array.isArray(data?.stores) || data.stores.length === 0;
+        if (!isEmpty) {
+          setRows(data.stores.map((s) => ({
+            ...mapApiStoreToCpRow(s),
+            customStatus: null as string | null,
+            customStatusTone: null as 'warning' | 'success' | 'danger' | 'neutral' | null,
+          })));
+        }
+        setStoresSource('api');
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          const isOffline = !globalThis.navigator?.onLine || (err instanceof TypeError && /network|fetch/i.test(String(err)));
+          setStoresSource(isOffline ? 'offline' : 'api-error');
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [retryCount]);
+
+  React.useEffect(() => {
+    if (urlStoreId && rows.some((s) => s.id === urlStoreId)) {
       setSelectedStoreId(urlStoreId);
     }
   }, [urlStoreId]);
@@ -397,12 +493,27 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
     <Box gap={3}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>المتاجر والشركاء</h2>
+        {storesSource === 'api' && (
+          <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-success)', fontWeight: 700 }}>
+            ● مصدر حي — GET /stores
+          </span>
+        )}
+        {storesSource === 'api-error' && (
+          <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-warning)', fontWeight: 700 }}>
+            ⚠ API غير متاح — بيانات معاينة
+          </span>
+        )}
+        {storesSource === 'preview' && (
+          <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)' }}>
+            بيانات معاينة — API غير مهيأ
+          </span>
+        )}
       </div>
 
       <WebControlPanelKpiStrip
         items={[
-          { id: 'open', label: 'مفتوحة الآن', value: '١٤٢', tone: 'success' },
-          { id: 'closed', label: 'مغلقة', value: '٣٨', tone: 'neutral' },
+          { id: 'open', label: 'مفتوحة الآن', value: String(rows.filter(r => (r.customStatus ?? r.status) === 'مفتوح').length), tone: 'success' },
+          { id: 'closed', label: 'مغلقة', value: String(rows.filter(r => (r.customStatus ?? r.status) === 'مغلق').length), tone: 'neutral' },
           { id: 'surged', label: 'متاجر مضغوطة', value: String(rows.filter(r => r.customStatus === 'مضغوط' || (r.status === 'مضغوط' && !r.customStatus)).length), tone: 'warning' },
           { id: 'delay', label: 'تأخير التجهيز', value: String(rows.filter(r => r.customStatus === 'تأخير' || (r.status === 'تأخير' && !r.customStatus)).length), tone: 'danger' },
           { id: 'suspended', label: 'موقوفة مؤقتاً', value: String(rows.filter(r => r.customStatus === 'موقف مؤقتاً').length), tone: 'danger' },

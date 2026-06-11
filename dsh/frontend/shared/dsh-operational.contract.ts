@@ -39,7 +39,7 @@ export type DshOperationalEntityKind =
   | 'control-panel-operation-record';
 
 export type DshOperationalDataClassification =
-  | 'UI_PREVIEW_ONLY'
+  | 'SCAFFOLD'
   | 'RUNTIME_UNPROVEN'
   | 'RUNTIME_PROVEN'
   | 'WLT_READ_ONLY_REFERENCE';

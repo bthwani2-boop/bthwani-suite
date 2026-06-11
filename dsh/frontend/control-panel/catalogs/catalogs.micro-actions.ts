@@ -56,7 +56,7 @@ export function useCatalogMicroActions({
           label: '🔄 تبديل سياسة صور المجموعة',
           isActive: false,
           onAction: () => {
-            const proposal = makeProposal({ type: 'media-policy-change', label: 'تبديل سياسة صور المجموعة', note: 'UI_PREVIEW_ONLY | تبديل سياسة الصور للمنتجات المحددة في الجدول', productIds: filteredProducts.map(f => f.id) });
+            const proposal = makeProposal({ type: 'media-policy-change', label: 'تبديل سياسة صور المجموعة', note: 'محاكاة محلية | تبديل سياسة الصور للمنتجات المحددة في الجدول', productIds: filteredProducts.map(f => f.id) });
             pushPreviewProposal(proposal);
             setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           },
@@ -81,7 +81,7 @@ export function useCatalogMicroActions({
         label: '✅ اعتماد مقترحات الشركاء',
         isActive: false,
         onAction: () => {
-          const proposal = makeProposal({ type: 'bulk-approve', label: 'اعتماد مقترحات الشركاء', note: 'UI_PREVIEW_ONLY | اعتماد مقترحات الشركاء المحددة ونقلها لمرحلة الجاهزية', productIds: filteredProducts.filter(p => p.approvalStage === 'partner-proposed' || p.sourceSurface === 'partner').map(f => f.id) });
+          const proposal = makeProposal({ type: 'bulk-approve', label: 'اعتماد مقترحات الشركاء', note: 'محاكاة محلية | اعتماد مقترحات الشركاء المحددة ونقلها لمرحلة الجاهزية', productIds: filteredProducts.filter(p => p.approvalStage === 'partner-proposed' || p.sourceSurface === 'partner').map(f => f.id) });
           pushPreviewProposal(proposal);
           setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
         },
@@ -92,7 +92,7 @@ export function useCatalogMicroActions({
           {
             id: 'ma-appr-marketing-approve-all', label: '📢 اعتماد كل مراجعات التسويق', isActive: false,
             onAction: () => {
-              const proposal = makeProposal({ type: 'bulk-approve', label: 'اعتماد كل مراجعات التسويق', note: 'UI_PREVIEW_ONLY | اعتماد مراجعات التسويق المحددة بنجاح', productIds: filteredProducts.filter(p => p.approvalStage === 'marketing-review').map(f => f.id) });
+              const proposal = makeProposal({ type: 'bulk-approve', label: 'اعتماد كل مراجعات التسويق', note: 'محاكاة محلية | اعتماد مراجعات التسويق المحددة بنجاح', productIds: filteredProducts.filter(p => p.approvalStage === 'marketing-review').map(f => f.id) });
               pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
             },
           },
@@ -107,7 +107,7 @@ export function useCatalogMicroActions({
         actions.push({
           id: 'ma-appr-quality-pass-all', label: '🛡️ تمرير جميع فحوصات الجودة', isActive: false,
           onAction: () => {
-            const proposal = makeProposal({ type: 'bulk-approve', label: 'تمرير جميع فحوصات الجودة', note: 'UI_PREVIEW_ONLY | تمرير فحوصات الجودة لمنتجات الشركاء بنجاح', productIds: filteredProducts.filter(p => p.approvalStage === 'partner-review').map(f => f.id) });
+            const proposal = makeProposal({ type: 'bulk-approve', label: 'تمرير جميع فحوصات الجودة', note: 'محاكاة محلية | تمرير فحوصات الجودة لمنتجات الشركاء بنجاح', productIds: filteredProducts.filter(p => p.approvalStage === 'partner-review').map(f => f.id) });
             pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           },
         });
@@ -115,7 +115,7 @@ export function useCatalogMicroActions({
         actions.push({
           id: 'ma-appr-pricing-resolve', label: '💸 تسوية تعارض الأسعار تلقائياً', isActive: false,
           onAction: () => {
-            const proposal = makeProposal({ type: 'price-change', label: 'تسوية تعارض الأسعار تلقائياً', note: 'UI_PREVIEW_ONLY | خفض وتعديل الأسعار المرتفعة وتسوية تعارض التسعير', productIds: filteredProducts.filter(p => p.price > 100).map(f => f.id) });
+            const proposal = makeProposal({ type: 'price-change', label: 'تسوية تعارض الأسعار تلقائياً', note: 'محاكاة محلية | خفض وتعديل الأسعار المرتفعة وتسوية تعارض التسعير', productIds: filteredProducts.filter(p => p.price > 100).map(f => f.id) });
             pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           },
         });
@@ -123,7 +123,7 @@ export function useCatalogMicroActions({
         actions.push({
           id: 'ma-media-assign-central', label: '📸 تعيين صور مركزية معتمدة', isActive: false,
           onAction: () => {
-            const proposal = makeProposal({ type: 'media-policy-change', label: 'تعيين صور مركزية معتمدة', note: 'UI_PREVIEW_ONLY | تعيين صورة مركزية افتراضية للمنتجات التي تنقصها صور', productIds: filteredProducts.filter(p => !p.mediaKey).map(f => f.id) });
+            const proposal = makeProposal({ type: 'media-policy-change', label: 'تعيين صور مركزية معتمدة', note: 'محاكاة محلية | تعيين صورة مركزية افتراضية للمنتجات التي تنقصها صور', productIds: filteredProducts.filter(p => !p.mediaKey).map(f => f.id) });
             pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           },
         });
@@ -145,7 +145,7 @@ export function useCatalogMicroActions({
         actions.push({
           id: 'ma-dup-resolve-all', label: '🔗 دمج وحل جميع التكرارات', isActive: false,
           onAction: () => {
-            const proposal = makeProposal({ type: 'conflict-resolution', label: 'دمج وحل جميع التكرارات', note: 'UI_PREVIEW_ONLY | دمج التكرارات وحل النزاعات للمنتجات المحددة', productIds: filteredProducts.map(f => f.id) });
+            const proposal = makeProposal({ type: 'conflict-resolution', label: 'دمج وحل جميع التكرارات', note: 'محاكاة محلية | دمج التكرارات وحل النزاعات للمنتجات المحددة', productIds: filteredProducts.map(f => f.id) });
             pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           },
         });
@@ -153,7 +153,7 @@ export function useCatalogMicroActions({
         actions.push({
           id: 'ma-gtin-sync', label: '🔄 مزامنة الباركود مع المعرف', isActive: false,
           onAction: () => {
-            const proposal = makeProposal({ type: 'edit-product', label: 'مزامنة الباركود مع المعرف', note: 'UI_PREVIEW_ONLY | تعيين GTIN بالاعتماد على SKU للمنتجات المحددة', productIds: filteredProducts.filter(p => !p.gtin).map(f => f.id) });
+            const proposal = makeProposal({ type: 'edit-product', label: 'مزامنة الباركود مع المعرف', note: 'محاكاة محلية | تعيين GTIN بالاعتماد على SKU للمنتجات المحددة', productIds: filteredProducts.filter(p => !p.gtin).map(f => f.id) });
             pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           },
         });
@@ -165,7 +165,7 @@ export function useCatalogMicroActions({
         actions.push({
           id: 'ma-vis-toggle-client', label: '👁️ تبديل الظهور للمستهلكين', isActive: false,
           onAction: () => {
-            const proposal = makeProposal({ type: 'visibility-change', label: 'تبديل الظهور للمستهلكين', note: 'UI_PREVIEW_ONLY | تعديل منصات العرض المتاحة للمنتجات المحددة', productIds: filteredProducts.map(f => f.id) });
+            const proposal = makeProposal({ type: 'visibility-change', label: 'تبديل الظهور للمستهلكين', note: 'محاكاة محلية | تعديل منصات العرض المتاحة للمنتجات المحددة', productIds: filteredProducts.map(f => f.id) });
             pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           },
         });
@@ -187,14 +187,14 @@ export function useCatalogMicroActions({
         {
           id: 'ma-pub-publish-ready', label: '🚀 نشر جميع المنتجات الجاهزة للعميل', isActive: false,
           onAction: () => {
-            const proposal = makeProposal({ type: 'visibility-change', label: 'نشر جميع المنتجات الجاهزة للعميل', note: 'UI_PREVIEW_ONLY | نشر جميع المنتجات الجاهزة بنجاح للعميل', productIds: filteredProducts.filter(p => p.approvalStage === 'catalog-adopted').map(f => f.id) });
+            const proposal = makeProposal({ type: 'visibility-change', label: 'نشر جميع المنتجات الجاهزة للعميل', note: 'محاكاة محلية | نشر جميع المنتجات الجاهزة بنجاح للعميل', productIds: filteredProducts.filter(p => p.approvalStage === 'catalog-adopted').map(f => f.id) });
             pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           },
         },
         {
           id: 'ma-pub-hide-drafts', label: '🙈 إخفاء جميع المسودات والمقترحات', isActive: false,
           onAction: () => {
-            const proposal = makeProposal({ type: 'visibility-change', label: 'إخفاء جميع المسودات والمقترحات', note: 'UI_PREVIEW_ONLY | التأكد من إخفاء جميع المسودات ومقترحات الشركاء', productIds: filteredProducts.filter(p => p.approvalStage === 'catalog-draft' || p.approvalStage === 'partner-proposed').map(f => f.id) });
+            const proposal = makeProposal({ type: 'visibility-change', label: 'إخفاء جميع المسودات والمقترحات', note: 'محاكاة محلية | التأكد من إخفاء جميع المسودات ومقترحات الشركاء', productIds: filteredProducts.filter(p => p.approvalStage === 'catalog-draft' || p.approvalStage === 'partner-proposed').map(f => f.id) });
             pushPreviewProposal(proposal); setActionMessage(`📋 مقترح: ${proposal.label} (${proposal.status})`);
           },
         }

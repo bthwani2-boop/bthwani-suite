@@ -66,7 +66,7 @@ export function DshPartnerOrderActionPanel({ activeFlowId, fulfillmentMode, onSe
         <Surface tone="raised" gap={2}>
           <SectionHeader
             title="موصل الشريك"
-            subtitle="UI_PREVIEW_ONLY — تعيين الموصل يتم عبر إعدادات الفريق لاحقًا."
+            subtitle="تعيين الموصل يتم عبر إعدادات الفريق لاحقًا."
           />
           <ListItem
             title="اسم الموصل"

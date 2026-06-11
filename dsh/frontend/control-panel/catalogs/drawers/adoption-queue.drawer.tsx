@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * CatalogAdoptionQueueWorkspace — UI_PREVIEW_ONLY
+ * CatalogAdoptionQueueWorkspace — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * API boundary: GET /catalog/adoption-queue (not yet bound) · PATCH /catalog/products/:id/stage (not yet bound)
  *
@@ -169,7 +169,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
       label: result.label,
       status: 'ready-for-api',
       owner: action === 'fix' ? 'control-panel-marketing' : 'control-panel-catalogs',
-      note: `UI_PREVIEW_ONLY | ${result.label} — "${item.title}"`,
+      note: `محاكاة محلية | ${result.label} — "${item.title}"`,
       apiBoundary: result.apiBoundary,
     });
 
@@ -279,7 +279,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
           border: `1px solid ${theme.warning as string}28`,
           fontSize: 9, color: theme.textMuted,
         }}>
-          <span style={{ fontWeight: 700, color: theme.warning as string }}>UI_PREVIEW_ONLY</span>
+          <span style={{ fontWeight: 700, color: theme.warning as string }}>ربط API قيد التنفيذ</span>
           {' · API: GET /catalog/adoption-queue · PATCH /catalog/products/:id/stage — not yet bound'}
         </div>
 
@@ -396,7 +396,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
 
         {/* Footer */}
         <div style={{ fontSize: 9, color: theme.textMuted, textAlign: 'center', paddingTop: 8 }}>
-          UI_PREVIEW_ONLY · control-panel/catalogs هو السطح الوحيد المخوّل بالاعتماد النهائي
+          control-panel/catalogs هو السطح الوحيد المخوّل بالاعتماد النهائي
         </div>
       </div>
     </Surface>

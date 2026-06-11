@@ -1,7 +1,7 @@
 import { dshDiscoveryStores } from './stores.preview-data';
 
 export const dshBranchesPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

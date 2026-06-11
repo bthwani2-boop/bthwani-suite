@@ -1,4 +1,4 @@
-﻿// UI_PREVIEW_ONLY — no backend/API/DB binding.
+// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Media ownership governance workspace — separates catalog-owned media from
 //   partner-exception and marketing-review items.
@@ -140,7 +140,7 @@ export function CatalogMediaGovernanceWorkspace({
     }
     setResult(item.id, {
       type: 'success',
-      message: `UI_PREVIEW_ONLY — تم تحويل "${item.name}" لمراجعة التسويق محلياً. الإجراء الفعلي يتطلب ربط API.`,
+      message: `تم تحويل "${item.name}" لمراجعة التسويق محلياً. الإجراء الفعلي يتطلب ربط API.`,
     });
   }
 
@@ -154,14 +154,14 @@ export function CatalogMediaGovernanceWorkspace({
     }
     setResult(item.id, {
       type: 'success',
-      message: `UI_PREVIEW_ONLY — تم اعتماد استثناء الشريك لـ "${item.name}" محلياً.`,
+      message: `تم اعتماد استثناء الشريك لـ "${item.name}" محلياً.`,
     });
   }
 
   function handleMarkCatalogOwned(item: Pick<CatalogProductMaster, 'id' | 'name'>) {
     setResult(item.id, {
       type: 'info',
-      message: `UI_PREVIEW_ONLY — تم تمييز "${item.name}" كمركزي (catalog-owned-media) محلياً.`,
+      message: `تم تمييز "${item.name}" كمركزي (catalog-owned-media) محلياً.`,
     });
   }
 
@@ -188,7 +188,7 @@ export function CatalogMediaGovernanceWorkspace({
     >
       <WebCompactSurfaceHeader
         title="حوكمة الوسائط"
-        subtitle="UI_PREVIEW_ONLY · المالك: control-panel/catalogs"
+        subtitle="المالك: control-panel/catalogs"
         onBack={onClose}
       />
 
@@ -250,7 +250,7 @@ export function CatalogMediaGovernanceWorkspace({
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
             جميع الصور الموافق عليها تخضع لسياسة العلامة التجارية المركزية (watermark/brand policy).{'\n'}
             الصور الإضافية من الشريك تمر على مراجعة تسويقية قبل الإقرار النهائي.{'\n'}
-            لا يمكن رفع أو نقل ملفات وسائط مباشرة من هذه الواجهة — UI_PREVIEW_ONLY.
+            لا يمكن رفع أو نقل ملفات وسائط مباشرة من هذه الواجهة — الربط قيد التنفيذ.
           </Text>
         </Box>
 
@@ -327,7 +327,7 @@ export function CatalogMediaGovernanceWorkspace({
         })}
 
         <Text role="caption" tone="muted" style={{ fontSize: 10, marginTop: 4 }}>
-          UI_PREVIEW_ONLY — لا نقل وسائط · لا صور · لا payload كامل · جميع الإجراءات محاكاة محلية
+          لا نقل وسائط · لا صور · لا payload كامل · جميع الإجراءات محاكاة محلية — الربط قيد التنفيذ
         </Text>
 
         <Button label="إغلاق" tone="ghost" size="sm" onPress={onClose} style={{ marginTop: 8 }} />

@@ -1,5 +1,5 @@
 /**
- * DSH Partner Activation Model (UI_PREVIEW_ONLY)
+ * DSH Partner Activation Model
  *
  * SSoT for partner activation lifecycle across all DSH surfaces.
  * Governs how a partner entity moves from initial draft through

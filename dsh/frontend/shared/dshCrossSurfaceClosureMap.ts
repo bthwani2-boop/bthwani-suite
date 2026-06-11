@@ -59,7 +59,7 @@ export type DshClosureEvidenceStatus =
 export function translateDshRuntimeBindingStatus(status: DshRuntimeBindingStatus): string {
   switch (status) {
     case 'UI_PREVIEW_ONLY':
-      return 'معاينة واجهة فقط';
+      return 'ربط قيد التنفيذ';
     case 'NEEDS_BINDING_LATER':
       return 'يحتاج ربطًا لاحقًا';
     case 'API_CLIENT_BOUND__RUNTIME_EVIDENCE_PRESENT':

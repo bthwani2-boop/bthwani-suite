@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
 /**
- * CatalogAuditTrailWorkspace — UI_PREVIEW_ONLY
+ * CatalogAuditTrailWorkspace — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * API boundary: GET /catalog/audit/:productId (not yet bound)
  *
@@ -11,7 +11,7 @@
  * Constraints:
  * - No direct Tamagui import. All UI via @bthwani/ui-kit.
  * - No full evidence payload always loaded — summary + detail-on-open principle.
- * - No claim of API audit truth — UI_PREVIEW_ONLY.
+ * - No claim of API audit truth — الربط قيد التنفيذ.
  * - No canonical data mutation.
  */
 
@@ -52,7 +52,7 @@ type AuditEvent = {
   apiNote: string;
 };
 
-// UI_PREVIEW_ONLY: preview audit events derived from product state
+// SCAFFOLD: preview audit events derived from product state
 function derivePreviewAuditEvents(product: CatalogProductMaster): AuditEvent[] {
   const events: AuditEvent[] = [];
 
@@ -236,7 +236,7 @@ export function CatalogAuditTrailWorkspace({
 
       {/* Notice */}
       <WorkspacePreviewNotice
-        bannerTitle="UI_PREVIEW_ONLY — سجل أحداث اشتقاقي"
+        bannerTitle="سجل أحداث اشتقاقي"
         subtitle="الأحداث مشتقة من حالة المنتج الحالية للعرض فقط. السجل الحقيقي يأتي من: GET /catalog/audit/:productId — not yet bound."
       />
 
@@ -519,7 +519,7 @@ export function CatalogAuditTrailWorkspace({
       )}
 
       <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'center' }}>
-        UI_PREVIEW_ONLY • الأحداث اشتقاقية • GET /catalog/audit/:productId — not yet bound
+        الأحداث اشتقاقية • GET /catalog/audit/:productId — not yet bound
       </Text>
     </Surface>
   );

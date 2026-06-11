@@ -1,6 +1,6 @@
 /**
  * CENTRAL DSH CANONICAL PREVIEW DATA
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  *
  * Owns: canonical store + product constants, helpers, and discovery builders.
  * Import direction: this file → ../shared/dshStoreProductCardModel only.

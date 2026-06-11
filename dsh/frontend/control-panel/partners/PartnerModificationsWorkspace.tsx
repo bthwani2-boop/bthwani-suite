@@ -125,7 +125,7 @@ export function PartnerModificationsWorkspace() {
               title="توجيه أمني/عملياتي"
               reason={selectedRequest.reason}
               confidence={selectedRequest.risk === 'danger' ? 'medium' : 'high'}
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
             />
 
             <Box style={{ marginVertical: 8 }}>
@@ -148,7 +148,7 @@ export function PartnerModificationsWorkspace() {
             title="مراجعة التعديلات"
             reason="اختر طلب تعديل من القائمة الجانبية لمراجعة التغييرات المطلوب إجراؤها على ملف الشريك والموافقة عليها."
             confidence="high"
-            auditTag="UI_PREVIEW_ONLY"
+            auditTag="NEEDS_BINDING_LATER"
           />
         )}
       </Box>

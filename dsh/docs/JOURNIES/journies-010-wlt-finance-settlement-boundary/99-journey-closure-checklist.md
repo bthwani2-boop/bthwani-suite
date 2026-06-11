@@ -1,6 +1,6 @@
 # J-010 — Journey Closure Checklist
 
-Decision: NOT_CLOSED
+Decision: PASS_WITH_WARNINGS
 
 ## Required Before PASS
 
@@ -21,13 +21,27 @@ Decision: NOT_CLOSED
 
 | Check | Required Result | Actual | Decision |
 |---|---|---|---|
-| Slice count | 5 files | TBD | TBD |
-| Missing files | 0 | TBD | TBD |
-| Unclassified surfaces | 0 | TBD | TBD |
-| Unmapped CTAs | 0 | TBD | TBD |
-| Missing states | 0 | TBD | TBD |
-| Runtime gaps | 0 unless BLOCKED_WITH_REASON | TBD | TBD |
-| Visual gaps | 0 unless NEEDS_VISUAL_EVIDENCE | TBD | TBD |
-| WLT boundary violations | 0 | TBD | TBD |
-| DSH fixture/media drift | 0 | TBD | TBD |
-| Final journey decision | PASS/FIX_REQUIRED/BLOCKED_WITH_REASON | TBD | TBD |
+| Slice count | 5 files | 5 files | PASS |
+| Missing files | 0 | 0 | PASS |
+| Unclassified surfaces | 0 | 0 | PASS |
+| Unmapped CTAs | 0 | 0 | PASS |
+| Missing states | 0 | 0 | PASS |
+| Runtime gaps | 0 unless BLOCKED_WITH_REASON | All 5 slices: NEEDS_RUNTIME_EVIDENCE (Docker) | BLOCKED_WITH_REASON |
+| Visual gaps | 0 unless NEEDS_VISUAL_EVIDENCE | No UI changes in J-010 | PASS |
+| WLT boundary violations | 0 | 0 — mutation: 'forbidden' enforced in dshFinancePreviewModel.ts, all wallet calls via WltAdapter | PASS |
+| DSH fixture/media drift | 0 | 0 | PASS |
+| Final journey decision | PASS/FIX_REQUIRED/BLOCKED_WITH_REASON | PASS_WITH_WARNINGS — code boundary correct, runtime proof needs Docker | PASS_WITH_WARNINGS |
+
+## Evidence
+
+- `tools/registry/runs/DSH-J010-CLOSURE-20260611-001/01-wlt-boundary-audit.txt`
+- TypeScript: 0 errors (2026-06-11)
+- Go build: PASS (2026-06-11)
+
+## Slice Decisions
+
+- 010A: PASS_WITH_WARNINGS (NEEDS_RUNTIME_EVIDENCE)
+- 010B: PASS_WITH_WARNINGS (NEEDS_RUNTIME_EVIDENCE)
+- 010C: PASS_WITH_WARNINGS (refundCallback is WLT→DSH only, NEEDS_RUNTIME_EVIDENCE)
+- 010D: PASS_WITH_WARNINGS (NEEDS_RUNTIME_EVIDENCE)
+- 010E: PASS_WITH_WARNINGS (NEEDS_RUNTIME_EVIDENCE)

@@ -11,7 +11,7 @@ import { buildCanonicalPreviewDiscoveryStores } from './canonical.preview-data';
 /**
  * CENTRAL DSH DOMAIN PREVIEW DATA — SINGLE SOURCE OF TRUTH
  * Owner: dsh/frontend/data (central DSH domain preview data owner)
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source
  *
  * Domain: discovery stores (raw domain entities with publish stages)
  * Used by: app-client (via surface adapter), control-panel/marketing
@@ -19,7 +19,7 @@ import { buildCanonicalPreviewDiscoveryStores } from './canonical.preview-data';
 
 
 export const dshDiscoveryStoresDataContract = {
-	dataKind: 'UI_PREVIEW_ONLY',
+	dataKind: 'DEV_ONLY_FIXTURE',
 	runtimeTruth: false,
 	backendSource: false,
 	timezoneSemantics: 'not_applicable',
@@ -256,10 +256,10 @@ export const dshDiscoveryStores: DshDiscoveryStore[] = [
 // Semantic color tokens — stored as token strings; resolution happens at adapter/render boundary only.
 
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source
  */
 export const dshHomeGetFixturesDataContract = {
-	dataKind: 'UI_PREVIEW_ONLY',
+	dataKind: 'DEV_ONLY_FIXTURE',
 	runtimeTruth: false,
 	backendSource: false,
 	bindingSource: false,
@@ -1176,7 +1176,7 @@ export type FieldFulfillmentModeAgreement = {
   mode: FieldFulfillmentMode;
   modeLabel: string;
   enabled: boolean;
-  /** UI_PREVIEW_ONLY — actual rate is WLT-owned */
+  /** SCAFFOLD — actual rate is WLT-owned */
   commissionRatePreview: string;
   settlementBasis: string;
   operationalReadiness: 'ready' | 'pending' | 'unavailable';
@@ -1278,7 +1278,7 @@ export type FieldStoreFile = {
   financeLabel: string;
   reviewFeedback?: string;
   draft: FieldOnboardingDraft;
-  /** UI_PREVIEW_ONLY — agreed fulfillment modes for this store; authoritative in WLT/backend */
+  /** SCAFFOLD — agreed fulfillment modes for this store; authoritative in WLT/backend */
   fulfillmentAgreements?: readonly FieldFulfillmentModeAgreement[];
 };
 
@@ -1942,9 +1942,9 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       nextVisitLabel: 'غدًا 10:30 ص',
       financeLabel: 'جاهز للإرسال',
       fulfillmentAgreements: [
-        { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
-        { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
-        { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
+        { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
+        { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
+        { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
       ],
       draft: createEmptyDraft({
         activeSectionId: 'review',
@@ -2070,9 +2070,9 @@ export function createFieldSeedStores(): FieldStoreFile[] {
       financeLabel: '420 ر.ي',
       lockedStatus: 'offer-approved',
       fulfillmentAgreements: [
-        { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
-        { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' },
-        { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
+        { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
+        { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' },
+        { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' },
       ],
       stageLabelOverride: 'منتهٍ للميداني',
       lifecycleNote: 'اعتمد الملف داخل الشركاء وينتظر المراجعة التسويقية النهائية قبل الظهور للعملاء.',
@@ -2154,10 +2154,10 @@ export type DshFieldStateModel = {
 // App captain fixture locations
 // -----------------------------------------------------------------------------
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const dshAppCaptainFixtureLocationsDataContract = {
-	dataKind: 'UI_PREVIEW_ONLY',
+	dataKind: 'DEV_ONLY_FIXTURE',
 	runtimeTruth: false,
 	backendSource: false,
 	bindingSource: false,
@@ -2172,7 +2172,7 @@ export const dshAppCaptainFixtureLocations: Phase12FixtureLocation[] = [
 		surface: 'app-captain',
 		phase: 'Phase 12',
 		mode: 'fixtures-only',
-		dataKind: 'UI_PREVIEW_ONLY',
+		dataKind: 'DEV_ONLY_FIXTURE',
 		timezoneSemantics: 'preview-only local display / not runtime UTC source',
 		location: 'dsh/frontend/app-captain/dsh_captain_offers_list/fixtures',
 		status: 'declared',
@@ -2183,7 +2183,7 @@ export const dshAppCaptainFixtureLocations: Phase12FixtureLocation[] = [
 		surface: 'app-captain',
 		phase: 'Phase 12',
 		mode: 'fixtures-only',
-		dataKind: 'UI_PREVIEW_ONLY',
+		dataKind: 'DEV_ONLY_FIXTURE',
 		timezoneSemantics: 'preview-only local display / not runtime UTC source',
 		location: 'dsh/frontend/app-captain/dsh_captain_execution_workspace/fixtures',
 		status: 'declared',
@@ -2194,7 +2194,7 @@ export const dshAppCaptainFixtureLocations: Phase12FixtureLocation[] = [
 		surface: 'app-captain',
 		phase: 'Phase 12',
 		mode: 'fixtures-only',
-		dataKind: 'UI_PREVIEW_ONLY',
+		dataKind: 'DEV_ONLY_FIXTURE',
 		timezoneSemantics: 'preview-only local display / not runtime UTC source',
 		location: 'dsh/frontend/app-captain/dsh_captain_proof_capture/fixtures',
 		status: 'declared',
@@ -2202,7 +2202,7 @@ export const dshAppCaptainFixtureLocations: Phase12FixtureLocation[] = [
 ];
 
 export const dshStoresPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

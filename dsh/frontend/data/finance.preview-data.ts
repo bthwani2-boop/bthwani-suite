@@ -1,6 +1,6 @@
 /**
  * WLT DSH Finance — Centralized Preview Data.
- * UI_PREVIEW_ONLY — not runtime truth, not API source, not a real ledger.
+ * DEV_ONLY — not runtime truth, not API source, not a real ledger.
  * WLT owns all financial artifacts. DSH displays only.
  * Centralised here per DSH preview data ownership rules.
  */

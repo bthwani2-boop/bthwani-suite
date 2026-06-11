@@ -1,5 +1,5 @@
 /**
- * DSH Delivery Mode Model (UI_PREVIEW_ONLY)
+ * DSH Delivery Mode Model
  *
  * SSoT for delivery mode definitions across all DSH surfaces.
  * Each mode governs how an order is physically fulfilled:

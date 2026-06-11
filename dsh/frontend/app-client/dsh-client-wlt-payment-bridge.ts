@@ -1,6 +1,6 @@
 /**
  * DSH Client ↔ WLT Payment Bridge
- * UI_PREVIEW_ONLY — CONTRACT_SCAFFOLD_PREVIEW_ONLY
+ * CONTRACT_SCAFFOLD — Not UI preview. This file is live runtime code.
  *
  * Maps client-side payment states to WLT intents for display purposes.
  * Defines the exact boundary between what DSH shows and what WLT owns.
@@ -9,12 +9,14 @@
  *   - DSH NEVER writes to WLT ledger, wallet, or payment systems.
  *   - DSH NEVER computes fees, commissions, refund amounts, or balances.
  *   - DSH displays WLT-provided values in read-only format only.
- *   - Every WLT intent here is CONTRACT_SCAFFOLD_PREVIEW_ONLY until runtime exists.
+ *   - contractState 'CONTRACT_SCAFFOLD_PREVIEW_ONLY' means the WLT backend
+ *     binding for this intent is scaffolded but not yet live-wired (J-010).
+ *     It does NOT mean this file is a UI preview or fixture.
  *
  * Consumers: DshClientSurface (checkout/tracking), dsh-client.navigation-bridge.ts
  */
 
-import type { DshClientState } from '../data/operational-statuses.preview-data';
+import type { DshClientState } from '../shared/client-state';
 import type { DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
 import type { DshSignalEventKind } from '../shared/dsh-signal-layer.model';
 

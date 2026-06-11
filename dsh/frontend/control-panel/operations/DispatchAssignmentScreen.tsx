@@ -98,6 +98,10 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   const urlOrderId = searchParams.get('orderId') ?? null;
   const [selectedRowId, setSelectedRowId] = React.useState<string | null>(null);
   const [runtimeLoaded, setRuntimeLoaded] = React.useState(false);
+  const [runtimeOffline, setRuntimeOffline] = React.useState(false);
+  const [runtimeError, setRuntimeError] = React.useState<string | null>(null);
+  const [retryCount, setRetryCount] = React.useState(0);
+  const retry = React.useCallback(() => setRetryCount((n) => n + 1), []);
 
   const [rows, setRows] = React.useState<DispatchRowState[]>(() =>
     DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.rows.map((row) => ({
@@ -112,13 +116,20 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
     let cancelled = false;
     fetchDshRuntimeOrders({ status: 'CREATED', limit: 100 }).then((result) => {
       if (cancelled) return;
-      if (result.kind === 'ok' && result.orders.length > 0) {
-        setRows(result.orders.map(buildRuntimeDispatchRow));
+      if (result.kind === 'ok') {
+        const isEmpty = result.orders.length === 0;
+        if (!isEmpty) setRows(result.orders.map(buildRuntimeDispatchRow));
         setRuntimeLoaded(true);
+        setRuntimeError(null);
+        setRuntimeOffline(false);
+      } else if (result.kind === 'offline') {
+        setRuntimeOffline(true);
+      } else {
+        setRuntimeError(result.message);
       }
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [retryCount]);
 
   React.useEffect(() => {
     if (urlOrderId) {

@@ -1,10 +1,10 @@
 /**
- * CENTRAL CATALOG ADAPTER — UI_PREVIEW_ONLY
+ * CENTRAL CATALOG ADAPTER — DEV_ONLY adapter (not UI preview mode)
  * Owner: dsh/frontend/shared (shared adapter layer)
  * Purpose: Map central data (dsh/frontend/data) to surface-specific view models.
  *
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API binding source.
- * Surfaces consume through this adapter only — they do NOT own identity.
+ * SCAFFOLD: not runtime truth, not backend/API binding source.
+ * Used as offline fallback when API unreachable. Surfaces consume through this adapter only — they do NOT own identity.
  *
  * Client app was the donor/reference for current correct preview data.
  * Central data owner: dsh/frontend/data/products.preview-data.ts
@@ -74,7 +74,7 @@ function resolvePublishStageOwnership(publishStage?: string): Pick<
  * Returned items use identity from central data.
  * Partner-local overrides (stock, price, availability) are seeded with sensible defaults.
  *
- * UI_PREVIEW_ONLY — not runtime truth.
+ * SCAFFOLD — not runtime truth.
  */
 export function buildCentralPartnerInventoryItems(
   storeItems: StoreItemsByStoreId = storeItemsByStoreId,

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * CatalogPublicationReadinessMatrix — UI_PREVIEW_ONLY
+ * CatalogPublicationReadinessMatrix — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * API boundary: GET /catalog/readiness/:storeId (not yet bound)
  */
@@ -272,7 +272,7 @@ export function CatalogPublicationReadinessMatrix({
           border: `1px solid ${theme.warning}30`,
           fontSize: 10, color: theme.textMuted, lineHeight: 1.5,
         }}>
-          <span style={{ fontWeight: 700, color: theme.warning }}>UI_PREVIEW_ONLY</span>
+          <span style={{ fontWeight: 700, color: theme.warning }}>ربط API قيد التنفيذ</span>
           {' '}· visibility mapping: shared resolver ·{' '}
           <span style={{ direction: 'ltr', display: 'inline-block' }}>GET /catalog/readiness — not yet bound</span>
         </div>
@@ -422,7 +422,7 @@ export function CatalogPublicationReadinessMatrix({
 
         {/* Footer note */}
         <div style={{ fontSize: 9, color: theme.textMuted, textAlign: 'center', paddingBottom: 4 }}>
-          UI_PREVIEW_ONLY · visibility via shared resolver · POST /catalog/publish — not yet bound
+          visibility via shared resolver · POST /catalog/publish — not yet bound
         </div>
       </div>
     </Surface>

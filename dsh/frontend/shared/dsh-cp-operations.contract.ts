@@ -1,5 +1,5 @@
 /**
- * UI_PREVIEW_ONLY: DSH Control Panel operations workspace shared types.
+ * SCAFFOLD: DSH Control Panel operations workspace shared types.
  * Moved here from dsh/frontend/control-panel/operations/operations.types to
  * correct the dependency direction: dsh/frontend/data must not import from
  * dsh/frontend/control-panel.
@@ -11,7 +11,7 @@
 import type { DshFulfillmentDeliveryMode } from './dsh-delivery-mode.model';
 
 export const dshCpOperationsContractMeta = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'SCAFFOLD_PENDING_BINDING',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

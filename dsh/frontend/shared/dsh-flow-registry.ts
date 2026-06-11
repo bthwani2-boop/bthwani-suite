@@ -822,7 +822,7 @@ export type DshFlowClosureEvidenceStatus =
   | 'blocked-by-wlt';
 
 export type DshFlowClosureRuntimeBindingStatus =
-  | 'UI_PREVIEW_ONLY'
+  | 'SCAFFOLD'
   | 'NEEDS_BINDING_LATER'
   | 'NEEDS_RUNTIME_EVIDENCE'
   | 'BLOCKED_BY_CONTRACT'
@@ -856,7 +856,7 @@ export const DSH_FLOW_CLOSURE_SUMMARY: readonly DshFlowClosureSummary[] = [
     primaryAction: 'Open a destination, store, or category from the discovery feed.',
     requiredStates: ['loading', 'empty', 'error', 'success', 'offline'],
     evidenceStatus: 'needs-visual-evidence',
-    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    runtimeBindingStatus: 'SCAFFOLD',
     remainingBlocker: 'Discovery/storefront logic is closed through the shared client-visibility gate; only screenshots and visual review are still missing.',
     crossSurfaceDependencies: ['control-panel marketing visibility', 'app-partner inventory readiness', 'shared marketing visibility contract'],
     wltBoundary: 'No WLT ownership in discovery.',
@@ -920,7 +920,7 @@ export const DSH_FLOW_CLOSURE_SUMMARY: readonly DshFlowClosureSummary[] = [
     primaryAction: 'Update item readiness and publishing visibility before client exposure.',
     requiredStates: ['loading', 'empty', 'error', 'success', 'offline'],
     evidenceStatus: 'needs-visual-evidence',
-    runtimeBindingStatus: 'UI_PREVIEW_ONLY',
+    runtimeBindingStatus: 'SCAFFOLD',
     remainingBlocker: 'Barcode, duplicate, publishing-gate, and client-visibility logic is wired; screenshots are still missing.',
     crossSurfaceDependencies: ['app-client storefront visibility', 'control-panel catalogs governance', 'control-panel marketing visibility'],
     wltBoundary: 'No WLT ownership in catalog readiness.',

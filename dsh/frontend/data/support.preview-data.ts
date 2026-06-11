@@ -1792,10 +1792,10 @@ export type DshNotificationFixture = {
 };
 
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source
  */
 export const dshNotificationsFixturesDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   timezoneSemantics: 'preview-only local display / not runtime UTC source',
@@ -1975,7 +1975,7 @@ export function selectDshControlPanelSupportPreview() {
 }
 
 // -----------------------------------------------------------------------------
-// Ops approval panel — order-linked support chat tickets (UI_PREVIEW_ONLY)
+// Ops approval panel — order-linked support chat tickets (DEV_ONLY)
 // Authority: control-panel/operations -> OpsOrderDetailPanel (approval queue).
 // attachmentRef: canonical ops proof ID — never a raw file path.
 // Moved from surface-level OpsOrderDetailPanel.tsx to canonical support data.
@@ -2007,7 +2007,7 @@ export type DshOpsApprovalChatTicket = {
 
 /**
  * Ops approval chat tickets keyed by orderId.
- * UI_PREVIEW_ONLY — fictional preview entries only.
+ * DEV_ONLY — fictional preview entries only.
  * Consumed by: OpsOrderDetailPanel (control-panel/operations).
  */
 export const DSH_OPS_APPROVAL_CHAT_TICKETS: Readonly<Record<string, DshOpsApprovalChatTicket>> = {

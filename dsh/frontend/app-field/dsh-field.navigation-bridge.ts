@@ -1,6 +1,7 @@
 /**
  * DSH Field Navigation Bridge
- * UI_PREVIEW_ONLY — CONTRACT_SCAFFOLD_PREVIEW_ONLY
+ * CONTRACT_SCAFFOLD — Not UI preview. This file is live runtime code.
+ * contractState 'CONTRACT_SCAFFOLD_PREVIEW_ONLY' means the WLT field-visit settlement binding is scaffolded (J-010).
  *
  * Maps field agent operational state to:
  *   - which route/screen the field surface should show

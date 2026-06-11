@@ -54,11 +54,11 @@ export const dshCartPreviewFallbackItemsFixture: CartItem[] = [
 // Partner orders preview
 // -----------------------------------------------------------------------------
 /**
- * UI_PREVIEW_ONLY: app-partner order alerts + conversation fixtures.
+ * DEV_ONLY: app-partner order alerts + conversation fixtures.
  * Merged from: partner-order-alert.preview-data.ts + partner-order-conversation.preview-data.ts
  */
 export const dshPartnerOrdersPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -558,10 +558,10 @@ export function getDshOrderRescueByContext(context: {
 // Control panel operations preview
 // -----------------------------------------------------------------------------
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const operationsPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -1262,7 +1262,7 @@ export function selectDshControlPanelOperationsPreview() {
 
 // -----------------------------------------------------------------------------
 // Control panel ops approval queue preview
-// UI_PREVIEW_ONLY — pending approval orders for the ops approval panel.
+// DEV_ONLY — pending approval orders for the ops approval panel.
 // Authority: control-panel/operations LiveOrdersScreen → OpsOrderDetailPanel.
 // No backend call, no claim of runtime truth, no mutation.
 // -----------------------------------------------------------------------------

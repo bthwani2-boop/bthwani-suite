@@ -935,7 +935,7 @@ function OperationsPanel({
         </Box>
 
         <Text role="caption" tone="muted" align="start">
-          UI_PREVIEW_ONLY · التنفيذ المحلي هنا. التسعير والتسويات مركزيًا في WLT/Finance.
+          التسعير والتسويات مركزيًا في WLT/Finance. (ربط WLT قيد التنفيذ — J-010)
         </Text>
       </Box>
 
@@ -1078,7 +1078,7 @@ function OperationsPanel({
             <Box layoutDirection="row" style={{ alignItems: 'center', gap: 6 }}>
               <Icon name="information-circle-outline" size={14} tone="muted" />
               <Text role="caption" tone="muted" align="start" style={{ flex: 1 }}>
-                UI_PREVIEW_ONLY · الأدوار والدعوات هنا محلية حتى يتصل Control Panel.
+                الأدوار والدعوات هنا محلية حتى يتصل مسار إدارة الأعضاء في Control Panel.
               </Text>
             </Box>
 
@@ -1180,7 +1180,7 @@ function OperationsPanel({
                 placeholder="مثال: staff@bthwani.sa"
                 value={inviteDraft}
                 onChangeText={setInviteDraft}
-                hint="UI_PREVIEW_ONLY · إنشاء دعوة محلية حتى يتصل مسار العضوية المركزي."
+                hint="إنشاء دعوة محلية — مسار العضوية المركزي قيد الربط (J-006)."
               />
               <Button
                 label="إضافة عضو"

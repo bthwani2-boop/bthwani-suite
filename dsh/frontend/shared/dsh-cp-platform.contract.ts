@@ -1,5 +1,5 @@
 /**
- * UI_PREVIEW_ONLY: DSH Control Panel platform workspace shared types.
+ * SCAFFOLD: DSH Control Panel platform workspace shared types.
  * These are preview-neutral contracts for the Appearance, Providers, Services,
  * and Vars workspaces inside dsh/frontend/control-panel/platform/.
  *
@@ -11,7 +11,7 @@
  */
 
 export const dshCpPlatformContractMeta = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'SCAFFOLD_PENDING_BINDING',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

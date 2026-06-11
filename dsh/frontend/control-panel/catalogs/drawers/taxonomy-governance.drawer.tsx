@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
 /**
- * CatalogTaxonomyGovernanceWorkspace — UI_PREVIEW_ONLY
+ * CatalogTaxonomyGovernanceWorkspace — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * API boundary: PATCH /catalog/categories (not yet bound)
  *
@@ -119,7 +119,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
 
       {/* Notice */}
       <WorkspacePreviewNotice
-        bannerTitle="UI_PREVIEW_ONLY — لا إضافة أو تعديل فعلي للفئات"
+        bannerTitle="لا إضافة أو تعديل فعلي للفئات"
         subtitle="كل الإجراءات هنا تُنتج طلب مقترح فقط. API boundary: PATCH /catalog/categories"
       />
 
@@ -308,7 +308,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
       )}
 
       <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'center' }}>
-        UI_PREVIEW_ONLY • لا تعديل فعلي للفئات • API boundary: PATCH /catalog/categories
+        لا تعديل فعلي للفئات • API boundary: PATCH /catalog/categories
       </Text>
     </Surface>
   );

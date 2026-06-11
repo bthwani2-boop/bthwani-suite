@@ -695,6 +695,75 @@ RETURNING id, item_id, action, note, operator_id, created_at`
 	return rec, nil
 }
 
+func (repo *PostgresRepository) ListAllProducts(ctx context.Context, approvalStatus string, limit int, offset int) (domain.ListProductsResponse, error) {
+	where := []string{}
+	args := []any{}
+
+	if approvalStatus != "" {
+		args = append(args, approvalStatus)
+		where = append(where, fmt.Sprintf("approval_status = $%d", len(args)))
+	}
+
+	whereClause := "1 = 1"
+	if len(where) > 0 {
+		whereClause = strings.Join(where, " AND ")
+	}
+
+	countQuery := fmt.Sprintf(`SELECT COUNT(*) FROM dsh_catalog_products WHERE %s`, whereClause)
+	var total int
+	if err := repo.db.QueryRowContext(ctx, countQuery, args...).Scan(&total); err != nil {
+		return domain.ListProductsResponse{}, err
+	}
+
+	args = append(args, limit)
+	limitPlaceholder := len(args)
+	args = append(args, offset)
+	offsetPlaceholder := len(args)
+
+	query := fmt.Sprintf(`
+SELECT p.id, p.store_id, p.name, p.sku, p.gtin, p.barcode, p.description, p.base_price_label, p.base_price_minor_units, p.category_id, p.approval_status, p.created_at, p.updated_at,
+       o.price_override, o.price_override_minor_units, o.stock_override, o.available_override
+FROM dsh_catalog_products p
+LEFT JOIN dsh_catalog_overrides o ON p.store_id = o.store_id AND p.id = o.product_id
+WHERE %s
+ORDER BY p.created_at DESC
+LIMIT $%d OFFSET $%d`, whereClause, limitPlaceholder, offsetPlaceholder)
+
+	rows, err := repo.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return domain.ListProductsResponse{}, err
+	}
+	defer rows.Close()
+
+	products := []domain.ProductRecord{}
+	productIDs := []string{}
+	for rows.Next() {
+		record, err := scanProductRowColumnsWithOverrides(rows)
+		if err != nil {
+			return domain.ListProductsResponse{}, err
+		}
+		products = append(products, record)
+		productIDs = append(productIDs, record.ID)
+	}
+	if err := rows.Err(); err != nil {
+		return domain.ListProductsResponse{}, err
+	}
+	if mediaByProductID, err := repo.listProductMediaByProductIDs(ctx, productIDs); err == nil {
+		for i := range products {
+			products[i].Media = mediaByProductID[products[i].ID]
+		}
+	}
+
+	return domain.ListProductsResponse{
+		Products: products,
+		Pagination: domain.Pagination{
+			Limit:  limit,
+			Offset: offset,
+			Total:  total,
+		},
+	}, nil
+}
+
 func (repo *PostgresRepository) ListConflicts(ctx context.Context, storeID string, status string, limit int, offset int) (domain.ListConflictsResponse, error) {
 	where := []string{"1 = 1"}
 	args := []any{}

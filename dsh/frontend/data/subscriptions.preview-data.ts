@@ -6,10 +6,10 @@ import { mapLoyaltyProgramToClientBenefits, mapSubscriptionPlansToClientCards, t
 // Semantic color tokens — stored as token strings; resolution happens at adapter/render boundary only.
 
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const loyaltyStoreDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -204,13 +204,13 @@ export function getRedemptionRules(): RedemptionRule[] {
 // Client subscription adapters
 // -----------------------------------------------------------------------------
 /**
- * UI_PREVIEW_ONLY — commercial subscriptions + loyalty consumer adapter.
+ * DEV_ONLY — commercial subscriptions + loyalty consumer adapter.
  * Merged from: loyalty-commercial.preview-data.ts + subscriptions-commercial.preview-data.ts
  * Derives display fixtures from shared stores; NOT a source of truth.
  */
 
 export const dshSubscriptionsPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

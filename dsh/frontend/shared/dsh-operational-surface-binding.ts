@@ -57,7 +57,7 @@ function binding(
 ): DshOperationalScreenBinding {
   return {
     ...record,
-    dataClassification: 'UI_PREVIEW_ONLY',
+    dataClassification: 'SCAFFOLD',
     runtimeBindingStatus: 'metadata-bound',
     visualEvidenceRequired: true,
   };

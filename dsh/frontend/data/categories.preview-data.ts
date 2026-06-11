@@ -1,7 +1,7 @@
 /**
  * CENTRAL DSH DOMAIN PREVIEW DATA — SINGLE SOURCE OF TRUTH
  * Owner: dsh/frontend/data (central DSH domain preview data owner)
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source
  *
  * Domain: categories, subcategories, category icons
  * Used by: app-client (via surface adapter), control-panel/marketing
@@ -35,7 +35,7 @@ export type DshCategoryFixture = {
 };
 
 export const dshCategoriesFixturesDataContract = {
-	dataKind: 'UI_PREVIEW_ONLY',
+	dataKind: 'DEV_ONLY_FIXTURE',
 	runtimeTruth: false,
 	backendSource: false,
 	bindingSource: false,

@@ -1,4 +1,4 @@
-﻿// UI_PREVIEW_ONLY — no backend/API/DB binding.
+// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Detail view for a single catalog product — identity, approval stage,
 //   client visibility gate, linked surfaces summary, and action result banner.
@@ -107,14 +107,14 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
   const isClientVisible = product.approvalStage === 'client-visible';
 
   function handleRequestFix() {
-    setActionResult({ type: 'info', message: 'UI_PREVIEW_ONLY — طلب التعديل سُجّل محلياً. الإجراء الفعلي يتطلب ربط API.' });
+    setActionResult({ type: 'info', message: 'طلب التعديل سُجّل محلياً. الإجراء الفعلي يتطلب ربط API.' });
   }
   function handleSendToMarketing() {
     if (product.mediaPolicy !== 'marketing-enhancement-required' && product.mediaPolicy !== 'partner-proposed-review') {
       setActionResult({ type: 'blocked', message: `محظور — سياسة الوسائط الحالية (${mediaPolicyLabel[product.mediaPolicy] || product.mediaPolicy}) لا تستلزم التحويل للتسويق.` });
       return;
     }
-    setActionResult({ type: 'success', message: 'UI_PREVIEW_ONLY — تم تحويل المنتج لمراجعة التسويق (محاكاة محلية).' });
+    setActionResult({ type: 'success', message: 'تم تحويل المنتج لمراجعة التسويق (محاكاة محلية).' });
   }
 
   return (
@@ -135,7 +135,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
       {/* Header */}
       <WebCompactSurfaceHeader
         title={product.name}
-        subtitle="تفاصيل عنصر الكتالوج — UI_PREVIEW_ONLY"
+        subtitle="تفاصيل عنصر الكتالوج"
         onBack={onClose}
       />
 
@@ -233,7 +233,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
         <Box gap={2} style={{ backgroundColor: theme.surfaceInset, borderRadius: 8, padding: 12 }}>
           <SectionTitle>ملخص سجل التدقيق</SectionTitle>
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
-            UI_PREVIEW_ONLY — سجل التدقيق الفعلي يُربط من audit trail API.
+            سجل التدقيق الفعلي يُربط من audit trail API.
           </Text>
           <InfoRow label="المصدر" value={product.sourceSurface} />
           <InfoRow label="المالك الحالي" value="control-panel/catalogs" />
@@ -282,7 +282,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
             />
           </Box>
           <Text role="caption" tone="muted" style={{ fontSize: 10, marginTop: 4 }}>
-            جميع الإجراءات محاكاة محلية — UI_PREVIEW_ONLY
+            جميع الإجراءات محاكاة محلية — الربط قيد التنفيذ
           </Text>
         </Box>
 

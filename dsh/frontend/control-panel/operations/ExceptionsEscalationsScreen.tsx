@@ -229,21 +229,31 @@ type ExceptionsStateItem = {
   const [activeForm, setActiveForm] = React.useState<null | 'escalate' | 'resolve'>(null);
   const [actionStatus, setActionStatus] = React.useState<'idle' | 'pending' | 'success'>('idle');
   const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
+  const [retryCount, setRetryCount] = React.useState(0);
+  const retry = React.useCallback(() => setRetryCount((n) => n + 1), []);
   const [runtimeExcState, setRuntimeExcState] = React.useState<{
     orders: readonly DshRuntimeOrderRow[];
     loaded: boolean;
-  }>({ orders: [], loaded: false });
+    error: string | null;
+    offline: boolean;
+  }>({ orders: [], loaded: false, error: null, offline: false });
 
   React.useEffect(() => {
     let cancelled = false;
     fetchDshRuntimeOrders({ status: 'FAILED_DELIVERY', limit: 50 }).then((result) => {
       if (cancelled) return;
       if (result.kind === 'ok') {
-        setRuntimeExcState({ orders: result.orders, loaded: true });
+        setRuntimeExcState({ orders: result.orders, loaded: true, error: null, offline: false });
+      } else if (result.kind === 'offline') {
+        setRuntimeExcState({ orders: [], loaded: false, error: null, offline: true });
+      } else {
+        setRuntimeExcState({ orders: [], loaded: false, error: result.message, offline: false });
       }
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [retryCount]);
+
+  const isEmpty = runtimeExcState.loaded && runtimeExcState.orders.length === 0;
 
   // Form input states
   const [selectedEscalationQueue, setSelectedEscalationQueue] = React.useState('customer-support');

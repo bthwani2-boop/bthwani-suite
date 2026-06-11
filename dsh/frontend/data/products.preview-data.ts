@@ -39,7 +39,7 @@ export {
 /**
  * CENTRAL DSH DOMAIN PREVIEW DATA — SINGLE SOURCE OF TRUTH
  * Owner: dsh/frontend/data (central DSH domain preview data owner)
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source
  *
  * Domain: store items / products (by storeId, with publish stages)
  * Used by: app-client (via surface adapter), control-panel/marketing
@@ -47,7 +47,7 @@ export {
 
 
 export const itemsFixturesDataContract = {
-	dataKind: 'UI_PREVIEW_ONLY',
+	dataKind: 'DEV_ONLY_FIXTURE',
 	runtimeTruth: false,
 	backendSource: false,
 	bindingSource: false,

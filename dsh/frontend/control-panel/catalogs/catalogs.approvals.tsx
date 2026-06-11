@@ -92,7 +92,42 @@ export function ItemApprovalScreen({
   const { theme } = useTheme();
   const client = React.useMemo(() => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()), []);
 
-  // Connect to the shared global store if no props are provided
+  // Live products fetched from GET /products?approval_status=...
+  // Falls back to workflow store records when API is unreachable.
+  const [liveProducts, setLiveProducts] = React.useState<CatalogItemApprovalRecord[] | null>(null);
+
+  React.useEffect(() => {
+    const baseUrl = resolveDshProductApiBaseUrl();
+    if (!baseUrl) return;
+    let cancelled = false;
+    client.listAllProducts({ limit: 100 })
+      .then((resp) => {
+        if (cancelled) return;
+        const mapped = resp.products.map((p): CatalogItemApprovalRecord => {
+          let status: ItemApprovalStatus = 'pending';
+          if (p.approval_status === 'needs_fix') status = 'needs-revision';
+          else if (p.approval_status === 'rejected') status = 'rejected';
+          else if (['partner_approved', 'marketing_approved', 'catalog_adopted', 'client_visible'].includes(p.approval_status)) {
+            status = 'approved';
+          }
+          return {
+            id: p.id,
+            displayCaption: p.name,
+            partnerLabel: 'تطبيق الشريك',
+            category: 'منتج كتالوج',
+            submittedAt: p.created_at ? p.created_at.split('T')[0] : '',
+            status,
+            approvalStatus: p.approval_status as import('../../shared/dsh-product-identity.model').DshProductIdentityApprovalStatus,
+            auditRequired: false,
+          };
+        });
+        setLiveProducts(mapped);
+      })
+      .catch(() => { /* fallback to workflow records */ });
+    return () => { cancelled = true; };
+  }, [client]);
+
+  // Workflow store — populated by in-session product submissions (fallback when API unreachable)
   const [records, setRecords] = React.useState<ApprovalRecord[]>([]);
   const refresh = React.useCallback(() => {
     setRecords(getAllApprovalRecords());
@@ -105,7 +140,18 @@ export function ItemApprovalScreen({
   const items = React.useMemo(() => {
     if (propsItems) return propsItems;
 
-    // Filter records from the shared workflow SSoT based on sub-tab
+    // Prefer live API products when available
+    if (liveProducts !== null) {
+      if (activeSubTab === 'quality') {
+        return liveProducts.filter((p) => p.approvalStatus === 'partner_submitted' || p.approvalStatus === 'partner_review' || p.approvalStatus === 'field_draft');
+      }
+      if (activeSubTab === 'marketing') {
+        return liveProducts.filter((p) => p.approvalStatus === 'marketing_review' || p.approvalStatus === 'marketing_approved');
+      }
+      return liveProducts;
+    }
+
+    // Fallback: workflow store records
     let filteredRecords = records.filter(
       (r) => r.entityType === 'product' || r.entityType === 'product-media' || r.entityType === 'category-suggestion'
     );
@@ -150,7 +196,7 @@ export function ItemApprovalScreen({
         auditRequired: false,
       } satisfies CatalogItemApprovalRecord;
     });
-  }, [records, propsItems, activeSubTab]);
+  }, [liveProducts, records, propsItems, activeSubTab]);
 
   const [crossSurfaceNotification, setCrossSurfaceNotification] = React.useState<{
     itemCaption: string;
@@ -331,7 +377,7 @@ export function ItemApprovalScreen({
               الوجهة: <strong>{crossSurfaceNotification.targetSurface}</strong>
             </div>
             <div style={{ fontSize: 9, color: theme.textMuted, direction: 'ltr', textAlign: 'right', marginTop: 2 }}>
-              {crossSurfaceNotification.apiBoundary} — UI_PREVIEW_ONLY
+              {crossSurfaceNotification.apiBoundary}
             </div>
           </div>
           <button

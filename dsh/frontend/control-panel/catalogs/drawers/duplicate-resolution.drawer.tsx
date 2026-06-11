@@ -1,4 +1,4 @@
-﻿// UI_PREVIEW_ONLY — no backend/API/DB binding.
+// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Duplicate resolution workspace — pair-by-pair comparison, merge preview,
 //   keep canonical, reject duplicate, send to review.
@@ -37,7 +37,7 @@ function toActionResult(res: PairResolution | null): ActionResult {
   if (!res) return null;
   switch (res.decision) {
     case 'keep-canonical': return { type: 'success', message: '✓ تم الاحتفاظ بالنسخة الأصلية (محاكاة محلية)' };
-    case 'merge-preview': return { type: 'success', message: '✓ معاينة الدمج جاهزة (محلية فقط — UI_PREVIEW_ONLY)' };
+    case 'merge-preview': return { type: 'success', message: '✓ معاينة الدمج جاهزة (محاكاة محلية)' };
     case 'rejected': return { type: 'blocked', message: `✓ تم رفض التكرار (محاكاة محلية) · ملاحظة: ${res.auditNote}` };
     case 'sent-to-review': return { type: 'success', message: '✓ تم الإرسال للمراجعة (محاكاة محلية)' };
   }
@@ -189,7 +189,7 @@ export function CatalogDuplicateResolutionWorkspace({
         resolution: null,
       });
       // Use a transient message approach via a flag
-      globalThis.alert('ملاحظة التدقيق مطلوبة (10 أحرف على الأقل) — UI_PREVIEW_ONLY');
+      globalThis.alert('ملاحظة التدقيق مطلوبة (10 أحرف على الأقل)');
       return;
     }
     updatePairState(pair, {
@@ -224,7 +224,7 @@ export function CatalogDuplicateResolutionWorkspace({
     >
       <WebCompactSurfaceHeader
         title="حل التكرارات"
-        subtitle="UI_PREVIEW_ONLY · المالك: control-panel/catalogs"
+        subtitle="المالك: control-panel/catalogs"
         onBack={onClose}
       />
 
@@ -363,7 +363,7 @@ export function CatalogDuplicateResolutionWorkspace({
         })}
 
         <Text role="caption" tone="muted" style={{ fontSize: 10, marginTop: 4 }}>
-          UI_PREVIEW_ONLY — جميع القرارات محاكاة محلية. لا mutation خارج الحالة المحلية.
+          جميع القرارات محاكاة محلية. الإجراء الفعلي يتطلب ربط API.
         </Text>
 
         <Button label="إغلاق" tone="ghost" size="sm" onPress={onClose} style={{ marginTop: 8 }} />

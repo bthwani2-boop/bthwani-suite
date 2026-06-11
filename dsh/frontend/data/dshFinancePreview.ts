@@ -1,6 +1,6 @@
 /**
  * WLT DSH Finance Preview — centralized preview data and accessor functions.
- * UI_PREVIEW_ONLY — not runtime, not accounting truth, not real settlements.
+ * DEV_ONLY — not runtime, not accounting truth, not real settlements.
  * WLT owns all financial artifacts. DSH displays only.
  * Centralised here per DSH preview data ownership rules.
  */
@@ -212,17 +212,17 @@ export function getWltDshStoreDeliveryFinancePreview() {
 // ─── Commission breakdown ──────────────────────────────────────────
 
 export function getWltDshOrderCommissionBreakdown(mode: WltDshFulfillmentMode): WltDshOrderCommissionBreakdown {
-  const base = { fulfillmentMode: mode, commissionRatePreview: 'UI_PREVIEW_ONLY' as const, isPreview: true as const };
-  if (mode === 'bthwani_delivery') return { ...base, fulfillmentModeLabel: 'توصيل بثواني', deliveryFee: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' }, platformCommission: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' }, captainPayout: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' }, partnerCourierCost: { applies: false, reason: 'لا ينطبق — كابتن بثواني هو المسؤول' }, partnerNet: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' } };
-  if (mode === 'partner_delivery') return { ...base, fulfillmentModeLabel: 'توصيل المتجر', deliveryFee: { applies: true, label: 'UI_PREVIEW_ONLY — حسب سياسة المتجر' }, platformCommission: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' }, captainPayout: { applies: false, reason: 'لا ينطبق — لا كابتن في توصيل المتجر' }, partnerCourierCost: { applies: true, label: 'UI_PREVIEW_ONLY — حسب اتفاق المتجر' }, partnerNet: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' } };
-  return { ...base, fulfillmentModeLabel: 'استلام بنفسي', deliveryFee: { applies: false, reason: 'لا رسوم توصيل — العميل يستلم بنفسه' }, platformCommission: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' }, captainPayout: { applies: false, reason: 'لا ينطبق — لا كابتن في الاستلام الذاتي' }, partnerCourierCost: { applies: false, reason: 'لا ينطبق — لا موصل في الاستلام الذاتي' }, partnerNet: { applies: true, label: 'UI_PREVIEW_ONLY — WLT' } };
+  const base = { fulfillmentMode: mode, commissionRatePreview: 'RATE_NOT_SET' as const, isPreview: true as const };
+  if (mode === 'bthwani_delivery') return { ...base, fulfillmentModeLabel: 'توصيل بثواني', deliveryFee: { applies: true, label: 'WLT' }, platformCommission: { applies: true, label: 'WLT' }, captainPayout: { applies: true, label: 'WLT' }, partnerCourierCost: { applies: false, reason: 'لا ينطبق — كابتن بثواني هو المسؤول' }, partnerNet: { applies: true, label: 'WLT' } };
+  if (mode === 'partner_delivery') return { ...base, fulfillmentModeLabel: 'توصيل المتجر', deliveryFee: { applies: true, label: 'حسب سياسة المتجر' }, platformCommission: { applies: true, label: 'WLT' }, captainPayout: { applies: false, reason: 'لا ينطبق — لا كابتن في توصيل المتجر' }, partnerCourierCost: { applies: true, label: 'حسب اتفاق المتجر' }, partnerNet: { applies: true, label: 'WLT' } };
+  return { ...base, fulfillmentModeLabel: 'استلام بنفسي', deliveryFee: { applies: false, reason: 'لا رسوم توصيل — العميل يستلم بنفسه' }, platformCommission: { applies: true, label: 'WLT' }, captainPayout: { applies: false, reason: 'لا ينطبق — لا كابتن في الاستلام الذاتي' }, partnerCourierCost: { applies: false, reason: 'لا ينطبق — لا موصل في الاستلام الذاتي' }, partnerNet: { applies: true, label: 'WLT' } };
 }
 
 export const WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW: readonly WltDshPartnerModeRatePreview[] = [
-  { partnerId: 'partner-saha', storeLabel: 'محمصة الساحة', rates: { bthwani_delivery: 'UI_PREVIEW_ONLY', partner_delivery: 'UI_PREVIEW_ONLY', pickup: 'UI_PREVIEW_ONLY' }, isPreview: true },
-  { partnerId: 'partner-shorouq', storeLabel: 'بوفيه الشروق', rates: { bthwani_delivery: 'UI_PREVIEW_ONLY', partner_delivery: 'UI_PREVIEW_ONLY', pickup: 'UI_PREVIEW_ONLY' }, isPreview: true },
-  { partnerId: 'partner-zawya', storeLabel: 'مخبز الزاوية', rates: { bthwani_delivery: 'UI_PREVIEW_ONLY', partner_delivery: 'UI_PREVIEW_ONLY', pickup: 'UI_PREVIEW_ONLY' }, isPreview: true },
-  { partnerId: 'partner-nokhba', storeLabel: 'تمور النخبة', rates: { bthwani_delivery: 'UI_PREVIEW_ONLY', partner_delivery: 'UI_PREVIEW_ONLY', pickup: 'UI_PREVIEW_ONLY' }, isPreview: true },
+  { partnerId: 'partner-saha', storeLabel: 'محمصة الساحة', rates: { bthwani_delivery: 'RATE_NOT_SET', partner_delivery: 'RATE_NOT_SET', pickup: 'RATE_NOT_SET' }, isPreview: true },
+  { partnerId: 'partner-shorouq', storeLabel: 'بوفيه الشروق', rates: { bthwani_delivery: 'RATE_NOT_SET', partner_delivery: 'RATE_NOT_SET', pickup: 'RATE_NOT_SET' }, isPreview: true },
+  { partnerId: 'partner-zawya', storeLabel: 'مخبز الزاوية', rates: { bthwani_delivery: 'RATE_NOT_SET', partner_delivery: 'RATE_NOT_SET', pickup: 'RATE_NOT_SET' }, isPreview: true },
+  { partnerId: 'partner-nokhba', storeLabel: 'تمور النخبة', rates: { bthwani_delivery: 'RATE_NOT_SET', partner_delivery: 'RATE_NOT_SET', pickup: 'RATE_NOT_SET' }, isPreview: true },
 ];
 
 // re-export formatter and ownership constants for convenience

@@ -1,5 +1,5 @@
 /**
- * PartnerCatalogReadinessPanel — UI_PREVIEW_ONLY
+ * PartnerCatalogReadinessPanel — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: app-partner surface
  * API boundary: GET /partner/:id/catalog-readiness (not yet bound)
  *
@@ -160,7 +160,7 @@ export function PartnerCatalogReadinessPanel({
             🚦 جاهزية الكتالوج
           </Text>
           <Text role="caption" tone="muted" style={{ fontSize: typographyRoles.overline.fontSize }}>
-            UI_PREVIEW_ONLY — API boundary: GET /partner/catalog-readiness
+            ربط API قيد التنفيذ — GET /partner/catalog-readiness
           </Text>
         </Box>
         {onClose && (

@@ -4,7 +4,7 @@ export {
 } from '../shared/dsh-delivery-mode.model';
 
 export const dshDeliveryModesPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

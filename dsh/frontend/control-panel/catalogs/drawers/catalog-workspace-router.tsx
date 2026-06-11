@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * CatalogWorkspaceRouter — UI_PREVIEW_ONLY
+ * CatalogWorkspaceRouter — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * router-ready: renders the correct workspace overlay given CatalogWorkspaceState.
  *
@@ -48,7 +48,7 @@ export type CatalogWorkspaceRouterProps = {
 };
 
 // ── Visibility mapping via shared adapter ─────────────────────────────────────
-// UI_PREVIEW_ONLY: maps approvalStage to partner activation status for preview.
+// SCAFFOLD: maps approvalStage to partner activation status for preview.
 // router-ready: real status will come from dsh-client-visibility.model.ts resolver.
 
 function approvalStageToActivationStatus(stage: string) {

@@ -1,13 +1,13 @@
 /**
- * UI_PREVIEW_ONLY canonical preview data graph.
+ * DEV_ONLY canonical preview data graph.
  * Owner: dsh/frontend/data
  * Runtime/API/backend truth: false.
  */
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const partnerOfferStoreDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

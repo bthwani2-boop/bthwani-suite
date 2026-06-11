@@ -221,7 +221,7 @@ function ControlPanelDshPartnerDeactivationTab() {
             title="إجراءات إلغاء التفعيل"
             reason={actionMessage}
             confidence="high"
-            auditTag="UI_PREVIEW_ONLY"
+            auditTag="NEEDS_BINDING_LATER"
           />
         </Box>
       </div>

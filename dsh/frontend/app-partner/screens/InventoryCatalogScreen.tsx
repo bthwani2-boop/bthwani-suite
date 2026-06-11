@@ -1,20 +1,16 @@
 /**
  * InventoryCatalogScreen — Partner Surface
  *
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API binding source.
- * Owner: app-partner surface (local state/overrides only)
- *
- * Catalog identity (name, mediaKey, categoryLabel, publishStage) comes from:
- *   central data: dsh/frontend/data/products.preview-data.ts
- *   via adapter:  dsh/frontend/shared/catalog-central-adapter.ts
+ * Runtime truth: GET /stores/{store_id}/products via dsh-product-api.client.ts.
+ * Falls back to workflow store (in-session submitted products) when API unreachable.
  *
  * Partner surface owns ONLY: stock, availability, preparationNote, internalNote, price override.
- * Surfaces must not define product identity independently.
+ * Catalog identity (name, category, publishStage) comes from the DSH backend — partners do not define it locally.
  */
 import React from 'react';
 import type { DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
 import { createDshMediaApiHttpClient } from '../../shared/dsh-media-api.client';
-import { resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
+import { resolveDshProductApiBaseUrl, createDshProductApiHttpClient } from '../../shared/dsh-product-api.transport';
 import {
   type DshCatalogDomainId,
   type DshCatalogMainCategoryId,
@@ -255,6 +251,19 @@ const canonicalPreviewListItems: readonly InventoryCatalogListItem[] = [];
 
 const centralInventoryItems: readonly InventoryCatalogListItem[] = [];
 
+function mapApiStatusToPublishStage(approvalStatus: string): string {
+  switch (approvalStatus) {
+    case 'client_visible': return 'client-visible';
+    case 'catalog_adopted': return 'catalog-adopted';
+    case 'marketing_review': return 'marketing-review';
+    case 'partner_review': return 'partner-review';
+    case 'partner_submitted': return 'partner-submitted';
+    case 'rejected': return 'rejected';
+    case 'needs_fix': return 'needs-fix';
+    default: return approvalStatus;
+  }
+}
+
 function dedupeItems(items: ReadonlyArray<InventoryCatalogListItem>) {
   const seen = new Set<string>();
   return items.filter((item) => {
@@ -395,6 +404,8 @@ function StoreReadinessGate({ storeId }: { storeId: string }) {
     status: 'ready',
   });
 
+  const retry = React.useCallback(() => setGate({ kind: 'idle', status: 'ready' }), []);
+
   const handleToggle = React.useCallback(
     async (nextStatus: PartnerReadinessStatus) => {
       const baseUrl = resolveDshStoreVisibilityBaseUrl();
@@ -442,9 +453,12 @@ function StoreReadinessGate({ storeId }: { storeId: string }) {
               {gate.clientVisible ? 'true' : 'false'}
             </Text>
           ) : gate.kind === 'error' ? (
-            <Text role="caption" tone="danger" align={direction === 'rtl' ? 'end' : 'start'}>
-              {gate.message}
-            </Text>
+            <Box style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+              <Text role="caption" tone="danger" align={direction === 'rtl' ? 'end' : 'start'}>
+                {gate.message}
+              </Text>
+              <Button label="إعادة المحاولة" tone="secondary" size="sm" onPress={retry} />
+            </Box>
           ) : gate.kind === 'loading' ? (
             <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
               جاري التحديث...
@@ -1174,6 +1188,36 @@ function InventoryCatalogContent({
   const [items, setItems] = React.useState<InventoryCatalogListItem[]>(() =>
     buildListItems(canonicalStoreId),
   );
+
+  // Fetch live products from GET /stores/{store_id}/products
+  React.useEffect(() => {
+    const baseUrl = resolveDshProductApiBaseUrl();
+    if (!baseUrl || !canonicalStoreId) return;
+    let cancelled = false;
+    const apiClient = createDshProductApiHttpClient(baseUrl);
+    apiClient.listProducts(canonicalStoreId, { limit: 100 })
+      .then((resp) => {
+        if (cancelled || !resp.products.length) return;
+        const liveItems = resp.products.map((p): InventoryCatalogListItem => ({
+          id: p.id,
+          name: p.name,
+          categoryLabel: p.category_id ?? 'بدون فئة',
+          isPrivateStoreProduct: false,
+          isCatalogOwned: p.approval_status === 'catalog_adopted' || p.approval_status === 'client_visible',
+          catalogLinked: true,
+          priceLabel: p.base_price_label || '0.00 ر.ي',
+          stockCount: p.stock_override ?? 0,
+          available: p.available_override ?? true,
+          lowStock: (p.stock_override ?? 0) <= 3,
+          publishStage: mapApiStatusToPublishStage(p.approval_status),
+          reviewNeeded: !['catalog_adopted', 'client_visible'].includes(p.approval_status),
+        }));
+        setItems(liveItems);
+      })
+      .catch(() => { /* keep preview items on error */ });
+    return () => { cancelled = true; };
+  }, [canonicalStoreId]);
+
   const [expandedEditId, setExpandedEditId] = React.useState<string | null>(null);
   const [expandedDetailsId, setExpandedDetailsId] = React.useState<string | null>(null);
   const [overrides, setOverrides] = React.useState<Record<string, PartnerLocalOverride>>({});

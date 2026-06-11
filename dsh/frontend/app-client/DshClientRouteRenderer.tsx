@@ -22,6 +22,7 @@ import { DshStoreGetScreen, type DshStoreGetScreenProps } from './screens/StoreS
 import { DshStoreItemsScreen } from './screens/StoreItemsScreen';
 import { DshCartGetScreen } from './screens/CartScreen';
 import { DshCheckoutIntentScreen } from './screens/DshCheckoutIntentScreen';
+import { DshCheckoutFailureScreen, type DshCheckoutFailureReason } from './screens/DshCheckoutFailureScreen';
 import { DshConversationHubScreen } from './screens/DshConversationHubScreen';
 import { DshOrderIssueHubScreen } from './screens/DshOrderIssueHubScreen';
 import { DshProxyHubScreen } from './screens/DshProxyHubScreen';
@@ -143,6 +144,7 @@ type DshClientRouteRendererProps = {
   renderApprovedVideoReelsViewer: ((props: any) => React.ReactNode) | undefined;
   setHomeRetryToken: React.Dispatch<React.SetStateAction<number>>;
   openSupportFlow: () => void;
+  bellSignalEvents: readonly import('../shared/dsh-signal-layer.model').DshSignalSummary[];
 };
 
 export function DshClientRouteRenderer({
@@ -232,6 +234,7 @@ export function DshClientRouteRenderer({
   renderApprovedVideoReelsViewer,
   setHomeRetryToken,
   openSupportFlow,
+  bellSignalEvents,
 }: DshClientRouteRendererProps) {
   // Sanity check
   const importedScreens: Array<[string, unknown]> = [
@@ -303,6 +306,21 @@ export function DshClientRouteRenderer({
         onSelectPaymentMethod={(id) => setSelectedPaymentMethod(id)}
         onChangeAddress={() => setRoute('addresses-location')}
         onRetry={() => setCheckoutState('ready')}
+      />
+    );
+  }
+
+  if (route === 'checkout-failure') {
+    const failureReason: DshCheckoutFailureReason =
+      (checkoutAuth as unknown as { failureReason?: DshCheckoutFailureReason })?.failureReason ?? 'unknown';
+    return (
+      <DshCheckoutFailureScreen
+        state="error"
+        failureReason={failureReason}
+        cartPreserved
+        onRetry={() => { setCheckoutState('ready'); setRoute('checkout-intent'); }}
+        onCancel={() => setRoute('cart-get')}
+        onContactSupport={() => setRoute('conversation-workspace')}
       />
     );
   }
@@ -409,6 +427,24 @@ export function DshClientRouteRenderer({
     const cartClientState = cartItems.length > 0 ? hostClientStates.cartReady : hostClientStates.cartEmpty;
     const cartClientStateMeta = getDshClientStateMeta(cartClientState);
 
+    const handleCartOrderPayload = async (payload: Parameters<NonNullable<React.ComponentProps<typeof DshCartGetScreen>['onOpenOrder']>>[0]) => {
+      if (payload) {
+        setSelectedPaymentMethod(payload.paymentMethod);
+        setCreateOrderValues((current) => ({
+          ...current,
+          fulfillmentMode: payload.orderDraft.fulfillmentMode,
+          pickupAddress: payload.orderDraft.pickupAddress,
+          dropoffAddress: payload.orderDraft.dropoffAddress,
+          note: payload.orderDraft.note ?? current.note,
+        }));
+        handleConfirmedOrderExecution({
+          fulfillmentMode: payload.fulfillmentMode,
+          orderDraft: payload.orderDraft,
+          wltPaymentRefId: payload.wltPaymentRefId,
+        });
+      }
+    };
+
     return (
       <DshCartGetScreen
         clientState={cartClientState}
@@ -438,40 +474,8 @@ export function DshClientRouteRenderer({
         bearerToken={checkoutAuth.bearerToken}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
-        onOpenOrder={async (payload) => {
-          if (payload) {
-            setSelectedPaymentMethod(payload.paymentMethod);
-            setCreateOrderValues((current) => ({
-              ...current,
-              fulfillmentMode: payload.orderDraft.fulfillmentMode,
-              pickupAddress: payload.orderDraft.pickupAddress,
-              dropoffAddress: payload.orderDraft.dropoffAddress,
-              note: payload.orderDraft.note ?? current.note,
-            }));
-            handleConfirmedOrderExecution({
-              fulfillmentMode: payload.fulfillmentMode,
-              orderDraft: payload.orderDraft,
-              wltPaymentRefId: payload.wltPaymentRefId,
-            });
-          }
-        }}
-        onContinue={async (payload) => {
-          if (payload) {
-            setSelectedPaymentMethod(payload.paymentMethod);
-            setCreateOrderValues((current) => ({
-              ...current,
-              fulfillmentMode: payload.orderDraft.fulfillmentMode,
-              pickupAddress: payload.orderDraft.pickupAddress,
-              dropoffAddress: payload.orderDraft.dropoffAddress,
-              note: payload.orderDraft.note ?? current.note,
-            }));
-            handleConfirmedOrderExecution({
-              fulfillmentMode: payload.fulfillmentMode,
-              orderDraft: payload.orderDraft,
-              wltPaymentRefId: payload.wltPaymentRefId,
-            });
-          }
-        }}
+        onOpenOrder={handleCartOrderPayload}
+        onContinue={handleCartOrderPayload}
         onRetry={() => setRoute('cart-get')}
       />
     );
@@ -644,6 +648,7 @@ export function DshClientRouteRenderer({
   if (route === 'bell') {
     return (
       <DshClientBellScreen
+        signalEvents={bellSignalEvents}
         onOpenTracking={reopenTracking}
         onOpenOrders={() => setRoute('orders-list')}
         onBack={reopenTracking}

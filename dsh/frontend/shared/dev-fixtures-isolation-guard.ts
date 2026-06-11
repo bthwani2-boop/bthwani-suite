@@ -72,6 +72,16 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
     classification: 'DEV_ALLOWED',
     reason: 'Category mediaKey fields are fixture references used only for category tile rendering. Not in order/payment/product upload flows.',
   },
+  {
+    file: 'dsh/frontend/app-client/hooks/useDshClientMarketingState.ts',
+    classification: 'DEV_ALLOWED',
+    reason: 'Imports getLiveMarketingGrowthItems/getPublishedMarketingHomePromos/getLiveMarketingVideoItems from marketing.preview-data. These drive home promos and shorts. Exit path: migrate to GET /marketing/promos and GET /marketing/shorts runtime endpoints.',
+  },
+  {
+    file: 'dsh/frontend/app-captain/dsh-captain.types.ts',
+    classification: 'DEV_ALLOWED',
+    reason: 'Re-exports operational status types from operational-statuses.preview-data. Type-only export — no runtime fixture values. Exit: move type definitions to a pure types file.',
+  },
 ];
 
 // ─── Allowed Import Contexts ──────────────────────────────────────────────────

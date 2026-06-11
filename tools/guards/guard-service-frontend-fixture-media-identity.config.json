@@ -482,7 +482,16 @@
     "dsh/frontend/app-field/storage/field-onboarding.storage.ts",
     "dsh/frontend/app-client/parts/home/HomePromoSection.tsx",
     "dsh/frontend/app-client/parts/store/StoreMenuListSection.tsx",
-    "dsh/frontend/shared/dsh-store-builders.ts"
+    "dsh/frontend/shared/dsh-store-builders.ts",
+    "dsh/frontend/shared/commercial.preview-contract.ts",
+    "dsh/frontend/shared/dsh-cp-administration.contract.ts",
+    "dsh/frontend/shared/dsh-field-visit.contract.ts",
+    "dsh/frontend/control-panel/operations/PartnerStoresScreen.tsx",
+    "dsh/frontend/data/subscriptions.preview-data.ts",
+    "dsh/frontend/shared/dsh-cp-operations.contract.ts",
+    "dsh/frontend/shared/dsh-cp-platform.contract.ts",
+    "dsh/frontend/shared/dsh-notifications-client.ts",
+    "dsh/frontend/shared/dsh-order-journey.model.ts"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

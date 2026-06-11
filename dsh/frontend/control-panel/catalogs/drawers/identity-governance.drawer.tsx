@@ -1,4 +1,4 @@
-﻿// UI_PREVIEW_ONLY — no backend/API/DB binding.
+// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: SKU / GTIN / Barcode governance workspace.
 //   Consolidates mapping/gtin and approvals/barcode subtabs into one operational workspace.
@@ -84,11 +84,11 @@ export function CatalogIdentityGovernanceWorkspace({
       setResult(item.id, { type: 'blocked', message: `محظور — يوجد تعارض بين GTIN (${item.gtin}) والباركود (${item.barcode}). حل التعارض أولًا.` });
       return;
     }
-    setResult(item.id, { type: 'success', message: `UI_PREVIEW_ONLY — تم اعتماد هوية "${item.name}" محلياً. الإجراء الفعلي يتطلب ربط API.` });
+    setResult(item.id, { type: 'success', message: `تم اعتماد هوية "${item.name}" محلياً. الإجراء الفعلي يتطلب ربط API.` });
   }
 
   function handleNeedsFix(item: Pick<CatalogProductMaster, 'id' | 'name'>) {
-    setResult(item.id, { type: 'info', message: `UI_PREVIEW_ONLY — تم تحديد "${item.name}" كـ needs-fix محلياً.` });
+    setResult(item.id, { type: 'info', message: `تم تحديد "${item.name}" كـ needs-fix محلياً.` });
   }
 
   function handleSendToMarketing(item: Pick<CatalogProductMaster, 'id' | 'name'>, state: IdentityState) {
@@ -96,7 +96,7 @@ export function CatalogIdentityGovernanceWorkspace({
       setResult(item.id, { type: 'blocked', message: `محظور — "${item.name}" لا يحتاج مراجعة تسويق في حالته الحالية.` });
       return;
     }
-    setResult(item.id, { type: 'success', message: `UI_PREVIEW_ONLY — تم إرسال "${item.name}" لمراجعة التسويق محلياً.` });
+    setResult(item.id, { type: 'success', message: `تم إرسال "${item.name}" لمراجعة التسويق محلياً.` });
   }
 
   const missingCount = items.filter((i) => !i.gtin && !i.barcode).length;
@@ -119,7 +119,7 @@ export function CatalogIdentityGovernanceWorkspace({
     >
       <WebCompactSurfaceHeader
         title="حوكمة الهوية — SKU / GTIN / Barcode"
-        subtitle="UI_PREVIEW_ONLY · المالك: control-panel/catalogs"
+        subtitle="المالك: control-panel/catalogs"
         onBack={onClose}
       />
 

@@ -11,7 +11,7 @@ import {
 import type { DshSurfaceId } from './dsh-flow-registry';
 
 export const dshOperationalPreviewAdapterMeta = {
-  dataKind: 'UI_PREVIEW_ONLY_ADAPTER',
+  dataKind: 'SCAFFOLD_ADAPTER',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

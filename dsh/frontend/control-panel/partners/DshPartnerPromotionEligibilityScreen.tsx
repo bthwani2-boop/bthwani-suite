@@ -252,7 +252,7 @@ export function DshPartnerPromotionEligibilityScreen({
               title="قرار الأهلية الحالي"
               reason={selectedItem ? `حالة الاعتماد ${resolveStatusLabel(selectedItem.status)} · ${selectedItem.offerHint}` : 'اختر عنصرًا لعرض قرار أهلية الميزة أو العرض.'}
               confidence={selectedItem?.eligibility === 'eligible' ? 'high' : selectedItem?.eligibility === 'review' ? 'medium' : 'low'}
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
               primaryAction={selectedItem ? { id: `${selectedItem.id}-route-primary`, label: resolvePrimaryActionLabel(selectedItem), onAction: handlePrimaryAction } : undefined}
               secondaryAction={selectedItem ? { id: `${selectedItem.id}-route-secondary`, label: 'فتح الكتالوج', onAction: handleSecondaryAction } : undefined}
             />

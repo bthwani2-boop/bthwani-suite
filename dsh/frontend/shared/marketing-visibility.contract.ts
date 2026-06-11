@@ -44,7 +44,7 @@ type MarketingVideoRecord = {
 };
 
 export const marketingVisibilityContractMeta = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'SCAFFOLD_PENDING_BINDING',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

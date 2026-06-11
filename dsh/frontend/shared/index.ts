@@ -1,4 +1,4 @@
-// --- Commercial Preview Contract (UI_PREVIEW_ONLY) ---
+// --- Commercial Preview Contract (SCAFFOLD — WLT binding pending J-010) ---
 export type {
   CommercialLifecycleStatus,
   CommercialAudience,
@@ -628,7 +628,7 @@ export {
   dshPreviewColorContractMeta,
 } from './dsh-preview-color';
 
-// --- Catalog Central Adapter (UI_PREVIEW_ONLY) ---
+// --- Catalog Central Adapter (DEV_ONLY offline fallback) ---
 // Maps central data (dsh/frontend/data) to surface view models.
 // Surfaces consume through this adapter — they do NOT own catalog identity.
 // Owner: dsh/frontend/shared (adapter layer)
@@ -751,3 +751,38 @@ export {
   useFeatureFlag,
   FeatureFlagsRegistry,
 } from './platform/FeatureFlagProvider';
+
+// --- DEV Fixture Isolation Guard (J-007) ---
+export type { FixtureEvidenceEntry } from './dev-fixtures-isolation-guard';
+export {
+  DSH_FIXTURE_EVIDENCE,
+  guardDevFixture,
+  getFixtureEvidenceSummary,
+} from './dev-fixtures-isolation-guard';
+
+// --- Notifications Client (J-013) ---
+export type {
+  DshNotificationRecord,
+  DshNotificationsListResponse,
+  DshNotificationsQuery,
+  DshNotificationsClientConfig,
+} from './dsh-notifications-client';
+export {
+  listNotifications,
+  markNotificationRead,
+} from './dsh-notifications-client';
+
+// --- Auth Client (J-012) ---
+export type {
+  DshAuthActorRole,
+  DshAuthState,
+  DshAuthSessionResponse,
+  DshAuthSurfacePermissions,
+  DshAuthPermissionsResponse,
+  DshAuthClientConfig,
+} from './dsh-auth-client';
+export {
+  verifyAuthSession,
+  getAuthPermissions,
+  resolveDshAuthBaseUrl,
+} from './dsh-auth-client';

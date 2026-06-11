@@ -1,4 +1,5 @@
 import { buildStoreTags, buildStoreDeliveryModes } from '../../shared/dsh-store-builders';
+import { formatDshStoreFollowerCount } from '../shared/store-profile';
 import type { DshGetDiscoveryStoreResponse } from '../shared/dsh-discovery-stores-client';
 import type { DshDiscoveryStore } from '../../shared/dshStoreProductCardModel';
 import type { DshProductRecord } from '../../shared/dsh-product-api.client';
@@ -77,6 +78,7 @@ export function mapStoreDetailToScreenStore(
     etaLabel: str(s?.['delivery_label']) || str(s?.['meta']) || str(s?.['etaLabel']),
     deliveryFeeLabel: str(s?.['deliveryFeeLabel']) || 'رسوم التوصيل 12 ر.ي',
     followersCount: (typeof s?.['followerCount'] === 'number' ? s['followerCount'] : 0),
+    followersLabel: formatDshStoreFollowerCount(typeof s?.['followerCount'] === 'number' ? s['followerCount'] : 0),
     priceMatchLabel: str(s?.['priceMatchLabel']) || 'الأسعار مطابقة للمطعم',
     imageUri: str(s?.['image_url']) || str(s?.['imageUri']),
     deliveryLabel: str(s?.['delivery_label']) || str(s?.['deliveryLabel']),

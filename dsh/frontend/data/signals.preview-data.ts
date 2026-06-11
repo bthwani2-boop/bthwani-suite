@@ -1,7 +1,7 @@
 /**
  * DSH Signal Layer — Canonical Preview Events
  * Owner: dsh/frontend/data (canonical data root)
- * UI_PREVIEW_ONLY — 10 representative events covering all DSH actor surfaces.
+ * DEV_ONLY — 10 representative events covering all DSH actor surfaces.
  * Production: server delivers real-time signal summaries via push; this file is
  * the display/testing reference only and has no backend/API binding.
  *

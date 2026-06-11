@@ -1,5 +1,5 @@
 /**
- * UI_PREVIEW_ONLY: DSH Control Panel administration workspace shared types.
+ * SCAFFOLD: DSH Control Panel administration workspace shared types.
  * Moved here from dsh/frontend/control-panel/administration/administration.types to
  * correct the dependency direction: dsh/frontend/data must not import from
  * dsh/frontend/control-panel.
@@ -10,7 +10,7 @@
  */
 
 export const dshCpAdministrationContractMeta = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'SCAFFOLD_PENDING_RBAC_BINDING',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -57,12 +57,12 @@ export function ControlPanelDshMarketingScreen({
 				<div className={styles.commandKpi} style={{ flex: 1, minWidth: '180px' }}>
 					<span className={styles.commandKpiLabel}>إجمالي الوصول</span>
 					<span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>1.2M</span>
-					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>تقدير معاينة · UI_PREVIEW_ONLY</span>
+					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>ربط API قيد التنفيذ</span>
 				</div>
 				<div className={styles.commandKpi} style={{ flex: 1, minWidth: '180px' }}>
 					<span className={styles.commandKpiLabel}>إشارات الاهتمام (المفضلة)</span>
 					<span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>12.4K</span>
-					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>تقدير معاينة · UI_PREVIEW_ONLY</span>
+					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>ربط API قيد التنفيذ</span>
 				</div>
 				<div className={styles.commandKpi} style={{ flex: 1, minWidth: '180px' }}>
 					<span className={styles.commandKpiLabel}>إشارات التسويق والكتالوج</span>

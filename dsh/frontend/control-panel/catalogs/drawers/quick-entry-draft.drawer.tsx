@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
 /**
- * CatalogQuickEntryDraftWorkspace — UI_PREVIEW_ONLY
+ * CatalogQuickEntryDraftWorkspace — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * API boundary: POST /catalog/products (not yet bound)
  *
@@ -157,7 +157,7 @@ export function CatalogQuickEntryDraftWorkspace({
 
       {/* Notice banner */}
       <WorkspacePreviewNotice
-        bannerTitle="⚠️ UI_PREVIEW_ONLY — مسودة اقتراح فقط"
+        bannerTitle="⚠️ مسودة اقتراح فقط"
         subtitle="لن يُنشئ هذا النموذج منتجًا في الكتالوج. الإرسال يولّد طلب مسودة يحتاج ربط API. لا يُولَّد معرّف منتج أو باركود هنا."
       />
 
@@ -297,7 +297,7 @@ export function CatalogQuickEntryDraftWorkspace({
       </Box>
 
       <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'center' }}>
-        UI_PREVIEW_ONLY • هذه المسودة لا تُنشئ منتجًا فعليًا • API boundary: POST /catalog/products
+        هذه المسودة لا تُنشئ منتجًا فعليًا • API boundary: POST /catalog/products
       </Text>
     </Surface>
   );

@@ -10,6 +10,7 @@ export type DshRoute =
   | 'store-items'
   | 'cart-get'
   | 'checkout-intent'
+  | 'checkout-failure'
   | 'search'
   | 'store-get'
   | 'bell'

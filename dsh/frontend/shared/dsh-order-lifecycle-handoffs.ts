@@ -1,6 +1,7 @@
 /**
  * DSH Order Lifecycle Handoffs — Cross-Surface Transition Model
- * UI_PREVIEW_ONLY — CONTRACT_SCAFFOLD_PREVIEW_ONLY
+ * CONTRACT_SCAFFOLD — Not UI preview. This file is live runtime code.
+ * contractState 'CONTRACT_SCAFFOLD_PREVIEW_ONLY' marks transitions pending WLT live-wire (J-010).
  *
  * SSoT for what happens to every surface when an order transitions between states.
  * Each handoff entry declares:

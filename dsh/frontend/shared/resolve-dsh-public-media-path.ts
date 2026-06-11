@@ -1,5 +1,5 @@
 // DSH Web/Public Media Resolver
-// UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+// SCAFFOLD: not runtime truth, not backend/API/binding source.
 // Owner: dsh/frontend/shared.
 // Media ownership remains centralized under dsh/frontend/media-fixtures.
 // Data ownership remains centralized under dsh/frontend/data.

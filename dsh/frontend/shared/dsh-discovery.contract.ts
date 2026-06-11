@@ -1,14 +1,14 @@
 /**
- * UI_PREVIEW_ONLY: DSH discovery/home surface shared types.
- * These are preview-neutral contracts used by dsh/frontend/data fixtures
- * and shared across DSH surfaces without surface-specific coupling.
+ * DSH discovery/home surface shared types.
+ * These are shared type contracts used across DSH surfaces.
+ * DiscoveryFilter is used in the live typed client (dsh-discovery-stores-client.ts).
  *
  * Owner: dsh/frontend/shared
- * Not a runtime binding — not API/backend source.
+ * Not an API source — types only. The live source of truth is the DSH backend via OpenAPI.
  */
 
 export const dshDiscoveryContractMeta = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'SHARED_TYPES',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

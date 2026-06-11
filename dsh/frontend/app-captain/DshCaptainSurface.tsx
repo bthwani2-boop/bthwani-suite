@@ -30,27 +30,10 @@ import {
   CaptainOrdersInboxScreen,
   CaptainPickupConfirmSheet,
   DshCaptainBellScreen,
-  DshCaptainOrderAcceptScreen,
   DshCaptainOrderChatScreen,
-  DshCaptainOrderDeliverScreen,
-  DshCaptainOrderDetailsScreen,
-  DshCaptainOrderGetScreen,
-  DshCaptainOrderPickupScreen,
-  DshCaptainOrdersListScreen,
-  DshCaptainOrdersOffersListScreen,
-  DshCaptainProofUploadScreen,
 } from './screens/DshCaptainOrdersScreen';
-import {
-  DshCaptainSupportDirectoryScreen,
-  DshCaptainChatReadAckScreen,
-  DshCaptainChatSendScreen,
-} from './screens/DshCaptainOperationsScreen';
-import { DshCaptainCodBalanceScreen, DshCaptainFinanceScreen } from './screens/DshCaptainFinanceScreen';
-import {
-  DshCaptainProfileGetScreen,
-  DshCaptainTierEvaluateScreen,
-  DshCaptainTierInfoScreen,
-} from './screens/DshCaptainProfileScreen';
+import { DshCaptainSupportDirectoryScreen } from './screens/DshCaptainOperationsScreen';
+import { DshCaptainFinanceScreen } from './screens/DshCaptainFinanceScreen';
 import { DshCaptainMapScreen } from './screens/DshCaptainMapScreen';
 import { DshCaptainPickupDropoffScreen } from './screens/DshCaptainPickupDropoffScreen';
 import { DshCaptainPoDSubmissionScreen } from './screens/DshCaptainPoDSubmissionScreen';
@@ -76,6 +59,7 @@ import {
   usePlatformVars,
 } from '../shared';
 import { OfferDeclineSheet } from './sheets';
+import { CaptainSupportScreenRouter } from './CaptainSupportScreenRouter';
 
 type CaptainOrderDetailSummary = React.ComponentProps<typeof CaptainOrderDetailScreen>['summary'];
 type CaptainOrdersInboxScreenState = NonNullable<React.ComponentProps<typeof CaptainOrdersInboxScreen>>['state'];
@@ -596,6 +580,43 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID, w
     }
   }, [captainAppMode]);
 
+  // DSH-SLICE-005D: push captain GPS location to backend while on active delivery
+  React.useEffect(() => {
+    const activeDeliveryStates = new Set(['offer-accepting', 'offer-accepted']);
+    if (!inboxState || !activeDeliveryStates.has(inboxState) || !apiBaseUrl) return undefined;
+    const rawOrderId = resolveRuntimeOrderId(activeOrderId);
+    if (!rawOrderId || rawOrderId === activeOrderId) return undefined; // skip preview IDs
+    let cancelled = false;
+    let watchId: number | null = null;
+
+    const postLocation = (lat: number, lng: number) => {
+      if (cancelled) return;
+      orderLifecycleClient.pushLocation(rawOrderId, {
+        captain_id: captainId ?? 'unknown',
+        latitude: lat,
+        longitude: lng,
+        lifecycle_status: inboxState ?? 'active',
+        order_status: 'EN_ROUTE',
+      })
+        .catch(() => { /* location push failure is non-fatal */ });
+    };
+
+    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => postLocation(pos.coords.latitude, pos.coords.longitude),
+        () => { /* GPS unavailable — no-op */ },
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 8000 },
+      );
+    }
+
+    return () => {
+      cancelled = true;
+      if (watchId !== null && Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, [activeOrderId, apiBaseUrl, captainId, inboxState, orderLifecycleClient]);
+
   const openOrderDetail = React.useCallback((orderId: string) => {
     setActiveOrderId(orderId);
     setRoute('detail');
@@ -881,7 +902,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID, w
           onReportIssue={() => setRoute('inbox')}
           onBack={goBack}
           onRingBell={() => {
-            // UI_PREVIEW_ONLY: bell event stub — no runtime dispatch, value is not used
+            // SCAFFOLD: bell event stub — no runtime dispatch, value is not used
             void ({ orderId: activeOrderId, captainId, timestamp: new Date().toISOString(), proximityState: 'bell_rang' } satisfies DshCaptainBellEvent);
           }}
         />
@@ -2106,50 +2127,23 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID, w
     }
 
     if (route === 'support-screen') {
-      let supportScreenContent: React.ReactNode = null;
-      switch (selectedSupportScreen) {
-        case 'chat-read-ack': supportScreenContent = <DshCaptainChatReadAckScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />; break;
-        case 'chat-send': supportScreenContent = <DshCaptainChatSendScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />; break;
-        // SSoT: COD screen only shown when captain collects COD (bthwani_delivery, not store_courier_mode)
-        case 'cod-liability':
-          supportScreenContent = captainCollectsCod ? (
-            <DshCaptainCodBalanceScreen
-              onBack={openSupportDirectory}
-              onRetry={openSupportDirectory}
-              dshAuthBearerToken={dshAuthBearerToken}
-              dshClientId={dshClientId}
-            />
-          ) : null;
-          break;
-        case 'order-accept':
-          supportScreenContent = (
-            <DshCaptainOrderAcceptScreen
-              orderId={activeOrderId}
-              onBack={openSupportDirectory}
-              onAccept={handleAcceptTask}
-              onDecline={(id) => {
-                setDeclineOrderId(id);
-                setIsDeclineSheetVisible(true);
-              }}
-            />
-          );
-          break;
-        case 'order-deliver': supportScreenContent = <DshCaptainOrderDeliverScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('proof-upload')} />; break;
-        case 'order-details': supportScreenContent = <DshCaptainOrderDetailsScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />; break;
-        case 'order-get': supportScreenContent = <DshCaptainOrderGetScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />; break;
-        case 'order-pickup': supportScreenContent = <DshCaptainOrderPickupScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('order-deliver')} />; break;
-        case 'orders-list': supportScreenContent = <DshCaptainOrdersListScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('orders-offers-list')} />; break;
-        case 'orders-offers-list': supportScreenContent = <DshCaptainOrdersOffersListScreen onBack={openSupportDirectory} onSecondaryAction={() => openCaptainSupportScreen('order-accept')} />; break;
-        case 'profile-get': supportScreenContent = <DshCaptainProfileGetScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} />; break;
-        case 'proof-upload': supportScreenContent = <DshCaptainProofUploadScreen onBack={openSupportDirectory} onSecondaryAction={openSupportDirectory} />; break;
-        case 'tier-evaluate': supportScreenContent = <DshCaptainTierEvaluateScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} />; break;
-        case 'tier-info': supportScreenContent = <DshCaptainTierInfoScreen onBack={openSupportDirectory} onRetry={openSupportDirectory} />; break;
-        default: supportScreenContent = null;
-      }
       return renderCaptainAccountShell(
         selectedSupportScreen === 'cod-liability' ? 'ذمة الدفع عند الاستلام' : 'الدعم',
         'المسار المفتوح من الدليل',
-        supportScreenContent
+        <CaptainSupportScreenRouter
+          selectedSupportScreen={selectedSupportScreen}
+          onBack={openSupportDirectory}
+          onNavigate={openCaptainSupportScreen}
+          captainCollectsCod={captainCollectsCod}
+          dshAuthBearerToken={dshAuthBearerToken}
+          dshClientId={dshClientId}
+          activeOrderId={activeOrderId}
+          onAcceptTask={handleAcceptTask}
+          onDeclineTask={(id) => {
+            setDeclineOrderId(id);
+            setIsDeclineSheetVisible(true);
+          }}
+        />
       );
     }
 

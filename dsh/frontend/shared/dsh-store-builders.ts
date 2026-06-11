@@ -1,5 +1,5 @@
 /**
- * UI_PREVIEW_ONLY: DSH store preview builder helpers.
+ * SCAFFOLD: DSH store preview builder helpers.
  * These pure builder functions derive structured data from fixture types
  * for use in store-detail and home preview screens.
  *
@@ -14,7 +14,7 @@ import type { DshFulfillmentDeliveryMode } from './dsh-delivery-mode.model';
 import type { DshDiscoveryStore, DshStoreFixtureItem } from './dshStoreProductCardModel';
 
 export const dshStoreBuildersContractMeta = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'SCAFFOLD_PENDING_BINDING',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

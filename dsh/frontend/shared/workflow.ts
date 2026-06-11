@@ -808,7 +808,7 @@ export function moveApprovalRecordToStage(
 }
 
 // =====================================================================
-// DSH Shared Partner Activation, Documents & Overrides SSoT — UI_PREVIEW_ONLY
+// DSH Shared Partner Activation, Documents & Overrides SSoT — SCAFFOLD
 // =====================================================================
 
 export type DshPartnerDocumentKind = 'commercial_registration' | 'tax_certificate' | 'identity_proof';

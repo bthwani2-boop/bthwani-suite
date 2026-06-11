@@ -1,5 +1,5 @@
 /**
- * COMMERCIAL PREVIEW CONTRACT — UI_PREVIEW_ONLY
+ * COMMERCIAL PREVIEW CONTRACT — DEV_ONLY (offline fallback, not UI preview mode)
  *
  * Single source of truth for all commercial domain types in DSH preview/UI layer.
  * This file is the authoritative type contract. Individual preview-stores implement
@@ -9,7 +9,7 @@
  * All values are UI preview fixtures for development/preview only.
  */
 export const commercialContractMeta = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_OFFLINE_FALLBACK',
   version: '2.0.0',
   runtimeTruth: false,
   backendSource: false,

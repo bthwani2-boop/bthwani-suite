@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
@@ -91,7 +91,7 @@ export function PublishingGateChecklist({
                 type: 'visibility-change',
                 productIds: readyProducts.map((p) => p.id),
                 label: 'نشر الكتالوج بالكامل للعميل',
-                note: 'UI_PREVIEW_ONLY: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
+                note: 'محاكاة محلية: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
                 apiBoundary: 'POST /catalog/products/publish',
               }));
               setActionMessage('تم تسجيل مقترح نشر المنتجات الجاهزة للعميل');

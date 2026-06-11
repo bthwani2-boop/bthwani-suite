@@ -1,4 +1,4 @@
-﻿// UI_PREVIEW_ONLY — no backend/API/DB binding.
+// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Client visibility policy gateway — shows why a product is visible/hidden
 //   and lists all prerequisites that must be satisfied.
@@ -136,7 +136,7 @@ export function CatalogVisibilityPolicyWorkspace({
       return;
     }
     setShowFixForm(false);
-    setActionResult({ type: 'info', message: `UI_PREVIEW_ONLY — طلب التعديل مُسجّل محلياً: "${fixNote.trim()}"` });
+    setActionResult({ type: 'info', message: `طلب التعديل مُسجّل محلياً: "${fixNote.trim()}"` });
     setFixNote('');
   }
 
@@ -150,13 +150,13 @@ export function CatalogVisibilityPolicyWorkspace({
       const first = productVisibility.publishingPrerequisites.find((p) => !p.satisfied);
       setActionResult({
         type: 'blocked',
-        message: `محظور — UI_PREVIEW_ONLY — ${first?.blockedReason || 'يوجد متطلب غير مستوفٍ قبل تمييز المنتج كجاهز.'}`,
+        message: `محظور — ${first?.blockedReason || 'يوجد متطلب غير مستوفٍ قبل تمييز المنتج كجاهز.'}`,
       });
       return;
     }
     // Local state transition preview
     setLocalStage('catalog-adopted');
-    setActionResult({ type: 'success', message: 'UI_PREVIEW_ONLY — تم تمييز المنتج كـ "جاهز للنشر" محلياً (catalog-adopted). الإجراء الفعلي يتطلب ربط API.' });
+    setActionResult({ type: 'success', message: 'تم تمييز المنتج كـ "جاهز للنشر" محلياً (catalog-adopted). الإجراء الفعلي يتطلب ربط API.' });
   }
 
   return (
@@ -176,7 +176,7 @@ export function CatalogVisibilityPolicyWorkspace({
     >
       <WebCompactSurfaceHeader
         title="سياسة ظهور العميل"
-        subtitle={`${product.name} — UI_PREVIEW_ONLY`}
+        subtitle={`${product.name} — ربط API قيد التنفيذ`}
         onBack={onClose}
       />
 

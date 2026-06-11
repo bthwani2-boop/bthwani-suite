@@ -1,8 +1,8 @@
-﻿// P0-05: Catalog publishing gate — control-panel/catalogs is the ONLY surface that can publish.
+// P0-05: Catalog publishing gate — control-panel/catalogs is the ONLY surface that can publish.
 // All prerequisites must be satisfied before the publish CTA is enabled.
 // Prerequisites: partner active + all items approved + delivery modes ready + category mapped + no duplicates.
 // Audit note is shown when the gate record flags auditRequired = true.
-// UI_PREVIEW_ONLY: gate actions produce visible result state but no backend/API binding.
+// SCAFFOLD: gate actions produce visible result state but no backend/API binding yet.
 import React from 'react';
 import { Box, Button, Chip, KeyValueList, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
@@ -10,7 +10,7 @@ import { resolveDshProductClientVisibility } from '../../shared/dsh-client-visib
 import { PublishGateStatus, CatalogPublishGateRecord, demoPublishGateRecord } from '../../data/publishing-gates.preview-data';
 
 
-// Gate action result — UI_PREVIEW_ONLY
+// Gate action result — SCAFFOLD
 type GateActionResult = {
   action: 'publish' | 'request-revision' | 'reject';
   label: string;
@@ -95,7 +95,7 @@ export function ListingGovernanceScreen({
         label: 'معاينة النشر',
         status: 'preview-only',
         owner: 'control-panel-catalog',
-        note: 'UI_PREVIEW_ONLY — لا يعني نشرًا فعليًا في runtime/API',
+        note: 'محاكاة محلية — لا يعني نشرًا فعليًا في runtime/API',
       });
     }
   }, [record.id, onApproveForPublish]);
@@ -107,7 +107,7 @@ export function ListingGovernanceScreen({
       label: 'تم طلب المراجعة',
       status: onRequestRevision ? 'sent' : 'preview-only',
       owner: 'control-panel-marketing',
-      note: onRequestRevision ? 'تم الإرسال للمالك' : 'UI_PREVIEW_ONLY — لا يعني إرسالًا فعليًا',
+      note: onRequestRevision ? 'تم الإرسال للمالك' : 'محاكاة محلية — الربط قيد التنفيذ',
     });
   }, [record.id, onRequestRevision]);
 
@@ -118,7 +118,7 @@ export function ListingGovernanceScreen({
       label: 'تم الرفض',
       status: onReject ? 'sent' : 'preview-only',
       owner: 'control-panel-operations',
-      note: onReject ? 'تم الإرسال للمالك' : 'UI_PREVIEW_ONLY — لا يعني رفضًا فعليًا',
+      note: onReject ? 'تم الإرسال للمالك' : 'محاكاة محلية — الربط قيد التنفيذ',
     });
   }, [record.id, onReject]);
 
@@ -269,7 +269,7 @@ export function ListingGovernanceScreen({
               />
             </Box>
 
-            {/* Gate action result banner — UI_PREVIEW_ONLY */}
+            {/* Gate action result banner — SCAFFOLD */}
             {gateActionResult ? (
               <div
                 role="status"

@@ -1,4 +1,4 @@
-﻿// UI_PREVIEW_ONLY — no backend/API/DB binding.
+// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Bridge from control-panel/partners and app-partner into catalog onboarding.
 //   Shows partner activation status, readiness checklist, incoming items, and handoff result.
@@ -128,14 +128,14 @@ export function CatalogPartnerHandoffWorkspace({
     }
     setActionResult({
       type: 'success',
-      message: `UI_PREVIEW_ONLY — تم استلام ${pendingItems.length} عنصر من "${partnerLabel}" وفتح ملف الاستلام محلياً. الإجراء الفعلي يتطلب ربط API.`,
+      message: `تم استلام ${pendingItems.length} عنصر من "${partnerLabel}" وفتح ملف الاستلام محلياً. الإجراء الفعلي يتطلب ربط API.`,
     });
   }
 
   function handleEscalateToCatalog() {
     setActionResult({
       type: 'info',
-      message: `UI_PREVIEW_ONLY — تم تصعيد الملف إلى فريق الكتالوج للمراجعة (محاكاة محلية).`,
+      message: `تم تصعيد الملف إلى فريق الكتالوج للمراجعة (محاكاة محلية).`,
     });
   }
 
@@ -165,7 +165,7 @@ export function CatalogPartnerHandoffWorkspace({
     >
       <WebCompactSurfaceHeader
         title="استلام الشريك — الكتالوج"
-        subtitle={`${partnerLabel} (${partnerId}) — UI_PREVIEW_ONLY`}
+        subtitle={`${partnerLabel} (${partnerId}) — ربط API قيد التنفيذ`}
         onBack={onClose}
       />
 
@@ -294,7 +294,7 @@ export function CatalogPartnerHandoffWorkspace({
             />
           </Box>
           <Text role="caption" tone="muted" style={{ fontSize: 10 }}>
-            UI_PREVIEW_ONLY — جميع الإجراءات محاكاة محلية
+            جميع الإجراءات محاكاة محلية — الربط قيد التنفيذ
           </Text>
         </Box>
 

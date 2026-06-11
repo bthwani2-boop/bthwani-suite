@@ -221,14 +221,14 @@ export type WltDshOrderCommissionBreakdown = {
   captainPayout: WltDshOrderLineItemApplicability;
   partnerCourierCost: WltDshOrderLineItemApplicability;
   partnerNet: WltDshOrderLineItemApplicability;
-  commissionRatePreview: 'UI_PREVIEW_ONLY';
+  commissionRatePreview: string;
   isPreview: true;
 };
 
 export type WltDshPartnerModeRatePreview = {
   partnerId: string;
   storeLabel: string;
-  rates: Readonly<Record<WltDshFulfillmentMode, 'UI_PREVIEW_ONLY'>>;
+  rates: Readonly<Record<WltDshFulfillmentMode, string>>;
   isPreview: true;
 };
 

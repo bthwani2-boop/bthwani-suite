@@ -187,7 +187,7 @@ export function createCatalogPreviewProposal(params: {
     label: params.label,
     status: params.status ?? 'ready-for-api',
     owner: 'control-panel-catalogs',
-    note: `UI_PREVIEW_ONLY | ${params.note}`,
+    note: `محاكاة محلية | ${params.note}`,
     apiBoundary: params.apiBoundary,
   };
 }

@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
 /**
- * CatalogBulkOperationsWorkspace — UI_PREVIEW_ONLY
+ * CatalogBulkOperationsWorkspace — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * API boundary: POST /catalog/bulk (not yet bound)
  *
@@ -155,7 +155,7 @@ export function CatalogBulkOperationsWorkspace({
 
       {/* Notice */}
       <WorkspacePreviewNotice
-        bannerTitle="UI_PREVIEW_ONLY — لا تعديل فعلي على الكتالوج"
+        bannerTitle="لا تعديل فعلي على الكتالوج"
         subtitle="كل الإجراءات المجمعة تُنتج مقترحًا يحتاج ربط API. لا تعديل local على البيانات."
       />
 
@@ -273,7 +273,7 @@ export function CatalogBulkOperationsWorkspace({
       )}
 
       <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'center' }}>
-        UI_PREVIEW_ONLY • Carbon batch action principle applied • API boundary: POST /catalog/bulk
+        محاكاة محلية • Carbon batch action principle • API boundary: POST /catalog/bulk
       </Text>
     </Surface>
   );

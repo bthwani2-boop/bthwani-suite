@@ -5,7 +5,7 @@
  * Web/DOM component used exclusively within control-panel/marketing screens
  * to simulate how commercial badges appear on store cards.
  *
- * UI_PREVIEW_ONLY. Not rendered in app-client or app-partner.
+ * SCAFFOLD. Not rendered in app-client or app-partner.
  * Lives in control-panel/marketing/ because it is not a shared UI primitive.
  *
  * Audit / History / Rollback Preview:

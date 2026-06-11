@@ -18,10 +18,10 @@ const bannerPalette = {
 } as const;
 
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const bannerStoreDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -607,10 +607,10 @@ export function recordMarketingBannerImpression(id: string) {
 // Marketing campaigns
 // -----------------------------------------------------------------------------
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const campaignStoreDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -827,10 +827,10 @@ export function removeCampaignItem(id: string) {
 const promoPalette = { white: 'white', brandStrong: 'brandStrong' } as const;
 
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const promoStoreDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -1036,10 +1036,10 @@ export function toggleHomePromoStatus(id: string) {
 // Marketing videos
 // -----------------------------------------------------------------------------
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const videoStoreDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -1364,10 +1364,10 @@ const _BRAND = 'brand' as const;
  * Please use campaign-store.ts or partner-offer-store.ts for new commercial data ownership.
  */
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const growthStoreDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -1649,11 +1649,11 @@ export function getGrowthRecommendations(): GrowthRecommendation[] {
 // Marketing ticker
 // -----------------------------------------------------------------------------
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  * Seed data merged from news-ticker-fixtures.ts.
  */
 export const newsTickerStoreDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

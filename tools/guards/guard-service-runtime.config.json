@@ -19,7 +19,8 @@
         "dsh/backend/internal/http/conflicts_handler.go",
         "dsh/backend/internal/http/orders_handler.go",
         "dsh/backend/internal/http/support_handler.go",
-        "dsh/backend/internal/http/checkout_handler.go"
+        "dsh/backend/internal/http/checkout_handler.go",
+        "dsh/backend/internal/http/notifications_handler.go"
       ],
       "repositoryRequiredMethods": [
         "ListStores",
@@ -44,10 +45,11 @@
         "FailDelivery",
         "ConfirmReturn",
         "CreateSupportEscalation",
-        "SubmitSettlementCandidates",
-        "ProcessSettlementCallback",
+        "UpdateOrderSettlement",
         "CreateFieldReadinessEscalation",
-        "CreateFieldReadinessApproval"
+        "CreateFieldReadinessApproval",
+        "ListNotifications",
+        "MarkNotificationRead"
       ],
       "postgresRequiredPatterns": [
         "pgx",
@@ -63,7 +65,11 @@
       ],
       "composePath": "dsh/backend/docker-compose.local.yml",
       "allowedComposeServices": [
-        "dsh-postgres"
+        "dsh-postgres",
+        "auth-service",
+        "dsh-api",
+        "minio",
+        "minio-init"
       ],
       "forbiddenComposeTerms": [
         "redis",
@@ -96,7 +102,16 @@
         "dsh/backend/migrations/020_field_store_visits.sql",
         "dsh/backend/migrations/021_field_store_documents.sql",
         "dsh/backend/migrations/022_field_readiness_escalation.sql",
-        "dsh/backend/migrations/023_field_readiness_approval.sql"
+        "dsh/backend/migrations/023_field_readiness_approval.sql",
+        "dsh/backend/migrations/024_order_checkout_intent_link.sql",
+        "dsh/backend/migrations/025_remove_dsh_financial_columns.sql",
+        "dsh/backend/migrations/026_performance_indexes.sql",
+        "dsh/backend/migrations/027_auth_sessions.sql",
+        "dsh/backend/migrations/028_product_price_minor_units.sql",
+        "dsh/backend/migrations/029_order_status_events_indexes.sql",
+        "dsh/backend/migrations/030_dsh_media_assets.sql",
+        "dsh/backend/migrations/031_seed_product_prices.sql",
+        "dsh/backend/migrations/032_notifications.sql"
       ],
       "seedFiles": [
         "dsh/backend/seed/003_store_discovery_seed.sql"
@@ -118,7 +133,11 @@
         "dsh_field_store_visits",
         "dsh_field_store_documents",
         "dsh_field_readiness_escalations",
-        "dsh_field_readiness_approvals"
+        "dsh_field_readiness_approvals",
+        "dsh_media_assets",
+        "dsh_notifications",
+        "auth_users",
+        "auth_sessions"
       ],
       "requiredTableColumns": [
         "id",
@@ -197,7 +216,13 @@
             "GET /cart/serviceability",
             "POST /checkout/intent",
             "DELETE /checkout/intent/{id}",
-            "POST /checkout/payment-callback"
+            "POST /checkout/payment-callback",
+            "GET /products",
+            "POST /dev-fixtures/product-media",
+            "DELETE /dev-fixtures/product-media/{id}",
+            "POST /orders/{id}/settlement-callback",
+            "GET /notifications",
+            "POST /notifications/{id}/read"
           ],
           "evidenceFolderPrefix": "DSH_LIVE_BACKEND_RUNTIME-",
           "requiredEvidenceFiles": [],
@@ -207,7 +232,6 @@
         },
         "DSH-SLICE-001": {
           "docPath": "dsh/docs/slices/journey-001-store-discovery/DSH-SLICE-001-STORE-DISCOVERY.md",
-          "runtimeMatrixPath": "dsh/docs/RUNTIME_EVIDENCE_MATRIX.md",
           "allowedRoutes": [
             "GET /stores",
             "GET /stores/{id}",
@@ -242,7 +266,6 @@
         },
         "DSH-SLICE-006A": {
           "docPath": "dsh/docs/slices/journey-006-field-readiness/DSH-SLICE-006A-STORE-ONBOARDING.md",
-          "runtimeMatrixPath": "dsh/docs/RUNTIME_EVIDENCE_MATRIX.md",
           "allowedRoutes": [
             "POST /stores"
           ],
@@ -254,7 +277,6 @@
         },
         "DSH-SLICE-006B": {
           "docPath": "dsh/docs/slices/journey-006-field-readiness/DSH-SLICE-006B-FIELD-VISIT-EVIDENCE.md",
-          "runtimeMatrixPath": "dsh/docs/RUNTIME_EVIDENCE_MATRIX.md",
           "allowedRoutes": [
             "POST /stores/{id}/field-visits"
           ],
@@ -266,7 +288,6 @@
         },
         "DSH-SLICE-006C": {
           "docPath": "dsh/docs/slices/journey-006-field-readiness/DSH-SLICE-006C-DOCUMENTS-MEDIA-PROOF.md",
-          "runtimeMatrixPath": "dsh/docs/RUNTIME_EVIDENCE_MATRIX.md",
           "allowedRoutes": [
             "POST /stores/{id}/documents"
           ],

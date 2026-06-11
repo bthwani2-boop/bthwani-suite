@@ -32,22 +32,30 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 	const wallet = useWltDshWalletPreview(clientId, bearerToken);
 	const [transactions, setTransactions] = React.useState<any[]>([]);
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
+	const [offline, setOffline] = React.useState<boolean>(false);
 	const [rechargeAmount, setRechargeAmount] = React.useState<string>('');
 	const [rechargeError, setRechargeError] = React.useState<string | null>(null);
 	const [rechargeSuccess, setRechargeSuccess] = React.useState<boolean>(false);
 
+	const loading = !wallet.hydrated || loadingTx;
+
 	const fetchTransactions = React.useCallback(async () => {
 		if (!wallet.linked) return;
 		setLoadingTx(true);
+		setOffline(false);
 		try {
 			const res = await listLedgerEntries(clientId, bearerToken, 20, 0);
 			setTransactions(res.entries || []);
 		} catch (err) {
 			console.error('Failed to fetch ledger entries:', err);
+			const isOffline = !globalThis.navigator?.onLine || (err instanceof TypeError && /network|fetch/i.test(String(err)));
+			setOffline(isOffline);
 		} finally {
 			setLoadingTx(false);
 		}
 	}, [wallet.linked, clientId, bearerToken]);
+
+	const retry = React.useCallback(() => { void fetchTransactions(); }, [fetchTransactions]);
 
 	React.useEffect(() => {
 		void fetchTransactions();
@@ -82,7 +90,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 		}
 	};
 
-	if (!wallet.hydrated) {
+	if (loading) {
 		return (
 			<Surface tone="default" style={styles.centerContainer}>
 				<Text role="bodyMd" tone="muted" style={{ textAlign: 'center' }}>
@@ -106,6 +114,13 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 						المحفظة الإلكترونية
 					</Text>
 				</View>
+
+				{offline && (
+					<Card tone="warning" gap={2} padding={3}>
+						<Text role="bodyStrong" style={{ textAlign: 'right' }}>لا يوجد اتصال بالشبكة</Text>
+						<Button label="إعادة المحاولة" tone="secondary" size="sm" onPress={retry} />
+					</Card>
+				)}
 
 				{/* Wallet status banner */}
 				{!wallet.linked ? (

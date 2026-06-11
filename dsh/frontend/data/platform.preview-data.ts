@@ -8,13 +8,13 @@ import type { Phase12FixtureLocation } from '../../types';
 // Platform records
 // -----------------------------------------------------------------------------
 /**
- * UI_PREVIEW_ONLY: Control-panel platform configuration preview fixtures.
+ * DEV_ONLY: Control-panel platform configuration preview fixtures.
  * Merged from: cp-appearance.preview.ts + cp-providers.preview.ts + cp-services.preview.ts
  * Owner: dsh/frontend/data
  */
 
 export const dshPlatformPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -188,10 +188,10 @@ export const MOCK_USERS: readonly MockAdminUser[] = [
 // Geo heatmap preview
 // -----------------------------------------------------------------------------
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const geoHeatmapPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -351,7 +351,7 @@ export function getDshRecommendationSeverityLabel(severity: DshRecommendationSev
 // --- Cross-surface journey fixtures (merged from cp-journey-fixtures.ts) ---
 
 /**
- * UI_PREVIEW_ONLY: Cross-surface journey closure examples.
+ * DEV_ONLY: Cross-surface journey closure examples.
  * These link Client, Partner, Captain, Field and Operations.
  */
 export const DSH_CROSS_SURFACE_JOURNEYS: readonly DshUnifiedRecommendation[] = [
@@ -1046,10 +1046,10 @@ export const DSH_PLATFORM_AUDIT_PREVIEW: readonly DshPlatformAuditEntry[] = [
 // Control panel fixture locations
 // -----------------------------------------------------------------------------
 /**
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source.
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source.
  */
 export const dshControlPanelFixtureLocationsDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
@@ -1064,7 +1064,7 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'control-panel',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    dataKind: 'UI_PREVIEW_ONLY',
+    dataKind: 'DEV_ONLY_FIXTURE',
     timezoneSemantics: 'preview-only local display / not runtime UTC source',
     location: 'dsh/frontend/control-panel/dsh_ops_orders_board/fixtures',
     status: 'declared',
@@ -1075,7 +1075,7 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'control-panel',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    dataKind: 'UI_PREVIEW_ONLY',
+    dataKind: 'DEV_ONLY_FIXTURE',
     timezoneSemantics: 'preview-only local display / not runtime UTC source',
     location: 'dsh/frontend/control-panel/dsh_ops_order_detail_exception_workspace/fixtures',
     status: 'declared',
@@ -1086,7 +1086,7 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'control-panel',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    dataKind: 'UI_PREVIEW_ONLY',
+    dataKind: 'DEV_ONLY_FIXTURE',
     timezoneSemantics: 'preview-only local display / not runtime UTC source',
     location: 'dsh/frontend/control-panel/dsh_ops_peak_mode_control/fixtures',
     status: 'declared',
@@ -1097,7 +1097,7 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'control-panel',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    dataKind: 'UI_PREVIEW_ONLY',
+    dataKind: 'DEV_ONLY_FIXTURE',
     timezoneSemantics: 'preview-only local display / not runtime UTC source',
     location: 'dsh/frontend/control-panel/dsh_proxy_requests_list/fixtures',
     status: 'declared',
@@ -1108,7 +1108,7 @@ export const dshControlPanelFixtureLocations: Phase12FixtureLocation[] = [
     surface: 'control-panel',
     phase: 'Phase 12',
     mode: 'fixtures-only',
-    dataKind: 'UI_PREVIEW_ONLY',
+    dataKind: 'DEV_ONLY_FIXTURE',
     timezoneSemantics: 'preview-only local display / not runtime UTC source',
     location: 'dsh/frontend/control-panel/dsh_proxy_request_review_workspace/fixtures',
     status: 'declared',

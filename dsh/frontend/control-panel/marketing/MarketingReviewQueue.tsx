@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, KeyValueList, StateView, Surface, Text } from '@bthwani/ui-kit';
@@ -259,7 +259,7 @@ export function MarketingReviewQueue() {
               title="القرار الحالي"
               reason={selectedItem ? resolveRecommendation(selectedItem) : 'اختر عنصرًا من الصف لعرض القرار.'}
               confidence={selectedItem?.stage === 'marketing-approved' || selectedItem?.stage === 'catalog-adopted' ? 'high' : selectedItem?.stage === 'marketing-review' ? 'medium' : 'low'}
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
               primaryAction={selectedItem ? { id: `${selectedItem.id}-primary`, label: selectedItem.stage === 'marketing-review' ? 'اعتماد' : selectedItem.stage === 'marketing-approved' ? 'إرسال للكتالوج' : 'تثبيت المتابعة', onAction: handlePrimaryAction } : undefined}
               secondaryAction={selectedItem ? { id: `${selectedItem.id}-secondary`, label: selectedItem.stage === 'marketing-review' || selectedItem.stage === 'marketing-approved' ? 'طلب تعديل' : 'لا إجراء', onAction: handleSecondaryAction } : undefined}
             />

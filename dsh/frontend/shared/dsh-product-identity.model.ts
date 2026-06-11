@@ -1,5 +1,5 @@
 /**
- * DSH Product Identity Model (UI_PREVIEW_ONLY)
+ * DSH Product Identity Model
  *
  * SSoT for product identity, approval pipeline, barcode scan states,
  * publishing gate prerequisites, and client visibility rules across all DSH surfaces.

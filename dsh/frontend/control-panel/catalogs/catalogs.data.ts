@@ -1,16 +1,14 @@
 /**
- * DSH Catalog Control-Panel View Models — UI_PREVIEW_ONLY
+ * DSH Catalog Control-Panel View Models
  * Owner: control-panel/catalogs (governance/approval/mapping consumer)
- * NOT runtime truth. NOT backend/API/DB binding source.
  *
- * Identity sources:
- *   Categories: dsh/frontend/data/categories.preview-data.ts (via dshCategoryFixtures)
- *   Products:   dsh/frontend/data/products.preview-data.ts (via storeItemsByStoreId)
- *   Media:      dsh/frontend/media-fixtures (via shared/resolve-dsh-image-source.ts)
+ * Runtime truth: DSH backend API (products/categories via dsh-product-api.client.ts).
+ * This file provides: type definitions + preview-data fallback for offline/dev mode.
+ * When NEXT_PUBLIC_DSH_API_BASE_URL is set, live data is fetched instead.
  *
- * Client app was the donor/reference for current correct preview data.
- * Surfaces consume through adapters only.
- * Surface-specific overrides must be lean and id-based.
+ * Preview fallback sources (DEV_ONLY):
+ *   Categories: dsh/frontend/data/categories.preview-data.ts
+ *   Products:   dsh/frontend/data/products.preview-data.ts
  *
  * control-panel/catalogs is a governance/approval/mapping consumer.
  * It does NOT add canonical products or categories locally.

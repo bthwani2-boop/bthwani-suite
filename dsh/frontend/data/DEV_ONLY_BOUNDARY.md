@@ -1,5 +1,18 @@
 # DEV_ONLY_PREVIEW_DATA
 
+## Execution Mode
+
+**LIVE EXECUTION MODE — Not UI Preview.**
+
+The project is no longer in UI Preview mode. Slices are executed End-to-End against live backend,
+Docker runtime, API, and database. This directory exists ONLY as:
+
+- A fallback when the API is unreachable (network/Docker not running)
+- Dev-time fixtures for Storybook, tests, and design token validation
+
+Any screen or surface that shows data from this directory to a real user in a live session
+is a violation. The live truth is the DSH API + PostgreSQL + MinIO.
+
 ## Classification
 
 DEV_ONLY_PREVIEW_DATA — UI preview fixtures only.
@@ -10,7 +23,7 @@ The `preview-data.contract.ts` file enforces this programmatically:
 
 ```ts
 export const dshCanonicalPreviewDataContract: DshPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

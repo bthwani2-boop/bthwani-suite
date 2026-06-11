@@ -1,7 +1,7 @@
 import { DSH_CUSTOMER_360_PREVIEW } from './support.preview-data';
 
 export const dshCustomersPreviewDataContract = {
-  dataKind: 'UI_PREVIEW_ONLY',
+  dataKind: 'DEV_ONLY_FIXTURE',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,

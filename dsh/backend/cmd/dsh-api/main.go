@@ -51,6 +51,7 @@ func main() {
 	httpapi.RegisterOrderRoutes(mux, repository)
 	httpapi.RegisterSupportRoutes(mux, repository)
 	httpapi.RegisterCheckoutRoutes(mux, repository)
+	httpapi.RegisterNotificationsRoutes(mux, repository)
 	httpapi.RegisterPlatformRoutes(mux)
 	// WLT routes are NOT registered here — DSH backend does not own wallet state.
 	// Financial operations are delegated to WLT service via payment session handoff.
@@ -84,7 +85,7 @@ func main() {
 	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization, X-Client-Id, X-Actor-Type, X-WLT-Callback-Token, X-WLT-Event-Id, Idempotency-Key")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization, X-Client-Id, X-Dev-Client-Id, X-Actor-Type, X-WLT-Callback-Token, X-WLT-Event-Id, Idempotency-Key")
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusOK)
 			return

@@ -23,3 +23,6 @@ export {
   type PartnerWorkspaceTabId,
   type PartnerWorkspaceTabItem,
 } from './partners.types';
+
+export { PartnerIntakeLane } from './PartnerIntakeLane';
+export type { PartnerIntakeLaneProps } from './PartnerIntakeLane';

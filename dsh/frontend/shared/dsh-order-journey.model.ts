@@ -1,5 +1,5 @@
 /**
- * DSH Order Journey — Shared Model (UI_PREVIEW_ONLY)
+ * DSH Order Journey — Shared Model
  *
  * Single source of truth for the full delivery journey shared across surfaces:
  * app-client (tracking), app-captain (execution), app-partner (preparation),

@@ -20,10 +20,12 @@ export const WltHomeGetScreen: React.FC<{
   };
 
   const [amount, setAmount] = useState('');
-  const [balance, setBalance] = useState<number>(0.0);
+  const [balance, setBalance] = useState<number | null>(null);
   const [method, setMethod] = useState<string | undefined>(undefined);
   const [state, setState] = useState<'content' | 'loading' | 'success' | 'error'>('content');
+  const [offline, setOffline] = useState(false);
   const [trigger, setTrigger] = useState(0);
+  const retry = React.useCallback(() => setTrigger((n) => n + 1), []);
 
   const activeClientId = dshClientId || 'client-demo';
 
@@ -34,14 +36,20 @@ export const WltHomeGetScreen: React.FC<{
 
   React.useEffect(() => {
     let active = true;
+    setOffline(false);
     client.getClientWalletSummary(activeClientId)
       .then((summary) => {
         if (active) {
           setBalance(summary.balance);
+          setOffline(false);
         }
       })
       .catch((err) => {
         console.error('Failed to fetch balance:', err);
+        if (active) {
+          const isOffline = !globalThis.navigator?.onLine || (err instanceof TypeError && /network|fetch/i.test(String(err)));
+          setOffline(isOffline);
+        }
       });
     return () => { active = false; };
   }, [client, activeClientId, trigger]);
@@ -99,7 +107,10 @@ export const WltHomeGetScreen: React.FC<{
     }
   };
 
-  const formattedBalance = new Intl.NumberFormat('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(balance);
+  const isEmpty = balance === null && !offline;
+  const formattedBalance = balance !== null
+    ? new Intl.NumberFormat('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(balance)
+    : '—';
 
   return (
     <View style={{ flex: 1 }}>
@@ -114,6 +125,15 @@ export const WltHomeGetScreen: React.FC<{
         >
           <Text role="titleLg" style={{ textAlign: 'center', marginTop: spacing[2] }}>{formattedBalance} {tr('wlt.currency', 'ريال')}</Text>
         </Card>
+
+        {offline && (
+          <Card title={tr('wlt.home.offlineTitle', 'لا يوجد اتصال بالشبكة')}>
+            <Button label={tr('wlt.home.retry', 'إعادة المحاولة')} tone="secondary" onPress={retry} size="sm" />
+          </Card>
+        )}
+        {isEmpty && !offline && (
+          <Card title={tr('wlt.home.emptyBalance', 'جارٍ تحميل الرصيد…')} subtitle="" />
+        )}
 
         {/* CTA below the card (pill) */}
         <View style={{ alignItems: 'center' }}>

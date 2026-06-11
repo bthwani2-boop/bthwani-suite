@@ -374,6 +374,10 @@ func (repo *MemoryRepository) ListProducts(_ context.Context, _ string, _ string
 	return domain.ListProductsResponse{}, errors.New("product list requires postgres backend (set DATABASE_URL)")
 }
 
+func (repo *MemoryRepository) ListAllProducts(_ context.Context, _ string, _ int, _ int) (domain.ListProductsResponse, error) {
+	return domain.ListProductsResponse{}, errors.New("product list requires postgres backend (set DATABASE_URL)")
+}
+
 // Category structure stubs (J-002 / DSH-SLICE-002B)
 func (repo *MemoryRepository) CreateCategory(_ context.Context, _ string, _ domain.CreateCategoryRequest) (domain.CategoryRecord, error) {
 	return domain.CategoryRecord{}, errors.New("category create requires postgres backend (set DATABASE_URL)")
@@ -586,4 +590,13 @@ func (repo *MemoryRepository) CreateFieldReadinessApproval(_ context.Context, _ 
 
 func (repo *MemoryRepository) GetLatestFieldReadinessApproval(_ context.Context, _ string) (domain.FieldReadinessApprovalRecord, error) {
 	return domain.FieldReadinessApprovalRecord{}, errors.New("readiness approval retrieval requires postgres backend (set DATABASE_URL)")
+}
+
+// J-013 stubs
+func (repo *MemoryRepository) ListNotifications(_ context.Context, _ domain.ListNotificationsQuery) (domain.ListNotificationsResponse, error) {
+	return domain.ListNotificationsResponse{Notifications: []domain.NotificationRecord{}, Total: 0}, nil
+}
+
+func (repo *MemoryRepository) MarkNotificationRead(_ context.Context, _ string, _ string) error {
+	return nil
 }

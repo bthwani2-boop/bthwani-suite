@@ -1,7 +1,7 @@
 /**
  * CENTRAL DSH DOMAIN PARTNER PREVIEW DATA — SINGLE SOURCE OF TRUTH
  * Owner: dsh/frontend/data (central DSH domain preview data owner)
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API/binding source
+ * DEV_ONLY data fixture: not runtime truth, not backend/API/binding source
  */
 
 import type {
@@ -61,7 +61,7 @@ export const partnerTeamPreviewMembers: readonly PartnerTeamMember[] = [
     deliveryAssignment: 'لا يوجد',
     inviteLifecycle: 'اعتماد مالك مباشر',
     operationalImpact: 'لا يُعطَّل محليًا في هذا السطح.',
-    auditNote: 'UI_PREVIEW_ONLY · CONTRACT_TBD · مالك الفرع ظاهر محليًا فقط.',
+    auditNote: 'CONTRACT_TBD · مالك الفرع ظاهر محليًا فقط.',
     inlineActionLabel: 'عرض الدور',
   },
   {
@@ -76,7 +76,7 @@ export const partnerTeamPreviewMembers: readonly PartnerTeamMember[] = [
     deliveryAssignment: 'إشراف على التوصيل عند الحاجة',
     inviteLifecycle: 'مفعل ويعمل الآن',
     operationalImpact: 'تعطيله يوقف المتابعة التشغيلية للفرع.',
-    auditNote: 'UI_PREVIEW_ONLY · هذا المشرف هو مرجع الحظر الأخير في هذا العرض.',
+    auditNote: 'DEV_ONLY · هذا المشرف هو مرجع الحظر الأخير في هذا العرض.',
     inlineActionLabel: 'تعطيل',
   },
   {
@@ -106,7 +106,7 @@ export const partnerTeamPreviewMembers: readonly PartnerTeamMember[] = [
     deliveryAssignment: 'مرتبط بتوصيل المتجر',
     inviteLifecycle: 'الدعوة مرسلة وتنتظر القبول',
     operationalImpact: 'قبوله يفتح الإسناد الداخلي للتوصيل.',
-    auditNote: 'UI_PREVIEW_ONLY · دعوة الموصل هنا محلية حتى تتصل الصلاحيات.',
+    auditNote: 'DEV_ONLY · دعوة الموصل هنا محلية حتى تتصل الصلاحيات.',
     inlineActionLabel: 'إعادة إرسال الدعوة',
   },
   {
@@ -136,7 +136,7 @@ export const partnerTeamPreviewMembers: readonly PartnerTeamMember[] = [
     deliveryAssignment: 'موقوف عن الإسناد',
     inviteLifecycle: 'محجوب بقرار مركزي',
     operationalImpact: 'الحظر يمنع إسناد الطلبات لهذا الموصل.',
-    auditNote: 'UI_PREVIEW_ONLY · لا يمكن تغيير هذا الحظر داخل الشريك.',
+    auditNote: 'DEV_ONLY · لا يمكن تغيير هذا الحظر داخل الشريك.',
     inlineActionLabel: 'إعادة تفعيل',
   },
 ];
@@ -156,7 +156,7 @@ export const partnerCoveragePreviewZones: readonly PartnerCoverageZone[] = [
     commissionReference: 'Control Panel',
     payoutReference: 'WLT/Finance',
     reviewActionLabel: 'طلب مراجعة',
-    auditNote: 'UI_PREVIEW_ONLY · التفعيل هنا مرئي فقط حتى يثبت الارتباط المركزي.',
+    auditNote: 'DEV_ONLY · التفعيل هنا مرئي فقط حتى يثبت الارتباط المركزي.',
   },
   {
     id: 'nada',
@@ -188,7 +188,7 @@ export const partnerCoveragePreviewZones: readonly PartnerCoverageZone[] = [
     commissionReference: 'WLT/Finance',
     payoutReference: 'WLT/Finance',
     reviewActionLabel: 'طلب مراجعة',
-    auditNote: 'UI_PREVIEW_ONLY · لا يوجد تجاوز محلي لهذا القرار.',
+    auditNote: 'DEV_ONLY · لا يوجد تجاوز محلي لهذا القرار.',
   },
 ];
 
@@ -481,36 +481,36 @@ export const PARTNER_FULFILLMENT_AGREEMENTS: readonly DshPartnerFulfillmentAgree
     storeName: 'محمصة الساحة',
     categoryLabel: 'مقاهٍ ومحمصات',
     modes: [
-      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري', negotiationNote: 'الاتفاق الافتراضي' },
-      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' as const, validityLabel: 'غير مفعّل' },
-      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
+      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري', negotiationNote: 'الاتفاق الافتراضي' },
+      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' as const, validityLabel: 'غير مفعّل' },
+      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
     ],
   }),
   Object.assign({ partnerId: 'partner-shorouq' }, {
     storeName: 'بوفيه الشروق',
     categoryLabel: 'بوفيهات',
     modes: [
-      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
-      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'pending' as const, validityLabel: 'قيد التفعيل', negotiationNote: 'يحتاج تأكيد جاهزية موصل المتجر' },
-      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' as const, validityLabel: 'غير مفعّل' },
+      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
+      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'pending' as const, validityLabel: 'قيد التفعيل', negotiationNote: 'يحتاج تأكيد جاهزية موصل المتجر' },
+      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: false, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' as const, validityLabel: 'غير مفعّل' },
     ],
   }),
   Object.assign({ partnerId: 'partner-zawya' }, {
     storeName: 'مخبز الزاوية',
     categoryLabel: 'مخابز',
     modes: [
-      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
-      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري', negotiationNote: 'موصل المتجر جاهز' },
-      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري', negotiationNote: 'الاتفاق الكامل للأوضاع الثلاثة' },
+      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
+      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري', negotiationNote: 'موصل المتجر جاهز' },
+      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري', negotiationNote: 'الاتفاق الكامل للأوضاع الثلاثة' },
     ],
   }),
   Object.assign({ partnerId: 'partner-nokhba' }, {
     storeName: 'تمور النخبة',
     categoryLabel: 'مواد غذائية',
     modes: [
-      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
-      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' as const, validityLabel: 'غير مفعّل' },
-      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'UI_PREVIEW_ONLY', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
+      { mode: 'bthwani_delivery' as const, modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
+      { mode: 'partner_delivery' as const, modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable' as const, validityLabel: 'غير مفعّل' },
+      { mode: 'pickup' as const, modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready' as const, validityLabel: 'ساري' },
     ],
   }),
 ];

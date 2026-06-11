@@ -334,7 +334,7 @@ export function PartnerCatalogOverridesWorkspace() {
               title="توجيه التجاوزات"
               reason={actionMessage}
               confidence="high"
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
             />
           )}
 
