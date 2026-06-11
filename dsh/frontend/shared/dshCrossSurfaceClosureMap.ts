@@ -301,7 +301,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     primaryAction: 'تحديث جاهزية العنصر ونطاق ظهوره قبل النشر.',
     requiredStates: ['loading', 'empty', 'error', 'success', 'offline'],
     evidenceStatus: 'captured',
-    remainingBlocker: 'none; screen proof captured and verified under tools/registry/runs/DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700/ against live database.',
+    remainingBlocker: 'none; screen proof captured and verified against live database with evidence id DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700.',
     runtimeEvidenceHint: 'DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700',
     crossSurfaceDependencies: [
       'app-client storefront visibility',
@@ -424,7 +424,7 @@ export const DSH_CROSS_SURFACE_CLOSURE_MAP: readonly DshCrossSurfaceClosureItem[
     ],
     wltBoundary: 'أي finance visibility لاحقة تبقى WLT-owned وخارج visit/readiness flow.',
     visualEvidenceRequired: true,
-    evidenceHint: 'Runtime evidence: tools/registry/runs/DSH_SLICE_006B_FIELD_VISIT_EVIDENCE_FINAL_CLOSURE-20260606-LOCAL/post-field-visit-runtime.txt. المتبقي: visual capture بعد rebuild/install.',
+    evidenceHint: 'Runtime evidence captured with evidence id DSH_SLICE_006B_FIELD_VISIT_EVIDENCE_FINAL_CLOSURE-20260606-LOCAL. المتبقي: visual capture بعد rebuild/install.',
     routeHint: '/app-field/visits',
     routeProof: 'dsh-field-visit, dsh-field-readiness-escalation — registered in dsh-field.screen-registry.ts',
     screenProof: 'DshFieldStoreVisitScreen (VERIFIED), DshFieldReadinessEscalationScreen (READY_FOR_REVIEW)',
