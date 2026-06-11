@@ -63,6 +63,7 @@
   "devDependencies": {
     "@ast-grep/cli": "0.43.0",
     "@cucumber/cucumber": "13.0.0",
+    "@ls-lint/ls-lint": "2.3.1",
     "@playwright/test": "1.58.2",
     "@react-native-async-storage/async-storage": "3.0.2",
     "@stoplight/spectral-cli": "6.16.0",
@@ -81,6 +82,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "expo": "~54.0.0",
     "globals": "^16.0.0",
+    "jscpd": "5.0.6",
     "knip": "6.16.1",
     "next": "16.2.2",
     "nx": "22.3.3",
@@ -89,6 +91,7 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.0",
     "react-scanner": "1.2.0",
+    "sherif": "1.11.1",
     "style-dictionary": "5.4.4",
     "stylelint": "17.13.0",
     "typescript": "5.9.3"

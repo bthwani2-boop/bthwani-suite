@@ -33,6 +33,9 @@ importers:
       '@cucumber/cucumber':
         specifier: 13.0.0
         version: 13.0.0
+      '@ls-lint/ls-lint':
+        specifier: 2.3.1
+        version: 2.3.1
       '@playwright/test':
         specifier: 1.58.2
         version: 1.58.2
@@ -87,6 +90,9 @@ importers:
       globals:
         specifier: ^16.0.0
         version: 16.4.0
+      jscpd:
+        specifier: 5.0.6
+        version: 5.0.6
       knip:
         specifier: 6.16.1
         version: 6.16.1
@@ -111,6 +117,9 @@ importers:
       react-scanner:
         specifier: 1.2.0
         version: 1.2.0
+      sherif:
+        specifier: 1.11.1
+        version: 1.11.1
       style-dictionary:
         specifier: 5.4.4
         version: 5.4.4(tslib@2.8.1)
@@ -3016,6 +3025,13 @@ packages:
 
   /@keyv/serialize@1.1.1:
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
+    dev: true
+
+  /@ls-lint/ls-lint@2.3.1:
+    resolution: {integrity: sha512-vPe6IDByQnQRTxcAYjTxrmga/tSIui50VBFTB5KIJWY3OOFmxE2VtymjeSEfQfiMbhZV/ZPAqYy2lt8pZFQ0Rw==}
+    cpu: [x64, arm64, s390x, ppc64le]
+    os: [darwin, linux, win32]
+    hasBin: true
     dev: true
 
   /@napi-rs/nice-android-arm-eabi@1.1.1:
@@ -9020,6 +9036,54 @@ packages:
       typescript: 5.9.3
     dev: true
 
+  /cpd-darwin-arm64@5.0.6:
+    resolution: {integrity: sha512-S4bSBpAAgUFPikTYOEDgPLC4+p6k09n9pWKs7BHKGaCX+n1A/fx3lenn1MsTag9LPMBei9rHmSE8PJsRmmL7Og==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /cpd-darwin-x64@5.0.6:
+    resolution: {integrity: sha512-4hhEfshjBCPzaH6Ne9qtdaXrntgxLko+dkj80JMCKhUUsTM+UbG5HfD9bpTxRrG4+xD+4z+/8xh0z4QjwBrdsw==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /cpd-linux-arm64-gnu@5.0.6:
+    resolution: {integrity: sha512-6n2qUOx4p/gUHv3UugRR2hsHPrkmFlyBhrjXekdden8K5lTP1Um/+iaL+fSY20QaXFMHdYAOvuLRdMYftP9ukQ==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /cpd-linux-x64-gnu@5.0.6:
+    resolution: {integrity: sha512-5ZRb9/H6L0z2metS1zQWwgwi+nSMixe8p/11w5YYZRBDXWSWDMutWs01L/FihwyTkZKVjCovwyjim1k98fT0Mg==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /cpd-linux-x64-musl@5.0.6:
+    resolution: {integrity: sha512-0vOZ1M8U55QJJCjqY1gborA9b8Lrcv6k/tD1vs8kTlNt+jInpgmAwXBYnBEQoqDiW/RTwwaZIASDWJ7Y20oYsg==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /cpd-windows-x64-msvc@5.0.6:
+    resolution: {integrity: sha512-zJxu7SAuuCrV6FpyGdveOXqJ+AsxcnmOCm1RPuurYD1X+FcaKTJZFhc1XtT6k3hSx2muqymIG6+ilUWJ7rwCnA==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
   /cross-fetch@3.2.0:
     resolution: {integrity: sha512-Q+xVJLoGOeIMXZmbUK4HYk+69cQH6LudR0Vu/pRm2YlU/hDV9CiS0gKUMaWY5f2NeUH9C1nV3bsTlCo0FsTV1Q==}
     dependencies:
@@ -11475,6 +11539,19 @@ packages:
 
   /jsc-safe-url@0.2.4:
     resolution: {integrity: sha512-0wM3YBWtYePOjfyXQH5MWQ8H7sdk5EXSwZvmSLKk2RboVQ2Bu239jycHDz5J/8Blf3K0Qnoy2b6xD+z10MFB+Q==}
+
+  /jscpd@5.0.6:
+    resolution: {integrity: sha512-EEZFZNTcALuchsM2FwQ13e9w5EAMvgLgl1U8gRXPEATUmN9Bvqs1tnfWD/y/dIba/3Lc/ILMev/amxql90ztYA==}
+    engines: {node: '>=18'}
+    hasBin: true
+    optionalDependencies:
+      cpd-darwin-arm64: 5.0.6
+      cpd-darwin-x64: 5.0.6
+      cpd-linux-arm64-gnu: 5.0.6
+      cpd-linux-x64-gnu: 5.0.6
+      cpd-linux-x64-musl: 5.0.6
+      cpd-windows-x64-msvc: 5.0.6
+    dev: true
 
   /jsep@1.4.0:
     resolution: {integrity: sha512-B7qPcEVE3NVkmSJbaYxvv4cHkVW7DQsZz13pUMrfS8z8Q/BuShN+gcTXrUlPiGqM2/t/EEaI030bpxMqY8gMlw==}
@@ -14309,6 +14386,84 @@ packages:
   /shell-quote@1.8.3:
     resolution: {integrity: sha512-ObmnIF4hXNg1BqhnHmgbDETF8dLPCggZWBjkQfhZpbszZnYur5DUljTcCHii5LC3J5E0yeO/1LIMyH+UvHQgyw==}
     engines: {node: '>= 0.4'}
+
+  /sherif-darwin-arm64@1.11.1:
+    resolution: {integrity: sha512-VoMrUv5QY6hQ2rByNa3AAhr/KGQsCb6pvAUNKa1iCh1jvnY836hQr6zNBw9hYCDkVv6t9sITFGJljwdTCQD4xw==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /sherif-darwin-x64@1.11.1:
+    resolution: {integrity: sha512-7j3yOCBkvVbltVT3lXoiazGfG2nb36FteYT5VZPEBSf8sTn1pPTScukAQ1Fdl+MphadGyici7XlRbDrtZ/wnvA==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /sherif-linux-arm64-musl@1.11.1:
+    resolution: {integrity: sha512-DCf87RFqBh8ZrYgu3y+fv0x4kFn/np84m2jAEgygznwozH/VCfrXbHFVdhxW7762JCYkXbHO9dUj/ff5fkvkvw==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /sherif-linux-arm64@1.11.1:
+    resolution: {integrity: sha512-vCZFS7RxhZ/8g9bdj3UPNVPTcZiKiWigW+FIlVQEUKEKfG0MfSOMBJqEWPVVUniyJa3rdIxtmZKSdWkG0e1x3w==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /sherif-linux-x64-musl@1.11.1:
+    resolution: {integrity: sha512-f8xitqXdHObUFPZo4QVbz3o30Y4+gHA3B5ZobsOWocnSfJBaUGutBzJsUsjG6w2tccSRn6+mugiMUGKIbIPZmQ==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /sherif-linux-x64@1.11.1:
+    resolution: {integrity: sha512-9t+p1X3SyhU75BrJNHBbj9i/aQxHC/sF+Mdkf17V5AlokCznFgYKQUXq5EVmcmRDDhDl69RMzCTLD95EBqUSYA==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /sherif-windows-arm64@1.11.1:
+    resolution: {integrity: sha512-Dnffgcyz9zLq/8UTY2REchJzRJWcWAuMWo5Vl5O17IZGkhl71dwa7/Vi2wC3EQd8WAVK/O82yArOYggWA0dj5w==}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /sherif-windows-x64@1.11.1:
+    resolution: {integrity: sha512-xjfYUL/IQ65DwHkRsWIxiZWtglKtL5/E3UHpnLwOui3jqW1V2K88SMct415dnlBQiL3U9VEIVUo1i+KmToOBgQ==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /sherif@1.11.1:
+    resolution: {integrity: sha512-HBFce8NGaPuWPg5NXb6+aI7hJQFjTilhtbrgo+Y/BvtGlkuJAzLnkmC8nyD+p3v7oIAq4KQeA8qySKGga28xZg==}
+    hasBin: true
+    optionalDependencies:
+      sherif-darwin-arm64: 1.11.1
+      sherif-darwin-x64: 1.11.1
+      sherif-linux-arm64: 1.11.1
+      sherif-linux-arm64-musl: 1.11.1
+      sherif-linux-x64: 1.11.1
+      sherif-linux-x64-musl: 1.11.1
+      sherif-windows-arm64: 1.11.1
+      sherif-windows-x64: 1.11.1
+    dev: true
 
   /side-channel-list@1.0.1:
     resolution: {integrity: sha512-mjn/0bi/oUURjc5Xl7IaWi/OJJJumuoJFQJfDDyO46+hBWsfaVM65TBHq2eoZBhzl9EchxOijpkbRC8SVBQU0w==}
