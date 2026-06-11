@@ -491,7 +491,11 @@
     "dsh/frontend/shared/dsh-cp-operations.contract.ts",
     "dsh/frontend/shared/dsh-cp-platform.contract.ts",
     "dsh/frontend/shared/dsh-notifications-client.ts",
-    "dsh/frontend/shared/dsh-order-journey.model.ts"
+    "dsh/frontend/shared/dsh-order-journey.model.ts",
+    "dsh/frontend/app-client/contracts/dsh-client-binding.contracts.ts",
+    "dsh/frontend/shared/dsh-marketing-types.ts",
+    "dsh/frontend/shared/dsh-partner-offer-types.ts",
+    "dsh/frontend/shared/field-store-model.ts"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

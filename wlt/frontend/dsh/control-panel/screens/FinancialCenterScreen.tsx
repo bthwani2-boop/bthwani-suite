@@ -6,13 +6,13 @@ import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
 import { buildFinanceHref } from '../constants/finance.registry';
-import { getWltControlPanelFinancePreview } from '../financeContracts';
 import { buildWltFinancialCenter } from '../selectors/buildFinancialCenter';
 import {
   buildWltRuntimeFinancialCenter,
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
 } from '../adapters/wltDshFinanceRuntime.adapter';
+import { getFallbackControlPanelFinancePreview } from '../adapters/wltDshFinanceFallback.adapter';
 import type { WltFinancialCenterSection, WltLedgerEntry, WltFinancialCenterBlockingVariance } from '../models/financialCenter.types';
 
 const SECTION_COLOR: Record<string, string> = {
@@ -344,7 +344,7 @@ function CloseGatePanel({ canClose, blockingCount }: { canClose: boolean; blocki
 }
 
 export function FinancialCenterScreen({ hubHref: _hubHref, subGroup: _subGroup }: { hubHref: string; subGroup?: string }) {
-  const preview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
+  const preview = React.useMemo(() => getFallbackControlPanelFinancePreview(), []);
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
 
   React.useEffect(() => {

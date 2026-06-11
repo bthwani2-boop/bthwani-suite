@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import { getWltDshRefundLedgerPreview } from '../financeContracts';
 import { loadWltDshFinanceRuntimeReadModel, type WltDshFinanceRuntimeResult } from '../adapters/wltDshFinanceRuntime.adapter';
+import { getFallbackRefundLedgerPreview } from '../adapters/wltDshFinanceFallback.adapter';
 
 const STATUS_LABEL: Record<string, string> = {
   pending_wlt_review: 'قيد مراجعة WLT',
@@ -13,7 +13,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export function WltDshRefundLedger({ subGroup }: { subGroup?: string } = {}) {
-  const previewCases = React.useMemo(() => getWltDshRefundLedgerPreview(), []);
+  const previewCases = React.useMemo(() => getFallbackRefundLedgerPreview(), []);
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
 
   React.useEffect(() => {

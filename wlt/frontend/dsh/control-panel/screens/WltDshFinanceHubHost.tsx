@@ -11,12 +11,13 @@ import {
   normalizeFinanceLocation,
 } from '../constants/finance.registry';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from '../models/financeRouting.types';
-import { getWltControlPanelFinancePreview, buildWltFinancialCenter } from '../financeContracts';
+import { buildWltFinancialCenter } from '../financeContracts';
 import {
   buildWltRuntimeFinancialCenter,
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
 } from '../adapters/wltDshFinanceRuntime.adapter';
+import { getFallbackControlPanelFinancePreview } from '../adapters/wltDshFinanceFallback.adapter';
 
 import { FinancialCenterScreen } from './FinancialCenterScreen';
 import { LedgerScreen } from './LedgerScreen';
@@ -162,7 +163,7 @@ export function WltDshFinanceHubHost({
     setActiveSubGroup(urlSubGroup ?? subGroup ?? norm.subGroup);
   }, [group, subGroup, panel, urlSubGroup]);
 
-  const financePreview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
+  const financePreview = React.useMemo(() => getFallbackControlPanelFinancePreview(), []);
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
 
   React.useEffect(() => {
@@ -242,11 +243,11 @@ export function WltDshFinanceHubHost({
     if (center.blockingVariances.length > 0) {
       return '🔒 معلق بالكامل (تسوية وصرف محجوبة)';
     }
-    if (financePreview.allRecords.some(r => r.statusTone === 'error')) {
+    if (center.allEntries.some((entry) => entry.status === 'blocked' || entry.status === 'disputed')) {
       return '⚠️ تعليق جزئي (حظر تسوية متأثرة)';
     }
     return '✓ لا يوجد حظر (جاهز للتسوية)';
-  }, [center, financePreview]);
+  }, [center]);
 
   const renderActiveScreen = (groupId: CanonicalFinanceGroupId, subGroupId: string | undefined, currentHref: string) => {
     const activeSub = subGroupId || getFinanceGroupMeta(groupId).subGroups?.[0]?.id;
@@ -269,24 +270,24 @@ export function WltDshFinanceHubHost({
 
       case 'payments-wallets':
         if (activeSub === 'wallet-control-center') {
-          return <WltDshWalletControlCenter />;
+          return <WltDshWalletControlCenter runtimeFinance={runtimeFinance} />;
         }
         if (activeSub === 'payments') {
-          return <WltDshWalletControlCenter />;
+          return <WltDshWalletControlCenter runtimeFinance={runtimeFinance} />;
         }
         if (activeSub === 'client-wallets') {
-          return <WltDshAccountStatement actorId="CUS-553" />;
+          return <WltDshAccountStatement actorId="CUS-553" runtimeFinance={runtimeFinance} />;
         }
         if (activeSub === 'partner-wallets') {
-          return <WltDshAccountStatement actorId="STORE-99" />;
+          return <WltDshAccountStatement actorId="STORE-99" runtimeFinance={runtimeFinance} />;
         }
         if (activeSub === 'captain-wallets') {
-          return <WltDshAccountStatement actorId="CAP-42" />;
+          return <WltDshAccountStatement actorId="CAP-42" runtimeFinance={runtimeFinance} />;
         }
         if (activeSub === 'platform-wallet') {
-          return <WltDshAccountStatement actorId="DSH-PLATFORM" />;
+          return <WltDshAccountStatement actorId="DSH-PLATFORM" runtimeFinance={runtimeFinance} />;
         }
-        return <WltDshAccountStatement />;
+        return <WltDshAccountStatement runtimeFinance={runtimeFinance} />;
 
       case 'settlements-payouts':
         if (activeSub === 'partners') {
@@ -302,9 +303,9 @@ export function WltDshFinanceHubHost({
           return <WltDshFieldCommissionStatement />;
         }
         if (activeSub === 'bank-transfers') {
-          return <WltDshSettlementCalendar />;
+          return <WltDshSettlementCalendar runtimeFinance={runtimeFinance} />;
         }
-        return <WltDshSettlementCalendar />;
+        return <WltDshSettlementCalendar runtimeFinance={runtimeFinance} />;
 
       case 'refunds-disputes-holds':
         return <WltDshRefundLedger subGroup={activeSub} />;
@@ -326,7 +327,7 @@ export function WltDshFinanceHubHost({
 
       case 'reports-policies-approvals':
         if (activeSub === 'policies') {
-          return <WltDshSettlementCalendar />;
+          return <WltDshSettlementCalendar runtimeFinance={runtimeFinance} />;
         }
         return <AuditCloseScreen hubHref={currentHref} subGroup={activeSub} />;
 

@@ -8,11 +8,11 @@ import {
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
 import {
-  getWltControlPanelFinancePreview,
   getWltCaptainFinanceSnapshot,
   getWltDshStoreDeliveryFinancePreview,
   type WltDshFinancePreviewRecord,
 } from '../financeContracts';
+import { getFallbackControlPanelFinancePreview } from '../adapters/wltDshFinanceFallback.adapter';
 import styles from '../styles/wlt-dsh-finance.module.css';
 
 const PREVIEW_NOTICE =
@@ -174,7 +174,7 @@ export function WltDshFinanceControlPanelContent({
 }: {
   hideHeader?: boolean;
 } = {}) {
-  const preview = React.useMemo(() => getWltControlPanelFinancePreview(), []);
+  const preview = React.useMemo(() => getFallbackControlPanelFinancePreview(), []);
 
   return (
     <Box className={styles.financePreviewWrap} gap={6}>

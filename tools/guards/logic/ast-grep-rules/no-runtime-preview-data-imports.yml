@@ -1,0 +1,12 @@
+id: no-runtime-preview-data-imports
+language: TypeScript
+rule:
+  any:
+    - pattern: import $$$ from '$PATH'
+    - pattern: import { $$$ } from '$PATH'
+    - pattern: import type { $$$ } from '$PATH'
+constraints:
+  PATH:
+    regex: data\/.*preview-data|data\/dshFinancePreview|data\/operational-statuses\.preview-data
+message: Runtime-adjacent code must not import preview-data directly. Route through shared contracts/adapters instead.
+severity: error

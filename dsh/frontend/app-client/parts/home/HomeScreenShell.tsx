@@ -9,7 +9,6 @@ import { HomePromoSection } from './HomePromoSection';
 import { HomeStoreFeedSection, type HomeStoreCardEntry } from './HomeStoreFeedSection';
 import { HomeVideoReelsSection } from './HomeVideoReelsSection';
 import type { useTheme, useUiText } from '@bthwani/ui-kit';
-import type { HomePromoRecord } from '../../../data/marketing.preview-data';
 import type { DshHomeCategory } from '../../contracts/dsh-home-types';
 import type { DshHomeGetScreenProps } from '../../contracts/dsh-home-screen-props';
 import type { useHomeState } from '../../hooks/useHomeState';
@@ -19,6 +18,7 @@ import type { useHomeFilterRail } from '../../hooks/useHomeFilterRail';
 import type { useHomeVideoHandlers } from '../../hooks/useHomeVideoHandlers';
 import type { useHomeTickerState } from '../../hooks/useHomeTickerState';
 import type { buildHomeScreenStyles } from './home-screen.styles';
+import type { HomePromoRecord } from '../../../shared/dsh-marketing-types';
 
 export interface HomeScreenShellProps {
   props: DshHomeGetScreenProps;

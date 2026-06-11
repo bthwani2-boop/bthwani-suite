@@ -28,22 +28,22 @@ export function readFieldStoresLocal(): FieldStoreFile[] {
           return parsed;
         }
 
-        const seed = createFieldSeedStores();
-        fieldStoresMemory = seed;
-        storage.setItem(STORAGE_KEY, JSON.stringify(seed));
-        return seed;
+        const initialStores = createFieldSeedStores();
+        fieldStoresMemory = initialStores;
+        storage.setItem(STORAGE_KEY, JSON.stringify(initialStores));
+        return initialStores;
       }
 
       const parsed = JSON.parse(raw) as FieldStoreFile[];
       fieldStoresMemory = parsed;
       return parsed;
     } catch {
-      return fieldStoresMemory ?? createFieldSeedStores();
+      return fieldStoresMemory ?? [];
     }
   }
 
   if (!fieldStoresMemory) {
-    fieldStoresMemory = createFieldSeedStores();
+    fieldStoresMemory = [];
   }
 
   return fieldStoresMemory;

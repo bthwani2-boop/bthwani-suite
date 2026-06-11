@@ -41,7 +41,6 @@ import { hostClientStates, type CreateOrderValues, type HostCartItem, type HostO
 import { buildPaymentMethodsList } from './adapters/dshClientCheckoutAdapters';
 import type { DshRoute } from './dsh-client.types';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
-import type { MarketingGrowthRecord, MarketingVideoRecord, HomePromoRecord } from '../data/marketing.preview-data';
 import type { DshClientWltIntentEntry } from './dsh-client-wlt-payment-bridge';
 import type { DshTrackingTimelineItem } from './hooks/useDshOrderTracking';
 import type { DshDiscoveryStoresBridgeResult } from './shared/dsh-discovery-stores-bridge';
@@ -49,6 +48,7 @@ import type { DshClientState } from './dsh-client.types';
 import type { DshCheckoutAuthContext } from '../shared/dsh-checkout-client';
 import type { ActiveStore } from './hooks/useDshCheckout';
 import type { DshStoreFixtureItem, DshDiscoveryStore } from '../shared/dshStoreProductCardModel';
+import type { HomePromoRecord, MarketingGrowthRecord, MarketingVideoRecord } from '../shared/dsh-marketing-types';
 import type { WltDshWalletPreviewState } from '../../../wlt/frontend/dsh/app-client/wlt-dsh-client.types';
 
 function parsePrice(priceLabel?: string): number {

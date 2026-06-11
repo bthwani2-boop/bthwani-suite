@@ -1,7 +1,6 @@
-import type { MarketingVideoRecord } from '../../data/marketing.preview-data';
-import type { HomePromoRecord } from '../../data/marketing.preview-data';
 import type { CommercialSourceMap } from '../../shared/store-card-commercial-map';
 import type { DshPartnerVisibilityBadge } from '../../shared/dsh-partner-activation.model';
+import type { HomePromoRecord, MarketingVideoRecord } from '../../shared/dsh-marketing-types';
 
 export type DshServiceId = 'dsh' | 'knz' | 'amn' | 'arb' | 'wlt' | 'esf' | 'kwd' | 'mrf' | 'snd';
 

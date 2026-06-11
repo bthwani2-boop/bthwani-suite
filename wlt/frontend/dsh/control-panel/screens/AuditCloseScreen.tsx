@@ -4,36 +4,88 @@ import React from 'react';
 import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
-import { getAdaptedFinanceControlPanelRows } from '../adapters/dshFinanceFixture.adapter';
 import { formatWltYer } from '../financeContracts';
+import { buildWltFinancialCenter } from '../selectors/buildFinancialCenter';
 import { buildWltAuditPackPreview } from '../models/auditPack.types';
 import { WLT_MAKER_CHECKER_STATE_LABELS } from '../models/makerChecker.types';
 import { getWltCloseGateSubledgers } from '../models/subledger.types';
+import {
+  buildWltRuntimeFinancialCenter,
+  loadWltDshFinanceRuntimeReadModel,
+  type WltDshFinanceRuntimeResult,
+} from '../adapters/wltDshFinanceRuntime.adapter';
+import { getFallbackControlPanelFinancePreview } from '../adapters/wltDshFinanceFallback.adapter';
 
 export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string }) {
   const businessDate = new Date().toISOString().split('T')[0]!;
+  const preview = React.useMemo(() => getFallbackControlPanelFinancePreview(), []);
+  const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
 
-  const rows = React.useMemo(() => {
-    const s = getAdaptedFinanceControlPanelRows();
-    return [...s.overview, ...s['cod-reconciliation'], ...s.settlements];
+  React.useEffect(() => {
+    let cancelled = false;
+    void loadWltDshFinanceRuntimeReadModel().then((result) => {
+      if (!cancelled) setRuntimeFinance(result);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const center = React.useMemo(() => {
+    if (runtimeFinance?.state === 'runtime') {
+      return buildWltRuntimeFinancialCenter(businessDate, runtimeFinance.data);
+    }
+    return buildWltFinancialCenter(businessDate, preview.allRecords);
+  }, [businessDate, preview, runtimeFinance]);
+
+  const auditEntries = React.useMemo(() => {
+    const blockingVarianceByEntryId = new Map(
+      center.blockingVariances.map((variance) => [variance.entryId, variance.varianceMinorUnits]),
+    );
+
+    return center.allEntries.map((entry) => ({
+      id: entry.id,
+      evidenceStatus: entry.status === 'blocked' ? 'missing' : entry.isPending ? 'partial' : 'complete',
+      workflowState:
+        entry.status === 'posted'
+          ? 'approved'
+          : entry.status === 'pending'
+            ? 'checked'
+            : entry.status === 'disputed'
+              ? 'review_required'
+              : 'blocked_wlt',
+      varianceMinorUnits: blockingVarianceByEntryId.get(entry.id) ?? 0,
+      evidenceSource: 'audit-entry',
+      bankDepositRef: entry.sourceRef,
+    })) as ReadonlyArray<{
+      id: string;
+      evidenceStatus: 'complete' | 'partial' | 'missing';
+      workflowState: string;
+      varianceMinorUnits: number;
+      evidenceSource: string;
+      bankDepositRef?: string;
+      cashBagRef?: string;
+    }>;
+  }, [center]);
+
+  const expectedTotalMinorUnits = React.useMemo(
+    () => center.allEntries.reduce((sum, entry) => sum + entry.amountMinorUnits, 0),
+    [center],
+  );
+  const blockingVarianceTotalMinorUnits = React.useMemo(
+    () => center.blockingVariances.reduce((sum, variance) => sum + variance.varianceMinorUnits, 0),
+    [center],
+  );
+  const actualTotalMinorUnits = expectedTotalMinorUnits - blockingVarianceTotalMinorUnits;
 
   const auditPack = React.useMemo(() =>
     buildWltAuditPackPreview({
       businessDate,
-      expectedTotalMinorUnits: rows.reduce((s, r) => s + r.expectedMinorUnits, 0),
-      actualTotalMinorUnits: rows.reduce((s, r) => s + r.actualMinorUnits, 0),
-      entries: rows.map((r) => ({
-        id: r.id,
-        evidenceStatus: r.evidenceStatus,
-        workflowState: r.workflowState,
-        varianceMinorUnits: r.varianceMinorUnits,
-        evidenceSource: r.expectedSource,
-        bankDepositRef: r.bankDepositRef,
-        cashBagRef: r.cashBagRef,
-      })),
+      expectedTotalMinorUnits,
+      actualTotalMinorUnits,
+      entries: auditEntries,
     }),
-    [rows, businessDate],
+    [actualTotalMinorUnits, auditEntries, businessDate, expectedTotalMinorUnits],
   );
 
   const closeGateSubledgers = React.useMemo(() => getWltCloseGateSubledgers(), []);
@@ -41,6 +93,14 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
 
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
+      <div style={{ padding: '6px 12px', background: 'var(--bth-warning-surface)', border: '1px solid var(--bth-warning-border)', borderRadius: 7, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 10, color: 'var(--bth-warning-text)', fontWeight: '700' }}>
+          {runtimeFinance?.state === 'runtime'
+            ? `WLT runtime audit preparation · ${runtimeFinance.data.baseUrl} · ${runtimeFinance.data.closeStatus.status}`
+            : `Fallback preview · ${runtimeFinance?.state === 'blocked' ? runtimeFinance.error : 'loading runtime'}`}
+        </span>
+      </div>
+
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={1}>
         <Text role="titleMd" weight="bold">التدقيق والإغلاق اليومي</Text>
         <Text role="bodySm" tone="soft">

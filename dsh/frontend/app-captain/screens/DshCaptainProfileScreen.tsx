@@ -3,7 +3,10 @@ import { Box, KeyValueList, SectionHeader, Divider,
   spacing,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
-import type { DshCaptainProfileScreenState, DshCaptainProfileSnapshot } from '../../data/operational-statuses.preview-data';
+import type {
+	DshCaptainProfileScreenState,
+	DshCaptainProfileSnapshot,
+} from '../../shared/client-state';
 
 export type DshCaptainProfileScreenProps = {
 	section?: 'profile-get' | 'tier-info' | 'tier-evaluate';

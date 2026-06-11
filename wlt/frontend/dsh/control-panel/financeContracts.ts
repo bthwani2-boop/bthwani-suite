@@ -75,23 +75,23 @@ export type {
 } from './models/captainStatement.types';
 
 export {
-  getWltCaptainFinancePreview,
-  getWltCaptainFinanceSnapshot,
-  getWltControlPanelFinancePreview,
-  getWltDshClientPaymentPreview,
-  getWltDshFinanceRecordsForActor,
-  getWltDshFinanceSummaryForActor,
-  getWltDshOrderCommissionBreakdown,
-  getWltDshPaymentOptionsPreview,
-  getWltDshStoreDeliveryFinancePreview,
-  getWltFieldFinancePreview,
-  getWltFieldFinanceSnapshot,
-  getWltPartnerFinanceSnapshot,
-  getWltPartnerSettlementPreview,
-  resolveWltDshFinanceEventKindForPaymentMethod,
-  resolveWltDshPaymentPreviewState,
+  getFallbackCaptainFinancePreview as getWltCaptainFinancePreview,
+  getFallbackCaptainFinanceSnapshot as getWltCaptainFinanceSnapshot,
+  getFallbackControlPanelFinancePreview as getWltControlPanelFinancePreview,
+  getFallbackClientPaymentPreview as getWltDshClientPaymentPreview,
+  getFallbackFinanceRecordsForActor as getWltDshFinanceRecordsForActor,
+  getFallbackFinanceSummaryForActor as getWltDshFinanceSummaryForActor,
+  getFallbackOrderCommissionBreakdown as getWltDshOrderCommissionBreakdown,
+  getFallbackPaymentOptionsPreview as getWltDshPaymentOptionsPreview,
+  getFallbackStoreDeliveryFinancePreview as getWltDshStoreDeliveryFinancePreview,
+  getFallbackFieldFinancePreview as getWltFieldFinancePreview,
+  getFallbackFieldFinanceSnapshot as getWltFieldFinanceSnapshot,
+  getFallbackPartnerFinanceSnapshot as getWltPartnerFinanceSnapshot,
+  getFallbackPartnerSettlementPreview as getWltPartnerSettlementPreview,
+  resolveFallbackFinanceEventKindForPaymentMethod as resolveWltDshFinanceEventKindForPaymentMethod,
+  resolveFallbackPaymentPreviewState as resolveWltDshPaymentPreviewState,
   WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW,
-} from './adapters/dshFinanceFixture.adapter';
+} from './adapters/wltDshFinanceFallback.adapter';
 
 // ─── Chart of Accounts ─────────────────────────────────────────────
 
@@ -219,12 +219,12 @@ export type { WltDshRefundLedgerCase } from './models/refundLedger.types';
 // ─── Preview Data (adapted via WLT adapters) ─────────────────────
 
 export {
-  getWltDshAccountStatementsPreviewAdapter as getWltDshAccountStatementsPreview,
-  getWltDshRefundLedgerPreviewAdapter as getWltDshRefundLedgerPreview,
-  getWltDshSettlementCalendarPreviewAdapter as getWltDshSettlementCalendarPreview,
-  getWltDshStoreSettlementStatementsPreviewAdapter as getWltDshStoreSettlementStatementsPreview,
-  getWltFieldCommissionStatementsPreviewAdapter as getWltFieldCommissionStatementsPreview,
-  getWltDshPartnerSettlementStatementsPreviewAdapter as getWltDshPartnerSettlementStatementsPreview,
-  getWltDshCaptainSettlementStatementsPreviewAdapter as getWltDshCaptainSettlementStatementsPreview,
+  getFallbackAccountStatementsPreview as getWltDshAccountStatementsPreview,
+  getFallbackRefundLedgerPreview as getWltDshRefundLedgerPreview,
+  getFallbackSettlementCalendarPreview as getWltDshSettlementCalendarPreview,
+  getFallbackStoreSettlementStatementsPreview as getWltDshStoreSettlementStatementsPreview,
+  getFallbackFieldCommissionStatementsPreview as getWltFieldCommissionStatementsPreview,
+  getFallbackPartnerSettlementStatementsPreview as getWltDshPartnerSettlementStatementsPreview,
+  getFallbackCaptainSettlementStatementsPreview as getWltDshCaptainSettlementStatementsPreview,
   WLT_DSH_CONTROL_PANEL_FINANCE_CONTRACT,
-} from './adapters/dshFinanceFixture.adapter';
+} from './adapters/wltDshFinanceFallback.adapter';

@@ -1,4 +1,4 @@
-import type { MarketingVideoRecord } from '../../data/marketing.preview-data';
+import type { MarketingVideoRecord } from '../../shared/dsh-marketing-types';
 import type { VideoDraft } from './video-types';
 
 export function createDraft(item?: MarketingVideoRecord | null): VideoDraft {

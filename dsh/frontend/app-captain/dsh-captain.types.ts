@@ -48,7 +48,7 @@ export type {
   DshCaptainState,
   DshCaptainStateGroup,
   DshCaptainStateMeta,
-} from '../data/operational-statuses.preview-data';
+} from '../shared/client-state';
 
 export type {
   DshCaptainFinanceSnapshot,

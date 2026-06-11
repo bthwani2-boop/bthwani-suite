@@ -7,8 +7,10 @@
  * لا تُنفَّذ هنا أي عمليات مالية حقيقية (لا dger، لا settlement، لا payment mutation).
  * العملة: YER / ر.ي — تمّت إزالة SAR / ر.س بالكامل.
  *
- * للاستخدام الجديد: استورد مباشرة من:
- *   dsh/frontend/data/dshFinancePreview
+ * للاستخدام الجديد:
+ * - استورد الأنواع المالية النقية من:
+ *   wlt/frontend/dsh/control-panel/models/dshFinance.types
+ * - واستعمل هذا الملف فقط عندما تحتاج جسر DSH read-only boundary metadata.
  */
 
 export type {

@@ -4,8 +4,13 @@ import React from 'react';
 import { Box, Text, Button,
   radius,
 } from '@bthwani/ui-kit';
-import { getAdaptedFinanceControlPanelRows, type DshFinancePreviewRow } from '../adapters/dshFinanceFixture.adapter';
+import type { DshFinancePreviewRow } from '../adapters/dshFinanceFixture.adapter';
 import { formatWltYer } from '../financeContracts';
+import {
+  loadWltDshFinanceRuntimeReadModel,
+  type WltDshFinanceRuntimeResult,
+} from '../adapters/wltDshFinanceRuntime.adapter';
+import { getFallbackWorkbenchRows } from '../adapters/wltDshFinanceFallback.adapter';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 type DayLifecycleStage =
@@ -90,27 +95,104 @@ const ACTUAL_SOURCE_LABEL: Record<string, string> = {
   'preview-seed': 'بيانات معاينة',
 };
 
-export function DailyReconciliationWorkbench() {
-  const [allRows, setAllRows] = React.useState<ReadonlyArray<DshFinancePreviewRow>>(() => {
-    const surfaces = getAdaptedFinanceControlPanelRows();
-    const seen = new Set<string>();
-    const combined: DshFinancePreviewRow[] = [];
-    for (const surface of [
-      surfaces.overview,
-      surfaces['cod-reconciliation'],
-      surfaces.settlements,
-      surfaces.payouts,
-      surfaces.refunds,
-    ] as const) {
-      for (const row of surface) {
-        if (!seen.has(row.id)) {
-          seen.add(row.id);
-          combined.push(row);
-        }
-      }
-    }
-    return combined;
+function buildPreviewWorkbenchRows(): ReadonlyArray<DshFinancePreviewRow> {
+  return getFallbackWorkbenchRows();
+}
+
+function buildRuntimeWorkbenchRows(runtimeFinance: WltDshFinanceRuntimeResult | null): ReadonlyArray<DshFinancePreviewRow> {
+  if (runtimeFinance?.state !== 'runtime') {
+    return [];
+  }
+
+  return runtimeFinance.data.ledgerEntries.map((entry): DshFinancePreviewRow => {
+    const amountMinorUnits = Math.round(entry.amount * 100);
+    const isPosted = entry.status === 'COMPLETED';
+    const isBlocked = entry.status === 'FAILED' || entry.status === 'REVERSED';
+    const actualMinorUnits = isPosted ? amountMinorUnits : 0;
+    const varianceMinorUnits = amountMinorUnits - actualMinorUnits;
+    const actorType: DshFinancePreviewRow['actorType'] =
+      entry.subject.startsWith('captain') ? 'captain'
+      : entry.subject.startsWith('partner') ? 'partner'
+      : entry.subject.startsWith('field') ? 'field'
+      : entry.subject.startsWith('client') ? 'client'
+      : 'platform';
+    const eventKind: DshFinancePreviewRow['eventKind'] =
+      entry.reference_type === 'payment_session' ? 'wallet-payment'
+      : entry.reference_type === 'refund' ? 'refund-adjustment'
+      : entry.reference_type === 'settlement' ? 'partner-settlement'
+      : 'unknown';
+    const expectedSource: DshFinancePreviewRow['expectedSource'] =
+      entry.reference_type === 'settlement' ? 'settlement-cycle'
+      : 'order-invoice';
+    const actualSource: DshFinancePreviewRow['actualSource'] =
+      entry.reference_type === 'payment_session' ? 'wallet-debit'
+      : 'bank-deposit';
+
+    return {
+      id: `runtime-${entry.id}`,
+      amount: formatWltYer(amountMinorUnits),
+      owner: entry.subject,
+      status: entry.status,
+      risk: isBlocked ? 'danger' : isPosted ? 'success' : 'warning',
+      evidence: entry.reference_id ?? entry.order_id ?? entry.id,
+      nextAction: isPosted ? 'مراقبة القيد المرحل من WLT' : 'مطابقة القيد مع WLT runtime وإرفاق الدليل الناقص',
+      recommendation: isPosted ? 'القيد مكتمل ومطابق.' : 'القيد يحتاج استكمال مطابقة قبل الإغلاق.',
+      primaryActionLabel: isPosted ? 'عرض القيد' : 'تحضير مطابقة',
+      secondaryActionLabel: isPosted ? 'مراجعة السجل' : 'عرض الأدلة',
+      sla: isPosted ? 'مغلق' : 'يتطلب متابعة اليوم',
+      actorType,
+      eventKind,
+      expectedMinorUnits: amountMinorUnits,
+      actualMinorUnits,
+      varianceMinorUnits,
+      evidenceStatus: isPosted ? 'complete' : isBlocked ? 'missing' : 'partial',
+      reconciliationStatus: isPosted ? 'matched' : isBlocked ? 'disputed' : 'unmatched',
+      currencyCode: 'YER',
+      ownerService: 'wlt',
+      dshRole: 'view_only',
+      sourceOrderId: entry.order_id,
+      sourceStoreId: actorType === 'partner' ? entry.subject : undefined,
+      sourceCaptainId: actorType === 'captain' ? entry.subject : undefined,
+      sourceFieldAgentId: actorType === 'field' ? entry.subject : undefined,
+      debitAccountId: `[runtime] ${entry.reference_type}:debit`,
+      creditAccountId: `[runtime] ${entry.reference_type}:credit`,
+      auditTrailId: entry.id,
+      allowedAction: isPosted ? 'review' : 'view_evidence',
+      blockedReason: isBlocked ? (entry.reference_id ?? 'wlt_runtime_blocked') : undefined,
+      expectedSource,
+      actualSource,
+      evidenceSource: isPosted ? 'audit-entry' : 'none',
+      varianceReason: varianceMinorUnits !== 0 ? 'WLT runtime لم يؤكد الفعلي بعد' : undefined,
+      bankDepositRef: actualSource === 'bank-deposit' ? entry.reference_id ?? entry.id : undefined,
+      cashBagRef: undefined,
+      ledgerEntryRef: entry.id,
+      workflowState: isPosted ? 'approved' : isBlocked ? 'blocked_wlt' : 'prepared',
+    };
   });
+}
+
+function buildInitialWorkbenchRows(runtimeFinance: WltDshFinanceRuntimeResult | null): ReadonlyArray<DshFinancePreviewRow> {
+  const runtimeRows = buildRuntimeWorkbenchRows(runtimeFinance);
+  return runtimeRows.length > 0 ? runtimeRows : buildPreviewWorkbenchRows();
+}
+
+export function DailyReconciliationWorkbench() {
+  const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
+  const [allRows, setAllRows] = React.useState<ReadonlyArray<DshFinancePreviewRow>>(() => buildInitialWorkbenchRows(null));
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void loadWltDshFinanceRuntimeReadModel().then((result) => {
+      if (cancelled) {
+        return;
+      }
+      setRuntimeFinance(result);
+      setAllRows(buildInitialWorkbenchRows(result));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const [auditTrails, setAuditTrails] = React.useState<Record<string, Array<{ timestamp: string; actor: string; action: string; note?: string }>>>({});
   const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
@@ -210,6 +292,13 @@ export function DailyReconciliationWorkbench() {
 
   return (
     <Box gap={4} style={{ direction: 'rtl', padding: 8, maxWidth: '100%' }}>
+      <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={1}>
+        <Text role="bodySm" tone="soft">
+          {runtimeFinance?.state === 'runtime'
+            ? `مرتبط بصفوف مشتقة من WLT runtime ledger · ${runtimeFinance.data.baseUrl}`
+            : 'Fallback preview rows عند تعذر WLT runtime أو قبل اكتمال التحميل.'}
+        </Text>
+      </Box>
 
       <div
         style={{
@@ -317,24 +406,7 @@ export function DailyReconciliationWorkbench() {
           <Text role="titleSm" weight="black" style={{ margin: 0 }}>ميزان مطابقة البنود والقيود اليومية ({allRows.length} قيد)</Text>
           <button
             onClick={() => {
-              const surfaces = getAdaptedFinanceControlPanelRows();
-              const seen = new Set<string>();
-              const combined: DshFinancePreviewRow[] = [];
-              for (const surface of [
-                surfaces.overview,
-                surfaces['cod-reconciliation'],
-                surfaces.settlements,
-                surfaces.payouts,
-                surfaces.refunds,
-              ] as const) {
-                for (const row of surface) {
-                  if (!seen.has(row.id)) {
-                    seen.add(row.id);
-                    combined.push(row);
-                  }
-                }
-              }
-              setAllRows(combined);
+              setAllRows(buildInitialWorkbenchRows(runtimeFinance));
               setAuditTrails({});
             }}
             style={{

@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import type { DshClientState } from '../data/operational-statuses.preview-data';
+import type { DshClientState } from '../shared/client-state';
 import {
   type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,

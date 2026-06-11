@@ -68,7 +68,8 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
   }
 
   return (
-    <Box gap={6} dir="rtl">
+    <div dir="rtl">
+      <Box gap={6}>
       <Box layoutDirection="row" justify="space-between" align="center">
         <Box gap={1}>
           <Text role="caption" tone="brand">مسار استقبال الشركاء</Text>
@@ -83,7 +84,7 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
           ...dshPartnerIntakeMetrics.map((m, i) => ({
             id: m.id,
             label: m.label,
-            value: m.value,
+            value: String(m.value),
             tone: i === 0 ? ('warning' as const) : ('neutral' as const),
           })),
           { id: 'decision-time', label: 'متوسط وقت القرار', value: '١٤ د', tone: 'success' as const },
@@ -121,7 +122,8 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
           );
         })}
       </Box>
-    </Box>
+      </Box>
+    </div>
   );
 }
 

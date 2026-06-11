@@ -11,7 +11,9 @@
   ],
   "allowedDirectories": [
     "lib",
-    "design"
+    "design",
+    "logic",
+    "organization"
   ],
   "allowContextPatterns": [
     "legacy",

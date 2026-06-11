@@ -11,9 +11,10 @@ import {
 } from '../../data/marketing.preview-data';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
-import { getPartnerOfferItems, type PartnerOfferRecord } from '../../data/offers.preview-data';
+import { getPartnerOfferItems } from '../../data/offers.preview-data';
+import type { CampaignRecord } from '../../shared/dsh-marketing-types';
+import type { PartnerOfferRecord } from '../../shared/dsh-partner-offer-types';
 import type { SubscriptionPlan, Entitlement } from '../../data/subscriptions.preview-data';
-import type { CampaignRecord } from '../../data/marketing.preview-data';
 
 
 

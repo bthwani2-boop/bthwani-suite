@@ -11,7 +11,7 @@ import {
   getHomePromoVisibilityRecord,
   isMarketingRenderable,
 } from '../../shared/marketing-visibility.contract';
-import type { HomePromoRecord } from '../../data/marketing.preview-data';
+import type { HomePromoRecord } from '../../shared/dsh-marketing-types';
 import type { HomeStoreCardEntry } from '../parts/home/HomeStoreFeedSection';
 import { resolveHomePromoPublishStage } from '../shared/home-promo-mappers';
 import { resolveHomeStoresForCategory } from '../shared/home-search-helpers';

@@ -44,7 +44,7 @@ export type DshClientSurfaceProps = {
 };
 
 
-export type { DshClientState } from '../data/operational-statuses.preview-data';
+export type { DshClientState } from '../shared/client-state';
 export type {
 	DshClientBindingError,
 	DshClientCartLine,

@@ -12,7 +12,7 @@ import {
   useTheme,
   spacing,
 } from '@bthwani/ui-kit';
-import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType } from '../../data/offers.preview-data';
+import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType } from '../../shared/dsh-partner-offer-types';
 import {
   getPartnerOfferVisibilityRecord,
 } from '../../shared/marketing-visibility.contract';

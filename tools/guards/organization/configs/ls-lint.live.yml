@@ -1,0 +1,15 @@
+ls:
+  dsh/frontend:
+    .ts: kebab-case
+    .tsx: PascalCase | kebab-case
+  wlt/frontend:
+    .ts: kebab-case
+    .tsx: PascalCase | kebab-case
+ignore:
+  - node_modules
+  - .next
+  - dist
+  - build
+  - .tamagui
+  - graphify-out
+  - tools/registry/runs

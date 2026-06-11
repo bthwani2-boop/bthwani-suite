@@ -4,7 +4,7 @@ import { Box, Icon, Text, colorPalette, shadowPresets,
   radius,
   spacing,
 } from '@bthwani/ui-kit';
-import type { MarketingVideoRecord } from '../../data/marketing.preview-data';
+import type { MarketingVideoRecord } from '../../shared/dsh-marketing-types';
 
 import { usePlatformVars } from '../../shared';
 

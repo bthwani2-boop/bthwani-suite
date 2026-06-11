@@ -4,7 +4,7 @@
 
 import { dshCategoryFixtures } from '../../data/categories.preview-data';
 import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/stores.preview-data';
-import type { MarketingBannerRecord } from '../../data/marketing.preview-data';
+import type { MarketingBannerRecord } from '../../shared/dsh-marketing-types';
 import { SUBSCRIPTION_OPTIONS } from './banner-types';
 import type { BannerDraft, SmartBannerTargetType, SmartTargetSummary } from './banner-types';
 

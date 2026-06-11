@@ -34,8 +34,8 @@ import {
   isMarketingRenderable,
 } from '../../shared/marketing-visibility.contract';
 import type { DshNotificationItem } from './NotificationsScreen';
-import type { PartnerOfferRecord } from '../../data/offers.preview-data';
-import type { CampaignRecord } from '../../data/marketing.preview-data';
+import type { CampaignRecord } from '../../shared/dsh-marketing-types';
+import type { PartnerOfferRecord } from '../../shared/dsh-partner-offer-types';
 
 type DshBenefitsSection = 'now' | 'loyalty' | 'subscription' | 'offers' | 'history';
 
