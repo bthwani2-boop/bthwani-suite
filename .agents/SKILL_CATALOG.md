@@ -3,6 +3,9 @@
 | Skill | Purpose | Governance dependency | Output |
 |---|---|---|---|
 | `bthwani-graphify-query-first` | Use Graphify before broad raw-file search for repo architecture, ownership, dependency, routing, UI-kit, DSH data/media, and cross-surface questions. | local `graphify-out/graph.json` cache + exact owner files | focused file set + evidence-aware next action |
+| `bthwani-logic-graph-guard-tooling-contract` | Route feature, journey, screen, API, state, Cucumber/Spectral/Playwright, and cross-surface logic gap diagnostics. | feature/journey manifests + OpenAPI + existing guards | logic gap matrix + evidence-aware next action |
+| `bthwani-design-guard-tooling-contract` | Route installed design tooling, generated-output safety, UI-kit ownership, Tamagui boundary, design-token drift, and visual evidence checks. | `ui-kit`, `tools/guards`, generated/cache outputs | design tooling decision + guard/evidence requirements |
+
 | `bthwani-current-workspace-authority` | Resolve active roots and block stale/donor paths. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-agent-governance-execution` | Enforce scoped execution, forensics, dry-run, apply, verification, and evidence. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-local-evidence-pack` | Collect human-requested or workflow-justified local evidence; ZIP only when explicitly requested or when one upload artifact is practically needed. | `governance/` according to task domain | structured decision + evidence requirements |

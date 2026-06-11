@@ -54,6 +54,9 @@
 | `bthwani-frontend-design-excellence-contract` | See `.agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md`. |
 | `bthwani-stop-slop-prose-contract` | See `.agents/skills/bthwani-stop-slop-prose-contract/SKILL.md`. |
 | `bthwani-graphify-query-first` | See `.agents/skills/bthwani-graphify-query-first/SKILL.md`. |
+| `bthwani-logic-graph-guard-tooling-contract` | See `.agents/skills/bthwani-logic-graph-guard-tooling-contract/SKILL.md`. |
+| `bthwani-design-guard-tooling-contract` | See `.agents/skills/bthwani-design-guard-tooling-contract/SKILL.md`. |
+
 
 ## Preserved external/generated skills
 
