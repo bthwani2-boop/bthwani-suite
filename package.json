@@ -96,6 +96,7 @@
     "globals": "^16.0.0",
     "jscpd": "5.0.6",
     "knip": "6.16.1",
+    "madge": "8.0.0",
     "next": "16.2.2",
     "nx": "22.3.3",
     "openapi-typescript": "7.13.0",
