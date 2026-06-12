@@ -15,7 +15,6 @@ Lean index for the current DSH docs baseline. Service-state truth lives in the l
 - **Master Execution Sequence:** `tools/plan/BTHWANI_FORWARD_ONLY_CLOSURE_PACKAGE_20260523/00_START_HERE_MASTER_ROADMAP.md`
 - **Active Frontend Root:** `dsh/frontend/` is the active root for current frontend implementations.
 - **Active Surfaces:** `app-client`, `app-partner`, `app-captain`, `app-field`, and `control-panel` are the active frontend surfaces in the current repository.
-- **Inactive Source:** `packages/surfaces/src/service-owned/dsh` is NOT the active source of truth for this slice unless a separate evidence-backed decision restores it.
 
 ---
 

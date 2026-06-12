@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const cwd = process.cwd();
 const files = [
-  'packages/app-shells/web/control-panel/ControlPanelSurfaceHost.tsx',
-  'packages/ui-kit/src/web/root-layout.tsx'
+  'control-panel/shell/ControlPanelSurfaceHost.tsx',
+  'ui-kit/src/web/root-layout.tsx'
 ];
 
 for (const rel of files) {

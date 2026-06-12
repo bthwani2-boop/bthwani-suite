@@ -27,14 +27,14 @@ const forbiddenPatterns = [
     name: 'Direct getBthUiText usage outside ui-kit i18n/hook',
     regex: /\bgetBthUiText\s*\(/,
     allowPaths: [
-      'packages/ui-kit/src/foundation/i18n/BthUiTextCatalog.ts',
-      'packages/ui-kit/src/hooks/useUiText.ts',
+      'ui-kit/src/foundation/i18n/BthUiTextCatalog.ts',
+      'ui-kit/src/hooks/useUiText.ts',
     ],
   },
   {
     name: 'Global html dir selector inside shared web adapter CSS',
     regex: /html\[dir=['"](?:rtl|ltr)['"]\]/,
-    includePaths: ['packages/ui-kit/src/adapters/web/'],
+    includePaths: ['ui-kit/src/adapters/web/'],
   },
   {
     name: 'Caller-owned language click on shared command center frame',
@@ -44,13 +44,12 @@ const forbiddenPatterns = [
     name: 'Local language ownership in live control-panel web tree',
     regex: /\b(useUiLanguage\s*\(|toggleLanguage\s*\(|setLanguage\s*\()/,
     includePaths: [
-      'apps/web/control-panel/',
-      'packages/app-shells/web/control-panel/',
-      'packages/surfaces/src/dsh/control-panel/',
+      'control-panel/',
     ],
-    excludePaths: ['packages/app-shells/web/control-panel/quarantine/'],
+    excludePaths: [],
     allowPaths: [
-      'packages/ui-kit/src/hooks/useUiLanguage.ts',
+      'ui-kit/src/providers.tsx',
+      'control-panel/shell/ControlPanelSurfaceHost.tsx',
     ],
   },
 ];

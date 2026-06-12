@@ -12,7 +12,7 @@ for (const f of files) {
   if (rp === 'ui-kit/src/foundation.ts') continue; // color palette source — intentional raw hex definitions, not a consumer
   const txt = readText(f); if (!txt) continue;
   let m;
-  const insideUiKit = rp.startsWith('packages/ui-kit/') || rp.startsWith('ui-kit/'); // not active path ref: scanned-file classification
+  const insideUiKit = rp.startsWith('ui-kit/'); // not active path ref: scanned-file classification
   const tamagui = /from\s+['"](?:tamagui|@tamagui\/[^'"]+)['"]|require\(['"](?:tamagui|@tamagui\/[^'"]+)['"]\)/g;
   while ((m=tamagui.exec(txt))) {
     if (!insideUiKit && rp !== 'tamagui.build.ts' && !rp.endsWith('/tamagui.build.ts') && !/\.md$/i.test(rp)) r.add('FAIL','direct_tamagui_outside_ui_kit',f,'Direct Tamagui import outside @bthwani/ui-kit boundary.',lineOf(txt,m.index),'Move primitive usage into ui-kit and consume public exports only.'); // not active path ref: scanned-file classification
@@ -21,13 +21,13 @@ for (const f of files) {
   while ((m=hex.exec(txt))) {
     const value = m[0];
     if (!brandHex.has(value)) {
-      const reusable = rp.startsWith('packages/') || rp.includes('/components/') || rp.includes('/ui-kit/'); // not active path ref: scanned-file classification
+      const reusable = rp.includes('/components/') || rp.includes('/ui-kit/'); // not active path ref: scanned-file classification
       r.add(reusable ? 'FAIL' : 'WARN','central_color_system_drift',f,`Hardcoded non-core color ${value}. توجب الالتزام بنظام الألوان المركزي.`,lineOf(txt,m.index),'Use official @bthwani/ui-kit/design-system token or document exception.');
     }
   }
   const localComponentName = /function\s+(Button|Card|Header|Modal|Sheet|Tabs|List|Field)\b|const\s+(Button|Card|Header|Modal|Sheet|Tabs|List|Field)\s*=/g;
   while ((m=localComponentName.exec(txt))) {
-    if (!rp.startsWith('packages/ui-kit/') && !rp.startsWith('ui-kit/')) r.add('WARN','possible_local_reusable_component',f,'Possible reusable UI component implemented locally. تجب إزالة ومعالجة وتصحيح الضجيج والتكرار والكود الميت والتسرب والتشظي والتبعثر.',lineOf(txt,m.index),'Classify ownership; centralize reusable pattern in approved ui-kit owner only if needed and approved.'); // not active path ref: scanned-file classification
+    if (!rp.startsWith('ui-kit/')) r.add('WARN','possible_local_reusable_component',f,'Possible reusable UI component implemented locally. تجب إزالة ومعالجة وتصحيح الضجيج والتكرار والكود الميت والتسرب والتشظي والتبعثر.',lineOf(txt,m.index),'Classify ownership; centralize reusable pattern in approved ui-kit owner only if needed and approved.'); // not active path ref: scanned-file classification
   }
   const stateHints=['loading','empty','error','success','offline','disabled'];
   if (/Screen\.tsx$|Screen\.ts$|Workspace\.tsx$|page\.tsx$/.test(rp)) {

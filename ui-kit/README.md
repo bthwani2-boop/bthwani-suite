@@ -36,12 +36,12 @@
 - token output APIs live in the foundation layer
 - theme output APIs live in the foundation layer
 - web root CSS variables are generated from the same theme source consumed by native modes
-- generated proof artifacts, when produced, live under `packages/ui-kit/docs/generated`
+- generated proof artifacts, when produced, live under `ui-kit/docs/generated`
 
 ## Proof stack
 
-- generated proof artifacts: `packages/ui-kit/docs/generated`
-- visual regression and interaction proof: `apps/web/website/playwright.config.ts` and `packages/ui-kit/docs/generated`
+- generated proof artifacts: `ui-kit/docs/generated`
+- visual regression and interaction proof: `website/runtime/playwright.config.ts` and `ui-kit/docs/generated`
 - verification targets: `pnpm nx run ui-kit:typecheck`, `pnpm nx run ui-kit:build-outputs`, `pnpm nx run ui-kit:proof`
 
 ## Phase boundary note
