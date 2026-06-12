@@ -4,7 +4,7 @@
  * for use in store-detail and home preview screens.
  *
  * Moved here from dsh/frontend/app-client/shared/store-builders to correct
- * the dependency direction: dsh/frontend/data must not import from surfaces.
+ * the dependency direction: archived seed data must not import from surfaces.
  *
  * Owner: dsh/frontend/shared
  * Not a runtime binding — not API/backend source.

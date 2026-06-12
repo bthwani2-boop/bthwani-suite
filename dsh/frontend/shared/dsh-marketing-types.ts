@@ -1,5 +1,5 @@
-// Runtime-safe marketing types extracted from preview-data ownership so live
-// surfaces can depend on contracts without importing preview stores.
+// Runtime-safe marketing types extracted from archived seed ownership so live
+// surfaces can depend on contracts without importing archived stores.
 
 export type MarketingBannerActionType =
   | 'main_category'

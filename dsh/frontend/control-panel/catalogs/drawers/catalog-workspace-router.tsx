@@ -62,7 +62,7 @@ function approvalStageToActivationStatus(stage: string) {
 // ── Workspace input adapters ──────────────────────────────────────────────────
 // Named adapter functions that extract the minimal input each workspace needs
 // from the canonical product array. These are adapter transforms, not new entity
-// definitions — identity comes from dsh/frontend/data via catalog.ts.
+// definitions — identity comes from the catalog model, not workspace-local drafts.
 
 function toIdentityItems(products: readonly CatalogProductMaster[]) {
   return products.map((p) => ({

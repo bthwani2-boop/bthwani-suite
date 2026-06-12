@@ -629,11 +629,10 @@ export {
 } from './dsh-preview-color';
 
 // --- Catalog Central Adapter (DEV_ONLY offline fallback) ---
-// Maps central data (dsh/frontend/data) to surface view models.
+// Maps archived seed catalog data to surface view models.
 // Surfaces consume through this adapter — they do NOT own catalog identity.
 // Owner: dsh/frontend/shared (adapter layer)
-// Central data: dsh/frontend/data/legacy-preview/products.preview-data.ts, categories.preview-data.ts
-// Media: dsh/frontend/media-fixtures (resolved via resolve-dsh-image-source.ts)
+// Runtime catalog identity and media must come from DSH API/runtime media assets.
 export type {
   CatalogPartnerInventoryItem,
   PartnerInventoryDetail,

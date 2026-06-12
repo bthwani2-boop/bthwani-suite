@@ -144,6 +144,42 @@ WLT للمنطق المالي
 إذا احتاج التدفق إدخالًا يدويًا، أنشئ أو أصلح الشاشة أو endpoint أو Control Panel path اللازم له الآن.
 لا تترك الإدخال اليدوي كملاحظة مؤجلة.
 
+## 5.1) Gate إلزامي لإدخال البيانات والوسائط الحقيقية
+
+أي إدخال بيانات حقيقية أو صور أو فيديوهات أو مستندات لا يُقبل إلا عبر هذا المسار التشغيلي:
+
+```text
+PostgreSQL = البيانات التشغيلية والـ metadata فقط
+dsh_media_assets = سجل metadata وربط الوسائط بالمالك والغرض والحالة
+MinIO/S3-compatible storage = الملفات الثنائية الفعلية
+DSH Media Runtime API = upload intent / complete / read / list / delete
+Control Panel = مسار الإدخال الحقيقي
+WLT = منطق الماليات والـ read-models المالية
+```
+
+ممنوع نهائيًا تخزين binary image/video داخل PostgreSQL، أو استخدام `dsh/frontend/data` أو `dsh/frontend/media-fixtures` كمصدر runtime، أو إنشاء fixture/mock/fallback بديل، أو إدخال media حقيقية قبل إثبات upload flow end-to-end.
+
+قبل أي real data/media entry يجب إثبات Gate كامل داخل نفس الشريحة:
+
+```text
+PostgreSQL healthy
+dsh_media_assets migration applied
+MinIO healthy
+bucket bthwani-media-local exists
+DSH API لا يرجع MEDIA_STORAGE_UNAVAILABLE
+POST /media/upload-intents يرجع upload_url و storage_key و media_id
+PUT إلى upload_url ينجح
+POST /media/{media_id}/complete ينجح
+GET /media/{media_id} يرجع bucket/storage_key/public_url/status
+GET /media?owner_type=&owner_id= يرجع الوسائط المرتبطة
+الواجهة أو Control Panel يستخدم Media Runtime API ولا يستورد data/media-fixtures
+```
+
+أي فشل في هذه النقاط يمنع `CLOSED_WITH_EVIDENCE`.
+إذا كان MinIO أو bucket أو upload_url غير جاهز وكان الإصلاح داخل النطاق، أصلح Docker/local runtime أو env أو media storage config داخل الشريحة نفسها.
+إذا كان التدفق يحتاج شاشة إدخال أو Control Panel path، أنشئها أو أصلحها الآن.
+إذا كانت الوسائط تخص WLT، يحفظ WLT `media_id` أو reference فقط، ولا ينسخ الملفات أو metadata خارج عقد WLT المعتمد.
+
 ## 6) منع preview/demo/mock نهائيًا
 
 داخل نطاق الشريحة، أزل أو اعزل أي اعتماد runtime على:
@@ -178,6 +214,42 @@ C:\bthwani-suite\dsh\frontend\media-fixtures
 
 فأغلقه داخل الشريحة نفسها بتحويل المستهلك إلى API/runtime/MinIO/S3/metadata الحقيقي.
 لا تنشئ بديلًا محليًا جديدًا.
+
+### 6.1) العزل والإزالة الفورية بدل التصنيف
+
+هذه ليست قاعدة تصنيف. هذه قاعدة معالجة فورية.
+
+عند رصد أي runtime usage من:
+
+```text
+preview
+demo
+mock
+fixture
+sample
+fake
+fallback
+dev data
+test-only runtime data
+legacy-preview
+dsh/frontend/data
+dsh/frontend/media-fixtures
+```
+
+الإجراء الإلزامي هو:
+
+1. إزالة أو عزل الاعتماد الحي فورًا.
+2. تحويل المستهلك إلى API حقيقي أو شاشة إدخال حقيقية أو Media Runtime API أو WLT bridge صحيح.
+3. حذف import أو export أو barrel يخفي المصدر الأصلي.
+4. حذف fallback المحلي أو نقله إلى test/story/dev-only إذا كان مطلوبًا للاختبار.
+5. تشغيل graph/import/delete probe قبل حذف المصدر.
+6. إثبات صفر runtime imports من data/media-fixtures بعد الإصلاح.
+
+ممنوع كتابة `LIVE_RUNTIME_VIOLATION` أو `BLOCKED_NEEDS_API` أو `ADAPTER_ALLOWED_WITH_EXIT_PATH` كبديل عن التنفيذ.
+هذه العبارات لا تستخدم إلا داخل evidence بعد تنفيذ أقصى إصلاح ممكن، ومع تحديد ما أُزيل، وما عُزل، وما حُوّل إلى API/MinIO/WLT/input path، وما بقي خارجيًا فقط، وأمر التحقق الذي يثبت ذلك.
+
+إذا كان endpoint أو input path ناقصًا وكان داخل نطاق الشريحة، أنشئه الآن.
+إذا كان خارجيًا فقط، أثبت ذلك بأمر فاشل واضح ومسار محدد وسبب خارجي غير قابل للحل من الريبو.
 
 ## 7) حدود DSH/WLT المالية
 
@@ -224,6 +296,119 @@ C:\bthwani-suite\.env.local
 ```
 
 إذا كشفت الرحلة أو graph أو imports أو runtime ملفات إضافية مرتبطة، افحصها وأغلقها ضمن نفس الشريحة.
+
+## 8.1) قانون Surface Host العملي بدون تضخيم
+
+Surface host وظيفته orchestration فقط:
+
+```text
+تركيب providers/controllers
+تمرير runtime context
+ربط route الحالي
+ربط screen registry
+تجميع handlers جاهزة من hooks/adapters
+```
+
+ممنوع داخل Surface host:
+
+```text
+route switch ضخم
+screen registry inline كبير
+API mapping متعدد
+WLT money logic
+business calculations
+hardcoded operational identities
+preview/demo/sample/fallback data
+storage read/write مباشر
+media fixture resolving
+large copy blocks
+large inline arrays/objects
+screen-specific validation
+```
+
+إذا تجاوز Surface host حد orchestration، لا تنفذ refactor واسعًا ولا تنشئ مجلدات شكلية.
+استخرج أصغر مسؤولية حقيقية فقط، وبالترتيب عند الحاجة:
+
+```text
+state/       عند وجود state أو handlers كبيرة
+routes/      عند وجود route switch أو command routing
+adapters/    عند وجود API/WLT/media transformation
+copy/        عند وجود نصوص ثابتة كثيرة
+parts/       عند وجود UI sections طويلة أو متكررة
+screens/     عند وجود screen rendering داخل surface
+contracts/   عند وجود types مشتركة بين أكثر من طبقة
+storage/     عند وجود persistence/offline drafts
+```
+
+أنشئ المجلد فقط إذا وجدت مسؤولية حقيقية.
+ممنوع التوحيد الأعمى بين `app-client` و`app-partner` و`app-captain` و`app-field`.
+ممنوع mass rename أو تغيير UI behavior إلا بالحد الأدنى اللازم لإزالة مخالفة runtime أو فصل مسؤولية مثبتة.
+
+### 8.2) Ratchet إجباري عند وجود Surface legacy ضخم
+
+إذا كان Surface host الحالي ضخمًا وموجودًا قبل الشريحة، فلا يجوز إخفاء الدين ولا تنفيذ تفكيك عشوائي واسع.
+الإجراء العملي الإلزامي هو:
+
+```text
+تثبيت baseline line-count للملف الحالي
+منع أي نمو جديد فوق baseline
+منع direct data/media-fixtures import أو require
+منع storage direct access داخل Surface
+فتح تفكيك state/routes/adapters/screens كشرائح لاحقة فقط مع graph/import proof
+```
+
+هذا ratchet لا يعني أن التفكيك العميق اكتمل.
+يعني أن الشريحة الحالية تمنع التدهور وتغلق التسريبات القابلة للإثبات الآن، ثم تجعل أي زيادة لاحقة فشلًا مباشرًا.
+
+## 8.5) نطاق WLT/DSH frontend الإلزامي
+
+المسار التالي جزء إلزامي من أي شريحة DSH frontend أو real data/media أو finance boundary:
+
+```text
+C:\bthwani-suite\wlt\frontend\dsh
+```
+
+ممنوع إغلاق أي شريحة DSH/WLT إذا لم يتم فحص هذا المسار عند وجود أي ارتباط بـ:
+
+```text
+wallet
+balance
+payment
+refund
+settlement
+ledger
+finance summary
+earnings
+WLT bridge
+DSH finance read-model
+media_id reference
+preview-data
+FinancePreview
+PaymentPreview
+```
+
+مسؤولية هذا المسار هي توفير WLT-owned adapters/read-models/bridges لأسطح DSH، وإبقاء money mutation داخل WLT فقط، وإرجاع references واضحة إلى DSH بدون تكرار منطق المال داخل DSH.
+
+ممنوع داخله runtime preview/demo/mock/fake/sample/fallback data، أو تكرار `dsh/frontend/data` أو `media-fixtures`، أو نسخ metadata الخاصة بـ `dsh_media_assets` بدل reference صحيح، أو نقل money logic إلى DSH.
+
+أي ملف runtime داخل `wlt/frontend/dsh` يحمل اسم `Preview` أو `preview-data` أو `FinancePreview` أو `PaymentPreview` أو `Demo` أو `Mock` أو `Sample` أو `Fallback` يجب معالجته فورًا بأحد الإجراءات التنفيذية:
+
+1. إعادة تسميته إلى `Summary` أو `Session` أو `ReadModel` إذا كان runtime حقيقيًا.
+2. عزله إلى test/story/dev-only إذا كان غير تشغيلي.
+3. حذفه بعد import/reference proof إذا كان ميتًا.
+4. استبداله بـ WLT API/read-model حقيقي إذا كان يغطي نقصًا تشغيليًا.
+
+قبل حذف `dsh/frontend/data` أو `dsh/frontend/media-fixtures` يجب إثبات صفر اعتماد مباشر أو غير مباشر عليها داخل:
+
+```text
+C:\bthwani-suite\dsh\frontend\shared
+C:\bthwani-suite\dsh\frontend\control-panel
+C:\bthwani-suite\dsh\frontend\app-client
+C:\bthwani-suite\dsh\frontend\app-partner
+C:\bthwani-suite\dsh\frontend\app-captain
+C:\bthwani-suite\dsh\frontend\app-field
+C:\bthwani-suite\wlt\frontend\dsh
+```
 
 ## 9) قرار كل ملف يتم لمسه
 
@@ -323,6 +508,95 @@ dsh/frontend/media-fixtures
 
 فشغّل Delete Probe أو فحصًا مكافئًا يثبت عدم وجود consumers مكسورين أو references ممنوعة.
 
+### 11.1) VERIFY إلزامي لمسار media الحقيقي
+
+إذا مسّت الشريحة data entry أو product/store/banner/campaign media أو order proof media أو field visit media أو support/dispute attachments أو `dsh_media_assets` أو MinIO/S3 أو media upload UI أو Control Panel media input، يجب تشغيل تحقق media runtime كامل، وليس TypeScript فقط.
+
+الحد الأدنى:
+
+```powershell
+Set-Location -LiteralPath "C:\bthwani-suite"
+
+docker compose -f .\docker-compose.local.yml config
+docker compose -f .\docker-compose.local.yml up -d dsh-postgres minio minio-init dsh-api
+
+docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | Tee-Object -FilePath "$RunRoot\docker-ps.txt"
+
+docker exec bthwani-dsh-postgres-local psql -U dsh_local -d dsh_local -c "select to_regclass('public.dsh_media_assets') as dsh_media_assets;" | Tee-Object -FilePath "$RunRoot\postgres-media-table.txt"
+
+$MediaFile = Join-Path $RunRoot "real-media-gate.txt"
+"bthwani real media gate" | Set-Content -LiteralPath $MediaFile -Encoding utf8
+
+$IntentBody = @{
+  owner_type = "product"
+  owner_id = "media-gate-product"
+  media_type = "document"
+  purpose = "attachment"
+  filename = "real-media-gate.txt"
+  mime_type = "text/plain"
+  file_size_bytes = (Get-Item $MediaFile).Length
+} | ConvertTo-Json -Compress
+
+$Intent = Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8080/media/upload-intents" `
+  -Headers @{ "X-Client-Id" = "media-gate-operator"; "X-Actor-Type" = "operator" } `
+  -ContentType "application/json" `
+  -Body $IntentBody
+
+$Intent | ConvertTo-Json -Depth 10 | Tee-Object -FilePath "$RunRoot\media-upload-intent.json"
+
+if (!$Intent.intent.upload_url) {
+  throw "MEDIA_GATE_FAILED: upload_url is empty"
+}
+
+Invoke-WebRequest `
+  -Method Put `
+  -Uri $Intent.intent.upload_url `
+  -InFile $MediaFile `
+  -ContentType "text/plain" `
+  | Out-File "$RunRoot\media-put-result.txt"
+
+$Complete = Invoke-RestMethod `
+  -Method Post `
+  -Uri "http://localhost:8080/media/$($Intent.intent.media_id)/complete" `
+  -Headers @{ "X-Client-Id" = "media-gate-operator"; "X-Actor-Type" = "operator" } `
+  -ContentType "application/json" `
+  -Body (@{ actor_id = "media-gate-operator" } | ConvertTo-Json -Compress)
+
+$Complete | ConvertTo-Json -Depth 10 | Tee-Object -FilePath "$RunRoot\media-complete.json"
+
+$ReadBack = Invoke-RestMethod `
+  -Method Get `
+  -Uri "http://localhost:8080/media/$($Intent.intent.media_id)"
+
+$ReadBack | ConvertTo-Json -Depth 10 | Tee-Object -FilePath "$RunRoot\media-readback.json"
+
+if ($ReadBack.status -ne "active") {
+  throw "MEDIA_GATE_FAILED: media status is not active"
+}
+```
+
+استخدام document/text في gate مسموح لاختبار upload pipeline.
+أما الصور والفيديوهات الحقيقية فتُختبر عند وجود شاشة أو flow إدخال خاص بها، ويجب حفظ evidence منفصل لها.
+
+### 11.2) حراس لا تقبل report-only في شرائح الإغلاق
+
+في أي شريحة live closure، الحارس الذي يمس نطاق الشريحة يجب أن يكون failing guard.
+
+ممنوع اعتبار الآتي evidence إغلاق:
+
+```text
+--exit-code 0
+WARN فقط
+REPORT فقط
+NOT_RUN_REASON
+TOLERATED_VIOLATIONS
+```
+
+ينطبق ذلك خصوصًا على duplication وruntime preview/data/media imports وsurface structure وWLT/DSH boundary وPostgreSQL readiness وMinIO readiness وMedia Runtime API وOpenAPI/client binding.
+إذا كان guard الحالي report-only، إما تعدله ليصبح failing داخل scope، أو تشغل probe بديل يفشل فعليًا عند المخالفة وتحفظ خروجه داخل evidence.
+
 ## 12) شروط الإغلاق
 
 ممنوع إعلان:
@@ -358,6 +632,130 @@ FINAL
 
 إذا فشل شرط، لا تكتب نتيجة نهائية.
 ارجع فورًا إلى `APPLY` وأصلح ثم أعد `VERIFY`.
+
+### 12.1) شرط إغلاق إدخال البيانات والوسائط
+
+ممنوع إعلان `CLOSED_WITH_EVIDENCE` لأي شريحة real data/media إذا كان:
+
+```text
+MinIO غير شغال
+minio-init لم يثبت إنشاء bucket
+upload_url فارغ
+MEDIA_STORAGE_UNAVAILABLE ظاهر
+dsh_media_assets غير موجود
+public_url/storage_key غير راجعين من GET /media/{media_id}
+الواجهة ما زالت تستورد data/media-fixtures
+```
+
+في وضع التطوير، قد يبقى MinIO optional لتشغيل API العام.
+لكن عند أي شريحة إدخال بيانات أو وسائط حقيقية، MinIO يصبح required gate داخل تلك الشريحة.
+
+### 12.3) قانون إغلاق الشرائح 100% ومنع الملفات غير المغطاة
+
+ممنوع إعلان أي شريحة `CLOSED_WITH_EVIDENCE` إذا بقي داخل نطاقها أو نطاقها المرتبط أي ملف أو محتوى أو مسار غير مفحوص أو غير مدرج أو غير مملوك لشريحة واضحة.
+
+الإغلاق يعني إثبات أن كل الملفات والمحتوى المرتبطين بالشريحة تم اكتشافهم، إدراجهم، تحليلهم، ربطهم بمالك، معالجة الناقص منهم، إزالة الميت والمتكرر منهم، تحديث المسارات التي تعتمد عليهم، تشغيل التحقق عليهم، وحفظ الدليل.
+
+النطاق الإلزامي لأي شريحة DSH/WLT frontend يشمل:
+
+```text
+C:\bthwani-suite\dsh\frontend\shared
+C:\bthwani-suite\dsh\frontend\control-panel
+C:\bthwani-suite\dsh\frontend\app-client
+C:\bthwani-suite\dsh\frontend\app-partner
+C:\bthwani-suite\dsh\frontend\app-captain
+C:\bthwani-suite\dsh\frontend\app-field
+C:\bthwani-suite\wlt\frontend\dsh
+```
+
+ويشمل كذلك أي ملف خارج هذه المسارات إذا ظهر في imports أو exports أو routes أو navigation أو screen registry أو OpenAPI/client binding أو API adapter أو WLT bridge أو media resolver أو PostgreSQL/MinIO/media flow أو test أو story أو guard أو docker/env/runtime config.
+
+أي ملف مرتبط لم يكن داخل الشريحة الأصلية يجب إدخاله في الشريحة الحالية ومعالجته الآن، أو إنشاء شريحة فرعية فورية له داخل نفس Evidence Session ثم تنفيذها قبل إعلان الإغلاق.
+
+### 12.4) قانون Slice Coverage Matrix
+
+كل شريحة يجب أن تنتج عند الحاجة ملف تغطية داخل Evidence Session باسم:
+
+```text
+slice-coverage-matrix.json
+```
+
+يجب أن يحتوي لكل ملف داخل النطاق: `path`, `owner_slice`, `role`, `runtime_status`, `imported_by`, `imports`, `routes_or_screens`, `uses_data_or_media_fixtures`, `uses_preview_or_mock`, `uses_wlt_bridge`, `uses_media_api`, `uses_postgres_or_api`, `decision`, `action_taken`, `verify_command`, `verify_result`.
+
+القيم المسموحة لـ `decision`:
+
+```text
+KEEP_ACTIVE
+REFACTOR_SPLIT
+MERGE_DUPLICATE
+RETIRE_DEAD
+MOVE_TO_OWNER
+FIXED_IN_SLICE
+ADDED_TO_SLICE
+CREATED_MISSING_SLICE_AND_FIXED
+BLOCKED_EXTERNAL_WITH_PROOF
+```
+
+ممنوع استخدام `UNKNOWN` أو `TBD` أو `UNPROVEN` أو `LATER` أو `OUT_OF_SCOPE` أو `SKIPPED` إلا إذا كانت الحالة `BLOCKED_EXTERNAL_WITH_PROOF` ومعها الدليل والأمر الذي فشل وسبب أن المعالجة خارج الريبو.
+
+### 12.5) قانون اكتشاف النواقص قبل APPLY
+
+قبل تعديل أي ملف في الشريحة، نفّذ discovery موجّهًا للنطاق:
+
+```text
+file inventory
+import/export graph
+route/navigation/screen registry scan
+preview/data/media-fixtures scan
+WLT boundary scan
+control-panel input path scan
+PostgreSQL/MinIO/media flow scan عند وجود وسائط
+duplicate/dead/small/giant file scan عند وجود تنظيم بنيوي
+guard/config/docker/env scan إذا أثرت الشريحة على runtime
+```
+
+أي نقص يظهر في discovery لا يُكتب كتقرير فقط. يتم تحويله مباشرة إلى action داخل نفس الشريحة.
+
+### 12.6) قانون إعادة فتح الشريحة تلقائيًا
+
+إذا ظهرت أثناء VERIFY أي مشكلة في ملف لم يكن مدرجًا في الشريحة:
+
+```text
+الشريحة تُعاد إلى APPLY فورًا
+يُضاف الملف إلى slice-coverage-matrix.json
+يُعالج الملف أو يُنشأ له sub-slice فوري
+يُعاد تشغيل VERIFY
+```
+
+ممنوع اعتبار VERIFY ناجحًا إذا كشف ملفًا ناقصًا أو غير مغطى.
+
+### 12.7) قانون المحتوى الناقص داخل الشرائح
+
+لا يكفي أن تكون الملفات موجودة. يجب فحص محتوى الشرائح نفسها.
+كل Journey/Slice يجب أن يحتوي على الأقل: `scope`, `linked paths`, `entrypoints`, `dependencies`, `runtime behavior`, `data source`, `media source`, `WLT boundary`, `control-panel relation`, `guards`, `verification commands`, `evidence outputs`, `closure criteria`, `rollback notes`.
+
+إذا كانت الشريحة لا تذكر مسارًا مرتبطًا أو سلوكًا مرتبطًا أو مصدر بيانات/وسائط مرتبط، يتم تحديث الشريحة أو `command` قبل التنفيذ، ثم يبدأ التطبيق.
+
+### 12.8) شرط الإغلاق النهائي لكل الشرائح
+
+لا يوجد إغلاق نهائي إذا لم تثبت الأدلة:
+
+```text
+صفر uncovered files
+صفر uncovered directories
+صفر uncovered runtime imports
+صفر unowned shared files
+صفر unowned control-panel sections
+صفر unowned WLT/DSH bridge files
+صفر unhandled preview/data/media-fixtures usage
+صفر unhandled route/screen/navigation dependency
+صفر unhandled OpenAPI/client binding dependency
+صفر guard report-only داخل نطاق الإغلاق
+صفر files deleted without reference proof
+```
+
+ويجب وجود evidence مناسب للنطاق مثل `file-inventory.json`, `slice-coverage-matrix.json`, `uncovered-files.md`, `import-reference-report.json`, `preview-data-media-report.json`, `wlt-dsh-boundary-report.json`, `control-panel-input-path-report.json`, `shared-ownership-report.json`, `media-runtime-gate-report.json`, `guard-output.txt`, و`final-decision.md`.
+إذا كان `uncovered-files.md` غير فارغ، ممنوع `CLOSED_WITH_EVIDENCE`.
 
 ## 13) ممنوعات الهروب
 

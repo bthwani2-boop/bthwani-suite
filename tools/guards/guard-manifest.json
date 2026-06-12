@@ -960,6 +960,117 @@
       ]
     },
     {
+      "id": "GUARD_DSH_SURFACE_STRUCTURE",
+      "file": "tools/guards/guard-dsh-surface-structure.mjs",
+      "ownerPolicy": [
+        "governance/14_GUARDS_CATALOG.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "block growth and direct runtime data/media/storage leaks inside DSH Surface hosts",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/app-client/DshClientSurface.tsx",
+        "dsh/frontend/app-partner/DshPartnerSurface.tsx",
+        "dsh/frontend/app-captain/DshCaptainSurface.tsx",
+        "dsh/frontend/app-field/DshFieldSurface.tsx",
+        "tools/guards/guard-dsh-surface-structure.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_DSH_ZERO_GAP_RUNTIME_BOUNDARIES",
+      "file": "tools/guards/guard-dsh-zero-gap-runtime-boundaries.mjs",
+      "ownerPolicy": [
+        "governance/14_GUARDS_CATALOG.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "enforce Zero Gap runtime boundaries across dsh/frontend and wlt/frontend/dsh",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/**",
+        "dsh/frontend/control-panel/**",
+        "dsh/frontend/app-client/**",
+        "dsh/frontend/app-partner/**",
+        "dsh/frontend/app-captain/**",
+        "dsh/frontend/app-field/**",
+        "wlt/frontend/dsh/**",
+        "tools/guards/guard-dsh-zero-gap-runtime-boundaries.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_REAL_MEDIA_RUNTIME",
+      "file": "tools/guards/guard-real-media-runtime.mjs",
+      "ownerPolicy": [
+        "governance/14_GUARDS_CATALOG.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "validate required media runtime files and patterns consistently before real data/media closure",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/dsh.openapi.yaml",
+        "dsh/backend/internal/http/media_runtime_handler.go",
+        "dsh/backend/internal/store/postgres_media_assets_repository.go",
+        "dsh/backend/migrations/030_dsh_media_assets.sql",
+        "dsh/backend/docker-compose.local.yml",
+        "dsh/frontend/shared/dsh-media-api.client.ts",
+        "tools/guards/guard-real-media-runtime.mjs"
+      ],
+      "triggerExtensions": [
+        ".yaml",
+        ".yml",
+        ".go",
+        ".sql",
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs"
+      ]
+    },
+    {
       "id": "GUARD_SERVICE_WORKSPACE_MODEL",
       "file": "tools/guards/guard-service-workspace-model.mjs",
       "ownerPolicy": [

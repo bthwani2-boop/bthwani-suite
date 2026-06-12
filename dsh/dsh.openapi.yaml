@@ -514,6 +514,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '503':
           description: Media storage unavailable — MinIO/S3 not configured
+          x-error-code: MEDIA_STORAGE_UNAVAILABLE
           content:
             application/json:
               schema:

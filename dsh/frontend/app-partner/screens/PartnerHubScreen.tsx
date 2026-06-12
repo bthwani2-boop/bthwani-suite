@@ -42,16 +42,6 @@ import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
 import {
-  partnerTeamPreviewMembers,
-  partnerCoveragePreviewZones,
-  dshPartnerAnalyticsPreview,
-  type PartnerTeamMember,
-  type PartnerCoverageZone,
-  type PartnerTeamStatus,
-  type PartnerTeamRole,
-  type PartnerCoverageZoneStatus,
-} from '../../data';
-import {
   getDshPartnerJourneyStep,
   resolveDshPartnerLifecycleStageLabel,
   type DshPartnerLifecycleStage,
@@ -98,6 +88,65 @@ type NotificationPreferenceId =
   | 'priorityOnly';
 
 type NotificationPreferenceState = Record<NotificationPreferenceId, boolean>;
+
+type PartnerTeamRole = 'owner' | 'supervisor' | 'staff' | 'courier';
+type PartnerTeamStatus = 'active' | 'paused' | 'invited' | 'blocked' | 'review-needed';
+
+type PartnerTeamMember = {
+  id: string;
+  name: string;
+  role: PartnerTeamRole;
+  roleLabel: string;
+  status: PartnerTeamStatus;
+  statusLabel: string;
+  branchAssignment: string;
+  permissionsSummary: string;
+  deliveryAssignment: string;
+  inviteLifecycle: string;
+  operationalImpact: string;
+  auditNote: string;
+  inlineActionLabel: string;
+};
+
+type PartnerCoverageZoneStatus = 'active' | 'pending' | 'blocked';
+
+type PartnerCoverageZone = {
+  id: string;
+  name: string;
+  status: PartnerCoverageZoneStatus;
+  statusLabel: string;
+  branchRelation: string;
+  serviceModeRelation: string;
+  policySummary: string;
+  policyReason: string;
+  operationalImpact: string;
+  pricingReference: string;
+  commissionReference: string;
+  payoutReference: string;
+  reviewActionLabel: string;
+  auditNote: string;
+};
+
+const runtimePartnerTeamMembers: readonly PartnerTeamMember[] = [];
+const runtimePartnerCoverageZones: readonly PartnerCoverageZone[] = [];
+
+const runtimePartnerAnalytics = {
+  storeFavoritesCount: 0,
+  productFavoritesCount: 0,
+  followersCount: 0,
+  totalRatings: 0,
+  averageRating: 0,
+  topOrderedProduct: { name: 'لا توجد بيانات تشغيلية', ordersCount: 0 },
+  topFavoritedProduct: { name: 'لا توجد بيانات تشغيلية', favoritesCount: 0 },
+  topViewedProduct: { name: 'لا توجد بيانات تشغيلية', viewsCount: 0 },
+  opportunityProduct: {
+    name: 'لا توجد بيانات تشغيلية',
+    favoritesCount: 0,
+    ordersCount: 0,
+    insight: 'اربط التحليلات بمسار API أو Control Panel قبل عرض فرص تسويقية تشغيلية.',
+  },
+  smartRecommendation: 'لا توجد توصية تشغيلية قبل ربط analytics runtime.',
+} as const;
 
 
 
@@ -861,8 +910,8 @@ function OperationsPanel({
 }) {
   const { direction } = useDirection();
   const { theme } = useTheme();
-  const teamMembers = partnerTeamPreviewMembers;
-  const coverageZones = partnerCoveragePreviewZones;
+  const teamMembers = runtimePartnerTeamMembers;
+  const coverageZones = runtimePartnerCoverageZones;
   const [selectedModeId, setSelectedModeId] = React.useState<PartnerOperationalMode['id'] | ''>('pickup');
   const [modeOverrides, setModeOverrides] = React.useState<Partial<Record<PartnerOperationalMode['id'], boolean>>>({});
   const [teamPanelOpen, setTeamPanelOpen] = React.useState(false);
@@ -1365,7 +1414,7 @@ function AnalyticsInsightMetric({ label, value, tone = 'default', icon }: { labe
 function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
   const { direction } = useDirection();
   const { theme } = useTheme();
-  const d = dshPartnerAnalyticsPreview;
+  const d = runtimePartnerAnalytics;
 
   return (
     <Box gap={4}>

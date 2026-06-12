@@ -147,7 +147,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
       const badgeLabel = `حملة: ${camp.title}`;
       badges.push({ label: badgeLabel, source: 'campaign' });
       sourceMap[`campaign-${camp.id}`] = {
-        sourceOwner: 'marketing.preview-data',
+        sourceOwner: 'marketing-archived-seed',
         sourceRecordId: camp.id,
         sourceType: 'campaign',
         approvalStage: 'published',
@@ -155,7 +155,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
       };
     } else if (visibility.blockedReason) {
       sourceMap[`campaign-${camp.id}`] = {
-        sourceOwner: 'marketing.preview-data',
+        sourceOwner: 'marketing-archived-seed',
         sourceRecordId: camp.id,
         sourceType: 'campaign',
         approvalStage: camp.status,
@@ -178,7 +178,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
     // Conflict Detection: Pro subscription without entitlement
     const hasProEntitlement = context.activeEntitlements.some(e => e.type === 'loyalty-reward' || e.type === 'subscription');
     sourceMap['hasBthwaniPro'] = {
-      sourceOwner: 'subscriptions.preview-data',
+      sourceOwner: 'subscriptions-archived-seed',
       sourceRecordId: 'sub-pro',
       sourceType: 'subscription',
       approvalStage: 'active',
@@ -193,7 +193,7 @@ export function mapStoreCommercialFeatures(context: StoreCommercialContext) {
       notes.push('يوجد استحقاق مكافأة متاح');
       badges.push({ label: 'مكافأة ولاء', source: 'loyalty' });
       sourceMap[`entitlement-${e.id}`] = {
-        sourceOwner: 'subscriptions.preview-data',
+        sourceOwner: 'subscriptions-archived-seed',
         sourceRecordId: e.id,
         sourceType: 'entitlement',
         approvalStage: 'active',

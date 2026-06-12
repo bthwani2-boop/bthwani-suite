@@ -4,7 +4,7 @@
  * and Vars workspaces inside dsh/frontend/control-panel/platform/.
  *
  * Moved here from surface-local types files to correct the dependency direction:
- * dsh/frontend/data must not import from dsh/frontend/control-panel.
+ * archived seed data must not import from control-panel surface files.
  *
  * Owner: dsh/frontend/shared
  * Not a runtime binding — not API/backend source.

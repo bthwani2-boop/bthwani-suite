@@ -1,4 +1,4 @@
-// Runtime-safe partner offer types extracted from preview-data ownership so
+// Runtime-safe partner offer types extracted from archived seed ownership so
 // live surfaces can depend on contracts without importing preview stores.
 
 export type PartnerOfferType = 'discount' | 'free-delivery' | 'bundle' | 'buy-x-get-y' | 'coupon';

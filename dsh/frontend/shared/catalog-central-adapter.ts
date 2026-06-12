@@ -1,15 +1,14 @@
 /**
  * CENTRAL CATALOG ADAPTER — DEV_ONLY adapter (not UI preview mode)
  * Owner: dsh/frontend/shared (shared adapter layer)
- * Purpose: Map central data (dsh/frontend/data) to surface-specific view models.
+ * Purpose: Map archived seed catalog data to surface-specific view models.
  *
  * SCAFFOLD: not runtime truth, not backend/API binding source.
  * Used as offline fallback when API unreachable. Surfaces consume through this adapter only — they do NOT own identity.
  *
  * Client app was the donor/reference for current correct preview data.
- * Central data owner: dsh/frontend/data/legacy-preview/products.preview-data.ts
- * Central categories owner: dsh/frontend/data/legacy-preview/categories.preview-data.ts
- * Media owner: dsh/frontend/media-fixtures (via resolve-dsh-image-source.ts)
+ * Runtime catalog identity must come from DSH API, not archived seed files.
+ * Runtime media must come from DSH media assets, not archived seed assets.
  */
 
 import type { StoreItemsByStoreId } from './dshStoreProductCardModel';

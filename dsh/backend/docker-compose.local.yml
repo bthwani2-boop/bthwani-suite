@@ -53,7 +53,7 @@ services:
   dsh-api:
     # BTHWANI_DSH_API: Operations/dispatch backend. Stores, orders, products, checkout.
     # Port 8080 internal — host port default 8080. Reserved exclusively for DSH (not Expo).
-    # media-fixtures endpoint (/media-fixtures/) is NOT served inside Docker (dev-only path).
+    # legacy fixture static endpoint is not served inside Docker.
     # To run DSH from host instead: comment out this service and set
     #   WLT_DSH_BASE_URL=http://host.docker.internal:8080 in wlt/backend/docker-compose.local.yml
     build:

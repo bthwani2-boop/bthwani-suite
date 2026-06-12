@@ -88,7 +88,7 @@ type CaptainAppMode = 'bthwani_captain_mode' | 'store_courier_mode';
 type StoreCourierStage = 'ready_for_pickup' | 'picked_up' | 'out_for_delivery' | 'delivery_failed' | 'delivered';
 type DshCaptainPodState = NonNullable<React.ComponentProps<typeof DshCaptainPoDSubmissionScreen>['state']>;
 
-const CAPTAIN_POD_PREVIEW_MEDIA_KEY = 'dsh.proof.delivery.preview.v1';
+const CAPTAIN_POD_PREVIEW_MEDIA_KEY = 'proof.delivery.preview.v1';
 const CAPTAIN_POD_PLACEHOLDER_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+kG7wAAAAASUVORK5CYII=';
 const DSH_CAPTAIN_PREVIEW_ID = 'CAP-0041';
 

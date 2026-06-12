@@ -233,7 +233,7 @@ export function mapCanonicalStoreToDiscoveryStore(store: DshCanonicalStoreCard):
     isFavorite: false,
     isFollowing: false,
     mediaKey: store.mediaKey,
-    imageUri: store.imageUri ?? store.mediaKey ?? 'dsh.store.lead-5.cover.v1',
+    imageUri: store.imageUri ?? store.mediaKey ?? '',
     deliveryLabel: store.deliveryLabel ?? 'توصيل سريع',
     serviceLabel: store.serviceLabel ?? 'بثواني برو',
     followerCount: store.followerCount,

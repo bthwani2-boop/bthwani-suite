@@ -15,7 +15,7 @@ export type DshHomeCategory = {
   countLabel?: string;
   renderMode?: 'stores' | 'manual-order';
   emojiFallback?: string;
-  /** Central media key resolved via resolveDshImageSource → media-fixtures/categories/main */
+  /** Central media key resolved by runtime media handling or placeholder fallback. */
   mediaKey?: string;
   subcategories?: Array<{
     id: string;

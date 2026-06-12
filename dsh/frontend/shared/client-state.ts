@@ -478,7 +478,7 @@ export function isDshCaptainTerminalState(state: DshCaptainState): boolean {
 	return getDshCaptainStateMeta(state).terminal;
 }
 
-// --- Finance screen types (merged from captain-finance.preview-data.ts) ---
+// --- Finance screen types (merged from archived captain finance seed) ---
 
 export type DshCaptainFinanceScreenState = 'ready' | 'loading' | 'empty' | 'error';
 
@@ -499,7 +499,7 @@ export type DshCaptainFinanceSnapshot = {
 	cycleLabel?: string;
 };
 
-// --- Profile screen types (merged from captain-profile.preview-data.ts) ---
+// --- Profile screen types (merged from archived captain profile seed) ---
 
 export type DshCaptainProfileScreenState = 'ready' | 'loading' | 'empty' | 'error';
 

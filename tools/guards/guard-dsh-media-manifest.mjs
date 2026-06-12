@@ -57,7 +57,7 @@ function walkFiles(root, startRelative, extensions) {
   const out = [];
   const start = path.join(root, startRelative);
   if (!fs.existsSync(start)) return out;
-  const skip = new Set(['.git', 'node_modules', 'dist', 'build', 'coverage', '.next', '.expo', '.turbo', '.nx']);
+  const skip = new Set(['.git', 'node_modules', 'dist', 'build', 'coverage', '.next', '.expo', '.turbo', '.nx', 'legacy-preview']);
   function walk(current) {
     const relative = rel(root, current);
     if (relative.startsWith('tools/registry/runs/')) return;

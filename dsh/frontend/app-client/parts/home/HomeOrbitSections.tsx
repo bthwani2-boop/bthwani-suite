@@ -19,7 +19,7 @@ import { DSH_HOME_SERVICE_DIAL_ITEMS as dshHomeServiceDialFixtures } from '../..
 import { resolveDshImageSource } from '../../../shared/resolve-dsh-image-source';
 
 // --------------------------------------------------------------------------
-// Local DSH category tile — uses resolveDshImageSource for media-fixtures PNGs
+// Local DSH category tile — uses runtime media resolution or emoji fallback.
 // Does NOT rely on getDshCategoryIconUrl (which needs an env var HTTP base URL).
 // --------------------------------------------------------------------------
 

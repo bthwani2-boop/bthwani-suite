@@ -1,6 +1,6 @@
 // DEV_FIXTURES_ISOLATION_GUARD
-// Purpose: Track all usages of dsh/frontend/media-fixtures and dsh/frontend/data
-//          in runtime surfaces. Prevent fixture data from becoming runtime truth.
+// Purpose: Track archived fixture/seed usage in runtime surfaces and prevent it
+//          from becoming runtime truth.
 //
 // TRACKING: RETIRE_DEV_FIXTURES_AFTER_RUNTIME_MEDIA_CLOSURE
 //
@@ -68,12 +68,12 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
     reason: 'Uses resolveDshImageSource for preview catalog thumbnails. Not runtime product/order/payment flow.',
   },
   {
-    file: 'dsh/frontend/data/legacy-preview/media.preview-data.ts',
+    file: 'archived-seed/media',
     classification: 'DEV_ALLOWED',
     reason: 'Pure preview/seed data file. Not imported by any runtime surface directly.',
   },
   {
-    file: 'dsh/frontend/data/legacy-preview/categories.preview-data.ts',
+    file: 'archived-seed/categories',
     classification: 'DEV_ALLOWED',
     reason: 'Category mediaKey fields are fixture references used only for category tile rendering. Not in order/payment/product upload flows.',
   },
@@ -100,7 +100,7 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
   {
     file: 'dsh/frontend/app-client/parts/store/StoreMenuItemCard.tsx',
     classification: 'RUNTIME_VIOLATION_FIXED',
-    reason: 'Product cards on the client store surface now resolve only runtime/public URLs; dsh.* fixture keys fall back to the existing card placeholder instead of media-fixtures.',
+    reason: 'Product cards on the client store surface now resolve only runtime/public URLs; dsh.* seed keys fall back to the existing card placeholder.',
   },
   {
     file: 'dsh/frontend/app-client/shared/map-menu-item-to-product-card.ts',
@@ -125,21 +125,21 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
   {
     file: 'dsh/frontend/app-captain/dsh-captain.types.ts',
     classification: 'DEV_ALLOWED',
-    reason: 'Re-exports operational status types from operational-statuses.preview-data. Type-only export — no runtime fixture values. Exit: move type definitions to a pure types file.',
+    reason: 'Re-exports operational status types from archived operational status seed. Type-only export — no runtime fixture values. Exit: move type definitions to a pure types file.',
   },
   // ─── Finance sub-domain: RUNTIME_VIOLATION_FIXED (2026-06-12) ─────────────
   {
-    file: 'dsh/frontend/data/legacy-preview/dshFinancePreview.ts',
+    file: 'archived-seed/dsh-finance',
     classification: 'RUNTIME_VIOLATION_FIXED',
     reason: 'DELETED 2026-06-12. All WLT finance screens now runtime-only. Adapter chain (dshFinanceFixture → wltDshFinanceFallback) removed. No runtime consumers remain.',
   },
   {
-    file: 'dsh/frontend/data/legacy-preview/finance.preview-data.ts',
+    file: 'archived-seed/finance',
     classification: 'RUNTIME_VIOLATION_FIXED',
     reason: 'DELETED 2026-06-12. WLT control-panel statement components (Captain/Partner/Field/AccountStatement/RefundLedger/SettlementCalendar/StoreSettlement) converted to runtime-only empty-state pattern.',
   },
   {
-    file: 'dsh/frontend/data/legacy-preview/wallet.preview-data.ts',
+    file: 'archived-seed/wallet',
     classification: 'RUNTIME_VIOLATION_FIXED',
     reason: 'DELETED 2026-06-12. WltDshWalletControlCenter now uses buildRuntimeWalletRows(runtimeFinance) exclusively. DashFinancePreviewRow type inlined in DailyReconciliationWorkbench.',
   },

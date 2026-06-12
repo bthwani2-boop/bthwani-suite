@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	httpapi "bthwani.local/dsh/backend/internal/http"
 	"bthwani.local/dsh/backend/internal/store"
@@ -42,8 +41,6 @@ func main() {
 	httpapi.RegisterReadinessRoutes(mux, repository)
 	httpapi.RegisterProductRoutes(mux, repository)
 	httpapi.RegisterCategoryRoutes(mux, repository)
-	// DEV_FIXTURE_ADAPTER: routes /dev-fixtures/product-media are gated by DSH_ENABLE_DEV_FIXTURE_MEDIA=true.
-	// Default false in Docker runtime. Runtime upload uses POST /media/upload-intents.
 	httpapi.RegisterMediaRoutes(mux, repository)
 	httpapi.RegisterOverridesRoutes(mux, repository)
 	httpapi.RegisterApprovalsRoutes(mux, repository)
@@ -69,18 +66,7 @@ func main() {
 		}
 	}
 
-	// DEV_ONLY_MEDIA_FIXTURES: static file server gated by DSH_ENABLE_MEDIA_FIXTURES=true.
-	// Default false in Docker runtime. Runtime media is served from MinIO (DSH_MEDIA_PUBLIC_BASE_URL).
-	if strings.ToLower(strings.TrimSpace(os.Getenv("DSH_ENABLE_MEDIA_FIXTURES"))) == "true" {
-		mediaFixturesDir := "../frontend/media-fixtures"
-		if _, err := os.Stat(mediaFixturesDir); os.IsNotExist(err) {
-			mediaFixturesDir = "dsh/frontend/media-fixtures"
-		}
-		mux.Handle("GET /media-fixtures/", http.StripPrefix("/media-fixtures/", http.FileServer(http.Dir(mediaFixturesDir))))
-		log.Print("dsh-api: DEV_ONLY /media-fixtures/ static server enabled")
-	} else {
-		log.Print("dsh-api: /media-fixtures/ static server disabled (DSH_ENABLE_MEDIA_FIXTURES!=true)")
-	}
+	log.Print("dsh-api: legacy fixture static server retired; runtime media uses /media/upload-intents")
 
 	corsHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")

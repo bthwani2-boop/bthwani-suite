@@ -78,7 +78,7 @@ export function useHomeFilterRail({
         key: category.id,
         title: category.label,
         subtitle: category.subtitle,
-        // mediaKey threads the fixture key to DshCategoryOrbitCarouselBase → resolveDshImageSource
+        // mediaKey threads category identity to DshCategoryOrbitCarouselBase.
         mediaKey: category.mediaKey,
         iconUrl: getDshCategoryIconUrl(category.id),
         emojiFallback: category.emojiFallback ?? categoryIconMap[category.id] ?? '📂',

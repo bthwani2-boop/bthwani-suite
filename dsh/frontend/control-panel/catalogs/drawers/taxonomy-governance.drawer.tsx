@@ -10,7 +10,7 @@
  *
  * Constraints:
  * - No direct Tamagui import. All UI via @bthwani/ui-kit.
- * - No dsh/frontend/data mutation.
+ * - No archived seed data mutation.
  * - No canonical category create/edit — proposals only.
  * - No Date.now() / Math.random() category ID generation.
  * - All actions produce CatalogPreviewProposal.

@@ -1,6 +1,6 @@
 // Operations support flow domain types and constants.
-// Extracted from data/support.preview-data.ts so runtime screens can import
-// configuration constants without depending on the preview-data directory.
+// Extracted from archived seed ownership so runtime screens can import
+// configuration constants without depending on archived data directories.
 
 export type DshOperationsSupportSurfaceId =
   | 'app-partner'

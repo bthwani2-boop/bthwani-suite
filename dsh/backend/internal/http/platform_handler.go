@@ -27,9 +27,6 @@ func handleGetPlatformVars(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	enableMediaFixtures := strings.ToLower(strings.TrimSpace(os.Getenv("DSH_ENABLE_MEDIA_FIXTURES"))) == "true"
-	enableDevFixtureMedia := strings.ToLower(strings.TrimSpace(os.Getenv("DSH_ENABLE_DEV_FIXTURE_MEDIA"))) == "true"
-
 	mediaPublicBaseURL := strings.TrimSpace(os.Getenv("DSH_MEDIA_PUBLIC_BASE_URL"))
 	if mediaPublicBaseURL == "" {
 		mediaPublicBaseURL = ""
@@ -41,20 +38,20 @@ func handleGetPlatformVars(w http.ResponseWriter, r *http.Request) {
 			"environment": resolveEnv(),
 		},
 		"media": map[string]interface{}{
-			"enable_media_fixtures":    enableMediaFixtures,
-			"enable_dev_fixture_media": enableDevFixtureMedia,
+			"enable_media_fixtures":    false,
+			"enable_dev_fixture_media": false,
 			"public_base_url":          mediaPublicBaseURL,
 		},
 		"feature_flags": map[string]interface{}{
-			"awnak_enabled":       getEnvBool("DSH_FEATURE_AWNAK_ENABLED", false),
-			"shein_enabled":       getEnvBool("DSH_FEATURE_SHEIN_ENABLED", false),
-			"loyalty_enabled":     getEnvBool("DSH_FEATURE_LOYALTY_ENABLED", false),
-			"marketing_enabled":   getEnvBool("DSH_FEATURE_MARKETING_ENABLED", true),
+			"awnak_enabled":         getEnvBool("DSH_FEATURE_AWNAK_ENABLED", false),
+			"shein_enabled":         getEnvBool("DSH_FEATURE_SHEIN_ENABLED", false),
+			"loyalty_enabled":       getEnvBool("DSH_FEATURE_LOYALTY_ENABLED", false),
+			"marketing_enabled":     getEnvBool("DSH_FEATURE_MARKETING_ENABLED", true),
 			"subscriptions_enabled": getEnvBool("DSH_FEATURE_SUBSCRIPTIONS_ENABLED", false),
 		},
 		"runtime": map[string]interface{}{
-			"wlt_base_url":     strings.TrimSpace(os.Getenv("WLT_BASE_URL")),
-			"auth_base_url":    strings.TrimSpace(os.Getenv("AUTH_BASE_URL")),
+			"wlt_base_url":  strings.TrimSpace(os.Getenv("WLT_BASE_URL")),
+			"auth_base_url": strings.TrimSpace(os.Getenv("AUTH_BASE_URL")),
 		},
 	}
 

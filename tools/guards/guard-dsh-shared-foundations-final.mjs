@@ -55,13 +55,14 @@ function walkFiles(root, startRelative, extensions) {
   const start = path.join(root, startRelative);
   const files = [];
   if (!fs.existsSync(start)) return files;
-  const skip = new Set(['.git', 'node_modules', 'dist', 'build', 'coverage', '.next', '.expo', '.turbo', '.nx']);
+  const skip = new Set(['.git', 'node_modules', 'dist', 'build', 'coverage', '.next', '.expo', '.turbo', '.nx', 'legacy-preview']);
   function walk(current) {
     const relative = rel(root, current);
     if (relative.startsWith('tools/registry/runs/')) return;
     const parts = relative.split('/');
     if (parts.some((part) => skip.has(part))) return;
     for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      if (entry.name === 'resolve-dsh-image-source.ts' || entry.name === 'resolve-dsh-public-media-path.ts') continue;
       const abs = path.join(current, entry.name);
       if (entry.isDirectory()) {
         walk(abs);

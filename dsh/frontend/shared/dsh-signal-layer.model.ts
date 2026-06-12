@@ -288,7 +288,7 @@ const DSH_SIGNAL_TONES: Record<DshSignalEventKind, 'brand' | 'success' | 'warnin
 };
 
 // ─── Signal Layer Preview Events ─────────────────────────────────────────────
-// Canonical data lives in dsh/frontend/data/legacy-preview/signals.preview-data.ts
+// Canonical signal seed data lives in the archived preview signal source.
 // Re-exported here typed for the signal layer contract.
 export const DSH_SIGNAL_PREVIEW_EVENTS: ReadonlyArray<DshSignalEvent> = [];
 

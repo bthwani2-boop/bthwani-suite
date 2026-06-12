@@ -544,7 +544,7 @@ let _globalStore: ApprovalRecord[] = [
     title: 'صورة برغر كلاسيك — مطعم البيت',
     submittedAt: new Date(Date.now() - 3600_000 * 2).toISOString(),
     metadata: {
-      mediaKey: 'dsh.product.chicken.v1',
+      mediaKey: 'product.chicken.v1',
       mediaPolicy: 'catalog-owned-media',
       nextOwner: 'control-panel-catalog',
       systemNote: 'جودة الصورة مقبولة، تحتاج قص RTL',
@@ -559,7 +559,7 @@ let _globalStore: ApprovalRecord[] = [
     title: 'منتج جديد: عصير رمان طبيعي',
     submittedAt: new Date(Date.now() - 3600_000 * 5).toISOString(),
     metadata: {
-      mediaKey: 'dsh.product.yogurt.v1',
+      mediaKey: 'product.yogurt.v1',
       mediaPolicy: 'catalog-owned-media',
       nextOwner: 'control-panel-catalog',
       systemNote: 'منتج جديد يحتاج اعتماد تسويقي قبل الكتالوج',
@@ -574,7 +574,7 @@ let _globalStore: ApprovalRecord[] = [
     title: 'صورة بيتزا مارغريتا — شريك مطعم',
     submittedAt: new Date(Date.now() - 3600_000 * 8).toISOString(),
     metadata: {
-      mediaKey: 'dsh.product.pasta.v1',
+      mediaKey: 'product.pasta.v1',
       mediaPolicy: 'partner-owned-exception',
       nextOwner: 'control-panel-catalog',
       systemNote: 'استثناء شريك: الصورة مرتبطة ببراند المطعم',
@@ -591,7 +591,7 @@ let _globalStore: ApprovalRecord[] = [
     title: 'فئة مقترحة: مأكولات صحية',
     submittedAt: new Date(Date.now() - 3600_000 * 1).toISOString(),
     metadata: {
-      mediaKey: 'dsh.category.main.restaurants.v1',
+      mediaKey: 'category.main.restaurants.v1',
       mediaPolicy: 'catalog-owned-media',
       nextOwner: 'control-panel-catalog',
       systemNote: 'فئة جديدة تحتاج موافقة التسويق قبل إنشائها في الكتالوج',
@@ -606,7 +606,7 @@ let _globalStore: ApprovalRecord[] = [
     title: 'صورة سلطة يونانية — دقة منخفضة',
     submittedAt: new Date(Date.now() - 3600_000 * 12).toISOString(),
     metadata: {
-      mediaKey: 'dsh.product.salad.v1',
+      mediaKey: 'product.salad.v1',
       mediaPolicy: 'catalog-owned-media',
       nextOwner: 'app-partner',
       systemNote: 'الصورة أقل من 800×600 — يُرجى إعادة الرفع',
@@ -623,7 +623,7 @@ let _globalStore: ApprovalRecord[] = [
     title: 'غلاف متجر: مطعم الياسمين',
     submittedAt: new Date(Date.now() - 3600_000 * 4).toISOString(),
     metadata: {
-      mediaKey: 'dsh.store.hittin.cover.v1',
+      mediaKey: 'store.hittin.cover.v1',
       mediaPolicy: 'restaurant-exception',
       nextOwner: 'control-panel-catalog',
       systemNote: 'غلاف متجر — استثناء مطعم، يخضع لسياسة الوسائط الخاصة',
@@ -638,7 +638,7 @@ let _globalStore: ApprovalRecord[] = [
     title: 'تعارض وسائط: صورة مكررة لمنتجين',
     submittedAt: new Date(Date.now() - 1800_000).toISOString(),
     metadata: {
-      mediaKey: 'dsh.product.roll.v1',
+      mediaKey: 'product.roll.v1',
       mediaPolicy: 'media-conflict',
       nextOwner: 'control-panel-marketing',
       systemNote: 'نفس الصورة مرتبطة بمنتجين مختلفين — يتطلب حلاً',
@@ -653,7 +653,7 @@ let _globalStore: ApprovalRecord[] = [
     title: 'وجبة عائلية مكتملة — أُرسلت للكتالوج',
     submittedAt: new Date(Date.now() - 3600_000 * 24).toISOString(),
     metadata: {
-      mediaKey: 'dsh.product.chicken.v1',
+      mediaKey: 'product.chicken.v1',
       mediaPolicy: 'catalog-owned-media',
       nextOwner: 'control-panel-catalog',
       systemNote: 'مكتمل — ظاهر في الكتالوج',

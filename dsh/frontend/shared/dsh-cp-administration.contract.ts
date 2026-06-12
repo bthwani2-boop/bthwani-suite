@@ -1,7 +1,7 @@
 /**
  * SCAFFOLD: DSH Control Panel administration workspace shared types.
  * Moved here from dsh/frontend/control-panel/administration/administration.types to
- * correct the dependency direction: dsh/frontend/data must not import from
+ * correct the dependency direction: archived seed data must not import from
  * dsh/frontend/control-panel.
  *
  * Owner: dsh/frontend/shared

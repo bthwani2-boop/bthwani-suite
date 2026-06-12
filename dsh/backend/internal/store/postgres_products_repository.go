@@ -1,11 +1,9 @@
 package store
 
 import (
-	"bufio"
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -220,74 +218,8 @@ func scanProductRow(row *sql.Row) (domain.ProductRecord, error) {
 	return r, nil
 }
 
-// scanProductRowColumns scans a *sql.Rows into a ProductRecord (no overrides).
-
-var manifestMap map[string]string
-
-func loadManifest() map[string]string {
-	if manifestMap != nil {
-		return manifestMap
-	}
-	paths := []string{
-		"../frontend/media-fixtures/MANIFEST.local-required.tsv",
-		"../../frontend/media-fixtures/MANIFEST.local-required.tsv",
-		"dsh/frontend/media-fixtures/MANIFEST.local-required.tsv",
-		"frontend/media-fixtures/MANIFEST.local-required.tsv",
-		"media-fixtures/MANIFEST.local-required.tsv",
-	}
-	var file *os.File
-	var err error
-	for _, p := range paths {
-		file, err = os.Open(p)
-		if err == nil {
-			break
-		}
-	}
-	if err != nil {
-		return make(map[string]string)
-	}
-	defer file.Close()
-
-	m := make(map[string]string)
-	scanner := bufio.NewScanner(file)
-	if scanner.Scan() {
-		for scanner.Scan() {
-			line := scanner.Text()
-			parts := strings.Split(line, "\t")
-			if len(parts) >= 2 {
-				m[parts[0]] = parts[1]
-			}
-		}
-	}
-	manifestMap = m
-	return manifestMap
-}
-
-func GetMediaURL(mediaKey string) string {
-	m := loadManifest()
-	relPath, exists := m[mediaKey]
-	if !exists {
-		return ""
-	}
-	return "/media-fixtures/" + relPath
-}
-
 func (repo *PostgresRepository) CreateProductMedia(ctx context.Context, req domain.UploadProductMediaRequest) (domain.ProductMediaRecord, error) {
-	id := fmt.Sprintf("med-%d", time.Now().UnixNano())
-	url := GetMediaURL(req.MediaKey)
-	if url == "" {
-		return domain.ProductMediaRecord{}, fmt.Errorf("invalid or unregistered media key: %s", req.MediaKey)
-	}
-
-	query := `
-INSERT INTO dsh_catalog_product_media (id, product_id, media_key, url, created_at)
-VALUES ($1, $2, $3, $4, NOW())
-RETURNING id, product_id, media_key, url, created_at`
-
-	row := repo.db.QueryRowContext(ctx, query, id, req.ProductID, req.MediaKey, url)
-	var rec domain.ProductMediaRecord
-	err := row.Scan(&rec.ID, &rec.ProductID, &rec.MediaKey, &rec.URL, &rec.CreatedAt)
-	return rec, err
+	return domain.ProductMediaRecord{}, fmt.Errorf("legacy media_key product media create is retired; use POST /media/upload-intents")
 }
 
 func (repo *PostgresRepository) DeleteProductMedia(ctx context.Context, id string) error {

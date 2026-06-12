@@ -58,7 +58,7 @@ export function mapDiscoveryApiStoreToDiscoveryStore(store: DshDiscoveryApiStore
     isOffer: Boolean(homeStore.hasOffer),
     isFavorite: homeStore.isFavorite,
     isFollowing: homeStore.isFollowing,
-    imageUri: homeStore.imageUri ?? 'dsh.store.hadda.cover.v1',
+    imageUri: homeStore.imageUri ?? '',
     deliveryLabel: homeStore.deliveryLabel,
     serviceLabel: homeStore.serviceLabel,
     followerCount: homeStore.followerCount,

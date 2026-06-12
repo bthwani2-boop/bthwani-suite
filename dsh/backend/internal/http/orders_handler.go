@@ -874,10 +874,7 @@ func (h *OrdersHandler) DeliverOrder(w http.ResponseWriter, r *http.Request) {
 		if podMediaKey == "" {
 			req.PodMediaKey = nil
 		} else {
-			if store.GetMediaURL(podMediaKey) == "" {
-				writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "pod_media_key is not registered in manifest")
-				return
-			}
+			// pod_media_key now carries a runtime media reference/id; fixture manifest validation is retired.
 			req.PodMediaKey = &podMediaKey
 		}
 	}

@@ -3,12 +3,11 @@
  * Owner: control-panel/catalogs (governance/approval/mapping consumer)
  *
  * Runtime truth: DSH backend API (products/categories via dsh-product-api.client.ts).
- * This file provides: type definitions + preview-data fallback for offline/dev mode.
+ * This file provides: type definitions + archived seed fallback for offline/dev mode.
  * When NEXT_PUBLIC_DSH_API_BASE_URL is set, live data is fetched instead.
  *
- * Preview fallback sources (DEV_ONLY):
- *   Categories: dsh/frontend/data/legacy-preview/categories.preview-data.ts
- *   Products:   dsh/frontend/data/legacy-preview/products.preview-data.ts
+ * Offline/dev fallback is isolated behind this module and must be retired by
+ * the DSH product/category API path before any delete gate is executed.
  *
  * control-panel/catalogs is a governance/approval/mapping consumer.
  * It does NOT add canonical products or categories locally.

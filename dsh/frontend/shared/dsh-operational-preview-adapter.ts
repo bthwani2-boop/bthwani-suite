@@ -15,7 +15,7 @@ export const dshOperationalPreviewAdapterMeta = {
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
-  sourceDataOwner: 'dsh/frontend/data/legacy-preview/operational.preview-data.ts',
+  sourceDataOwner: 'archived-seed/operational',
   adapterOwner: 'dsh/frontend/shared/dsh-operational-preview-adapter.ts',
 } as const;
 

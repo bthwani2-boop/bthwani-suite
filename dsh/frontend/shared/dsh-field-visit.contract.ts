@@ -1,6 +1,6 @@
 /**
  * SCAFFOLD: DSH Field app store-visit shared types.
- * These are preview-neutral contracts used by dsh/frontend/data fixtures.
+ * These are preview-neutral contracts used by archived seed fixtures.
  * Moved here from dsh/frontend/app-field/types/DshFieldStoreVisitTypes to
  * correct the dependency direction: data must not import from surface directories.
  *

@@ -14,7 +14,7 @@
  *
  * Constraints:
  * - No direct Tamagui import. All UI via @bthwani/ui-kit.
- * - No dsh/frontend/data mutation.
+ * - No archived seed data mutation.
  * - No canonical product creation locally.
  * - No Date.now() / Math.random() identity generation.
  * - Submit produces CatalogPreviewProposal only.
