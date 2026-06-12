@@ -57,6 +57,8 @@
 | `bthwani-logic-graph-guard-tooling-contract` | See `.agents/skills/bthwani-logic-graph-guard-tooling-contract/SKILL.md`. |
 | `bthwani-design-guard-tooling-contract` | See `.agents/skills/bthwani-design-guard-tooling-contract/SKILL.md`. |
 | `bthwani-structure-organization-guard-tooling-contract` | See `.agents/skills/bthwani-structure-organization-guard-tooling-contract/SKILL.md`. |
+| `bthwani-dynamic-workflow-execution-contract` | See `.agents/skills/bthwani-dynamic-workflow-execution-contract/SKILL.md`. |
+
 
 
 

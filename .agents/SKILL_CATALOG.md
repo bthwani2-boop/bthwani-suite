@@ -37,5 +37,7 @@
 | `bthwani-agent-registry-validator` | Validate skill registry coverage, frontmatter, duplication, and risk terms. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-frontend-design-excellence-contract` | Guard premium frontend design quality, visual hierarchy, responsive web/mobile UX, interaction states, accessibility, and visual evidence requirement. | `governance/` according to task domain | frontend design decision + visual evidence requirement |
 | `bthwani-stop-slop-prose-contract` | Remove AI-sounding prose, filler, vague claims, noisy writing, and weak Arabic/English copy from prompts, reports, UI copy, governance text, and marketing text. | `governance/` according to task domain | prose cleanup + remaining TBD + final text |
+| `bthwani-dynamic-workflow-execution-contract` | Use dynamic task classification, tool/skill routing, alternative comparison, stakeholder-view review, adversarial verification, and evidence-grounded execution control. | `governance/` according to task domain | structured decision + evidence requirements |
+
 
 All skills require evidence before acceptance. External skills may be preserved, but BThwani rules override generic examples.
