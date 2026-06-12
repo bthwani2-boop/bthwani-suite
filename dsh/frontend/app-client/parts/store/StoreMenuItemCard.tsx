@@ -4,14 +4,14 @@ import { ProductCard } from '@bthwani/ui-kit';
 import { type DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
 import { canRenderInClientSurface } from '../../../shared/workflow';
 import { mapMenuItemToProductCard } from '../../shared/map-menu-item-to-product-card';
-import { resolveDshImageSource } from '../../shared/resolve-image-source';
+import { resolveDshRuntimeImageSource } from '../../shared/resolve-runtime-image-source';
 import { normalizeDisplayText } from '../../shared/store-formatting';
 
 export function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
 	if (!canRenderInClientSurface(item.publishStage, 'product-media')) {
 		return undefined;
 	}
-	return resolveDshImageSource(item.imageUri);
+	return resolveDshRuntimeImageSource(item.imageUri);
 }
 
 export function MenuItemCard({

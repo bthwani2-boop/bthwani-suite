@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, ListItem, useTheme,
@@ -14,7 +14,7 @@ import {
   sendMediaToCatalog,
   type MediaReviewRecord,
   type MediaPolicyKind,
-} from '../../data/marketing.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
 import {
   ApprovalStage,
   resolveApprovalStageMeta,

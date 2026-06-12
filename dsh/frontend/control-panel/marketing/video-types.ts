@@ -3,7 +3,7 @@ import type {
   MarketingVideoAudience,
   MarketingVideoSource,
   MarketingVideoTargetType,
-} from '../../data/marketing.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
 
 export type VideoDraft = Record<
   | 'title'

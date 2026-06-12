@@ -11,7 +11,7 @@ import {
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
-import { AREA_CAPACITY_OPERATIONAL_PREVIEW } from '../../data/orders.preview-data';
+import { AREA_CAPACITY_OPERATIONAL_PREVIEW } from '../../data/legacy-preview/orders.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
 import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';

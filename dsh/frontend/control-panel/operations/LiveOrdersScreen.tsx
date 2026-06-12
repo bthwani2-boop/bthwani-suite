@@ -8,7 +8,7 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
-import { LIVE_ORDERS_OPERATIONAL_PREVIEW, FULFILLMENT_MODE_ORDER_QUEUES } from '../../data/orders.preview-data';
+import { LIVE_ORDERS_OPERATIONAL_PREVIEW, FULFILLMENT_MODE_ORDER_QUEUES } from '../../data/legacy-preview/orders.preview-data';
 import { Box, KeyValueList, useTheme } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshOperationsDecisionKind, DshOrderLifecycleStatus } from '../../shared/dsh-order-journey.model';

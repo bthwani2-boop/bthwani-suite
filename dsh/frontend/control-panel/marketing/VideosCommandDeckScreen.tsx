@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 // Authority: control-panel/marketing — VideosCommandDeckScreen (slim entry point).
 // Giant Screen split: types → video-types.ts | utils → video-target-utils.ts
@@ -30,7 +30,7 @@ import {
   type MarketingVideoRecord,
   type MarketingVideoSummary,
   type MarketingVideoStatus,
-} from '../../data/marketing.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 import type { VideoDraft, EditorWorkspaceTab } from './video-types';
 import { createDraft } from './video-target-utils';

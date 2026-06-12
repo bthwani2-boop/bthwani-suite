@@ -7,8 +7,8 @@ import { WebControlPanelKpiStrip } from '@bthwani/ui-kit/web';
 import {
   DSH_ORDER_RESCUE_PREVIEW,
   getDshOrderRescueByContext,
-} from '../../data/orders.preview-data';
-import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
+} from '../../data/legacy-preview/orders.preview-data';
+import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/legacy-preview/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 // SSoT: rescue triggers are derived from the lifecycle handoffs table.

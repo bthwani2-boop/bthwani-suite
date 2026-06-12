@@ -9,7 +9,7 @@ import {
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerModifications, updatePartnerModificationStatus } from './workflow';
-import type { PartnerModificationRequest } from '../../data/partner.preview-data';
+import type { PartnerModificationRequest } from '../../data/legacy-preview/partner.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
 
 export function PartnerModificationsWorkspace() {

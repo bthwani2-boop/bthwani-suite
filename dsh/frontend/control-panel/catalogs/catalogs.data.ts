@@ -7,8 +7,8 @@
  * When NEXT_PUBLIC_DSH_API_BASE_URL is set, live data is fetched instead.
  *
  * Preview fallback sources (DEV_ONLY):
- *   Categories: dsh/frontend/data/categories.preview-data.ts
- *   Products:   dsh/frontend/data/products.preview-data.ts
+ *   Categories: dsh/frontend/data/legacy-preview/categories.preview-data.ts
+ *   Products:   dsh/frontend/data/legacy-preview/products.preview-data.ts
  *
  * control-panel/catalogs is a governance/approval/mapping consumer.
  * It does NOT add canonical products or categories locally.
@@ -151,14 +151,14 @@ function resolveCatalogMediaPolicy(value: string | undefined): CatalogMediaPolic
   }
 }
 
-import { dshCategoryFixtures } from '../../data/categories.preview-data';
-import { dshCommonMediaKeyOptions } from '../../data/media.preview-data';
+import { dshCategoryFixtures } from '../../data/legacy-preview/categories.preview-data';
+import { dshCommonMediaKeyOptions } from '../../data/legacy-preview/media.preview-data';
 import {
   storeItemsByStoreId,
   dshCatalogMetrics,
   dshCatalogSmartFilters,
   dshCatalogApprovalQueues,
-} from '../../data/products.preview-data';
+} from '../../data/legacy-preview/products.preview-data';
 import {
   getProductCategoryPath,
   deriveProductSku,

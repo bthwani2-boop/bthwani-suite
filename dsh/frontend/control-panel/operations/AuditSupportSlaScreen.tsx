@@ -8,7 +8,7 @@ import {
   WebControlPanelQueue,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
-import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from '../../data/orders.preview-data';
+import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from '../../data/legacy-preview/orders.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
 import { getDynamicUiAudits, resolveAuditEntry } from '../../shared';

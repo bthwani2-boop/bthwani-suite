@@ -72,7 +72,7 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 - `dsh/docs/SCREEN_API_MATRIX.md`
 - `dsh/docs/RUNTIME_EVIDENCE_MATRIX.md`
 - `dsh/docs/DSH_VISUAL_REVIEW.md`
-- `dsh/frontend/data/**`
+- `dsh/frontend/data/legacy-preview/**`
 - `dsh/frontend/media-fixtures/**`
 
 > القاعدة: القائمة أعلاه starting point. إذا كشف git grep أو registry أن الملف انتقل، سجّل `STALE_PATH` ولا تفترض.

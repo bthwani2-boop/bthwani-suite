@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, KeyValueList, useTheme,
@@ -22,7 +22,7 @@ import {
   type PartnerOfferStatus,
   type PartnerOfferType,
   type PartnerOfferSource,
-} from '../../data/offers.preview-data';
+} from '../../data/legacy-preview/offers.preview-data';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { validatePartnerOfferForPublish } from '../../shared/commercial.preview-contract';
 import { CommercialParityPreview } from './commercial-parity-preview';

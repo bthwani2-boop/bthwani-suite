@@ -40,7 +40,7 @@ import {
   useWltDshWalletPreview,
   type WltDshFinanceEventKind,
 } from '../../../../wlt/frontend/dsh/app-client';
-import { resolveDshImageSource } from '../shared/resolve-image-source';
+import { resolveDshRuntimeImageSource } from '../shared/resolve-runtime-image-source';
 import {
   type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,
@@ -389,7 +389,7 @@ type RecommendationCardProps = {
 };
 
 function RecommendationCard({ product, cartQty, onOpenProductPreview }: RecommendationCardProps) {
-  const imageSource = resolveDshImageSource(product.imageUri);
+  const imageSource = resolveDshRuntimeImageSource(product.imageUri);
 
   return (
     <Pressable onPress={onOpenProductPreview} style={({ pressed }) => ({ opacity: pressed ? 0.94 : 1 })}>
@@ -546,7 +546,7 @@ function ProductPreviewModal({
 }: ProductPreviewModalProps) {
   const { direction } = useDirection();
   const isRTL = direction === 'rtl';
-  const imageSource = product ? resolveDshImageSource(product.imageUri) : undefined;
+  const imageSource = product ? resolveDshRuntimeImageSource(product.imageUri) : undefined;
   const priceLabel = product ? formatDshPrice(product.priceValue) : '';
   const hasCartQty = cartQty > 0;
   const actionLabel = hasCartQty ? 'زيادة الكمية' : 'إضافة للسلة';

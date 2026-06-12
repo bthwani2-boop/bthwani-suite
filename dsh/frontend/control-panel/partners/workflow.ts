@@ -61,7 +61,7 @@ export {
   dshPartnerIntakeMetrics,
   dshPartnerIntakeItems,
   dshPartnerApprovalLanes,
-} from '../../data/partner.preview-data';
+} from '../../data/legacy-preview/partner.preview-data';
 
 // Re-export centralized models and getters/setters from shared workflow store
 export type {

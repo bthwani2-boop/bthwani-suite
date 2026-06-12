@@ -140,13 +140,13 @@ export type DshOrderLifecycleStatus =
 export type DshSmartProximityState = 'enroute' | 'near_customer' | 'at_door' | 'bell_rang';
 
 /**
- * Snapshot produced by a captain heartbeat tick.
- * source: 'captain_heartbeat_demo' — no live GPS, no real-time stream.
- * cadenceMinutes: 3 — ticks every 3 minutes.
+ * Snapshot produced by the order-tracking layer.
+ * source: 'runtime_unbound' means no live GPS/heartbeat stream is currently wired.
+ * source: 'captain_heartbeat_demo' remains for explicitly demo-scoped flows only.
  * isLiveMap: false — no map rendered from this data.
  */
 export type DshSmartTrackingSnapshot = {
-  source: 'captain_heartbeat_demo';
+  source: 'captain_heartbeat_demo' | 'runtime_unbound';
   cadenceMinutes: 3;
   isLiveMap: false;
   lastUpdateMinutesAgo: number;

@@ -354,6 +354,7 @@
   ],
   "skipPathPrefixes": [
     "tools/registry/runs",
+    "dsh/frontend/data/legacy-preview",
     "dsh/frontend/control-panel/partners/ReadinessApprovalsWorkspace.tsx",
     "dsh/frontend/control-panel/partners/ReadinessEscalationsWorkspace.tsx",
     "dsh/frontend/control-panel/partners/ControlPanelDshPartnerApprovalsScreen.tsx",

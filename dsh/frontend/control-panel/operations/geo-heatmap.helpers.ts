@@ -3,7 +3,7 @@
 // Extracted to keep GeoHeatmapScreen under 330 lines.
 
 import type { DshLifecycleStep, DshSurfaceId, DshUnifiedRecommendation } from '../shared';
-import type { GeoHeatmapZone } from '../../data/platform.preview-data';
+import type { GeoHeatmapZone } from '../../data/legacy-preview/platform.preview-data';
 
 export type GeoSubTabId = 'orders' | 'captains' | 'stores' | 'sla' | 'peak';
 export type GeoFilterId = 'الآن' | '١٥ دقيقة' | '٣٠ دقيقة' | 'خطر عالٍ' | 'نقص كباتن' | 'ضغط متاجر';

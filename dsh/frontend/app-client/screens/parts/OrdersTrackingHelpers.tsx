@@ -1130,42 +1130,25 @@ export const SMART_TRACKING_SEQUENCE: DshSmartProximityState[] = ['enroute', 'ne
 
 export function useSmartTrackingHeartbeat(phase: JourneyPhase): DshSmartTrackingSnapshot {
   const [state, setState] = React.useState<DshSmartTrackingSnapshot>({
-    source: 'captain_heartbeat_demo',
+    source: 'runtime_unbound',
     cadenceMinutes: 3,
     isLiveMap: false,
-    lastUpdateMinutesAgo: 1,
-    etaMinutes: 12,
+    lastUpdateMinutesAgo: 0,
+    etaMinutes: null,
     proximityState: 'enroute',
     bellRang: false,
   });
 
   React.useEffect(() => {
-    if (phase === 'received') return;
-
-    const HEARTBEAT_INTERVAL_MS = 3 * 60 * 1000;
-
-    const timer = setInterval(() => {
-      setState((prev) => {
-        const currentIndex = SMART_TRACKING_SEQUENCE.indexOf(prev.proximityState);
-        const nextIndex = phase === 'arrived'
-          ? Math.min(currentIndex + 1, SMART_TRACKING_SEQUENCE.length - 1)
-          : Math.min(currentIndex, 1);
-        const nextProximity = SMART_TRACKING_SEQUENCE[nextIndex] ?? 'enroute';
-        const etaDelta = prev.etaMinutes !== null ? Math.max(0, prev.etaMinutes - 3) : null;
-
-        return {
-          source: 'captain_heartbeat_demo',
-          cadenceMinutes: 3,
-          isLiveMap: false,
-          lastUpdateMinutesAgo: 0,
-          etaMinutes: etaDelta,
-          proximityState: nextProximity,
-          bellRang: nextProximity === 'bell_rang',
-        };
-      });
-    }, HEARTBEAT_INTERVAL_MS);
-
-    return () => clearInterval(timer);
+    setState({
+      source: 'runtime_unbound',
+      cadenceMinutes: 3,
+      isLiveMap: false,
+      lastUpdateMinutesAgo: 0,
+      etaMinutes: null,
+      proximityState: phase === 'arrived' ? 'near_customer' : 'enroute',
+      bellRang: false,
+    });
   }, [phase]);
 
   return state;
@@ -1218,8 +1201,20 @@ export const SmartTrackingCard = React.memo(function SmartTrackingCard({ phase, 
       <KeyValueList
         items={[
           ...(etaText ? [{ label: 'الوقت التقريبي للوصول', value: etaText, tone: 'success' as const }] : []),
-          { label: 'آخر تحديث', value: smartTracking.lastUpdateMinutesAgo === 0 ? 'الآن' : `منذ ${smartTracking.lastUpdateMinutesAgo} دقيقة` },
-          { label: 'آلية التحديث', value: 'كل 3 دقائق — بدون خريطة حية' },
+          {
+            label: 'آخر تحديث',
+            value: smartTracking.source === 'runtime_unbound'
+              ? 'بانتظار heartbeat حي من DSH'
+              : smartTracking.lastUpdateMinutesAgo === 0
+                ? 'الآن'
+                : `منذ ${smartTracking.lastUpdateMinutesAgo} دقيقة`,
+          },
+          {
+            label: 'آلية التحديث',
+            value: smartTracking.source === 'runtime_unbound'
+              ? 'الربط الحي غير مفعّل بعد'
+              : 'كل 3 دقائق — بدون خريطة حية',
+          },
         ]}
       />
     </Surface>
@@ -1356,8 +1351,6 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
   const [isChatExpanded, setIsChatExpanded] = React.useState(false);
   const [isFinancialDetailsExpanded, setIsFinancialDetailsExpanded] = React.useState(false);
   const [hasAlertedCaptain, setHasAlertedCaptain] = React.useState(false);
-  const [supportAttachment, setSupportAttachment] = React.useState<string | null>(null);
-
   const issueTypes = [
     { id: 'not_received', label: 'لم أستلم الطلب' },
     ...(isBthwaniDelivery
@@ -1760,7 +1753,6 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
                   items={[
                     { label: 'نوع المشكلة', value: issueTypes.find(i => i.id === selectedIssue)?.label ?? '' },
                     { label: 'تفاصيل إضافية', value: supportDetailsText.trim() || 'لا يوجد تفاصيل إضافية' },
-                    ...(supportAttachment ? [{ label: 'الملف المرفق', value: supportAttachment }] : []),
                   ]}
                 />
                 <Button
@@ -1770,7 +1762,6 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
                     setIsSupportSubmitted(false);
                     setSelectedIssue(null);
                     setSupportDetailsText('');
-                    setSupportAttachment(null);
                   }}
                   style={{ width: '100%', marginTop: spacing[2] }}
                 />
@@ -1806,59 +1797,17 @@ export function CreateOrderJourneyScreen({ values, timeline, clientState = 'trac
                   style={{ textAlign: 'right' }}
                 />
 
-                {supportAttachment === null ? (
-                  <Pressable
-                    onPress={() => setSupportAttachment('dsh_support_proof.jpg')}
-                    style={({ pressed }) => ({
-                      flexDirection: 'row-reverse',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      gap: spacing[2],
-                      padding: spacing[3],
-                      borderRadius: radius.sm2,
-                      borderWidth: 1,
-                      borderStyle: 'dashed',
-                      borderColor: theme.brand,
-                      backgroundColor: pressed ? theme.brandSurface : theme.surface,
-                      marginTop: spacing[2],
-                    })}
-                  >
-                    <Icon name="camera-outline" size={20} color={theme.brand} />
-                    <Text role="bodySm" weight="medium" style={{ color: theme.brand }}>
-                      إرفاق صورة أو مستند داعم (اختياري)
+                <Surface tone="inset" padding={3} radiusToken="lg" gap={2} style={{ marginTop: spacing[2] }}>
+                  <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+                    <Icon name="camera-outline" size={18} color={theme.warning} />
+                    <Text role="bodyStrong" style={{ textAlign: 'right', flex: 1 }}>
+                      إرفاق الإثبات سيُفعّل بعد ربط رفع الوسائط الحي
                     </Text>
-                  </Pressable>
-                ) : (
-                  <Surface
-                    tone="success"
-                    padding={3}
-                    radiusToken="lg"
-                    style={{
-                      flexDirection: 'row-reverse',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginTop: spacing[2],
-                      borderWidth: 1,
-                      borderColor: theme.success,
-                    }}
-                  >
-                    <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
-                      <Icon name="checkmark-circle-outline" size={20} color={theme.success} />
-                      <Text role="bodySm" weight="semibold" style={{ color: theme.success }}>
-                        تم إرفاق صورة الإثبات بنجاح ({supportAttachment})
-                      </Text>
-                    </Box>
-                    <Pressable
-                      onPress={() => setSupportAttachment(null)}
-                      style={({ pressed }) => ({
-                        padding: spacing[1],
-                        opacity: pressed ? 0.7 : 1,
-                      })}
-                    >
-                      <Icon name="trash-outline" size={18} color={theme.brand} />
-                    </Pressable>
-                  </Surface>
-                )}
+                  </Box>
+                  <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                    لا يتم إنشاء أي ملف تجريبي داخل هذا الطلب. عند اكتمال الربط سيُرفع الإثبات إلى DSH API ثم MinIO/S3.
+                  </Text>
+                </Surface>
 
                 <Button
                   label={selectedIssue ? 'إرسال البلاغ' : 'اختر نوع المشكلة أولاً'}

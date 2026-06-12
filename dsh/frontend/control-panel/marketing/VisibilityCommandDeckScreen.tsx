@@ -12,12 +12,12 @@ import {
   type CampaignRecord,
   type CampaignStatus,
   type CampaignTargetType,
-} from '../../data/marketing.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
 import {
   getPartnerOfferItems,
   type PartnerOfferRecord,
   type PartnerOfferStatus,
-} from '../../data/offers.preview-data';
+} from '../../data/legacy-preview/offers.preview-data';
 import {
   buildCommercialProjection,
   evaluateCommercialConflicts,

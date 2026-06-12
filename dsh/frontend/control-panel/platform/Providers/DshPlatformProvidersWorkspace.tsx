@@ -3,7 +3,7 @@
 import React from 'react';
 import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
-import { PREVIEW_PROVIDER_RECORDS } from '../../../data/platform.preview-data';
+import { PREVIEW_PROVIDER_RECORDS } from '../../../data/legacy-preview/platform.preview-data';
 import { useDemoPlatformState } from '../useDemoPlatformState';
 import styles from '../../shared/control-panel-surface.module.css';
 

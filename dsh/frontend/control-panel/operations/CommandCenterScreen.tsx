@@ -11,12 +11,12 @@ import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-g
 import {
   DSH_SERVICE_HEALTH_PREVIEW,
   DSH_WLT_FINANCE_ALERTS_PREVIEW,
-} from '../../data/orders.preview-data';
+} from '../../data/legacy-preview/orders.preview-data';
 import type { AnyOperationsWorkspaceId } from './operations.registry';
 import { buildOperationsHref, NON_OPERATIONS_SECTION_SHORTCUTS } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 import { getDshSignalSummaries, getDshSignalEventLabel, getDshSignalEventTone } from '../../shared/dsh-signal-layer.model';
-import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
+import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/legacy-preview/support.preview-data';
 
 export type CommandCenterScreenProps = { hubHref: string; subGroup?: string; };
 

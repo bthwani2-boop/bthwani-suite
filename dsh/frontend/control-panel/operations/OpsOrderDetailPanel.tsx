@@ -1,9 +1,9 @@
-﻿'use client';
+'use client';
 
 // OpsOrderDetailPanel — approval queue detail view for the control-panel operations hub.
 // Data ownership:
-//   approval orders   → dsh/frontend/data/orders.preview-data.ts  (getDshOpsApprovalQueuePreview)
-//   support tickets   → dsh/frontend/data/support.preview-data.ts (getDshOpsApprovalChatTicket)
+//   approval orders   → dsh/frontend/data/legacy-preview/orders.preview-data.ts  (getDshOpsApprovalQueuePreview)
+//   support tickets   → dsh/frontend/data/legacy-preview/support.preview-data.ts (getDshOpsApprovalChatTicket)
 // This surface owns only rendering logic; zero fixture data lives here.
 
 import React from 'react';
@@ -11,8 +11,8 @@ import { useTheme, Text } from '@bthwani/ui-kit';
 import type { DshOperationsDecisionKind } from '../../shared/dsh-order-journey.model';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import type { DshFulfillmentOperationalMode } from './operations.types';
-import { getDshOpsApprovalQueuePreview, type DshOpsApprovalOrder } from '../../data/orders.preview-data';
-import { getDshOpsApprovalChatTicket } from '../../data/support.preview-data';
+import { getDshOpsApprovalQueuePreview, type DshOpsApprovalOrder } from '../../data/legacy-preview/orders.preview-data';
+import { getDshOpsApprovalChatTicket } from '../../data/legacy-preview/support.preview-data';
 
 export type PendingApprovalOrder = DshOpsApprovalOrder;
 

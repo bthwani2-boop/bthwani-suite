@@ -77,7 +77,7 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 - `dsh/frontend/app-partner/**`
 - `dsh/frontend/shared/**`
 - `dsh/frontend/app-field/**`
-- `dsh/frontend/data/**`
+- `dsh/frontend/data/legacy-preview/**`
 - `dsh/frontend/media-fixtures/**`
 
 > القاعدة: القائمة أعلاه starting point. إذا كشف git grep أو registry أن الملف انتقل، سجّل `STALE_PATH` ولا تفترض.

@@ -3,7 +3,7 @@ import {
   WebControlPanelDecisionRow,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import type { DshUnifiedRecommendation } from '../../data/platform.preview-data';
+import type { DshUnifiedRecommendation } from '../../data/legacy-preview/platform.preview-data';
 import { DSH_CONTROL_PANEL_TONE_MAP } from './dsh-control-panel-display';
 
 export type ControlPanelDshActionQueueItem = {

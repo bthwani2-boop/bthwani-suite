@@ -38,6 +38,11 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
     reason: 'Re-exports resolveDshImageSource for category/banner fallback. Used only in category tile and banner fallback — not in product/order/payment flows.',
   },
   {
+    file: 'dsh/frontend/app-client/shared/resolve-runtime-image-source.ts',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'Active client store/cart/checkout image rendering now ignores dsh.* fixture keys and only resolves runtime/public URLs or uploaded media objects.',
+  },
+  {
     file: 'dsh/frontend/app-partner/screens/ProductMediaScreen.tsx',
     classification: 'RUNTIME_VIOLATION_FIXED',
     reason: 'Was: manifest-key selector + POST /media (fixture). Now: runtime createUploadIntent → PUT MinIO → completeUpload → listMediaAssets.',
@@ -63,19 +68,59 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
     reason: 'Uses resolveDshImageSource for preview catalog thumbnails. Not runtime product/order/payment flow.',
   },
   {
-    file: 'dsh/frontend/data/media.preview-data.ts',
+    file: 'dsh/frontend/data/legacy-preview/media.preview-data.ts',
     classification: 'DEV_ALLOWED',
     reason: 'Pure preview/seed data file. Not imported by any runtime surface directly.',
   },
   {
-    file: 'dsh/frontend/data/categories.preview-data.ts',
+    file: 'dsh/frontend/data/legacy-preview/categories.preview-data.ts',
     classification: 'DEV_ALLOWED',
     reason: 'Category mediaKey fields are fixture references used only for category tile rendering. Not in order/payment/product upload flows.',
   },
   {
     file: 'dsh/frontend/app-client/hooks/useDshClientMarketingState.ts',
-    classification: 'DEV_ALLOWED',
-    reason: 'Imports getLiveMarketingGrowthItems/getPublishedMarketingHomePromos/getLiveMarketingVideoItems from marketing.preview-data. These drive home promos and shorts. Exit path: migrate to GET /marketing/promos and GET /marketing/shorts runtime endpoints.',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'Client marketing hook no longer reads preview marketing seeds. Until runtime marketing endpoints are wired, client home promos/shorts/growth render empty-state only.',
+  },
+  {
+    file: 'dsh/frontend/app-client/screens/DshOrdersListScreen.tsx',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'Orders list no longer defaults to fallbackOrderListItems. Empty-state is shown until DSH API provides live order rows.',
+  },
+  {
+    file: 'dsh/frontend/app-client/screens/parts/OrdersTrackingHelpers.tsx',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'Removed fake support attachment behavior and disabled demo heartbeat progression in the client order journey. Screen now stays runtime-safe and does not fabricate proof or live-tracking updates.',
+  },
+  {
+    file: 'dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'Partner support screen no longer renders local operational support cases. It now falls back to an empty runtime state until DSH API exposes live support queues.',
+  },
+  {
+    file: 'dsh/frontend/app-client/parts/store/StoreMenuItemCard.tsx',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'Product cards on the client store surface now resolve only runtime/public URLs; dsh.* fixture keys fall back to the existing card placeholder instead of media-fixtures.',
+  },
+  {
+    file: 'dsh/frontend/app-client/shared/map-menu-item-to-product-card.ts',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'Mapped product cards now avoid fixture-key image resolution in active client commerce flows.',
+  },
+  {
+    file: 'dsh/frontend/app-client/hooks/useStoreShellDerivedState.ts',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'Client store shell cover/logo rendering now depends on runtime/public URLs only and falls back to the existing StoreHero placeholder.',
+  },
+  {
+    file: 'dsh/frontend/app-client/hooks/useHomeDerivedStores.ts',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'Client home store cards now treat dsh.* fixture keys as non-runtime and render only runtime/public store media while category tiles remain on the approved preview path.',
+  },
+  {
+    file: 'dsh/frontend/app-client/screens/CartScreen.tsx',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'Cart recommendations and product preview modal now ignore fixture keys and render only runtime/public product media, falling back to the existing empty visual state.',
   },
   {
     file: 'dsh/frontend/app-captain/dsh-captain.types.ts',
@@ -84,17 +129,17 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
   },
   // ─── Finance sub-domain: RUNTIME_VIOLATION_FIXED (2026-06-12) ─────────────
   {
-    file: 'dsh/frontend/data/dshFinancePreview.ts',
+    file: 'dsh/frontend/data/legacy-preview/dshFinancePreview.ts',
     classification: 'RUNTIME_VIOLATION_FIXED',
     reason: 'DELETED 2026-06-12. All WLT finance screens now runtime-only. Adapter chain (dshFinanceFixture → wltDshFinanceFallback) removed. No runtime consumers remain.',
   },
   {
-    file: 'dsh/frontend/data/finance.preview-data.ts',
+    file: 'dsh/frontend/data/legacy-preview/finance.preview-data.ts',
     classification: 'RUNTIME_VIOLATION_FIXED',
     reason: 'DELETED 2026-06-12. WLT control-panel statement components (Captain/Partner/Field/AccountStatement/RefundLedger/SettlementCalendar/StoreSettlement) converted to runtime-only empty-state pattern.',
   },
   {
-    file: 'dsh/frontend/data/wallet.preview-data.ts',
+    file: 'dsh/frontend/data/legacy-preview/wallet.preview-data.ts',
     classification: 'RUNTIME_VIOLATION_FIXED',
     reason: 'DELETED 2026-06-12. WltDshWalletControlCenter now uses buildRuntimeWalletRows(runtimeFinance) exclusively. DashFinancePreviewRow type inlined in DailyReconciliationWorkbench.',
   },

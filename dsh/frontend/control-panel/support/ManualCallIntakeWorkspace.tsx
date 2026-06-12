@@ -9,7 +9,7 @@ import {
   getDshCallIntakeByContext,
   getDshCallIntakePreview,
   type DshCallIntakePreview,
-} from '../../data/support.preview-data';
+} from '../../data/legacy-preview/support.preview-data';
 import type {
   DshGlobalControlLink,
   DshRouteHintedAction,

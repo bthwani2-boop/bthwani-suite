@@ -1,10 +1,10 @@
-﻿import React from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import { Box, Button, SelectField, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
 import type { VideoDraft, EditorWorkspaceTab } from './video-types';
 import { TARGET_TYPE_OPTIONS } from './video-types';
-import { dshCategoryFixtures } from '../../data/categories.preview-data';
-import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/stores.preview-data';
+import { dshCategoryFixtures } from '../../data/legacy-preview/categories.preview-data';
+import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/legacy-preview/stores.preview-data';
 import {
   upsertMarketingVideoItem,
   type MarketingVideoRecord,
@@ -12,7 +12,7 @@ import {
   type MarketingVideoAudience,
   type MarketingVideoSource,
   type MarketingVideoTargetType,
-} from '../../data/marketing.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
 import type { MarketingPermission } from './marketing-permissions.contract';
 
 interface VideoEditorSectionProps {

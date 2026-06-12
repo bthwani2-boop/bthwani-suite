@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
@@ -28,7 +28,7 @@ import {
   type MarketingNewsTickerStatus,
   type MarketingNewsTickerDeliveryMode,
   type MarketingNewsTickerKind,
-} from '../../data/marketing.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
 /**

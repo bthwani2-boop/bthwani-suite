@@ -10,7 +10,7 @@ import {
 } from '@bthwani/ui-kit/web';
 import {
   DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW,
-} from '../../data/orders.preview-data';
+} from '../../data/legacy-preview/orders.preview-data';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order-preview.contract';
 import {

@@ -13,11 +13,11 @@ import {
 import {
   EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
   DSH_ORDER_RESCUE_PREVIEW,
-} from '../../data/orders.preview-data';
+} from '../../data/legacy-preview/orders.preview-data';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 import { resolveDshOrderApiBaseUrl } from '../../shared';
 import { EXCEPTION_TICKET_MAP } from '../../shared/dsh-order-preview.contract';
-import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
+import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/legacy-preview/support.preview-data';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';

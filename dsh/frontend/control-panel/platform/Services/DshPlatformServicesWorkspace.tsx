@@ -4,7 +4,7 @@ import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebControlPanelWorkspaceTabs } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
-import { PREVIEW_TOP_SERVICES, type PlatformTopService } from '../../../data/platform.preview-data';
+import { PREVIEW_TOP_SERVICES, type PlatformTopService } from '../../../data/legacy-preview/platform.preview-data';
 import styles from '../../shared/control-panel-surface.module.css';
 
 export function DshPlatformServicesWorkspace({ activeFilter }: { activeFilter: string }) {

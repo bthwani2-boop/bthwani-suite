@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { useTheme } from '@bthwani/ui-kit';
-import { FULFILLMENT_MODE_ORDER_QUEUES } from '../../data/orders.preview-data';
+import { FULFILLMENT_MODE_ORDER_QUEUES } from '../../data/legacy-preview/orders.preview-data';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import type { DshFulfillmentOperationalMode } from './operations.types';
 

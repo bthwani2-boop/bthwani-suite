@@ -10,7 +10,7 @@ import {
   getDshCustomer360Record,
   type DshCustomer360OrderSummary,
   type DshCustomer360Record,
-} from '../../data/support.preview-data';
+} from '../../data/legacy-preview/support.preview-data';
 import type { DshGlobalControlLink } from '../../shared/dsh-order-preview.contract';
 import styles from '../shared/control-panel-surface.module.css';
 import { SUPPORT_VERIFICATION_STATUS_META, SUPPORT_TICKET_STATUS_META } from './support.types';

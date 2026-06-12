@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 // Authority: control-panel/marketing — banner editor section component.
 // Extracted from BannersCommandDeckScreen (EditorSection inner component) as part of Giant Screen split.
@@ -23,9 +23,9 @@ import type {
   MarketingBannerAudience,
   MarketingBannerRecord,
   MarketingBannerStatus,
-} from '../../data/marketing.preview-data';
-import { dshCategoryFixtures } from '../../data/categories.preview-data';
-import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/stores.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
+import { dshCategoryFixtures } from '../../data/legacy-preview/categories.preview-data';
+import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/legacy-preview/stores.preview-data';
 import type { MarketingPermission } from './marketing-permissions.contract';
 import {
   BANNER_TEMPLATES,

@@ -7,14 +7,14 @@
  * Used as offline fallback when API unreachable. Surfaces consume through this adapter only — they do NOT own identity.
  *
  * Client app was the donor/reference for current correct preview data.
- * Central data owner: dsh/frontend/data/products.preview-data.ts
- * Central categories owner: dsh/frontend/data/categories.preview-data.ts
+ * Central data owner: dsh/frontend/data/legacy-preview/products.preview-data.ts
+ * Central categories owner: dsh/frontend/data/legacy-preview/categories.preview-data.ts
  * Media owner: dsh/frontend/media-fixtures (via resolve-dsh-image-source.ts)
  */
 
-import { storeItemsByStoreId } from '../data/products.preview-data';
+import { storeItemsByStoreId } from '../data/legacy-preview/products.preview-data';
 import type { StoreItemsByStoreId } from './dshStoreProductCardModel';
-import { CATEGORY_TAXONOMY_MAP } from '../data/categories.preview-data';
+import { CATEGORY_TAXONOMY_MAP } from '../data/legacy-preview/categories.preview-data';
 
 import type { DshCatalogDomainId, DshCatalogMainCategoryId, DshCatalogSubcategoryId, DshProductFacetId } from './catalog';
 
@@ -128,11 +128,11 @@ export function buildCentralPartnerInventoryItems(
   return result;
 }
 
-import { dshCategoryFixtures } from '../data/categories.preview-data';
+import { dshCategoryFixtures } from '../data/legacy-preview/categories.preview-data';
 import {
   type PartnerInventoryDetail,
   CENTRAL_PRODUCT_DETAIL_LOOKUP,
-} from '../data/partner.preview-data';
+} from '../data/legacy-preview/partner.preview-data';
 
 export type { PartnerInventoryDetail };
 export { CENTRAL_PRODUCT_DETAIL_LOOKUP };

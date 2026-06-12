@@ -5,12 +5,12 @@ import {
   PARTNER_MODIFICATION_REQUESTS,
   PARTNER_DISPUTES_DATA,
   PARTNER_FULFILLMENT_AGREEMENTS as PARTNER_FULFILLMENT_AGREEMENTS_SEED,
-} from '../data/partner.preview-data';
+} from '../data/legacy-preview/partner.preview-data';
 import type {
   PartnerComplaint,
   PartnerModificationRequest,
   PartnerDispute,
-} from '../data/partner.preview-data';
+} from '../data/legacy-preview/partner.preview-data';
 
 
 export type DshPartnerIntakeSource = 'app-field' | 'app-partner';

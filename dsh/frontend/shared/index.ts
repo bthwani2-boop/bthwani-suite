@@ -632,7 +632,7 @@ export {
 // Maps central data (dsh/frontend/data) to surface view models.
 // Surfaces consume through this adapter — they do NOT own catalog identity.
 // Owner: dsh/frontend/shared (adapter layer)
-// Central data: dsh/frontend/data/products.preview-data.ts, categories.preview-data.ts
+// Central data: dsh/frontend/data/legacy-preview/products.preview-data.ts, categories.preview-data.ts
 // Media: dsh/frontend/media-fixtures (resolved via resolve-dsh-image-source.ts)
 export type {
   CatalogPartnerInventoryItem,

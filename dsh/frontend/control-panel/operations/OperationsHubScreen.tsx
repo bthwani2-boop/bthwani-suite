@@ -9,7 +9,7 @@ import {
   WebControlPanelWorkbench,
   WebControlPanelDenseHeader,
 } from '@bthwani/ui-kit/web';
-import { OPERATIONS_PULSE_METRICS } from '../../data/orders.preview-data';
+import { OPERATIONS_PULSE_METRICS } from '../../data/legacy-preview/orders.preview-data';
 import type {
   CanonicalOperationsGroupId,
   OperationsFocusParams,

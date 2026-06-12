@@ -205,13 +205,13 @@ function parseWebResolver() {
     let relativePath = '';
     if (supportsCategoryMain && row.mediaKey.startsWith('dsh.category.main.')) {
       const id = row.mediaKey.slice('dsh.category.main.'.length).replace('.v1', '');
-      relativePath = `categories/main/dsh-category-main-${id}-v1.png`;
+      relativePath = `legacy-preview/categories/main/dsh-category-main-${id}-v1.png`;
     } else if (supportsCategorySub && row.mediaKey.startsWith('dsh.category.sub.')) {
       const id = row.mediaKey.slice('dsh.category.sub.'.length).replace('.v1', '');
-      relativePath = `categories/sub/dsh-category-sub-${id}-v1.png`;
+      relativePath = `legacy-preview/categories/sub/dsh-category-sub-${id}-v1.png`;
     } else if (supportsBanner && row.mediaKey.startsWith('dsh.banner.home.')) {
       const slug = row.mediaKey.replace('dsh.banner.home.', '').replace('.v1', '');
-      relativePath = `banners/dsh-banner-home-${slug}-v1.png`;
+      relativePath = `legacy-preview/banners/dsh-banner-home-${slug}-v1.png`;
     }
 
     if (relativePath) {

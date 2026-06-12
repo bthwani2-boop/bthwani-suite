@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { StyleSheet, View, Pressable } from 'react-native';
@@ -23,12 +23,12 @@ import {
   type CampaignChannel,
   type CampaignPriority,
   type CampaignTargetType,
-} from '../../data/marketing.preview-data';
-import { dshCategoryFixtures } from '../../data/categories.preview-data';
-import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/stores.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
+import { dshCategoryFixtures } from '../../data/legacy-preview/categories.preview-data';
+import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/legacy-preview/stores.preview-data';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
-import type { Entitlement } from '../../data/subscriptions.preview-data';
+import type { Entitlement } from '../../data/legacy-preview/subscriptions.preview-data';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
 /**

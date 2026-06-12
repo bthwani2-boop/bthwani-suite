@@ -13,7 +13,7 @@ import {
   PARTNER_PERFORMANCE_METRICS,
   PARTNER_VISIBILITY_TIMELINE_DATA,
   type PartnerDispute,
-} from '../../data/partner.preview-data';
+} from '../../data/legacy-preview/partner.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
 
 function parseKpiPercent(value: string): number {

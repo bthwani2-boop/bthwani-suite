@@ -13,12 +13,12 @@
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **J-000** | Foundation Remote / Local / Evidence Gate | `BLOCKED_TRUE_EXTERNAL_REASON` | 2026-06-12 | `tools/registry/runs/J-000-000a..e-20260612/` | Docker container baseline not confirmed; package.json files absent in frontends |
 | **J-001** | Store Discovery | `PASS` | 2026-06-12 | `tools/registry/runs/J-001-001b..001f-20260612-120000/` | tsc & go test PASS; historical visual proof confirmed in SERVICE_BLUEPRINT.md |
-| **J-002** | Catalog Management | `PASS` | 2026-06-12 | `tools/registry/runs/J-002-20260612-182200/` | tsc & go test PASS; historical visual runtime proven |
-| **J-003** | Checkout, Payment, WLT, and Order | `NEEDS_VISUAL_EVIDENCE` | 2026-06-12 | `tools/registry/runs/J-003-LIVE-20260612-093525/` | Code + E2E backend integration test PASS; device visual screenshots pending |
-| **J-004** | Order Lifecycle, Support, and Refund | `TBD` | — | — | Template state / Not yet executed |
+| **J-002** | Catalog Management | `NEEDS_RUNTIME_EVIDENCE` | 2026-06-12 | `tools/registry/runs/J-002-J-003-CLOSURE-20260612-103253/` | ProductEdit, partner inventory, client store-items list, and control-panel catalogs screenshots captured; 002F Docker query trace and some detailed visual states still pending |
+| **J-003** | Checkout, Payment, WLT, and Order | `NEEDS_RUNTIME_EVIDENCE` | 2026-06-12 | `tools/registry/runs/J-002-J-003-CLOSURE-20260612-103253/` | Checkout intent visual captured on device; live WLT callback/runtime proof blocked by Docker access denial |
+| **J-004** | Order Lifecycle, Support, and Refund | `FIX_REQUIRED` | 2026-06-12 | `tools/registry/runs/J-004-J-007-RUNTIME-HARDEN-20260612-143000/` | Client order list, support proof UI, and smart-tracking demo were hardened to runtime-safe states; live order timeline, refund bridge, and support/runtime evidence are still pending. |
 | **J-005** | Delivery Execution by Captain | `TBD` | — | — | Template state / Not yet executed |
 | **J-006** | Partner Onboarding & Field Readiness | `TBD` | — | — | Template state / Not yet executed |
-| **J-007** | Data & Media Fixture Governance | `TBD` | — | — | Template state / Not yet executed |
+| **J-007** | Data & Media Fixture Governance | `FIX_REQUIRED` | 2026-06-12 | `tools/registry/runs/J-004-J-007-RUNTIME-HARDEN-20260612-143000/` | `dsh/frontend/data` and `dsh/frontend/media-fixtures` were quarantined under `legacy-preview`, root shims preserved compatibility, and active app-client order/support plus partner-support surfaces were switched away from local demo truth; control-panel preview consumers and backend legacy fixture serving still remain. |
 | **J-008** | Platform Vars & Provider Policy | `TBD` | — | — | Template state / Not yet executed |
 | **J-009** | Control Panel Operations Room | `TBD` | — | — | Template state / Not yet executed |
 | **J-010** | WLT Finance & Settlement Boundary | `PASS_WITH_WARNINGS` | 2026-06-11 | `tools/registry/runs/DSH-J010-CLOSURE-20260611-001/` | Enforced financial ownership in dshFinancePreviewModel; runtime proof requires Docker postgres |
@@ -44,20 +44,20 @@
 | **001D** | `J-001` | Control Panel Catalog Approval Gate | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-001-001d-20260612-120000/` | Control Panel approvals require visual verification. |
 | **001E** | `J-001` | Control Panel Marketing Visibility Gate | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-001-001e-20260612-120000/` | Control Panel toggles require visual verification. |
 | **001F** | `J-001` | Cross-Surface Visibility Proof | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-001-001f-20260612-120000/` | Cross-surface list synchrony requires multi-surface captures. |
-| **002A** | `J-002` | Partner Product Create and Edit | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-002-20260612-182200/` | Requires ProductEditScreen capture. |
-| **002B** | `J-002` | Category Facet and Product Media | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-002-20260612-182200/` | Facet/media selectors require UI screenshots. |
-| **002C** | `J-002` | Control Panel Catalog Review | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-002-20260612-182200/` | CatalogGovernanceScreen operator approval screenshots needed. |
-| **002D** | `J-002` | Catalog Override and Conflict Resolution | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-002-20260612-182200/` | Conflict modal / resolution flow screenshots needed. |
-| **002E** | `J-002` | Client Catalog Display and Detail on Demand | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-002-20260612-182200/` | client StoreItemsScreen list and details screenshots needed. |
-| **002F** | `J-002` | Catalog Performance and N+1 Media Prevention | `NEEDS_RUNTIME_EVIDENCE` | `tools/registry/runs/J-002-20260612-182200/` | Query traces proving single call without N+1 needed. |
+| **002A** | `J-002` | Partner Product Create and Edit | `PASS_WITH_WARNINGS` | `tools/registry/runs/J-002-J-003-CLOSURE-20260612-103253/` | ProductEditScreen and partner inventory screenshots captured; journey remains blocked by 002F runtime trace. |
+| **002B** | `J-002` | Category Facet and Product Media | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-002-J-003-CLOSURE-20260612-103253/` | Partner inventory/catalog surface captured; facet/media selector proof still pending. |
+| **002C** | `J-002` | Control Panel Catalog Review | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-002-J-003-CLOSURE-20260612-103253/` | Control-panel `/catalogs` screenshot captured; approve/reject/audit drawer proof still pending. |
+| **002D** | `J-002` | Catalog Override and Conflict Resolution | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-002-J-003-CLOSURE-20260612-103253/` | Catalog governance page captured; conflict modal / resolution flow screenshots still pending. |
+| **002E** | `J-002` | Client Catalog Display and Detail on Demand | `NEEDS_VISUAL_EVIDENCE` | `tools/registry/runs/J-002-J-003-CLOSURE-20260612-103253/` | Client store-items list screenshot captured; item detail-on-demand screenshot still pending. |
+| **002F** | `J-002` | Catalog Performance and N+1 Media Prevention | `NEEDS_RUNTIME_EVIDENCE` | `tools/registry/runs/J-002-J-003-CLOSURE-20260612-103253/` | Docker access denied, so live query trace proving no N+1 could not be captured. |
 | **003A** | `J-003` | Cart Serviceability and Auth Binding | `NOT_CLOSED_BY_THIS_FILE` | `tools/registry/runs/J-003-LIVE-20260612-093525/` | Evaluated under journey closure logic. |
 | **003B** | `J-003` | Checkout Intent Address and Time Window | `NOT_CLOSED_BY_THIS_FILE` | — | Evaluated under journey closure logic. |
-| **003C** | `J-003` | WLT Payment Bridge and Money Boundary | `NEEDS_VISUAL_EVIDENCE` | — | DshCheckoutIntentScreen bridge lacks screenshot evidence. |
+| **003C** | `J-003` | WLT Payment Bridge and Money Boundary | `NEEDS_RUNTIME_EVIDENCE` | `tools/registry/runs/J-002-J-003-CLOSURE-20260612-103253/` | DshCheckoutIntentScreen checkout visual captured; live WLT callback proof blocked by Docker access denial. |
 | **003D** | `J-003` | Idempotent Order Creation Handoff | `NOT_CLOSED_BY_THIS_FILE` | — | Evaluated under journey closure logic. |
 | **003E** | `J-003` | Payment Failure and Support Entry | `NOT_CLOSED_BY_THIS_FILE` | — | Evaluated under journey closure logic. |
 | **003F** | `J-003` | Partner Order Intake after Payment | `NOT_CLOSED_BY_THIS_FILE` | — | Evaluated under journey closure logic. |
 | **003G** | `J-003` | Checkout Control Panel Finance Ops Visibility | `NOT_CLOSED_BY_THIS_FILE` | — | Evaluated under journey closure logic. |
-| **004A** | `J-004` | Client Order Tracking and Status Timeline | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
+| **004A** | `J-004` | Client Order Tracking and Status Timeline | `FIX_REQUIRED` | `tools/registry/runs/J-004-J-007-RUNTIME-HARDEN-20260612-143000/` | Removed fallback order rows and disabled fake heartbeat progression; the client order history/tracking flow now waits for live DSH API order rows and heartbeat/runtime updates. |
 | **004B** | `J-004` | Partner Prepare and Handoff Lifecycle | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
 | **004C** | `J-004` | Control Panel Support Case and Exception Queue | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
 | **004D** | `J-004` | Cancellation Rules and State Guards | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
@@ -77,11 +77,11 @@
 | **006E** | `J-006` | Control Panel Approval/Rejection/Escalation | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
 | **006F** | `J-006` | Partner Activation and First Catalog Readiness | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
 | **006G** | `J-006` | End-to-End Onboarding Closure Proof | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
-| **007A** | `J-007` | Central Data Inventory | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
-| **007B** | `J-007` | Central Media Fixture Inventory | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
-| **007C** | `J-007` | Duplicate Local Fixture Cleanup | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
-| **007D** | `J-007` | ID, MediaKey, and Reference Contract | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
-| **007E** | `J-007` | Seed Reset and Runtime Fixture Exit Path | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
+| **007A** | `J-007` | Central Data Inventory | `PASS_WITH_WARNINGS` | `tools/registry/runs/J-007-APPCLIENT-FIXTURE-HARDEN-20260612-110041/` | Current central preview-data consumers were re-inventoried during the Graphify-first closure pass; control-panel marketing/platform/operations and partner workflow seeds still depend on `dsh/frontend/data`. |
+| **007B** | `J-007` | Central Media Fixture Inventory | `PASS_WITH_WARNINGS` | `tools/registry/runs/J-007-APPCLIENT-FIXTURE-HARDEN-20260612-110041/` | `resolve-dsh-image-source.ts` and backend legacy static serving remain the central media-fixture owner path; active client commerce flows were detached from fixture-key rendering in this pass. |
+| **007C** | `J-007` | Duplicate Local Fixture Cleanup | `FIX_REQUIRED` | `tools/registry/runs/J-004-J-007-RUNTIME-HARDEN-20260612-143000/` | Core preview payloads were moved under `legacy-preview` and compatibility shims were restored at the root, but control-panel/shared workflow consumers still need phased runtime migration or explicit quarantine. |
+| **007D** | `J-007` | ID, MediaKey, and Reference Contract | `PASS_WITH_WARNINGS` | `tools/registry/runs/J-007-APPCLIENT-FIXTURE-HARDEN-20260612-110041/` | Added runtime-safe resolver for active app-client store/cart/home-store paths so `dsh.*` keys no longer drive live client commerce rendering; category tile/banner preview flows remain on the approved preview contract. |
+| **007E** | `J-007` | Seed Reset and Runtime Fixture Exit Path | `FIX_REQUIRED` | `tools/registry/runs/J-004-J-007-RUNTIME-HARDEN-20260612-143000/` | Client order/support and partner support surfaces no longer fabricate local orders, proof files, or operational cases, but backend `/media-fixtures/` legacy serving and preview-only control-panel consumers still block full fixture exit proof. |
 | **008A** | `J-008` | Vars Ownership and Scope Model | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
 | **008B** | `J-008` | Provider Policy Preview and Runtime Boundary | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
 | **008C** | `J-008` | Feature Flag Rollout and Experiment Guard | `NOT_CLOSED_BY_THIS_FILE` | — | Template state / Not executed. |
@@ -134,9 +134,12 @@ This section centralizes all active gaps extracted from the read-only checklists
 | **GAP-000D-01** | 000d | J-000 | `dsh/SERVICE_BLUEPRINT.md` missing | Locate or create at `dsh/` root | `OPEN` |
 | **GAP-000A-01** | 000a | J-000 | Untracked noise file `(3).md` in `dsh/docs` | Delete or commit this file | `OPEN` |
 | **GAP-001B-01** | Multiple | J-001 | Missing screenshots for client, partner & operator surfaces | Capture screenshots from scrcpy/localhost and store under `tools/registry/runs/J-001-{DATE}/` | `OPEN` (Visual blocker) |
-| **GAP-002A-01** | Multiple | J-002 | Missing screenshots for Product edit & catalog lists | Capture emulator screens and place under `tools/registry/runs/J-002-{DATE}/` | `OPEN` (Visual blocker) |
-| **GAP-002F-01** | 002f | J-002 | Missing query performance trace log | Run catalog load and capture console query output showing no N+1 calls | `OPEN` (Perf blocker) |
-| **GAP-003C-01** | 003c | J-003 | Missing checkout intent bridge screenshots | Capture browser and mobile screens for checkout intent | `OPEN` (Visual blocker) |
+| **GAP-002A-01** | Multiple | J-002 | Product edit, partner inventory/catalog, control-panel catalogs, and client store-items list screenshots captured | Capture remaining facet/media selector, approval drawer, conflict resolution, item detail, and runtime query trace evidence | `PARTIAL` (Visual/runtime evidence remains) |
+| **GAP-002F-01** | 002f | J-002 | Missing query performance trace log | Restore Docker access and capture console/query output showing no per-item N+1 calls | `BLOCKED_TRUE_EXTERNAL_REASON` (Docker access denied) |
+| **GAP-003C-01** | 003c | J-003 | Checkout intent bridge screenshot captured on device | Restore Docker/WLT runtime access and capture live WLT payment-session/callback proof | `BLOCKED_TRUE_EXTERNAL_REASON` (Docker access denied) |
+| **GAP-004A-01** | 004a | J-004 | Order history/tracking no longer shows fallback rows or demo heartbeat, but still lacks live DSH API order feed, support evidence upload, and runtime screenshot proof | Bind the screen to live order/support endpoints and capture device/browser evidence for the real timeline and support flow | `PARTIAL` |
+| **GAP-007D-01** | 007d | J-007 | Active app-client commerce flows and partner-support/runtime order-support surfaces were detached from local demo truth, but category/banner preview and control-panel preview consumers still point at legacy fixture/data boundaries | Keep preview consumers quarantined, migrate remaining runtime-capable surfaces to API/public media, then archive unused fixture/data residue | `PARTIAL` |
+| **GAP-007E-01** | 007e | J-007 | Post-edit graph refresh and TypeScript verification were not fully proven in the constrained local environment (`graphify update .` timeout, `tsc` sandbox `EPERM`) | Re-run `graphify update .` and targeted TypeScript verification in an unconstrained local session, then continue seed/runtime fixture-exit verification | `OPEN` |
 | **GAP-014A-01** | Multiple | J-014 | `postgres_migrations_test.go` requires local Docker | Start Docker containers on local port `:15432` to resolve test fail | `OPEN` (Runtime blocker) |
 
 ---

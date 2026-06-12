@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -25,7 +25,7 @@ import {
   type LoyaltyReward,
   type SubscriptionPlan,
   type Entitlement,
-} from '../../data/subscriptions.preview-data';
+} from '../../data/legacy-preview/subscriptions.preview-data';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
 

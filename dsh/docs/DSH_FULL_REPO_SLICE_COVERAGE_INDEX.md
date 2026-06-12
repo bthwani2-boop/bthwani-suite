@@ -129,30 +129,30 @@ Full execution slices: see `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` Â§ Execut
 
 | Source Area | Path | Journey(s) | Slice(s) | Status | Notes |
 |---|---|---|---|---|---|
-| Preview data contract | `dsh/frontend/data/preview-data.contract.ts` | J-007 | DSH-SLICE-007A | ACTIVE | Contract for all preview data |
-| Stores preview data | `dsh/frontend/data/stores.preview-data.ts` | J-001,J-007 | DSH-SLICE-001A,007A | ACTIVE_PREVIEW | Preview store list |
-| Categories preview data | `dsh/frontend/data/categories.preview-data.ts` | J-002,J-007 | DSH-SLICE-002B,007A | ACTIVE_PREVIEW | Preview categories |
-| Products preview data | `dsh/frontend/data/products.preview-data.ts` | J-002,J-007 | DSH-SLICE-002A,007A | ACTIVE_PREVIEW | Preview products |
-| Partner preview data | `dsh/frontend/data/partner.preview-data.ts` | J-002,J-006,J-007 | DSH-SLICE-002A,006A,007A | ACTIVE_PREVIEW | Preview partner data |
-| Orders preview data | `dsh/frontend/data/orders.preview-data.ts` | J-004,J-007 | DSH-SLICE-004A,007A | ACTIVE_PREVIEW | Preview orders |
-| Marketing preview data | `dsh/frontend/data/marketing.preview-data.ts` | J-001,J-002,J-007 | DSH-SLICE-001E,002F,007A | ACTIVE_PREVIEW | Preview marketing banners |
-| Offers preview data | `dsh/frontend/data/offers.preview-data.ts` | J-002,J-007 | DSH-SLICE-002A,007A | ACTIVE_PREVIEW | Preview offers |
-| Operational preview data | `dsh/frontend/data/operational.preview-data.ts` | J-009,J-007 | DSH-SLICE-009A,007A | ACTIVE_PREVIEW | Preview ops data |
-| Operational statuses preview | `dsh/frontend/data/operational-statuses.preview-data.ts` | J-009,J-007 | DSH-SLICE-009A,007A | ACTIVE_PREVIEW | Preview operational statuses |
-| Finance preview data | `dsh/frontend/data/finance.preview-data.ts` | J-010,J-007 | DSH-SLICE-010A,007A | ACTIVE_PREVIEW | Preview finance data (read-only WLT bridge) |
-| DSH finance preview | `dsh/frontend/data/dshFinancePreview.ts` | J-010,J-007 | DSH-SLICE-010A,007A | ACTIVE_PREVIEW | Finance preview fixture |
-| Wallet preview data | `dsh/frontend/data/wallet.preview-data.ts` | J-010,J-007 | DSH-SLICE-010A,007A | ACTIVE_PREVIEW | Wallet read-only preview |
-| Customers preview data | `dsh/frontend/data/customers.preview-data.ts` | J-001,J-007 | DSH-SLICE-001A,007A | ACTIVE_PREVIEW | Preview customer data |
-| Branches preview data | `dsh/frontend/data/branches.preview-data.ts` | J-002,J-007 | DSH-SLICE-002A,007A | ACTIVE_PREVIEW | Preview branch data |
-| Delivery modes preview data | `dsh/frontend/data/delivery-modes.preview-data.ts` | J-005,J-007 | DSH-SLICE-005A,007A | ACTIVE_PREVIEW | Preview delivery modes |
-| Subscriptions preview data | `dsh/frontend/data/subscriptions.preview-data.ts` | J-008,J-007 | DSH-SLICE-008B,007A | ACTIVE_PREVIEW | Preview subscriptions |
-| Platform preview data | `dsh/frontend/data/platform.preview-data.ts` | J-008,J-007 | DSH-SLICE-008A,007A | ACTIVE_PREVIEW | Preview platform config |
-| Publishing gates preview | `dsh/frontend/data/publishing-gates.preview-data.ts` | J-001,J-002,J-007 | DSH-SLICE-001D,002F,007A | ACTIVE_PREVIEW | Preview publishing gates |
-| Canonical preview data | `dsh/frontend/data/canonical.preview-data.ts` | J-007 | DSH-SLICE-007A | ACTIVE | Canonical preview authority |
-| Signals preview data | `dsh/frontend/data/signals.preview-data.ts` | J-009,J-007 | DSH-SLICE-009A,007A | ACTIVE_PREVIEW | Preview signal data |
-| Media preview data | `dsh/frontend/data/media.preview-data.ts` | J-007 | DSH-SLICE-007B | ACTIVE_PREVIEW | Preview media fixtures |
-| Support preview data | `dsh/frontend/data/support.preview-data.ts` | J-004,J-007 | DSH-SLICE-004C,007A | ACTIVE_PREVIEW | Preview support data |
-| Data index | `dsh/frontend/data/index.ts` | J-007 | DSH-SLICE-007A | ACTIVE | Public data export |
+| Preview data contract | `dsh/frontend/data/legacy-preview/preview-data.contract.ts` | J-007 | DSH-SLICE-007A | ACTIVE | Contract for all preview data |
+| Stores preview data | `dsh/frontend/data/legacy-preview/stores.preview-data.ts` | J-001,J-007 | DSH-SLICE-001A,007A | ACTIVE_PREVIEW | Preview store list |
+| Categories preview data | `dsh/frontend/data/legacy-preview/categories.preview-data.ts` | J-002,J-007 | DSH-SLICE-002B,007A | ACTIVE_PREVIEW | Preview categories |
+| Products preview data | `dsh/frontend/data/legacy-preview/products.preview-data.ts` | J-002,J-007 | DSH-SLICE-002A,007A | ACTIVE_PREVIEW | Preview products |
+| Partner preview data | `dsh/frontend/data/legacy-preview/partner.preview-data.ts` | J-002,J-006,J-007 | DSH-SLICE-002A,006A,007A | ACTIVE_PREVIEW | Preview partner data |
+| Orders preview data | `dsh/frontend/data/legacy-preview/orders.preview-data.ts` | J-004,J-007 | DSH-SLICE-004A,007A | ACTIVE_PREVIEW | Preview orders |
+| Marketing preview data | `dsh/frontend/data/legacy-preview/marketing.preview-data.ts` | J-001,J-002,J-007 | DSH-SLICE-001E,002F,007A | ACTIVE_PREVIEW | Preview marketing banners |
+| Offers preview data | `dsh/frontend/data/legacy-preview/offers.preview-data.ts` | J-002,J-007 | DSH-SLICE-002A,007A | ACTIVE_PREVIEW | Preview offers |
+| Operational preview data | `dsh/frontend/data/legacy-preview/operational.preview-data.ts` | J-009,J-007 | DSH-SLICE-009A,007A | ACTIVE_PREVIEW | Preview ops data |
+| Operational statuses preview | `dsh/frontend/data/legacy-preview/operational-statuses.preview-data.ts` | J-009,J-007 | DSH-SLICE-009A,007A | ACTIVE_PREVIEW | Preview operational statuses |
+| Finance preview data | `dsh/frontend/data/legacy-preview/finance.preview-data.ts` | J-010,J-007 | DSH-SLICE-010A,007A | ACTIVE_PREVIEW | Preview finance data (read-only WLT bridge) |
+| DSH finance preview | `dsh/frontend/data/legacy-preview/dshFinancePreview.ts` | J-010,J-007 | DSH-SLICE-010A,007A | ACTIVE_PREVIEW | Finance preview fixture |
+| Wallet preview data | `dsh/frontend/data/legacy-preview/wallet.preview-data.ts` | J-010,J-007 | DSH-SLICE-010A,007A | ACTIVE_PREVIEW | Wallet read-only preview |
+| Customers preview data | `dsh/frontend/data/legacy-preview/customers.preview-data.ts` | J-001,J-007 | DSH-SLICE-001A,007A | ACTIVE_PREVIEW | Preview customer data |
+| Branches preview data | `dsh/frontend/data/legacy-preview/branches.preview-data.ts` | J-002,J-007 | DSH-SLICE-002A,007A | ACTIVE_PREVIEW | Preview branch data |
+| Delivery modes preview data | `dsh/frontend/data/legacy-preview/delivery-modes.preview-data.ts` | J-005,J-007 | DSH-SLICE-005A,007A | ACTIVE_PREVIEW | Preview delivery modes |
+| Subscriptions preview data | `dsh/frontend/data/legacy-preview/subscriptions.preview-data.ts` | J-008,J-007 | DSH-SLICE-008B,007A | ACTIVE_PREVIEW | Preview subscriptions |
+| Platform preview data | `dsh/frontend/data/legacy-preview/platform.preview-data.ts` | J-008,J-007 | DSH-SLICE-008A,007A | ACTIVE_PREVIEW | Preview platform config |
+| Publishing gates preview | `dsh/frontend/data/legacy-preview/publishing-gates.preview-data.ts` | J-001,J-002,J-007 | DSH-SLICE-001D,002F,007A | ACTIVE_PREVIEW | Preview publishing gates |
+| Canonical preview data | `dsh/frontend/data/legacy-preview/canonical.preview-data.ts` | J-007 | DSH-SLICE-007A | ACTIVE | Canonical preview authority |
+| Signals preview data | `dsh/frontend/data/legacy-preview/signals.preview-data.ts` | J-009,J-007 | DSH-SLICE-009A,007A | ACTIVE_PREVIEW | Preview signal data |
+| Media preview data | `dsh/frontend/data/legacy-preview/media.preview-data.ts` | J-007 | DSH-SLICE-007B | ACTIVE_PREVIEW | Preview media fixtures |
+| Support preview data | `dsh/frontend/data/legacy-preview/support.preview-data.ts` | J-004,J-007 | DSH-SLICE-004C,007A | ACTIVE_PREVIEW | Preview support data |
+| Data index | `dsh/frontend/data/legacy-preview/index.ts` | J-007 | DSH-SLICE-007A | ACTIVE | Public data export |
 
 ### D. Frontend Media Fixtures
 

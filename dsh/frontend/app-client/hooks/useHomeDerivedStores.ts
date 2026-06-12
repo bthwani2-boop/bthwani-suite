@@ -15,7 +15,7 @@ import type { HomePromoRecord } from '../../shared/dsh-marketing-types';
 import type { HomeStoreCardEntry } from '../parts/home/HomeStoreFeedSection';
 import { resolveHomePromoPublishStage } from '../shared/home-promo-mappers';
 import { resolveHomeStoresForCategory } from '../shared/home-search-helpers';
-import { resolveDshImageSource } from '../shared/resolve-image-source';
+import { resolveDshRuntimeImageSource } from '../shared/resolve-runtime-image-source';
 // getPublishedHomePromos removed — home promos come from API.
 import { canRenderInClientSurface } from '../../shared/workflow';
 
@@ -42,11 +42,11 @@ type UseHomeDerivedStoresResult = {
   resolvedHomePromos: HomePromoRecord[];
 };
 
-function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string): ReturnType<typeof resolveDshImageSource> | undefined {
+function resolveDshHomeStoreImageSource(imageUri?: string, publishStage?: string): ReturnType<typeof resolveDshRuntimeImageSource> | undefined {
   if (!canRenderInClientSurface(publishStage, 'store')) {
     return undefined;
   }
-  return resolveDshImageSource(imageUri);
+  return resolveDshRuntimeImageSource(imageUri);
 }
 
 /**

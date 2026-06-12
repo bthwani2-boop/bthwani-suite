@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from 'react';
 import { Pressable, StyleSheet, View, Image } from 'react-native';
@@ -15,10 +15,10 @@ import {
   toggleHomePromoStatus,
   type HomePromoRecord,
   type HomePromoSummary,
-} from '../../data/marketing.preview-data';
-import { dshCategoryFixtures } from '../../data/categories.preview-data';
-import { dshDiscoveryStores } from '../../data/stores.preview-data';
-import { storeItemsByStoreId } from '../../data/stores.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
+import { dshCategoryFixtures } from '../../data/legacy-preview/categories.preview-data';
+import { dshDiscoveryStores } from '../../data/legacy-preview/stores.preview-data';
+import { storeItemsByStoreId } from '../../data/legacy-preview/stores.preview-data';
 import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 

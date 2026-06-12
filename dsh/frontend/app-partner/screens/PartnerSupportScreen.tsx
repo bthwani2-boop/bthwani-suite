@@ -98,6 +98,8 @@ const commandCenterFilterItems = [
   { value: 'escalation', label: 'تصعيد' },
 ] as const;
 
+const runtimePartnerSupportCases: readonly OperationsSupportCase[] = [];
+
 function resolvePartnerCaseOwnerLabel(item: OperationsSupportCase): string {
   if (item.issueCategoryId === 'payment-refund-review') {
     return 'قسم المالية';
@@ -684,7 +686,7 @@ export function PartnerSupportScreen({
   }, [initialCaseId, initialFilterId]);
 
   const visibleItems = React.useMemo(() => {
-    let items = [...operationsSupportCases];
+    let items = [...runtimePartnerSupportCases];
 
     if (selectedFilterId === 'urgent') {
       items = items.filter((item) => item.hasSlaRisk || item.requiresDecision);
@@ -729,7 +731,7 @@ export function PartnerSupportScreen({
   }, [expandedCaseId, visibleItems]);
 
   const urgentCount = React.useMemo(
-    () => operationsSupportCases.filter((item) => item.hasSlaRisk || item.requiresDecision).length,
+    () => runtimePartnerSupportCases.filter((item) => item.hasSlaRisk || item.requiresDecision).length,
     []
   );
 
@@ -877,14 +879,14 @@ export function PartnerSupportScreen({
       <Box gap={3} paddingY={2}>
         <SectionHeader
           title="صف الأولوية"
-          subtitle="حالات تشغيلية مرتبة حسب الأولوية وتتم معالجتها بالكامل محليًا."
+          subtitle="تظهر الحالات هنا بعد تحميلها من DSH API وربط التصعيدات التشغيلية الحية."
         />
 
         {listCases.length === 0 && !focusCase ? (
           <StateView
             stateId="empty"
-            title="لا توجد نتائج مطابقة"
-            description="غيّر معايير البحث أو الفلتر للمتابعة."
+            title="لا توجد حالات دعم حية"
+            description="سيظهر صف الدعم بعد وصول الحالات الفعلية من DSH API. تم عزل الحالات التجريبية المحلية."
           />
         ) : (
           <Box gap={2}>

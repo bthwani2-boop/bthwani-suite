@@ -20,7 +20,7 @@ import {
   getDshSupportTicketStatusTone,
   type DshSupportTicketMessage,
   DSH_DEMO_SUPPORT_TICKETS,
-} from '../../data/support.preview-data';
+} from '../../data/legacy-preview/support.preview-data';
 
 function MessageBubble({ message }: { message: DshSupportTicketMessage }) {
   const isOps = message.senderKind === 'ops';

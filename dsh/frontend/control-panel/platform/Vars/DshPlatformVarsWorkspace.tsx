@@ -12,7 +12,7 @@ import {
   DSH_PLATFORM_SIMULATION_PREVIEW,
   DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
   DSH_PLATFORM_DESIGN_POLICY_VARS,
-} from '../../../data/platform.preview-data';
+} from '../../../data/legacy-preview/platform.preview-data';
 import type {
   DshPlatformProviderControlRecord,
   DshPlatformVarRecord,

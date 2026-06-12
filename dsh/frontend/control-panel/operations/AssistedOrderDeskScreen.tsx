@@ -11,8 +11,8 @@ import {
 import {
   DSH_ASSISTED_ORDER_PREVIEW,
   getDshAssistedOrderByContext,
-} from '../../data/orders.preview-data';
-import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
+} from '../../data/legacy-preview/orders.preview-data';
+import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/legacy-preview/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import styles from '../shared/control-panel-surface.module.css';

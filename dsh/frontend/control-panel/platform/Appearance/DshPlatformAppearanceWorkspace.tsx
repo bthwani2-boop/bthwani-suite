@@ -4,7 +4,7 @@ import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
-import { PREVIEW_APPEARANCE_ITEMS, type AppearanceCustomization } from '../../../data/platform.preview-data';
+import { PREVIEW_APPEARANCE_ITEMS, type AppearanceCustomization } from '../../../data/legacy-preview/platform.preview-data';
 import styles from '../../shared/control-panel-surface.module.css';
 
 export function DshPlatformAppearanceWorkspace() {

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 // Authority: control-panel/marketing — BannersCommandDeckScreen (slim entry point).
 // Giant Screen split: types → banner-types.ts | utils → banner-target-utils.ts
@@ -35,7 +35,7 @@ import {
   upsertMarketingBannerItem,
   type MarketingBannerMotionStyle,
   type MarketingBannerRecord,
-} from '../../data/marketing.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 import { createDraft, bannerActionTypeLabel } from './banner-target-utils';
 import { BANNER_MOTION_OPTIONS, BANNER_TEMPLATES } from './banner-types';

@@ -152,15 +152,15 @@ const webRows = [];
   for (const row of manifestRows) {
     if (supportsCategoryMain && row.mediaKey.startsWith('dsh.category.main.')) {
       const id = row.mediaKey.slice('dsh.category.main.'.length).replace('.v1', '');
-      webRows.push({ resolver: 'web-public', mediaKey: row.mediaKey, relativePath: `categories/main/dsh-category-main-${id}-v1.png`, path: webResolverPath, line: 0, coverage: 'pattern' });
+      webRows.push({ resolver: 'web-public', mediaKey: row.mediaKey, relativePath: `legacy-preview/categories/main/dsh-category-main-${id}-v1.png`, path: webResolverPath, line: 0, coverage: 'pattern' });
     }
     if (supportsCategorySub && row.mediaKey.startsWith('dsh.category.sub.')) {
       const id = row.mediaKey.slice('dsh.category.sub.'.length).replace('.v1', '');
-      webRows.push({ resolver: 'web-public', mediaKey: row.mediaKey, relativePath: `categories/sub/dsh-category-sub-${id}-v1.png`, path: webResolverPath, line: 0, coverage: 'pattern' });
+      webRows.push({ resolver: 'web-public', mediaKey: row.mediaKey, relativePath: `legacy-preview/categories/sub/dsh-category-sub-${id}-v1.png`, path: webResolverPath, line: 0, coverage: 'pattern' });
     }
     if (supportsBanner && row.mediaKey.startsWith('dsh.banner.home.')) {
       const slug = row.mediaKey.replace('dsh.banner.home.', '').replace('.v1', '');
-      webRows.push({ resolver: 'web-public', mediaKey: row.mediaKey, relativePath: `banners/dsh-banner-home-${slug}-v1.png`, path: webResolverPath, line: 0, coverage: 'pattern' });
+      webRows.push({ resolver: 'web-public', mediaKey: row.mediaKey, relativePath: `legacy-preview/banners/dsh-banner-home-${slug}-v1.png`, path: webResolverPath, line: 0, coverage: 'pattern' });
     }
   }
 }

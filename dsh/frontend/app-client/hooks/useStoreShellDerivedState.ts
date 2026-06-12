@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Share } from 'react-native';
 import { getDshClientStateMeta } from '../../shared/client-state';
-import { resolveDshImageSource } from '../shared/resolve-image-source';
+import { resolveDshRuntimeImageSource } from '../shared/resolve-runtime-image-source';
 import {
   normalizeDisplayText,
   resolveStoreOperationalState,
@@ -28,13 +28,13 @@ export function useStoreShellDerivedState(
   setFavoriteIds: (updater: (prev: ReadonlySet<string>) => Set<string>) => void,
 ) {
   const storeCoverImageSource = React.useMemo(
-    () => (store ? resolveDshImageSource(store.imageUri) : undefined),
+    () => (store ? resolveDshRuntimeImageSource(store.imageUri) : undefined),
     [store],
   );
   const storeLogoImageSource = React.useMemo(
     () =>
       store
-        ? resolveDshImageSource(store.logoImageUri) || resolveDshImageSource('dsh.brand.logo.v1')
+        ? resolveDshRuntimeImageSource(store.logoImageUri)
         : undefined,
     [store],
   );

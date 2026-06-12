@@ -6,7 +6,7 @@ import type {
   MarketingBannerStatus,
   MarketingBannerActionType,
   MarketingBannerMotionStyle,
-} from '../../data/marketing.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
 
 export type BannerDraft = Record<
   | 'title'

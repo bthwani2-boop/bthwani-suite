@@ -1,7 +1,7 @@
 import {
   dshOperationalPreviewRecords,
   type DshOperationalPreviewRecord,
-} from '../data/operational.preview-data';
+} from '../data/legacy-preview/operational.preview-data';
 import type { DshOperationalEntityId } from './dsh-operational.contract';
 import {
   getDshOperationalEntriesBySurface,
@@ -15,7 +15,7 @@ export const dshOperationalPreviewAdapterMeta = {
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
-  sourceDataOwner: 'dsh/frontend/data/operational.preview-data.ts',
+  sourceDataOwner: 'dsh/frontend/data/legacy-preview/operational.preview-data.ts',
   adapterOwner: 'dsh/frontend/shared/dsh-operational-preview-adapter.ts',
 } as const;
 

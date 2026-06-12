@@ -28,7 +28,7 @@ import {
   activateClientVisible,
   returnToMarketing,
   rejectFromCatalog,
-} from '../../../data/marketing.preview-data';
+} from '../../../data/legacy-preview/marketing.preview-data';
 import { type ApprovalRecord, type ApprovalStage, translateStage, translateEntityType, translateOwner } from '../../../shared/workflow';
 import type { CatalogPreviewProposal } from '../catalogs.model';
 

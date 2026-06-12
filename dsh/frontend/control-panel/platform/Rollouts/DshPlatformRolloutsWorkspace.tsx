@@ -6,7 +6,7 @@ import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
 import styles from '../../shared/control-panel-surface.module.css';
 
-import { PREVIEW_ROLLOUT_RECORDS, type RolloutLevel, type RolloutRecord } from '../../../data/platform.preview-data';
+import { PREVIEW_ROLLOUT_RECORDS, type RolloutLevel, type RolloutRecord } from '../../../data/legacy-preview/platform.preview-data';
 import { FeatureFlagsRegistry } from '../../../shared';
 
 function RolloutLevelBadge({ level }: { level: RolloutLevel }) {

@@ -20,7 +20,7 @@ import {
   DSH_CALL_INTAKE_PREVIEW,
   DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS,
   DSH_CUSTOMER_360_PREVIEW,
-} from '../../data/support.preview-data';
+} from '../../data/legacy-preview/support.preview-data';
 import { buildOperationsHref } from '../operations/operations.registry';
 import { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
 import { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';
@@ -34,7 +34,7 @@ import {
   getOperationsSupportFlowPreview,
   type DshControlPanelSupportRowSeed,
   type DshOperationsSupportFlowId,
-} from '../../data/support.preview-data';
+} from '../../data/legacy-preview/support.preview-data';
 import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,

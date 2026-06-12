@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -8,13 +8,13 @@ import { useRouter } from 'next/navigation';
 import {
   getGrowthRecommendations,
   type GrowthRecommendation,
-} from '../../data/marketing.preview-data';
+} from '../../data/legacy-preview/marketing.preview-data';
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
-import { getPartnerOfferItems } from '../../data/offers.preview-data';
+import { getPartnerOfferItems } from '../../data/legacy-preview/offers.preview-data';
 import type { CampaignRecord } from '../../shared/dsh-marketing-types';
 import type { PartnerOfferRecord } from '../../shared/dsh-partner-offer-types';
-import type { SubscriptionPlan, Entitlement } from '../../data/subscriptions.preview-data';
+import type { SubscriptionPlan, Entitlement } from '../../data/legacy-preview/subscriptions.preview-data';
 
 
 

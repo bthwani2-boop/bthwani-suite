@@ -9,8 +9,8 @@ import {
   upsertCampaignItem,
   getMarketingVideoItems,
   upsertMarketingVideoItem,
-} from '../../../data/marketing.preview-data';
-import { getPartnerOfferItems, approvePartnerOfferItem, rejectPartnerOfferItem } from '../../../data/offers.preview-data';
+} from '../../../data/legacy-preview/marketing.preview-data';
+import { getPartnerOfferItems, approvePartnerOfferItem, rejectPartnerOfferItem } from '../../../data/legacy-preview/offers.preview-data';
 import { useMarketingPermissions } from '../marketing-permissions.contract';
 
 export type MarketingReviewKind = 'approval' | 'video';
