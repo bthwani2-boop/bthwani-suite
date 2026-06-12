@@ -67,3 +67,6 @@ dsh/frontend/media-fixtures/**/*.webp
 !dsh/frontend/media-fixtures/README.md
 !dsh/frontend/media-fixtures/MANIFEST.local-required.tsv
 dsh/frontend/media-fixtures/**/*.svg
+
+# BThwani local analysis outputs
+graphify-out/
