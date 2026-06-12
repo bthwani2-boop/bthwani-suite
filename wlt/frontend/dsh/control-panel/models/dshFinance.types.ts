@@ -201,7 +201,7 @@ export type WltDshPaymentPreviewState = {
   blockingLabel?: string;
   feedbackTone: WltDshFinanceStatusTone;
   financeEventKind: WltDshFinanceEventKind;
-  contractState: 'CONTRACT_TBD';
+  contractState: 'LIVE' | 'CONTRACT_TBD';
   isPreview: true;
 };
 

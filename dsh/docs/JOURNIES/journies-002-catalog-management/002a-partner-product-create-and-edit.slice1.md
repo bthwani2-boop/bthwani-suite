@@ -241,13 +241,15 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-002A-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-002A-01 | ProductEditScreen.tsx — create/edit/loading/offline/not_found/error/saved states all implemented. API client bound via dsh-product-api.transport.ts. OpenAPI operationId createProduct/updateProduct/getProduct defined. No WLT mutation. | CODE_EXISTS_VERIFIED | app-partner | None — visual screenshot evidence required for PASS | NEEDS_VISUAL_EVIDENCE |
+| GAP-002A-02 | InventoryCatalogScreen.tsx — live GET /stores/{id}/products fetch, on-demand expand, filter rail, search. Approval pipeline display correct. | CODE_EXISTS_VERIFIED | app-partner | None — visual screenshot evidence required for PASS | NEEDS_VISUAL_EVIDENCE |
+| GAP-002A-03 | CODE_VERIFICATION_RUN 2026-06-12: tsc --noEmit = PASS (0 errors). go test ./... = PASS (internal/http 0.187s, internal/store 1.979s). products_handler.go + ProductEditScreen.tsx confirmed compile-clean. Evidence: tools/registry/runs/J-002-20260612-182200/tsc-noemit.txt + go-test.txt | CODE_VERIFIED_TSC_GOTEST | app-partner + backend | None — code gate passed | NEEDS_VISUAL_EVIDENCE |
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
+| Slice Decision | `NEEDS_VISUAL_EVIDENCE` |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |

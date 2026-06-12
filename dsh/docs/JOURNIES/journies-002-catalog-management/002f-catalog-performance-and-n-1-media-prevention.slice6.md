@@ -244,13 +244,14 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-002F-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-002F-01 | InventoryCatalogScreen.tsx uses lean InventoryCatalogListItem model (no heavy fields). DETAIL_LOOKUP populated only on expand. Media loaded per-card via createDshMediaApiHttpClient only when card is expanded — no N+1 on list render. listProducts uses limit:100 pagination param. No per-card heavy payload on mount. | CODE_EXISTS_VERIFIED | backend + app-partner | None — runtime query log evidence required for PASS | NEEDS_RUNTIME_EVIDENCE |
+| GAP-002F-02 | CODE_VERIFICATION_RUN 2026-06-12: tsc --noEmit = PASS (0 errors). go test ./... = PASS. listProductMediaByProductIDs confirmed as single batch IN() query — no per-product loop, no N+1. Evidence: tools/registry/runs/J-002-20260612-182200/tsc-noemit.txt + go-test.txt | CODE_VERIFIED_TSC_GOTEST | backend | None — code gate passed. Runtime query log still needed for PASS | NEEDS_RUNTIME_EVIDENCE |
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
+| Slice Decision | `NEEDS_RUNTIME_EVIDENCE` |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |

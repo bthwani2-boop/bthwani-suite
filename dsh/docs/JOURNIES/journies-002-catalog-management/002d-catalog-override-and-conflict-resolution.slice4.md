@@ -243,13 +243,14 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-002D-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-002D-01 | PartnerCatalogOverridesWorkspace.tsx + duplicate-resolution.drawer.tsx + identity-governance.drawer.tsx exist. conflicts_handler.go + overrides_handler.go exist. OpenAPI GET /catalog-conflicts + POST /catalog-conflicts/{id}/resolve defined (statuses: pending/resolved_accept_local/resolved_reverted). No WLT mutation. | CODE_EXISTS_VERIFIED | control-panel + app-partner | None — visual screenshot evidence required for PASS | NEEDS_VISUAL_EVIDENCE |
+| GAP-002D-02 | CODE_VERIFICATION_RUN 2026-06-12: tsc --noEmit = PASS (0 errors). go test ./... = PASS. UpdateCatalogOverrides (price_divergence + availability_divergence conflict generation) + ResolveConflict (accept_local / revert_to_central) all compile-clean. Evidence: tools/registry/runs/J-002-20260612-182200/tsc-noemit.txt + go-test.txt | CODE_VERIFIED_TSC_GOTEST | control-panel + backend | None — code gate passed | NEEDS_VISUAL_EVIDENCE |
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
+| Slice Decision | `NEEDS_VISUAL_EVIDENCE` |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |

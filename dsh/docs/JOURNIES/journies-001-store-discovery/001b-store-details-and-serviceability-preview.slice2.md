@@ -237,16 +237,28 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-001B-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-001B-01 | DshStoreGetScreen موجود في StoreScreen.tsx يفوض إلى StoreScreenShell | KEEP_WITH_REASON | app-client | لا شيء | CLOSED |
+| GAP-001B-02 | StoreNonReadyState يغطي loading/empty/not-found/offline/error/blocked | KEEP_WITH_REASON | app-client | لا شيء | CLOSED |
+| GAP-001B-03 | serviceability مشتقة من serviceLabel/deliveryLabel عبر resolveDshStoreClientVisibility | KEEP_WITH_REASON | shared model | لا شيء | CLOSED |
+| GAP-001B-04 | بيانات المتجر (openingHours, contactNumber) تأتي من GET /stores/{id} وليس fixtures | KEEP_WITH_REASON | backend | لا شيء | CLOSED |
+| GAP-001B-05 | StoreVisibilityBlockedState يظهر عند storeVisibility.visible=false | KEEP_WITH_REASON | app-client | لا شيء | CLOSED |
+
+**Evidence Session:** `tools/registry/runs/J-001-001b-20260612-120000/`
+**TSC:** PASS | **Go Test:** ok 0.194s | **Code Changes:** NONE
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
+| Slice Decision | `NEEDS_VISUAL_EVIDENCE` |
+| Reason | الكود مكتمل — شاشة التفاصيل + حالات loading/error/offline/not-found/blocked + serviceability check + API binding كلها موجودة ومتحققة. يحتاج device screenshot للتحقق البصري. |
+| TSC | PASS |
+| Go Test | PASS (0.194s) |
+| Code Changes | NONE |
+| Evidence | tools/registry/runs/J-001-001b-20260612-120000/ |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
-| PASS allowed? | فقط بعد evidence كامل |
-| Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |
+| PASS allowed? | بعد إضافة device screenshots من ADB/Scrcpy |
+| Next Slice Allowed? | نعم — الكود مكتمل، NEEDS_VISUAL_EVIDENCE موثق |
 
 ## 17) أمر الوكيل المحلي الجاهز للنسخ
 

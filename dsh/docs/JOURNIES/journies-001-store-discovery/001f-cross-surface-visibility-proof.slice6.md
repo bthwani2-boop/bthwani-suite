@@ -244,16 +244,28 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-001F-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-001F-01 | GET /stores يطبق AND: partner_readiness='ready' + catalog_quality/pricing='approved' + marketing='active' | KEEP_WITH_REASON | backend | لا شيء | CLOSED |
+| GAP-001F-02 | useHomeDerivedStores يطبق resolveDshStoreClientVisibility client-side بعد API filter | KEEP_WITH_REASON | app-client | لا شيء | CLOSED |
+| GAP-001F-03 | app-partner read-only checklist؛ control-panel يملك كل الـ mutations | KEEP_WITH_REASON | app-partner/CP | لا شيء | CLOSED |
+| GAP-001F-04 | TestStoresHandlerVisibilityGates يثبت كل بوابة منفردة تحجب المتجر | KEEP_WITH_REASON | backend test | لا شيء | CLOSED |
+| GAP-001F-05 | serviceability من 001B مدمجة في resolveDshStoreClientVisibility | KEEP_WITH_REASON | shared model | لا شيء | CLOSED |
+
+**Evidence Session:** `tools/registry/runs/J-001-001f-20260612-120000/`
+**TSC:** PASS | **Go Test:** ok 0.194s | **Code Changes:** NONE
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
+| Slice Decision | `NEEDS_VISUAL_EVIDENCE` |
+| Reason | Cross-surface proof مكتمل في الكود والاختبارات. جميع بوابات 001B+001C+001D+001E تعمل بـ AND logic في backend + client-side. يحتاج device/browser screenshots لكل surface. |
+| TSC | PASS |
+| Go Test | PASS — TestStoresHandlerVisibilityGates (all 3 gates sequential proof) |
+| Code Changes | NONE |
+| Evidence | tools/registry/runs/J-001-001f-20260612-120000/ |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
-| PASS allowed? | فقط بعد evidence كامل |
-| Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |
+| PASS allowed? | بعد إضافة device + browser screenshots من كل surface |
+| Next Slice Allowed? | N/A — شريحة أخيرة في J-001 |
 
 ## 17) أمر الوكيل المحلي الجاهز للنسخ
 

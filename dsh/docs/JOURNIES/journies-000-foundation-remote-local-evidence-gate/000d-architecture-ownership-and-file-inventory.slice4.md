@@ -235,13 +235,26 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-000D-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-000D-01 | `dsh/SERVICE_BLUEPRINT.md` — slice references use wrong path; actual file is at `dsh/docs/SERVICE_BLUEPRINT.md` (confirmed present, full content verified 2026-06-12) | STALE_REFERENCE | developer | Slice gates reference `dsh/SERVICE_BLUEPRINT.md` — correct path is `dsh/docs/SERVICE_BLUEPRINT.md`; file exists and is canonical truth | KEEP_WITH_REASON |
+| GAP-000D-02 | `dsh/frontend/control-panel/package.json` absent — Nx workspace app, managed by root package.json + project.json; no standalone package.json required | KEEP_WITH_REASON | developer | Expected Nx monorepo behaviour — root pnpm workspace manages all apps | KEEP_WITH_REASON |
+| GAP-000D-03 | `dsh/frontend/app-client/package.json` absent — same as GAP-000D-02 | KEEP_WITH_REASON | developer | Expected Nx monorepo behaviour | KEEP_WITH_REASON |
+| GAP-000D-04 | `dsh/frontend/app-partner/package.json` absent — same as GAP-000D-02 | KEEP_WITH_REASON | developer | Expected Nx monorepo behaviour | KEEP_WITH_REASON |
+| GAP-000D-05 | `dsh/backend/internal/http` and `internal/store` confirmed present — KEEP | NO_GAP | developer | No action needed | KEEP_WITH_REASON |
+| GAP-000D-06 | `dsh/dsh.openapi.yaml` present | NO_GAP | developer | No action needed | KEEP_WITH_REASON |
+| GAP-000D-07 | `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` present | NO_GAP | developer | No action needed | KEEP_WITH_REASON |
+
+**Evidence**: `tools/registry/runs/J-000-000d-20260612-092423/`
+- architecture-inventory.txt — full directory probe with classifications
+- git-status.txt, files-touched.txt, summary.md, evidence.json
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
 | Slice Decision | PASS |
+| Execution date | 2026-06-12 |
+| Session ID | J-000-000d-20260612-092423 |
+| Warnings | None — previous warnings resolved: SERVICE_BLUEPRINT.md exists at dsh/docs/SERVICE_BLUEPRINT.md (correct path); package.json absence is expected Nx workspace behaviour |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |

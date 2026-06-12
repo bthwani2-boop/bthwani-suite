@@ -24,14 +24,14 @@ import {
 
 const PAYMENT_OPTIONS: readonly WltDshPaymentOptionPreview[] = [
   { id: 'cod', titleLabel: 'الدفع عند الاستلام', descriptionLabel: 'ادفع كامل المبلغ عند استلام الطلب.', availabilityLabel: 'متاح دائمًا', availabilityTone: 'success', isAvailable: true, isPreview: true },
-  { id: 'wallet', titleLabel: 'رصيد المحفظة (WLT)', descriptionLabel: 'ادفع من رصيد محفظة WLT الداخلية إذا توفر الرصيد.', availabilityLabel: 'يتطلب ربط وكفاية الرصيد', availabilityTone: 'warning', isAvailable: false, isPreview: true },
-  { id: 'mixed', titleLabel: 'دفع مدمج', descriptionLabel: 'جزء من المحفظة والباقي عند الاستلام.', availabilityLabel: 'يتطلب رصيدًا جزئيًا في WLT', availabilityTone: 'info', isAvailable: false, isPreview: true },
+  { id: 'wallet', titleLabel: 'رصيد المحفظة (WLT)', descriptionLabel: 'ادفع من رصيد محفظة WLT الداخلية إذا توفر الرصيد.', availabilityLabel: 'يتطلب ربط المحفظة وكفاية الرصيد', availabilityTone: 'warning', isAvailable: true, isPreview: true },
+  { id: 'mixed', titleLabel: 'دفع مدمج', descriptionLabel: 'جزء من المحفظة والباقي عند الاستلام.', availabilityLabel: 'يتطلب رصيدًا جزئيًا في WLT', availabilityTone: 'info', isAvailable: true, isPreview: true },
   { id: 'official-wallets', titleLabel: 'المحافظ الرسمية', descriptionLabel: 'اختر محفظة رسمية معتمدة لإتمام الدفع.', availabilityLabel: 'CONTRACT_TBD — غير مفعّل', availabilityTone: 'warning', isAvailable: false, isPreview: true },
 ];
 
 function resolvePaymentState(method: WltDshPaymentMethod, orderTotalMinorUnits: number, walletBalanceMinorUnits: number, walletLinked: boolean): WltDshPaymentPreviewState {
   const fmt = (n: number) => formatWltYer(n);
-  const base = { method, orderTotalMinorUnits, walletBalanceMinorUnits, walletLinked, contractState: 'CONTRACT_TBD' as const, financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(method), isPreview: true as const };
+  const base = { method, orderTotalMinorUnits, walletBalanceMinorUnits, walletLinked, contractState: 'LIVE' as const, financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(method), isPreview: true as const };
   if (method === 'cod') return { ...base, walletAmountMinorUnits: 0, amountDueOnDeliveryMinorUnits: orderTotalMinorUnits, valid: true, summaryLabel: `ستدفع ${fmt(orderTotalMinorUnits)} عند الاستلام.`, feedbackTone: 'info' };
   if (method === 'wallet') {
     if (!walletLinked) return { ...base, walletAmountMinorUnits: 0, amountDueOnDeliveryMinorUnits: orderTotalMinorUnits, valid: false, summaryLabel: 'المحفظة غير مرتبطة.', blockingLabel: 'اربط محفظة WLT أولًا.', feedbackTone: 'warning' };
@@ -43,7 +43,7 @@ function resolvePaymentState(method: WltDshPaymentMethod, orderTotalMinorUnits: 
     if (walletBalanceMinorUnits >= orderTotalMinorUnits) return { ...base, walletAmountMinorUnits: orderTotalMinorUnits, amountDueOnDeliveryMinorUnits: 0, valid: false, summaryLabel: 'الرصيد يكفي للدفع الكامل من المحفظة.', blockingLabel: 'استخدم خيار "رصيد المحفظة".', feedbackTone: 'info' };
     return { ...base, walletAmountMinorUnits: walletBalanceMinorUnits, amountDueOnDeliveryMinorUnits: orderTotalMinorUnits - walletBalanceMinorUnits, valid: true, summaryLabel: `${fmt(walletBalanceMinorUnits)} من المحفظة + ${fmt(orderTotalMinorUnits - walletBalanceMinorUnits)} عند الاستلام.`, feedbackTone: 'info' };
   }
-  return { ...base, walletAmountMinorUnits: 0, amountDueOnDeliveryMinorUnits: 0, valid: false, summaryLabel: 'المحافظ الرسمية غير مفعّلة — CONTRACT_TBD.', blockingLabel: 'يتطلب ربطًا بـ API لم يُعرَّف بعد.', feedbackTone: 'warning' };
+  return { ...base, contractState: 'CONTRACT_TBD' as const, walletAmountMinorUnits: 0, amountDueOnDeliveryMinorUnits: 0, valid: false, summaryLabel: 'المحافظ الرسمية غير مفعّلة — CONTRACT_TBD.', blockingLabel: 'يتطلب ربطًا بـ API لم يُعرَّف بعد.', feedbackTone: 'warning' };
 }
 
 function PaymentOptionCard({

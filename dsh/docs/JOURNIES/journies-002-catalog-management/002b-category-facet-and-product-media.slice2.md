@@ -242,13 +242,14 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-002B-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-002B-01 | CategoryManagementScreen.tsx exists. ProductMediaScreen.tsx exists. OpenAPI: createCategory/listCategories/getCategory/updateCategory/deleteCategory + media upload-intent/complete/delete all defined. Backend: categories_handler.go + media_handler.go + media_runtime_handler.go exist. No local media drift — mediaKey pattern used in InventoryCatalogScreen. | CODE_EXISTS_VERIFIED | app-partner | None — visual screenshot evidence required for PASS | NEEDS_VISUAL_EVIDENCE |
+| GAP-002B-02 | CODE_VERIFICATION_RUN 2026-06-12: tsc --noEmit = PASS (0 errors). go test ./... = PASS. categories_handler.go + ProductMediaScreen.tsx + listProductMediaByProductIDs batch query confirmed compile-clean. Evidence: tools/registry/runs/J-002-20260612-182200/tsc-noemit.txt + go-test.txt | CODE_VERIFIED_TSC_GOTEST | app-partner + backend | None — code gate passed | NEEDS_VISUAL_EVIDENCE |
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
+| Slice Decision | `NEEDS_VISUAL_EVIDENCE` |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |

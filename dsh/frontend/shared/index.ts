@@ -662,6 +662,19 @@ export {
   createDshCheckoutHttpClient,
 } from './dsh-checkout-client';
 
+// --- WLT Payment Session client (DSH → WLT, J-003C LIVE) ---
+export type {
+  WltPaymentSessionFetchFn,
+  WltPaymentSessionAuth,
+  DshToWltCreatePaymentSessionRequest,
+  WltPaymentSessionResponse,
+  WltPaymentSessionOfflineError,
+  WltPaymentSessionHttpError,
+  WltPaymentSessionError,
+  WltPaymentSessionClient,
+} from './dsh-wlt-payment-session.client';
+export { createWltPaymentSessionClient } from './dsh-wlt-payment-session.client';
+
 // --- Order Lifecycle client ---
 export type {
   DshOrderRecord,

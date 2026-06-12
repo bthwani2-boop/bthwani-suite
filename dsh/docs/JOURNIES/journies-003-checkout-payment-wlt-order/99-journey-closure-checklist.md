@@ -20,14 +20,21 @@ Decision: NOT_CLOSED
 ## Human Final Review Table
 
 | Check | Required Result | Actual | Decision |
-|---|---|---|---|
-| Slice count | 7 files | TBD | TBD |
-| Missing files | 0 | TBD | TBD |
-| Unclassified surfaces | 0 | TBD | TBD |
-| Unmapped CTAs | 0 | TBD | TBD |
-| Missing states | 0 | TBD | TBD |
-| Runtime gaps | 0 unless BLOCKED_WITH_REASON | TBD | TBD |
-| Visual gaps | 0 unless NEEDS_VISUAL_EVIDENCE | TBD | TBD |
-| WLT boundary violations | 0 | TBD | TBD |
-| DSH fixture/media drift | 0 | TBD | TBD |
-| Final journey decision | PASS/FIX_REQUIRED/BLOCKED_WITH_REASON | TBD | TBD |
+| --- | --- | --- | --- |
+| Slice count | 7 files | 7 files present (003a–003g) | PASS |
+| Missing files | 0 | 0 | PASS |
+| Unclassified surfaces | 0 | 0 | PASS |
+| Unmapped CTAs | 0 | 0 (DshCheckoutIntentScreen has all CTAs) | PASS |
+| Missing states | 0 | 0 | PASS |
+| Runtime gaps | 0 unless BLOCKED_WITH_REASON | Live wire wired; real-device runtime not verified | NEEDS_VISUAL_EVIDENCE |
+| Visual gaps | 0 unless NEEDS_VISUAL_EVIDENCE | No scrcpy/ADB screenshots captured | NEEDS_VISUAL_EVIDENCE |
+| WLT boundary violations | 0 | 0 — DSH has no money mutation | PASS |
+| DSH fixture/media drift | 0 | 0 — no local media added | PASS |
+| CONTRACT_TBD removed | YES | YES — all 22 occurrences replaced with LIVE | PASS |
+| TSC | PASS | PASS — 0 errors | PASS |
+| Go test DSH | PASS | PASS — ok bthwani.local/dsh/backend/internal/http 0.154s | PASS |
+| Go test WLT | PASS | PASS — ok bthwani.local/wlt/backend/internal/http 2.608s | PASS |
+| E2E integration test | written | TestCheckoutIntentToWLTPaymentFlow_ConfirmedPath + _FailedPath | PASS |
+| Final journey decision | PASS/FIX_REQUIRED/BLOCKED_WITH_REASON | Code+tests PASS; visual/runtime pending | NEEDS_VISUAL_EVIDENCE |
+
+Evidence: `tools/registry/runs/J-003-LIVE-20260612-093525/`

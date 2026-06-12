@@ -239,13 +239,23 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-000B-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-000B-01 | Docker containers not confirmed running — docker-compose.local.yml exists but live process not verified | NEEDS_RUNTIME_EVIDENCE | developer | Run `docker-compose -f dsh/backend/docker-compose.local.yml up -d` and verify container health | BLOCKED_TRUE_EXTERNAL_REASON |
+| GAP-000B-02 | `dsh/backend/main.go` not at root — entry point expected at `cmd/server/main.go` path not confirmed | STALE_PATH | developer | Verify actual Go entry point path in cmd/ directory | REQUIRED_ADDITION |
+| GAP-000B-03 | `dsh/frontend/control-panel/package.json` MISSING — dir exists, package.json absent | STALE_PATH | developer | Confirm if control-panel is scaffolded; if not, scaffolding required | REQUIRED_ADDITION |
+| GAP-000B-04 | `dsh/frontend/app-client/package.json` MISSING | STALE_PATH | developer | Same as GAP-000B-03 | REQUIRED_ADDITION |
+| GAP-000B-05 | `dsh/frontend/app-partner/package.json` MISSING | STALE_PATH | developer | Same as GAP-000B-03 | REQUIRED_ADDITION |
+
+**Evidence**: `tools/registry/runs/J-000-000b-20260612-092423/`
+- runtime-probe.txt — probe results for all stack components
+- git-status.txt, files-touched.txt, summary.md, evidence.json
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | PASS |
+| Slice Decision | NEEDS_RUNTIME_EVIDENCE |
+| Execution date | 2026-06-12 |
+| Session ID | J-000-000b-20260612-092423 |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |

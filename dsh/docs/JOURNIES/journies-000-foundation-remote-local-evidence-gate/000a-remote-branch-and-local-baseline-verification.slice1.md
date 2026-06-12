@@ -235,13 +235,23 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-000A-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-000A-01 | Untracked noise file: `dsh/docs/BTHWANI_UNIVERSAL_STAGE_SLICE_FINAL_CLOSURE_COMMAND (3).md` | OUT_OF_SCOPE | developer | Delete or commit this file — it is outside J-000 scope | DEFERRED_WITH_REASON |
+| GAP-000A-02 | 7 modified journies-002 docs (002a-002f, 99-closure-checklist) — staged changes from prior work session | OUT_OF_SCOPE | developer | Commit or stash journies-002 changes separately | KEEP_WITH_REASON — not J-000 scope |
+| GAP-000A-03 | Branch is `feat/dsh-surface-refactor`, slice docs reference `fix/docker-local-runtime-standardization` | STALE_PATH | developer | Slice docs reference old branch name; active branch is confirmed as `feat/dsh-surface-refactor` | PASS — active branch confirmed |
+
+**Evidence**: `tools/registry/runs/J-000-000a-20260612-092423/`
+- git-status.txt — branch, HEAD, remote, status
+- git-diff-check.txt — diff --check CLEAN
+- files-touched.txt — forensic read list
+- summary.md + evidence.json
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
 | Slice Decision | PASS |
+| Execution date | 2026-06-12 |
+| Session ID | J-000-000a-20260612-092423 |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |

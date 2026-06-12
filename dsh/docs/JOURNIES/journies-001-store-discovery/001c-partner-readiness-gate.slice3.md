@@ -238,16 +238,27 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-001C-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-001C-01 | app-partner StoreProfileScreen عرض read-only لـ visibility checklist؛ control-panel هو سلطة التفعيل | KEEP_WITH_REASON | app-partner | لا شيء | CLOSED |
+| GAP-001C-02 | PATCH /stores/{id}/partner-readiness موجود في stores_handler.go | KEEP_WITH_REASON | backend | لا شيء | CLOSED |
+| GAP-001C-03 | ListStores يفلتر partner_readiness_status='ready'؛ TestStoresHandlerVisibilityGates Step 2-3 يثبت | KEEP_WITH_REASON | backend | لا شيء | CLOSED |
+| GAP-001C-04 | PartnerStoresScreen يوصل PATCH partner-readiness عبر typed transport | KEEP_WITH_REASON | control-panel | لا شيء | CLOSED |
+
+**Evidence Session:** `tools/registry/runs/J-001-001c-20260612-120000/`
+**TSC:** PASS | **Go Test:** ok 0.194s | **Code Changes:** NONE
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
+| Slice Decision | `NEEDS_VISUAL_EVIDENCE` |
+| Reason | الكود مكتمل — backend filter مختبر، CP toggle حي، app-partner checklist موجود. يحتاج device/browser screenshots. |
+| TSC | PASS |
+| Go Test | PASS — TestStoresHandlerVisibilityGates Step 2-3 |
+| Code Changes | NONE |
+| Evidence | tools/registry/runs/J-001-001c-20260612-120000/ |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
-| PASS allowed? | فقط بعد evidence كامل |
-| Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |
+| PASS allowed? | بعد إضافة browser screenshots من localhost control-panel |
+| Next Slice Allowed? | نعم — الكود مكتمل، NEEDS_VISUAL_EVIDENCE موثق |
 
 ## 17) أمر الوكيل المحلي الجاهز للنسخ
 

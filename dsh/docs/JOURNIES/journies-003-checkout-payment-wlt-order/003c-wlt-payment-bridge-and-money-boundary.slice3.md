@@ -244,17 +244,25 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 ## 15) Gap Log During Execution
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
-|---|---|---|---|---|---|
-| GAP-003C-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| --- | --- | --- | --- | --- | --- |
+| GAP-003C-01 | `contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY'` في bridge file يمنع ربط WLT الحي | REQUIRED_ADDITION | dsh-frontend | إزالة التسمية وإبدالها بـ `'LIVE'` | RESOLVED — renamed to `'LIVE'` (22 occurrences) |
+| GAP-003C-02 | لا يوجد HTTP client لـ DSH→WLT POST /payment/sessions في shared layer | REQUIRED_ADDITION | dsh-frontend/shared | إضافة `createWltPaymentSessionClient` | RESOLVED — created `dsh-wlt-payment-session.client.ts` |
+| GAP-003C-03 | لا يوجد E2E integration test يغطي intent→callback→next_action flow | REQUIRED_ADDITION | dsh-backend | كتابة integration test | RESOLVED — `checkout_wlt_e2e_integration_test.go` |
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
-| Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
-| PASS allowed? | فقط بعد evidence كامل |
-| Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |
+| Slice Decision | `NEEDS_VISUAL_EVIDENCE` |
+| Code changes | CONTRACT_TBD removed, WLT client added, E2E tests pass |
+| TSC result | PASS — 0 errors |
+| Go test result | PASS — `ok bthwani.local/dsh/backend/internal/http 0.154s` |
+| WLT test result | PASS — `ok bthwani.local/wlt/backend/internal/http 2.608s` |
+| Evidence path | `tools/registry/runs/J-003-LIVE-20260612-093525/` |
+| Visual gap | DshCheckoutIntentScreen UI payment flow not tested on real device/scrcpy — requires ADB/Expo runtime |
+| Runtime gap | No live WLT→DSH callback over real network tested — integration test covers handler correctness only |
+| PASS allowed? | فقط بعد visual+runtime evidence من جهاز حقيقي أو localhost ADB/scrcpy |
+| Next Slice Allowed? | YES — blocker is visual/runtime only, not code |
 
 ## 17) أمر الوكيل المحلي الجاهز للنسخ
 

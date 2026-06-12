@@ -241,16 +241,27 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-001D-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-001D-01 | PartnerStoresScreen يحتوي قسم "اعتماد الكتالوج" مع أزرار approve/reject | KEEP_WITH_REASON | control-panel | لا شيء | CLOSED |
+| GAP-001D-02 | UpdateCatalogApproval() handler يعدل catalogQualityStatus و catalogPricingStatus | KEEP_WITH_REASON | backend | لا شيء | CLOSED |
+| GAP-001D-03 | ListStores يفلتر catalog_quality_status='approved' + catalog_pricing_status='approved'؛ Step 5 يثبت | KEEP_WITH_REASON | backend | لا شيء | CLOSED |
+| GAP-001D-04 | catalog approval gate مختلف عن marketing gate: quality/pricing vs exposure | KEEP_WITH_REASON | backend/shared | لا شيء | CLOSED |
+
+**Evidence Session:** `tools/registry/runs/J-001-001d-20260612-120000/`
+**TSC:** PASS | **Go Test:** ok 0.194s | **Code Changes:** NONE
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
+| Slice Decision | `NEEDS_VISUAL_EVIDENCE` |
+| Reason | الكود مكتمل — CP inspector panel يعمل، backend handler مختبر، filter مثبت في Step 5. يحتاج browser screenshots. |
+| TSC | PASS |
+| Go Test | PASS — TestStoresHandlerVisibilityGates Step 5 |
+| Code Changes | NONE |
+| Evidence | tools/registry/runs/J-001-001d-20260612-120000/ |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
-| PASS allowed? | فقط بعد evidence كامل |
-| Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |
+| PASS allowed? | بعد إضافة browser screenshots من localhost control-panel |
+| Next Slice Allowed? | نعم — الكود مكتمل، NEEDS_VISUAL_EVIDENCE موثق |
 
 ## 17) أمر الوكيل المحلي الجاهز للنسخ
 

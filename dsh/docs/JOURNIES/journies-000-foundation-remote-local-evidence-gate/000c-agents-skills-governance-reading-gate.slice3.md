@@ -235,13 +235,20 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-000C-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-000C-01 | All 3 core agent files confirmed present: INDEX.md, AUTHORITY_BOUNDARY.md, adapters/claude.md | NO_GAP | governance | No action needed | PASS |
+| GAP-000C-02 | 40 skills confirmed in .agents/skills/ — all canonical BThwani + Nx + CI skills present | NO_GAP | governance | No action needed | PASS |
+
+**Evidence**: `tools/registry/runs/J-000-000c-20260612-092423/`
+- agents-probe.txt — full skill listing with existence check
+- git-status.txt, files-touched.txt, summary.md, evidence.json
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
 | Slice Decision | PASS |
+| Execution date | 2026-06-12 |
+| Session ID | J-000-000c-20260612-092423 |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |

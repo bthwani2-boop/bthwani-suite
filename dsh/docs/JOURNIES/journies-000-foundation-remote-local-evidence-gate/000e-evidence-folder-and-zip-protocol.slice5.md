@@ -235,13 +235,22 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-000E-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-000E-01 | `tools/registry/runs/` EXISTS — protocol directory confirmed | NO_GAP | developer | No action needed | PASS |
+| GAP-000E-02 | `tools/registry/guards/` and `scripts/` also confirmed | NO_GAP | developer | No action needed | PASS |
+| GAP-000E-03 | 5 J-000 run folders created: J-000-000a through 000e, timestamped 20260612-092423 | NO_GAP | developer | No action needed | PASS |
+| GAP-000E-04 | ZIP not created — flat evidence files written instead | DEFERRED_WITH_REASON | developer | ZIP creation is a human/CI step; agent writes flat files per protocol | DEFERRED_WITH_REASON |
+
+**Evidence**: `tools/registry/runs/J-000-000e-20260612-092423/`
+- evidence-protocol-probe.txt — registry structure + J-000 folder listing
+- git-status.txt, files-touched.txt, summary.md, evidence.json
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
 | Slice Decision | PASS |
+| Execution date | 2026-06-12 |
+| Session ID | J-000-000e-20260612-092423 |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |
