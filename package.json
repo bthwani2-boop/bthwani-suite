@@ -103,6 +103,7 @@
     "react-dom": "19.1.0",
     "react-native": "0.81.0",
     "react-scanner": "1.2.0",
+    "repomix": "1.14.1",
     "sherif": "1.11.1",
     "style-dictionary": "5.4.4",
     "stylelint": "17.13.0",
