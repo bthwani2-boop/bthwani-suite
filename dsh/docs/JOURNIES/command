@@ -1,0 +1,458 @@
+نفّذ داخل `C:\bthwani-suite` فقط، وعلى الرحلة المحددة فقط من:
+
+```text
+C:\bthwani-suite\dsh\docs\JOURNIES
+```
+
+هذا أمر تنفيذ وإغلاق فعلي على الكود الحي، وليس تحليلًا، وليس تقريرًا، وليس تحديث توثيق.
+مجلد `JOURNIES` مرجع قراءة فقط. ممنوع تعديله أو استخدامه كبديل عن إصلاح الكود الحي.
+
+الوضع المعتمد إلزاميًا:
+
+```text
+Real End-to-End Live Code Implementation
+No UI Preview
+No Demo Runtime
+No Mock Runtime
+No Preview Data
+No Report-Only Output
+```
+
+## 1) قاعدة العمل الوحيدة
+
+اعمل بمنهج واحد فقط:
+
+```text
+CHECK → APPLY IMMEDIATELY → VERIFY
+```
+
+* `CHECK` قصير، موجه، مبني على graph، ولا يتحول إلى تقرير.
+* `APPLY` يبدأ فورًا بعد تحديد الملفات والعلاقات.
+* `VERIFY` جزء إلزامي من الإغلاق، وليس ذريعة للتأجيل.
+* إذا فشل `VERIFY`، ارجع مباشرة إلى `APPLY` وأصلح ثم أعد `VERIFY`.
+* ممنوع إنهاء الشريحة وفيها أي نقص قابل للإصلاح داخل النطاق.
+* ممنوع كتابة توصيات مستقبلية أو الاكتفاء بتشخيص.
+
+## 2) قاعدة إغلاق الشرائح
+
+قسّم الرحلة إلى شرائح صغيرة ومتدرجة.
+كل شريحة يجب أن تُغلق 100% بالكود الفعلي والأدلة قبل اعتبارها منتهية.
+
+إذا احتاج إغلاق الشريحة فتح ملف أو اعتماد من شريحة أخرى، افتحه كاستدعاء داخلي مؤقت، أصلح الاعتماد المطلوب، ثم عد فورًا للشريحة الأصلية وأغلقها. هذا جزء من الإغلاق وليس انتقالًا أو تأجيلًا.
+
+المخرج النهائي المقبول لكل شريحة:
+
+```text
+CLOSED_WITH_EVIDENCE
+```
+
+المخرج الوحيد غير ذلك:
+
+```text
+HARD_BLOCKED_EXTERNAL_ONLY
+```
+
+ولا يُستخدم إلا عند سبب خارجي حقيقي لا يمكن حله من الكود المحلي، مثل سر غير متاح، خدمة خارجية متوقفة، صلاحية غير ممنوحة، أو dependency خارج سيطرة الريبو. يجب إثباته بأمر فاشل واضح، ومسار محدد، وما تم إصلاحه قبل الوصول إليه.
+ممنوع استخدام `FIX_REQUIRED_WITH_EXACT_PATHS` أو أي صيغة مشابهة كمخرج نهائي.
+
+## 3) CHECK الإجباري باستخدام graphify
+
+ابدأ كل شريحة باستخدام `graphify` إلزاميًا لتقليل التخمين واستهلاك التوكنات وكشف العلاقات الحقيقية.
+
+ابدأ بـ:
+
+```text
+bthwani-graphify-query-first
+```
+
+واستخدم فقط عند الحاجة:
+
+```text
+bthwani-dynamic-workflow-execution-contract
+bthwani-design-guard-tooling-contract
+bthwani-logic-graph-guard-tooling-contract
+bthwani-structure-organization-guard-tooling-contract
+```
+
+في `CHECK` حدّد للشريحة الحالية فقط:
+
+```text
+هدف الشريحة
+actor
+الأسطح والشاشات المتأثرة
+routes/navigation/screen registry
+API/OpenAPI/client binding/generated consumers
+backend/runtime/Go files
+Docker/local runtime files عند الارتباط
+DSH/WLT boundary
+مصادر البيانات الحقيقية
+مصادر الوسائط الحقيقية
+حالات UI المطلوبة
+الملفات المرتبطة فعليًا
+الملفات التي تجاهلتها الرحلة لكن كشفها graph/import/runtime
+الملفات الميتة أو المتكررة المرتبطة بالشريحة
+أوامر التحقق المطلوبة
+```
+
+ممنوع تشغيل فحص شامل عشوائي.
+كل أداة تُشغّل يجب أن تنتج قرارًا تنفيذيًا مباشرًا داخل نفس الشريحة.
+
+## 4) APPLY الفوري
+
+بعد `CHECK` نفّذ مباشرة في الكود الحي.
+نفّذ كل ما يلزم لإغلاق الشريحة، بما يشمل عند الحاجة:
+
+```text
+إضافة منطق ناقص
+إصلاح flow
+إضافة أو إصلاح شاشة ناقصة
+إصلاح route/navigation/screen registry
+إصلاح API/OpenAPI usage
+إصلاح client binding/generated consumer
+إصلاح backend/runtime/Go logic
+إصلاح Docker/local runtime readiness
+إصلاح integration
+إزالة preview/demo/mock/fixture runtime usage
+حذف dead code بعد إثبات انقطاعه
+دمج duplicate بعد إثبات التكرار
+تفكيك ملف ضخم مرتبط بالشريحة
+نقل ownership إلى مكانه الصحيح
+إزالة orphan imports/adapters/hooks/types
+إصلاح UI/RTL/states
+```
+
+ممنوع الاكتفاء بوصف المشكلة إذا كان إصلاحها ممكنًا.
+ممنوع mass rename أو refactor واسع أو حذف شامل بلا إثبات عبر graph/imports/routes/runtime/guards.
+ممنوع تعديل ملفات خارج نطاق الشريحة إلا إذا كان ذلك مطلوبًا لإغلاقها ومثبتًا بعلاقة graph/import/runtime واضحة.
+
+## 5) البيانات الحقيقية والإدخال اليدوي
+
+أي تدفق حي يجب أن يُغلق ببيانات حقيقية أو مسار إدخال حقيقي، لا ببيانات تجريبية.
+
+المسموح فقط:
+
+```text
+إدخال يدوي حقيقي من شاشة أو Control Panel
+API حقيقي
+PostgreSQL عبر DSH API
+MinIO/S3 للوسائط والملفات
+dsh_media_assets للmetadata والربط
+WLT للمنطق المالي
+```
+
+ممنوع إنشاء fixtures أو mocks أو fallbacks جديدة داخل frontend.
+إذا احتاج التدفق إدخالًا يدويًا، أنشئ أو أصلح الشاشة أو endpoint أو Control Panel path اللازم له الآن.
+لا تترك الإدخال اليدوي كملاحظة مؤجلة.
+
+## 6) منع preview/demo/mock نهائيًا
+
+داخل نطاق الشريحة، أزل أو اعزل أي اعتماد runtime على:
+
+```text
+preview
+demo
+mock
+fixture
+sample
+fake
+fallback
+dev data
+test-only runtime data
+```
+
+وممنوع إبقاء أو استخدام flags مثل:
+
+```text
+DSH_ENABLE_DEV_FIXTURE_MEDIA
+DSH_ENABLE_MEDIA_FIXTURES
+USE_PREVIEW_DATA
+TOLERATED_VIOLATIONS
+```
+
+إذا ظهر اعتماد على:
+
+```text
+C:\bthwani-suite\dsh\frontend\data
+C:\bthwani-suite\dsh\frontend\media-fixtures
+```
+
+فأغلقه داخل الشريحة نفسها بتحويل المستهلك إلى API/runtime/MinIO/S3/metadata الحقيقي.
+لا تنشئ بديلًا محليًا جديدًا.
+
+## 7) حدود DSH/WLT المالية
+
+WLT هو المالك الحصري لأي منطق مالي:
+
+```text
+payment
+refund
+settlement
+ledger
+reconciliation
+balance
+wallet transaction
+financial state machine
+```
+
+DSH لا يملك المنطق المالي.
+DSH يحفظ references فقط.
+أي مخالفة داخل نطاق الشريحة يجب إصلاحها فورًا في الكود، لا توثيقها.
+
+## 8) المسارات التي تُفحص عند الارتباط بالشريحة
+
+افحص فقط ما يرتبط بالشريحة فعليًا، لكن لا تتجاهل أي ملف كشفه graph أو imports أو runtime أو API أو Docker أو Go أو navigation أو generated consumers.
+
+```text
+C:\bthwani-suite\dsh\frontend\app-captain
+C:\bthwani-suite\dsh\frontend\app-client
+C:\bthwani-suite\dsh\frontend\app-field
+C:\bthwani-suite\dsh\frontend\app-partner
+C:\bthwani-suite\dsh\frontend\control-panel
+C:\bthwani-suite\dsh\frontend\shared
+C:\bthwani-suite\dsh\backend
+C:\bthwani-suite\dsh\openapi
+C:\bthwani-suite\dsh\api
+C:\bthwani-suite\wlt\frontend\dsh\app-captain
+C:\bthwani-suite\wlt\frontend\dsh\app-client
+C:\bthwani-suite\wlt\frontend\dsh\app-field
+C:\bthwani-suite\wlt\frontend\dsh\app-partner
+C:\bthwani-suite\wlt\frontend\dsh\contracts
+C:\bthwani-suite\wlt\frontend\dsh\control-panel
+C:\bthwani-suite\wlt\frontend\dsh\transport
+C:\bthwani-suite\docker-compose.local.yml
+C:\bthwani-suite\.env.local
+```
+
+إذا كشفت الرحلة أو graph أو imports أو runtime ملفات إضافية مرتبطة، افحصها وأغلقها ضمن نفس الشريحة.
+
+## 9) قرار كل ملف يتم لمسه
+
+كل ملف أو مجلد يتم لمسه يجب أن يحصل على قرار واحد فقط بعد الإصلاح:
+
+```text
+KEEP_ACTIVE
+REFACTOR_SPLIT
+MERGE_DUPLICATE
+RETIRE_DEAD
+MOVE_TO_OWNER
+```
+
+لا تستخدم `FIX_REQUIRED` كقرار نهائي لملف.
+إذا احتاج الملف إصلاحًا، أصلحه ثم صنّفه بعد الإصلاح.
+
+ممنوع الحذف أو النقل أو الدمج قبل إثبات عدم وجود اعتماد عبر:
+
+```text
+imports
+exports
+routes
+navigation
+screen registry
+runtime dependency
+API/client binding
+OpenAPI/generated consumer
+tests
+guards
+build references
+Docker/runtime references
+Go references
+```
+
+## 10) التصميم والتنظيم
+
+`@bthwani/ui-kit` هو سلطة التصميم والمكونات والتوكنات.
+ممنوع إنشاء design system محلي أو components مكررة أو visual drift.
+
+كل شاشة متأثرة يجب أن تغطي:
+
+```text
+loading
+empty
+error
+success
+offline
+disabled
+RTL correctness
+primary action clarity
+no overflow
+no clipping
+no unrelated visual drift
+```
+
+ممنوع اعتماد runtime على:
+
+```text
+graphify-out
+.tamagui
+tools/registry/runs
+local evidence files
+diagnostic outputs
+temporary generated reports
+```
+
+هذه أدوات تحليل وأدلة فقط، وليست مصادر تشغيل.
+
+## 11) VERIFY الإجباري
+
+بعد كل `APPLY` شغّل الحد الأدنى التالي من جذر الريبو:
+
+```powershell
+Set-Location -LiteralPath "C:\bthwani-suite"
+git --no-pager status --short
+git --no-pager diff --stat
+git --no-pager diff --name-status
+git --no-pager diff --check
+```
+
+ثم شغّل حسب نطاق الشريحة:
+
+```powershell
+pnpm -w exec tsc --noEmit
+go test ./...
+docker compose -f .\docker-compose.local.yml config
+```
+
+وشغّل حراس التصميم والمنطق والتنظيم والـ runtime/API عندما تمس الشريحة هذه الطبقات.
+
+إذا مسّت الشريحة:
+
+```text
+dsh/frontend/data
+dsh/frontend/media-fixtures
+```
+
+فشغّل Delete Probe أو فحصًا مكافئًا يثبت عدم وجود consumers مكسورين أو references ممنوعة.
+
+## 12) شروط الإغلاق
+
+ممنوع إعلان:
+
+```text
+PASS
+CLOSED
+DONE
+READY
+FINAL
+100%
+```
+
+إلا بعد تحقق كل الشروط داخل نطاق الشريحة:
+
+```text
+نجاح git diff --check
+نجاح الحراس المطلوبة
+نجاح TypeScript عند لمس TS/React/frontend
+نجاح Go tests عند لمس Go/backend
+نجاح Docker config عند لمس Docker/local runtime
+عدم وجود تغييرات خارج النطاق
+عدم وجود imports ميتة في الملفات الملموسة
+عدم وجود orphan consumers
+عدم وجود preview/demo/mock/fixture runtime references
+عدم وجود tolerated violations
+عدم كسر UI/RTL/navigation
+عدم كسر WLT financial boundary
+عدم اعتماد runtime على evidence أو graphify أو مخرجات محلية
+وجود دليل واضح لكل حذف/نقل/دمج
+وجود مسار إدخال حقيقي أو API حقيقي لأي بيانات مطلوبة
+```
+
+إذا فشل شرط، لا تكتب نتيجة نهائية.
+ارجع فورًا إلى `APPLY` وأصلح ثم أعد `VERIFY`.
+
+## 13) ممنوعات الهروب
+
+ممنوع كتابة أو استخدام:
+
+```text
+يمكن لاحقًا
+يفضل مستقبلًا
+نوصي بأن
+يحتاج مرحلة أخرى
+خارج النطاق بدون إثبات
+تم الاكتفاء بالتحليل
+لم يتم التنفيذ لضيق الوقت
+FIX_REQUIRED_WITH_EXACT_PATHS
+تقرير فقط
+سنعود لها لاحقًا
+```
+
+إذا كانت المشكلة داخل النطاق وقابلة للإصلاح، أصلحها الآن.
+إذا كانت خارج النطاق فعلًا، أثبت ذلك بعلاقات graph/import/runtime واضحة، وليس بكلام عام.
+
+## 14) مخرج كل شريحة
+
+اكتب نتيجة مختصرة فقط:
+
+```text
+Slice:
+Decision: CLOSED_WITH_EVIDENCE
+Changed files:
+File/folder decisions:
+Graph evidence used:
+Runtime/API/Backend/Go changes:
+Docker/local runtime changes:
+Data/media changes:
+Manual real-input path:
+DSH/WLT boundary result:
+Preview/demo/mock/fixture cleanup result:
+Verification commands:
+Verification result:
+Evidence:
+Next slice:
+```
+
+لا تنشئ ملفات أدلة كثيرة بلا ضرورة.
+الأدلة تكون بالحد الأدنى الذي يثبت الإغلاق، لا لاستهلاك التوكنات.
+
+## 15) الهدف النهائي
+
+الهدف هو تحقيق أكبر إنجاز عملي بأسرع وقت داخل الكود الحي، مع إغلاق كل شريحة إغلاقًا حقيقيًا قابلًا للتشغيل والمراجعة، بصفر تسويف، صفر هروب، صفر preview runtime، صفر mock runtime، صفر tolerated violations، وصفر انتقال نهائي قبل الإغلاق.
+
+## 16) مخالفة مُثبَّتة: استيراد من legacy-preview ممنوع
+
+**مخالفة موثقة (2026-06-12):**
+تم رصد imports مباشرة من:
+
+```text
+C:\bthwani-suite\dsh\frontend\data\legacy-preview
+C:\bthwani-suite\dsh\frontend\media-fixtures\legacy-preview
+```
+
+داخل الكود الحي (frontend surfaces). هذا انتهاك صريح لقاعدة صفر preview/mock/fixture runtime.
+
+**السياق:** سيتم حذف المجلدين التاليين يدويًا في وقت لاحق:
+
+```text
+C:\bthwani-suite\dsh\frontend\data
+C:\bthwani-suite\dsh\frontend\media-fixtures
+```
+
+لذا يجب أن يكون الكود جاهزًا لهذا الحذف دون أي كسر. كل import من هذين المجلدين هو دين تقني مضمون الكسر.
+
+**الحكم:**
+
+```text
+أي import — runtime أو type-only — من:
+  dsh/frontend/data/legacy-preview/*
+  dsh/frontend/media-fixtures/legacy-preview/*
+يعتبر مخالفة يجب إغلاقها في نفس الشريحة بلا استثناء.
+```
+
+**الإجراء الإلزامي عند كشف أي import من هذه المسارات:**
+
+1. حوّل runtime import إلى `import type` إذا كان النوع ضروريًا فقط — أو أزله كليًا إذا لم يكن الـ type مستخدمًا في الـ interface الخارجية.
+2. استبدل أي استدعاء runtime (دالة، قيمة، ثابت) بـ typed empty array أو no-op مباشرة.
+3. لا تنشئ fixture أو mock أو fallback بديل داخل frontend.
+4. شغّل `pnpm -w exec tsc --noEmit` بعد كل إصلاح وتحقق من النجاح.
+5. لا تغلق الشريحة ويتبقى فيها أي import من هذه المسارات.
+
+**ممنوع تمامًا:**
+
+```text
+ترك import من legacy-preview بحجة "type-only مقبول"
+ترك import من legacy-preview بحجة "سنعالجه لاحقًا"
+إنشاء ملف وسيط يعيد تصدير من legacy-preview
+استخدام re-export أو barrel file يخفي المصدر الأصلي
+```
+
+**الهدف:** صفر imports من `dsh/frontend/data` و `dsh/frontend/media-fixtures` في أي ملف داخل frontend surfaces — حتى يكون الكود جاهزًا لحذف هذين المجلدين.
