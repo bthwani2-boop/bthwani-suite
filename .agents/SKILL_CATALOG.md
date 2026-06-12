@@ -2,7 +2,7 @@
 
 | Skill | Purpose | Governance dependency | Output |
 |---|---|---|---|
-| `bthwani-graphify-query-first` | Use Graphify before broad raw-file search for repo architecture, ownership, dependency, routing, UI-kit, DSH data/media, and cross-surface questions. | local `graphify-out/graph.json` cache + exact owner files | focused file set + evidence-aware next action |
+| `bthwani-graphify-query-first` | Start journeys/slices with Graphify to reduce context, identify scope, and lead targeted sub-tool runs. | local `graphify-out/graph.json` cache + exact owner files | scoped files/relationships + orchestrated next action |
 | `bthwani-logic-graph-guard-tooling-contract` | Route feature, journey, screen, API, state, Cucumber/Spectral/Playwright, and cross-surface logic gap diagnostics. | feature/journey manifests + OpenAPI + existing guards | logic gap matrix + evidence-aware next action |
 | `bthwani-design-guard-tooling-contract` | Route installed design tooling, generated-output safety, UI-kit ownership, Tamagui boundary, design-token drift, and visual evidence checks. | `ui-kit`, `tools/guards`, generated/cache outputs | design tooling decision + guard/evidence requirements |
 | `bthwani-structure-organization-guard-tooling-contract` | Use structure, duplication, monorepo, file-size, performance-bloat, and security-hygiene tooling to diagnose organization gaps. | `package.json`, `tools/guards` | organization decision + next action |
