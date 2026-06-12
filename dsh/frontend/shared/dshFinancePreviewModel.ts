@@ -13,20 +13,6 @@
  * - واستعمل هذا الملف فقط عندما تحتاج جسر DSH read-only boundary metadata.
  */
 
-export type {
-  WltDshFinanceActor as DshFinanceActor,
-  WltDshFinanceEventKind as DshFinanceEventKind,
-  WltDshFinancePreviewRecord as DshFinancePreviewRecord,
-} from '../../../dsh/frontend/data/dshFinancePreview';
-
-export {
-  getWltDshFinanceRecordsForActor as getDshFinanceRecordsForActor,
-  getWltDshFinanceSummaryForActor as getDshFinanceSummaryForActor,
-  getWltPartnerSettlementPreview as getDshPartnerSettlementPreview,
-  getWltCaptainFinancePreview as getDshCaptainFinancePreview,
-  getWltFieldFinancePreview as getDshFieldFinancePreview,
-  resolveWltDshFinanceEventKindForPaymentMethod as resolveDshFinanceEventKindForPayment,
-} from '../../../dsh/frontend/data/dshFinancePreview';
 
 // --- P0-07: WLT Finance Bridge — DSH Read-Only Boundary Contracts ---
 // All types below describe WHAT DSH DISPLAYS from WLT.

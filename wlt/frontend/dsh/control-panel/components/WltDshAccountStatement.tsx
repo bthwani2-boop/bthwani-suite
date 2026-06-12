@@ -2,10 +2,7 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import {
-  getWltDshAccountStatementsPreview,
-  type WltDshAccountStatement as WltDshAccountStatementModel,
-} from '../financeContracts';
+import type { WltDshAccountStatement as WltDshAccountStatementModel } from '../financeContracts';
 import { formatWltYer } from '../models/dshFinance.types';
 import type { WltDshFinanceRuntimeResult } from '../adapters/wltDshFinanceRuntime.adapter';
 
@@ -162,9 +159,8 @@ export function WltDshAccountStatement({
   actorId?: string;
   runtimeFinance?: WltDshFinanceRuntimeResult | null;
 } = {}) {
-  const previewStatements = React.useMemo(() => getWltDshAccountStatementsPreview(), []);
   const runtimeStatements = React.useMemo(() => buildRuntimeStatements(runtimeFinance), [runtimeFinance]);
-  const statements = runtimeStatements.length > 0 ? runtimeStatements : previewStatements;
+  const statements = runtimeStatements;
   const [activeId, setActiveId] = React.useState(statements[0]?.statementId ?? '');
 
   const statement = React.useMemo(() => {

@@ -11,7 +11,6 @@ export {
 } from './wlt-dsh-client.parts';
 export { wltDshClientBridgeDataContract } from './wlt-dsh-client.contract';
 export type { WltDshClientBridgeContract } from './wlt-dsh-client.contract';
-export { wltDshClientPaymentPreviewData } from './wlt-dsh-client.preview-data';
 export type { WltDshWalletPreviewState } from './wlt-dsh-client.types';
 export {
 	default as useWltDshWalletPreviewDefault,
@@ -28,5 +27,5 @@ export {
 	listLedgerEntries,
 } from './wlt-dsh-client.adapter';
 export type { WalletAccount } from './wlt-dsh-client.adapter';
-export { resolveWltDshFinanceEventKindForPaymentMethod } from '../control-panel/financeContracts';
-export type { WltDshFinanceEventKind } from '../control-panel/financeContracts';
+export { resolveWltDshFinanceEventKindForPaymentMethod } from '../control-panel/models/dshFinance.types';
+export type { WltDshFinanceEventKind } from '../control-panel/models/dshFinance.types';

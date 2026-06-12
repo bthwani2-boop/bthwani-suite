@@ -242,3 +242,11 @@ export function formatWltYer(minorUnits: number): string {
     return `${major.toLocaleString('ar', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ر.ي`;
   }
 }
+
+export function resolveWltDshFinanceEventKindForPaymentMethod(
+  method: 'cod' | 'wallet' | 'mixed' | 'official-wallets',
+): WltDshFinanceEventKind {
+  if (method === 'cod') return 'cash-on-delivery';
+  if (method === 'wallet' || method === 'mixed' || method === 'official-wallets') return 'wallet-payment';
+  return 'client-payment';
+}

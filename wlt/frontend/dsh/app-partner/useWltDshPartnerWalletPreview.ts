@@ -2,10 +2,25 @@ import React from 'react';
 import { createWltDshTypedClient, type WltSettlement } from '../contracts';
 import {
   formatWltYer,
-  getWltPartnerFinanceSnapshot,
   type WltDshFinancePreviewRecord,
   type WltPartnerFinanceSnapshot,
 } from '../control-panel/financeContracts';
+
+const EMPTY_PARTNER_SNAPSHOT: WltPartnerFinanceSnapshot = {
+  settlementRecords: [],
+  grossSalesMinorUnits: 0, grossSalesLabel: '—',
+  platformCommissionMinorUnits: 0, platformCommissionLabel: '—',
+  deductionsMinorUnits: 0, deductionsLabel: '—',
+  netSettlementMinorUnits: 0, netSettlementLabel: '—',
+  nextSettlementMinorUnits: 0, nextSettlementLabel: '—',
+  totalLabel: '—',
+  cycleStatus: 'empty', cycleStartDate: '—', cycleEndDate: '—', nextPayoutDate: '—',
+  contractState: 'CONTRACT_TBD',
+  dataKind: 'preview', runtimeTruth: 'none — runtime_unbound',
+  backendSource: 'none — preview_seeds_only', bindingSource: 'wlt_frontend_shared_finance',
+  moneySemantics: 'display_only — no_accounting_effect',
+  sourceLabel: '—', warnings: [], isPreview: false,
+};
 import { mapWltDshPartnerPreviewTransactions } from './wlt-dsh-partner.adapter';
 
 function settlementRecord(s: WltSettlement): WltDshFinancePreviewRecord {
@@ -32,7 +47,7 @@ function settlementRecord(s: WltSettlement): WltDshFinancePreviewRecord {
 }
 
 export function useWltDshPartnerWalletPreview(partnerId?: string, dshAuthBearerToken?: string | null) {
-  const [partnerPreview, setPartnerPreview] = React.useState<WltPartnerFinanceSnapshot>(() => getWltPartnerFinanceSnapshot());
+  const [partnerPreview, setPartnerPreview] = React.useState<WltPartnerFinanceSnapshot>(EMPTY_PARTNER_SNAPSHOT);
   const [lastError, setLastError] = React.useState<string | null>(null);
 
   const activePartnerId = partnerId || 'partner-demo';
@@ -48,11 +63,10 @@ export function useWltDshPartnerWalletPreview(partnerId?: string, dshAuthBearerT
     void client.listPartnerSettlements(activePartnerId)
       .then(({ settlements }) => {
         if (cancelled) return;
-        const fallback = getWltPartnerFinanceSnapshot();
         const settlementRecords = settlements.map(settlementRecord);
         const netSettlementMinorUnits = settlements.reduce((sum, s) => sum + Math.round(s.partner_payout * 100), 0);
         setPartnerPreview({
-          ...fallback,
+          ...EMPTY_PARTNER_SNAPSHOT,
           settlementRecords,
           grossSalesMinorUnits: netSettlementMinorUnits,
           grossSalesLabel: formatWltYer(netSettlementMinorUnits),
@@ -62,8 +76,8 @@ export function useWltDshPartnerWalletPreview(partnerId?: string, dshAuthBearerT
           nextSettlementLabel: formatWltYer(netSettlementMinorUnits),
           totalLabel: formatWltYer(netSettlementMinorUnits),
           cycleStatus: settlements[0]?.status ?? 'empty',
-          cycleStartDate: settlements[0]?.created_at ?? fallback.cycleStartDate,
-          cycleEndDate: settlements[0]?.created_at ?? fallback.cycleEndDate,
+          cycleStartDate: settlements[0]?.created_at ?? '—',
+          cycleEndDate: settlements[0]?.created_at ?? '—',
           sourceLabel: 'WLT runtime',
           warnings: [],
           isPreview: false,

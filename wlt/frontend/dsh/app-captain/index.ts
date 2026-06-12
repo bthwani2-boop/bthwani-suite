@@ -3,10 +3,6 @@ export type { WltDshCaptainBridgeProps } from './WltDshCaptainBridge';
 export { WltDshCaptainFinancePreview } from './WltDshCaptainFinancePreview';
 export { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
 export type { WltDshCaptainBridgeContract } from './wlt-dsh-captain.contract';
-export {
-  wltDshCaptainFinanceSections,
-  wltDshCaptainPreviewData,
-} from './wlt-dsh-captain.preview-data';
 export { wltDshCaptainUiCopy } from './wlt-dsh-captain.ui-copy';
 export type {
   WltDshCaptainUiCopy,

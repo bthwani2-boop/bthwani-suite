@@ -16,10 +16,35 @@ import {
 } from '@bthwani/ui-kit';
 import {
   formatWltYer,
-  getWltDshPaymentOptionsPreview,
-  resolveWltDshPaymentPreviewState,
   type WltDshPaymentMethod,
+  type WltDshPaymentOptionPreview,
+  type WltDshPaymentPreviewState,
+  resolveWltDshFinanceEventKindForPaymentMethod,
 } from '../control-panel/financeContracts';
+
+const PAYMENT_OPTIONS: readonly WltDshPaymentOptionPreview[] = [
+  { id: 'cod', titleLabel: 'الدفع عند الاستلام', descriptionLabel: 'ادفع كامل المبلغ عند استلام الطلب.', availabilityLabel: 'متاح دائمًا', availabilityTone: 'success', isAvailable: true, isPreview: true },
+  { id: 'wallet', titleLabel: 'رصيد المحفظة (WLT)', descriptionLabel: 'ادفع من رصيد محفظة WLT الداخلية إذا توفر الرصيد.', availabilityLabel: 'يتطلب ربط وكفاية الرصيد', availabilityTone: 'warning', isAvailable: false, isPreview: true },
+  { id: 'mixed', titleLabel: 'دفع مدمج', descriptionLabel: 'جزء من المحفظة والباقي عند الاستلام.', availabilityLabel: 'يتطلب رصيدًا جزئيًا في WLT', availabilityTone: 'info', isAvailable: false, isPreview: true },
+  { id: 'official-wallets', titleLabel: 'المحافظ الرسمية', descriptionLabel: 'اختر محفظة رسمية معتمدة لإتمام الدفع.', availabilityLabel: 'CONTRACT_TBD — غير مفعّل', availabilityTone: 'warning', isAvailable: false, isPreview: true },
+];
+
+function resolvePaymentState(method: WltDshPaymentMethod, orderTotalMinorUnits: number, walletBalanceMinorUnits: number, walletLinked: boolean): WltDshPaymentPreviewState {
+  const fmt = (n: number) => formatWltYer(n);
+  const base = { method, orderTotalMinorUnits, walletBalanceMinorUnits, walletLinked, contractState: 'CONTRACT_TBD' as const, financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(method), isPreview: true as const };
+  if (method === 'cod') return { ...base, walletAmountMinorUnits: 0, amountDueOnDeliveryMinorUnits: orderTotalMinorUnits, valid: true, summaryLabel: `ستدفع ${fmt(orderTotalMinorUnits)} عند الاستلام.`, feedbackTone: 'info' };
+  if (method === 'wallet') {
+    if (!walletLinked) return { ...base, walletAmountMinorUnits: 0, amountDueOnDeliveryMinorUnits: orderTotalMinorUnits, valid: false, summaryLabel: 'المحفظة غير مرتبطة.', blockingLabel: 'اربط محفظة WLT أولًا.', feedbackTone: 'warning' };
+    if (walletBalanceMinorUnits < orderTotalMinorUnits) return { ...base, walletAmountMinorUnits: walletBalanceMinorUnits, amountDueOnDeliveryMinorUnits: orderTotalMinorUnits - walletBalanceMinorUnits, valid: false, summaryLabel: `الرصيد ${fmt(walletBalanceMinorUnits)} أقل من إجمالي الطلب.`, blockingLabel: `تحتاج شحن ${fmt(orderTotalMinorUnits - walletBalanceMinorUnits)} إضافيًا.`, feedbackTone: 'warning' };
+    return { ...base, walletAmountMinorUnits: orderTotalMinorUnits, amountDueOnDeliveryMinorUnits: 0, valid: true, summaryLabel: `الرصيد يكفي — سيُخصم ${fmt(orderTotalMinorUnits)} من المحفظة.`, feedbackTone: 'success' };
+  }
+  if (method === 'mixed') {
+    if (!walletLinked || walletBalanceMinorUnits <= 0) return { ...base, walletAmountMinorUnits: 0, amountDueOnDeliveryMinorUnits: orderTotalMinorUnits, valid: false, summaryLabel: 'الدفع المدمج يحتاج رصيدًا في المحفظة.', blockingLabel: 'لا يوجد رصيد متاح.', feedbackTone: 'warning' };
+    if (walletBalanceMinorUnits >= orderTotalMinorUnits) return { ...base, walletAmountMinorUnits: orderTotalMinorUnits, amountDueOnDeliveryMinorUnits: 0, valid: false, summaryLabel: 'الرصيد يكفي للدفع الكامل من المحفظة.', blockingLabel: 'استخدم خيار "رصيد المحفظة".', feedbackTone: 'info' };
+    return { ...base, walletAmountMinorUnits: walletBalanceMinorUnits, amountDueOnDeliveryMinorUnits: orderTotalMinorUnits - walletBalanceMinorUnits, valid: true, summaryLabel: `${fmt(walletBalanceMinorUnits)} من المحفظة + ${fmt(orderTotalMinorUnits - walletBalanceMinorUnits)} عند الاستلام.`, feedbackTone: 'info' };
+  }
+  return { ...base, walletAmountMinorUnits: 0, amountDueOnDeliveryMinorUnits: 0, valid: false, summaryLabel: 'المحافظ الرسمية غير مفعّلة — CONTRACT_TBD.', blockingLabel: 'يتطلب ربطًا بـ API لم يُعرَّف بعد.', feedbackTone: 'warning' };
+}
 
 function PaymentOptionCard({
   id,
@@ -188,8 +213,6 @@ export function WltDshClientPaymentPreview({
   onSelectMethod,
 }: WltDshClientPaymentPreviewProps) {
   const [method, setMethod] = React.useState<WltDshPaymentMethod>(selectedMethod);
-  const options = React.useMemo(() => getWltDshPaymentOptionsPreview(), []);
-
   const handleSelect = React.useCallback(
     (id: WltDshPaymentMethod) => {
       setMethod(id);
@@ -199,7 +222,7 @@ export function WltDshClientPaymentPreview({
   );
 
   const previewState = React.useMemo(
-    () => resolveWltDshPaymentPreviewState(method, orderTotalMinorUnits, walletBalanceMinorUnits, walletLinked),
+    () => resolvePaymentState(method, orderTotalMinorUnits, walletBalanceMinorUnits, walletLinked),
     [method, orderTotalMinorUnits, walletBalanceMinorUnits, walletLinked],
   );
 
@@ -218,7 +241,7 @@ export function WltDshClientPaymentPreview({
           طرق الدفع المتاحة
         </Text>
         <Box gap={2}>
-          {options.map((opt) => (
+          {PAYMENT_OPTIONS.map((opt) => (
             <PaymentOptionCard
               key={opt.id}
               id={opt.id}

@@ -1,7 +1,6 @@
 import { createWltDshTypedClient, type WltLedgerEntry } from '../contracts';
 import {
 	formatWltYer,
-	getWltCaptainFinanceSnapshot,
 	type WltCaptainFinanceSection,
 	type WltCaptainFinanceSnapshot,
 	type WltDshFinancePreviewRecord,
@@ -43,23 +42,25 @@ export async function getSnapshot(captainId?: string | null, bearerToken?: strin
 		getClient(bearerToken, activeCaptainId).getCaptainWalletSummary(activeCaptainId),
 		getClient(bearerToken, activeCaptainId).listCaptainEarnings(activeCaptainId),
 	]);
-	const previewFallback = getWltCaptainFinanceSnapshot();
 	const earningsMinorUnits = earningsResponse.entries
 		.filter((e) => e.transaction_type === 'CREDIT')
 		.reduce((sum, e) => sum + Math.round(e.amount * 100), 0);
 	const balanceMinorUnits = Math.round(walletSummary.balance * 100);
 
 	return {
-		...previewFallback,
-		// COD liability concept is tracked by WLT internally; captain surface shows balance instead.
 		codLiabilityMinorUnits: 0,
 		codLiabilityLabel: formatWltYer(0),
 		earningsMinorUnits,
 		earningsLabel: formatWltYer(earningsMinorUnits),
+		settlementMinorUnits: 0,
+		settlementLabel: formatWltYer(0),
 		pendingPayoutMinorUnits: balanceMinorUnits,
 		pendingPayoutLabel: formatWltYer(balanceMinorUnits),
+		cycleLabel: '—',
 		eligibilityBalanceMinorUnits: balanceMinorUnits,
 		eligibilityBalanceLabel: formatWltYer(balanceMinorUnits),
+		minimumEligibilityMinorUnits: 0,
+		minimumEligibilityLabel: formatWltYer(0),
 		isEligible: walletSummary.balance >= 0,
 		eligibilityShortfallMinorUnits: 0,
 		eligibilityShortfallLabel: formatWltYer(0),

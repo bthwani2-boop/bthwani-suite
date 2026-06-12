@@ -2,10 +2,7 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import {
-  getWltDshSettlementCalendarPreview,
-  type WltDshSettlementCalendarCycle,
-} from '../financeContracts';
+import type { WltDshSettlementCalendarCycle } from '../financeContracts';
 import { formatWltYer } from '../models/dshFinance.types';
 import type { WltDshFinanceRuntimeResult } from '../adapters/wltDshFinanceRuntime.adapter';
 
@@ -90,16 +87,15 @@ export function WltDshSettlementCalendar({
 }: {
   runtimeFinance?: WltDshFinanceRuntimeResult | null;
 } = {}) {
-  const previewCycles = React.useMemo(() => getWltDshSettlementCalendarPreview(), []);
   const runtimeCycles = React.useMemo(() => buildRuntimeSettlementCycles(runtimeFinance), [runtimeFinance]);
-  const cycles = runtimeCycles.length > 0 ? runtimeCycles : previewCycles;
+  const cycles = runtimeCycles;
 
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <Text role="titleMd" weight="black">تقويم التسويات</Text>
         <Text role="bodySm" tone="soft">
-          يوضح دورات القطع والدفع والحجز لكل مالك مالي. يعرض WLT runtime أولًا ثم fallback عند التعذر.
+          يوضح دورات القطع والدفع والحجز لكل مالك مالي. البيانات من WLT runtime فقط.
         </Text>
       </Box>
 

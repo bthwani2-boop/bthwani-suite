@@ -3,7 +3,6 @@ export type { WltDshFieldBridgeProps } from './WltDshFieldBridge';
 export { WltDshFieldFinancePreview } from './WltDshFieldFinancePreview';
 export { wltDshFieldBridgeDataContract } from './wlt-dsh-field.contract';
 export type { WltDshFieldBridgeContract } from './wlt-dsh-field.contract';
-export { getWltDshFieldPreviewData } from './wlt-dsh-field.preview-data';
 export type {
   WltDshFieldBridgeState,
   WltDshFieldFinancePreviewState,

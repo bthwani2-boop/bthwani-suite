@@ -4,11 +4,10 @@ import React from 'react';
 import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
-import {
-  getWltDshCaptainSettlementStatementsPreview,
-  type WltDshCaptainStatement as CaptainStatement,
-  type WltDshCaptainCodBag as CaptainCodBag,
-  type WltDshCaptainEarningLine as CaptainEarningLine,
+import type {
+  WltDshCaptainStatement as CaptainStatement,
+  WltDshCaptainCodBag as CaptainCodBag,
+  WltDshCaptainEarningLine as CaptainEarningLine,
 } from '../financeContracts';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
@@ -51,7 +50,7 @@ function Metric({ label, value, tone }: { label: string; value: string; tone?: '
 }
 
 export function WltDshCaptainStatement() {
-  const statements = React.useMemo(() => getWltDshCaptainSettlementStatementsPreview(), []);
+  const statements: readonly CaptainStatement[] = [];
 
   const [activeCaptainId, setActiveCaptainId] = React.useState<string>(statements[0]?.captainId ?? '');
   const [activeTab, setActiveTab] = React.useState<'earnings' | 'cod'>('earnings');

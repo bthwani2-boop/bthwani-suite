@@ -23,11 +23,38 @@ import type { WltDshPartnerWalletTransaction } from './wlt-dsh-partner.adapter';
 import { useWltDshPartnerWalletPreview } from './useWltDshPartnerWalletPreview';
 import { getWltDshPartnerCommissionLabel, getWltDshPartnerOperationalModeCommission } from './wlt-dsh-partner.ui-copy';
 import {
-  getWltDshStoreDeliveryFinancePreview,
-  getWltDshOrderCommissionBreakdown,
   type WltDshFulfillmentMode,
   type WltDshOrderLineItemApplicability,
 } from '../control-panel/financeContracts';
+
+type StoreDeliveryState = {
+  totalFeeLabel: string;
+  totalCompensationLabel: string;
+  captainPayoutApplies: false;
+  separationNote: string;
+};
+
+const EMPTY_STORE_DELIVERY: StoreDeliveryState = {
+  totalFeeLabel: '—',
+  totalCompensationLabel: '—',
+  captainPayoutApplies: false,
+  separationNote: 'في انتظار WLT runtime — سياسة توصيل المتجر لم تُوصَل بعد',
+};
+
+type ModeBreakdown = {
+  fulfillmentModeLabel: string;
+  deliveryFee: WltDshOrderLineItemApplicability;
+  platformCommission: WltDshOrderLineItemApplicability;
+  captainPayout: WltDshOrderLineItemApplicability;
+  partnerCourierCost: WltDshOrderLineItemApplicability;
+  partnerNet: WltDshOrderLineItemApplicability;
+};
+
+const BREAKDOWN_BY_MODE: Record<WltDshFulfillmentMode, ModeBreakdown> = {
+  bthwani_delivery: { fulfillmentModeLabel: 'توصيل بثواني', deliveryFee: { applies: true, label: 'WLT' }, platformCommission: { applies: true, label: 'WLT' }, captainPayout: { applies: true, label: 'WLT' }, partnerCourierCost: { applies: false, reason: 'لا ينطبق — كابتن بثواني هو المسؤول' }, partnerNet: { applies: true, label: 'WLT' } },
+  partner_delivery: { fulfillmentModeLabel: 'توصيل المتجر', deliveryFee: { applies: true, label: 'حسب سياسة المتجر' }, platformCommission: { applies: true, label: 'WLT' }, captainPayout: { applies: false, reason: 'لا ينطبق — لا كابتن في توصيل المتجر' }, partnerCourierCost: { applies: true, label: 'حسب اتفاق المتجر' }, partnerNet: { applies: true, label: 'WLT' } },
+  pickup: { fulfillmentModeLabel: 'استلام بنفسي', deliveryFee: { applies: false, reason: 'لا رسوم توصيل — العميل يستلم بنفسه' }, platformCommission: { applies: true, label: 'WLT' }, captainPayout: { applies: false, reason: 'لا ينطبق' }, partnerCourierCost: { applies: false, reason: 'لا ينطبق' }, partnerNet: { applies: true, label: 'WLT' } },
+};
 
 type PartnerDshWalletViewState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-transactions';
 type PartnerDshWalletActionId = 'expanded-wallet' | 'settlements' | 'report';
@@ -265,7 +292,7 @@ function SummaryTab({
   openAction,
 }: {
   partnerPreview: ReturnType<typeof useWltDshPartnerWalletPreview>['partnerPreview'];
-  storeDeliveryPreview: ReturnType<typeof getWltDshStoreDeliveryFinancePreview>;
+  storeDeliveryPreview: StoreDeliveryState;
   openAction: (id: PartnerDshWalletActionId) => void;
 }) {
   const { direction } = useDirection();
@@ -372,7 +399,7 @@ function CycleTab({
   storeDeliveryPreview,
 }: {
   partnerPreview: ReturnType<typeof useWltDshPartnerWalletPreview>['partnerPreview'];
-  storeDeliveryPreview: ReturnType<typeof getWltDshStoreDeliveryFinancePreview>;
+  storeDeliveryPreview: StoreDeliveryState;
 }) {
   return (
     <Box gap={4}>
@@ -466,7 +493,7 @@ function CommissionModeCard({
 
   const modeId: WltDshFulfillmentMode =
     id === 'pickup' ? 'pickup' : id === 'partner_delivery' ? 'partner_delivery' : 'bthwani_delivery';
-  const breakdown = getWltDshOrderCommissionBreakdown(modeId);
+  const breakdown = BREAKDOWN_BY_MODE[modeId];
 
   const modeDetails = (() => {
     if (id === 'pickup') {
@@ -603,7 +630,7 @@ function CourierTab({
   storeDeliveryPreview,
   direction,
 }: {
-  storeDeliveryPreview: ReturnType<typeof getWltDshStoreDeliveryFinancePreview>;
+  storeDeliveryPreview: StoreDeliveryState;
   direction: 'rtl' | 'ltr';
 }) {
   const hasPolicy = storeDeliveryPreview.totalFeeLabel !== '٠ ر.ي';
@@ -675,7 +702,7 @@ export function PartnerDshWalletBridgeView({
     () => resolveLinkedScopeLabel(activeZoneLabel, branchLabel),
     [activeZoneLabel, branchLabel],
   );
-  const storeDeliveryPreview = React.useMemo(() => getWltDshStoreDeliveryFinancePreview(), []);
+  const storeDeliveryPreview = EMPTY_STORE_DELIVERY;
 
   const sourceTransactions = transactions ?? previewTransactions;
   const visibleTransactions = state === 'no-transactions' ? [] : sourceTransactions;

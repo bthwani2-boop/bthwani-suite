@@ -2,10 +2,7 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import {
-  getWltDshPartnerSettlementStatementsPreview,
-  type WltDshPartnerStatement as PartnerStatement,
-} from '../financeContracts';
+import type { WltDshPartnerStatement as PartnerStatement } from '../financeContracts';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 const STATUS_LABEL: Record<PartnerStatement['status'], string> = {
@@ -31,7 +28,7 @@ function Metric({ label, value }: { label: string; value: string }) {
 }
 
 export function WltDshPartnerStatement() {
-  const statements = React.useMemo(() => getWltDshPartnerSettlementStatementsPreview(), []);
+  const statements: readonly PartnerStatement[] = [];
 
   const [activePartnerId, setActivePartnerId] = React.useState<string>(statements[0]?.partnerId ?? '');
   const [selectedStoreId, setSelectedStoreId] = React.useState<string | null>(null);

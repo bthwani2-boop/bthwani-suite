@@ -10,12 +10,10 @@ import {
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
 } from '../adapters/wltDshFinanceRuntime.adapter';
-import { getFallbackControlPanelFinancePreview } from '../adapters/wltDshFinanceFallback.adapter';
 import { LedgerEntriesTable } from '../components/LedgerEntriesTable';
 import { TrialBalancePanel } from '../components/TrialBalancePanel';
 
 export function LedgerScreen({ hubHref: _hubHref, subGroup: _subGroup }: { hubHref: string; subGroup?: string }) {
-  const preview = React.useMemo(() => getFallbackControlPanelFinancePreview(), []);
   const businessDate = new Date().toISOString().split('T')[0]!;
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
 
@@ -33,8 +31,8 @@ export function LedgerScreen({ hubHref: _hubHref, subGroup: _subGroup }: { hubHr
     if (runtimeFinance?.state === 'runtime') {
       return buildWltRuntimeFinancialCenter(businessDate, runtimeFinance.data);
     }
-    return buildWltFinancialCenter(businessDate, preview.allRecords);
-  }, [preview, businessDate, runtimeFinance]);
+    return buildWltFinancialCenter(businessDate, []);
+  }, [businessDate, runtimeFinance]);
 
   const [activeView, setActiveView] = React.useState<'journal' | 'trial-balance'>('journal');
 

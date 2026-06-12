@@ -4,13 +4,53 @@ import React from 'react';
 import { Box, Text, Button,
   radius,
 } from '@bthwani/ui-kit';
-import type { DshFinancePreviewRow } from '../adapters/dshFinanceFixture.adapter';
+import type { WltDshFinanceEventKind } from '../models/dshFinance.types';
 import { formatWltYer } from '../financeContracts';
 import {
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
 } from '../adapters/wltDshFinanceRuntime.adapter';
-import { getFallbackWorkbenchRows } from '../adapters/wltDshFinanceFallback.adapter';
+
+type DshFinancePreviewRow = {
+  id: string;
+  amount: string;
+  owner: string;
+  status: string;
+  risk: 'danger' | 'warning' | 'success';
+  evidence: string;
+  nextAction: string;
+  recommendation: string;
+  primaryActionLabel: string;
+  secondaryActionLabel: string;
+  sla: string;
+  actorType: 'client' | 'partner' | 'captain' | 'field' | 'storeCourier' | 'platform';
+  eventKind: WltDshFinanceEventKind | 'unknown';
+  expectedMinorUnits: number;
+  actualMinorUnits: number;
+  varianceMinorUnits: number;
+  evidenceStatus: 'missing' | 'partial' | 'complete';
+  reconciliationStatus: 'unmatched' | 'matched' | 'disputed' | 'closed';
+  currencyCode: 'YER';
+  ownerService: 'wlt';
+  dshRole: 'view_only';
+  sourceOrderId?: string;
+  sourceStoreId?: string;
+  sourceCaptainId?: string;
+  sourceFieldAgentId?: string;
+  debitAccountId?: string;
+  creditAccountId?: string;
+  auditTrailId?: string;
+  allowedAction: 'review' | 'view_evidence' | 'prepare_decision' | 'none';
+  blockedReason?: string;
+  expectedSource: 'order-invoice' | 'settlement-cycle' | 'commission-schedule' | 'eligibility-calc' | 'preview-seed';
+  actualSource: 'bank-deposit' | 'wallet-debit' | 'cash-bag-delivery' | 'pos-receipt' | 'preview-seed';
+  evidenceSource: 'bank-statement' | 'pos-log' | 'audit-entry' | 'receipt-upload' | 'none';
+  varianceReason?: string;
+  bankDepositRef?: string;
+  cashBagRef?: string;
+  ledgerEntryRef?: string;
+  workflowState: 'draft' | 'prepared' | 'reviewed' | 'checked' | 'approved' | 'blocked_wlt';
+};
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 type DayLifecycleStage =
@@ -96,7 +136,7 @@ const ACTUAL_SOURCE_LABEL: Record<string, string> = {
 };
 
 function buildPreviewWorkbenchRows(): ReadonlyArray<DshFinancePreviewRow> {
-  return getFallbackWorkbenchRows();
+  return [];
 }
 
 function buildRuntimeWorkbenchRows(runtimeFinance: WltDshFinanceRuntimeResult | null): ReadonlyArray<DshFinancePreviewRow> {

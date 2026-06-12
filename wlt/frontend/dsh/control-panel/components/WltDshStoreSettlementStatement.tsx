@@ -10,7 +10,6 @@ import {
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
 } from '../adapters/wltDshFinanceRuntime.adapter';
-import { getFallbackStoreSettlementStatementsPreview } from '../adapters/wltDshFinanceFallback.adapter';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 const STATUS_LABEL: Record<StoreStatement['status'], string> = {
@@ -176,7 +175,6 @@ function buildRuntimeStoreStatements(runtimeFinance: WltDshFinanceRuntimeResult 
 }
 
 export function WltDshStoreSettlementStatement() {
-  const previewStatements = React.useMemo(() => getFallbackStoreSettlementStatementsPreview(), []);
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
 
   React.useEffect(() => {
@@ -190,7 +188,7 @@ export function WltDshStoreSettlementStatement() {
   }, []);
 
   const runtimeStatements = React.useMemo(() => buildRuntimeStoreStatements(runtimeFinance), [runtimeFinance]);
-  const statements = runtimeStatements.length > 0 ? runtimeStatements : previewStatements;
+  const statements = runtimeStatements;
   const usingRuntime = runtimeStatements.length > 0;
 
   const [activeStoreId, setActiveStoreId] = React.useState<string>(statements[0]?.storeId ?? '');

@@ -5,11 +5,44 @@
 import React from 'react';
 import { Box, Text, useTheme } from '@bthwani/ui-kit';
 import styles from '../../../../../dsh/frontend/control-panel/shared/control-panel-surface.module.css';
-import {
-  getWltDshOrderCommissionBreakdown,
-  WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW,
-} from '../financeContracts';
 import type { WltDshFulfillmentMode } from '../financeContracts';
+
+type LineItemShape = { applies: true; label: string } | { applies: false; reason: string };
+type ModeBreakdown = {
+  fulfillmentModeLabel: string;
+  deliveryFee: LineItemShape;
+  platformCommission: LineItemShape;
+  captainPayout: LineItemShape;
+  partnerCourierCost: LineItemShape;
+  partnerNet: LineItemShape;
+};
+
+const BREAKDOWN_BY_MODE: Record<WltDshFulfillmentMode, ModeBreakdown> = {
+  bthwani_delivery: {
+    fulfillmentModeLabel: 'توصيل بثواني',
+    deliveryFee: { applies: true, label: 'WLT' },
+    platformCommission: { applies: true, label: 'WLT' },
+    captainPayout: { applies: true, label: 'WLT' },
+    partnerCourierCost: { applies: false, reason: 'لا ينطبق — كابتن بثواني هو المسؤول' },
+    partnerNet: { applies: true, label: 'WLT' },
+  },
+  partner_delivery: {
+    fulfillmentModeLabel: 'توصيل المتجر',
+    deliveryFee: { applies: true, label: 'حسب سياسة المتجر' },
+    platformCommission: { applies: true, label: 'WLT' },
+    captainPayout: { applies: false, reason: 'لا ينطبق — لا كابتن في توصيل المتجر' },
+    partnerCourierCost: { applies: true, label: 'حسب اتفاق المتجر' },
+    partnerNet: { applies: true, label: 'WLT' },
+  },
+  pickup: {
+    fulfillmentModeLabel: 'استلام بنفسي',
+    deliveryFee: { applies: false, reason: 'لا رسوم توصيل — العميل يستلم بنفسه' },
+    platformCommission: { applies: true, label: 'WLT' },
+    captainPayout: { applies: false, reason: 'لا ينطبق — لا كابتن في الاستلام الذاتي' },
+    partnerCourierCost: { applies: false, reason: 'لا ينطبق — لا موصل في الاستلام الذاتي' },
+    partnerNet: { applies: true, label: 'WLT' },
+  },
+};
 
 export type CommissionBreakdownWorkspaceProps = {
   orderId?: string;
@@ -34,7 +67,7 @@ type LineItemKey = 'deliveryFee' | 'platformCommission' | 'captainPayout' | 'par
 export function CommissionBreakdownWorkspace({ orderId = '—' }: CommissionBreakdownWorkspaceProps) {
   const { theme } = useTheme();
   const [activeMode, setActiveMode] = React.useState<WltDshFulfillmentMode>('bthwani_delivery');
-  const breakdown = getWltDshOrderCommissionBreakdown(activeMode);
+  const breakdown = BREAKDOWN_BY_MODE[activeMode];
 
   const lineItems: LineItemKey[] = ['deliveryFee', 'platformCommission', 'captainPayout', 'partnerCourierCost', 'partnerNet'];
 
@@ -114,32 +147,10 @@ export function CommissionBreakdownWorkspace({ orderId = '—' }: CommissionBrea
               })}
             </Box>
 
-            <Box gap={2}>
-              <Text role="label" tone="muted" style={{ textAlign: 'right' }}>جدول العمولة — لكل شريك ولكل وضع:</Text>
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', direction: 'rtl' }}>
-                  <thead>
-                    <tr style={{ background: theme.surfaceInset }}>
-                      <th style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 700, color: theme.text }}>الشريك</th>
-                      <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 700, color: theme.text }}>توصيل بثواني</th>
-                      <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 700, color: theme.text }}>توصيل المتجر</th>
-                      <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 700, color: theme.text }}>استلام بنفسي</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {WLT_DSH_PARTNER_MODE_RATE_TABLE_PREVIEW.map((row) => (
-                      <tr key={row.partnerId} style={{ borderTop: `1px solid ${theme.line}` }}>
-                        <td style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 600, color: theme.text }}>{row.storeLabel}</td>
-                        <td style={{ padding: '8px 12px', textAlign: 'center', color: theme.brand }}><Text family="mono">{row.rates.bthwani_delivery}</Text></td>
-                        <td style={{ padding: '8px 12px', textAlign: 'center', color: theme.brand }}><Text family="mono">{row.rates.partner_delivery}</Text></td>
-                        <td style={{ padding: '8px 12px', textAlign: 'center', color: theme.brand }}><Text family="mono">{row.rates.pickup}</Text></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            <Box padding={3} background="surfaceInset" radiusToken="md" border borderTone="line" gap={1}>
+              <Text role="label" weight="bold" style={{ textAlign: 'right' }}>جدول العمولة لكل شريك ولكل وضع</Text>
               <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-                الأرقام الحقيقية per-partner + per-mode تُدار في محرك WLT. هذا العرض هيكلي فقط.
+                في انتظار WLT runtime — معدلات العمولة الفعلية per-partner + per-mode تُدار في محرك WLT ولم تُوصل بعد لهذه الشاشة.
               </Text>
             </Box>
           </Box>

@@ -1,7 +1,6 @@
 import { createWltDshTypedClient, type WltLedgerEntry } from '../contracts';
 import {
 	formatWltYer,
-	getWltFieldFinanceSnapshot,
 	type WltDshFinancePreviewRecord,
 	type WltFieldFinanceSnapshot,
 } from '../control-panel/financeContracts';
@@ -34,7 +33,6 @@ function commissionRecord(entry: WltLedgerEntry): WltDshFinancePreviewRecord {
 export async function getSnapshot(fieldAgentId = DEFAULT_FIELD_AGENT_ID): Promise<WltFieldFinanceSnapshot> {
 	const { entries } = await createWltDshTypedClient({}).listFieldEarnings(fieldAgentId);
 	const records = entries.map(commissionRecord);
-	const fallback = getWltFieldFinanceSnapshot();
 	const totalCommissionMinorUnits = records
 		.filter((r) => r.kind === 'field-commission')
 		.reduce((sum, r) => sum + r.amountMinorUnits, 0);
@@ -43,7 +41,6 @@ export async function getSnapshot(fieldAgentId = DEFAULT_FIELD_AGENT_ID): Promis
 		.reduce((sum, r) => sum + r.amountMinorUnits, 0);
 
 	return {
-		...fallback,
 		records,
 		commissionRecords: records.filter((r) => r.kind === 'field-commission'),
 		pendingRecords: records.filter((r) => r.kind === 'field-commission-pending'),
@@ -58,6 +55,8 @@ export async function getSnapshot(fieldAgentId = DEFAULT_FIELD_AGENT_ID): Promis
 		eligibleFilesCount: records.length,
 		lastPayoutMinorUnits: totalCommissionMinorUnits,
 		lastPayoutLabel: formatWltYer(totalCommissionMinorUnits),
+		lastPayoutDate: '—',
+		nextPayoutDate: '—',
 		contractState: 'CONTRACT_TBD',
 		isPreview: false,
 	};

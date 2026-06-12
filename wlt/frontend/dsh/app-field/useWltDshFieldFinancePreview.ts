@@ -2,7 +2,6 @@ import React from 'react';
 import { wltDshFieldBridgeDataContract } from './wlt-dsh-field.contract';
 import * as WltFieldAdapter from './wlt-dsh-field.adapter';
 import {
-  getWltFieldFinanceSnapshot,
   type WltDshFinancePreviewRecord,
   type WltFieldFinanceSnapshot,
 } from '../control-panel/financeContracts';
@@ -13,7 +12,16 @@ function createStoreIdsKey(storeIds?: readonly string[]) {
 
 export function useWltDshFieldFinancePreview(storeIds?: readonly string[]) {
   const storeIdsKey = createStoreIdsKey(storeIds);
-  const [snapshot, setSnapshot] = React.useState<WltFieldFinanceSnapshot>(() => getWltFieldFinanceSnapshot(storeIds ? [...storeIds] : undefined));
+  const [snapshot, setSnapshot] = React.useState<WltFieldFinanceSnapshot>({
+    records: [], commissionRecords: [], pendingRecords: [], rejectedRecords: [], payoutRecords: [],
+    totalCommissionMinorUnits: 0, totalCommissionLabel: '—',
+    pendingCommissionsMinorUnits: 0, pendingCommissionsLabel: '—',
+    rejectedCommissionsMinorUnits: 0, rejectedCommissionsLabel: '—',
+    eligibleFilesCount: 0,
+    lastPayoutMinorUnits: 0, lastPayoutLabel: '—',
+    lastPayoutDate: '—', nextPayoutDate: '—',
+    contractState: 'CONTRACT_TBD', isPreview: false,
+  });
   const [lastError, setLastError] = React.useState<string | null>(null);
 
   React.useEffect(() => {

@@ -82,6 +82,32 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
     classification: 'DEV_ALLOWED',
     reason: 'Re-exports operational status types from operational-statuses.preview-data. Type-only export — no runtime fixture values. Exit: move type definitions to a pure types file.',
   },
+  // ─── Finance sub-domain: RUNTIME_VIOLATION_FIXED (2026-06-12) ─────────────
+  {
+    file: 'dsh/frontend/data/dshFinancePreview.ts',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'DELETED 2026-06-12. All WLT finance screens now runtime-only. Adapter chain (dshFinanceFixture → wltDshFinanceFallback) removed. No runtime consumers remain.',
+  },
+  {
+    file: 'dsh/frontend/data/finance.preview-data.ts',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'DELETED 2026-06-12. WLT control-panel statement components (Captain/Partner/Field/AccountStatement/RefundLedger/SettlementCalendar/StoreSettlement) converted to runtime-only empty-state pattern.',
+  },
+  {
+    file: 'dsh/frontend/data/wallet.preview-data.ts',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'DELETED 2026-06-12. WltDshWalletControlCenter now uses buildRuntimeWalletRows(runtimeFinance) exclusively. DashFinancePreviewRow type inlined in DailyReconciliationWorkbench.',
+  },
+  {
+    file: 'wlt/frontend/dsh/control-panel/adapters/dshFinanceFixture.adapter.ts',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'DELETED 2026-06-12. Was pass-through bridge from DSH data to WLT adapters. Entire adapter chain removed.',
+  },
+  {
+    file: 'wlt/frontend/dsh/control-panel/adapters/wltDshFinanceFallback.adapter.ts',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'DELETED 2026-06-12. All getFallback* wrappers removed. financeContracts.ts Block1+Block2 removed. App-level hooks/adapters (captain/field/partner/client) use inline zero-state + runtime API only.',
+  },
 ];
 
 // ─── Allowed Import Contexts ──────────────────────────────────────────────────

@@ -14,11 +14,8 @@ import {
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
 } from '../adapters/wltDshFinanceRuntime.adapter';
-import { getFallbackControlPanelFinancePreview } from '../adapters/wltDshFinanceFallback.adapter';
-
 export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string }) {
   const businessDate = new Date().toISOString().split('T')[0]!;
-  const preview = React.useMemo(() => getFallbackControlPanelFinancePreview(), []);
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
 
   React.useEffect(() => {
@@ -35,8 +32,8 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
     if (runtimeFinance?.state === 'runtime') {
       return buildWltRuntimeFinancialCenter(businessDate, runtimeFinance.data);
     }
-    return buildWltFinancialCenter(businessDate, preview.allRecords);
-  }, [businessDate, preview, runtimeFinance]);
+    return buildWltFinancialCenter(businessDate, []);
+  }, [businessDate, runtimeFinance]);
 
   const auditEntries = React.useMemo(() => {
     const blockingVarianceByEntryId = new Map(

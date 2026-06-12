@@ -5,10 +5,9 @@ import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
 import {
-  getWltFieldCommissionStatementsPreview,
   formatWltYer,
-  WltDshFieldCommissionStatement as WltFieldStatement,
-  WltDshFieldCommissionStoreLine as WltStoreLine,
+  type WltDshFieldCommissionStatement as WltFieldStatement,
+  type WltDshFieldCommissionStoreLine as WltStoreLine,
 } from '../financeContracts';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
@@ -30,7 +29,7 @@ export function WltDshFieldCommissionStatement({
 }: {
   agentId?: string;
 }) {
-  const statements = React.useMemo(() => getWltFieldCommissionStatementsPreview(), []);
+  const statements: readonly WltFieldStatement[] = [];
   const statement = React.useMemo(
     () => statements.find((s) => s.fieldAgentId === agentId) || statements[0],
     [statements, agentId],

@@ -17,8 +17,6 @@ import {
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
 } from '../adapters/wltDshFinanceRuntime.adapter';
-import { getFallbackControlPanelFinancePreview } from '../adapters/wltDshFinanceFallback.adapter';
-
 import { FinancialCenterScreen } from './FinancialCenterScreen';
 import { LedgerScreen } from './LedgerScreen';
 import { AuditCloseScreen } from './AuditCloseScreen';
@@ -163,7 +161,6 @@ export function WltDshFinanceHubHost({
     setActiveSubGroup(urlSubGroup ?? subGroup ?? norm.subGroup);
   }, [group, subGroup, panel, urlSubGroup]);
 
-  const financePreview = React.useMemo(() => getFallbackControlPanelFinancePreview(), []);
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
 
   React.useEffect(() => {
@@ -183,8 +180,8 @@ export function WltDshFinanceHubHost({
       return buildWltRuntimeFinancialCenter(businessDate, runtimeFinance.data);
     }
 
-    return buildWltFinancialCenter(businessDate, financePreview.allRecords);
-  }, [financePreview, runtimeFinance]);
+    return buildWltFinancialCenter(businessDate, []);
+  }, [runtimeFinance]);
 
   const runtimeSourceLabel = React.useMemo(() => {
     if (!runtimeFinance) return 'WLT runtime: loading';

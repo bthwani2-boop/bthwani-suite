@@ -1,7 +1,5 @@
 import React from 'react';
 import {
-  getWltCaptainFinanceSnapshot,
-  getWltDshFinanceRecordsForActor,
   type WltCaptainFinanceSection,
   type WltCaptainFinanceSnapshot,
   type WltDshFinancePreviewRecord,
@@ -16,8 +14,20 @@ export function useWltDshCaptainFinancePreview(
 ) {
   const [activeSection, setActiveSection] = React.useState<WltCaptainFinanceSection>(initialSection);
   const [trigger, setTrigger] = React.useState(0);
-  const [snapshot, setSnapshot] = React.useState<WltCaptainFinanceSnapshot>(() => getWltCaptainFinanceSnapshot());
-  const [allRecords, setAllRecords] = React.useState<readonly WltDshFinancePreviewRecord[]>(() => getWltDshFinanceRecordsForActor('captain'));
+  const [snapshot, setSnapshot] = React.useState<WltCaptainFinanceSnapshot>({
+    codLiabilityMinorUnits: 0, codLiabilityLabel: '—',
+    earningsMinorUnits: 0, earningsLabel: '—',
+    settlementMinorUnits: 0, settlementLabel: '—',
+    pendingPayoutMinorUnits: 0, pendingPayoutLabel: '—',
+    cycleLabel: '—',
+    eligibilityBalanceMinorUnits: 0, eligibilityBalanceLabel: '—',
+    minimumEligibilityMinorUnits: 0, minimumEligibilityLabel: '—',
+    isEligible: false,
+    eligibilityShortfallMinorUnits: 0, eligibilityShortfallLabel: '—',
+    hasEligibilityBlock: false, eligibilityBlockReason: '',
+    contractState: 'CONTRACT_TBD', isPreview: false,
+  });
+  const [allRecords, setAllRecords] = React.useState<readonly WltDshFinancePreviewRecord[]>([]);
   const [lastError, setLastError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
