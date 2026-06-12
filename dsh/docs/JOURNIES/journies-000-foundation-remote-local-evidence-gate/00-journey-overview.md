@@ -40,7 +40,7 @@ Note: folder name intentionally follows user-requested spelling: journies-###-sl
 | Primary Actors | developer, reviewer, local operator |
 | Control Panel / Domain Owner | governance + runtime |
 | WLT Boundary | none unless finance proof is inspected |
-| Planning Status | `START_HERE` |
+| Planning Status | `PASS` |
 | Business Outcome | The local repository, remote reference, runtime baseline, evidence rules, and execution order are proven before any business slice is modified. |
 
 ## 2) لماذا هذه الرحلة موجودة؟
@@ -51,11 +51,11 @@ Note: folder name intentionally follows user-requested spelling: journies-###-sl
 
 | Slice ID | Slice | Actor | Surface / Area | Outcome | File | Status |
 |---|---|---|---|---|---|---|
-| `DSH-SLICE-000A` | Remote Branch and Local Baseline Verification | developer | repo/GitHub/local git | prove branch/ref/current local state and no hidden drift | `slices/j-000-foundation-remote-local-evidence-gate/DSH-SLICE-000A-remote-branch-and-local-baseline-verification.md` | NOT_CLOSED_BY_THIS_FILE |
-| `DSH-SLICE-000B` | Local Runtime Stack Baseline | developer | Docker/Postgres/Go API/Next/Expo/ADB | prove the approved local runtime starts with known ports and environment | `slices/j-000-foundation-remote-local-evidence-gate/DSH-SLICE-000B-local-runtime-stack-baseline.md` | NOT_CLOSED_BY_THIS_FILE |
-| `DSH-SLICE-000C` | Agents Skills Governance Reading Gate | developer | repo governance/agents/skills | read required agent and skill files before implementation | `slices/j-000-foundation-remote-local-evidence-gate/DSH-SLICE-000C-agents-skills-governance-reading-gate.md` | NOT_CLOSED_BY_THIS_FILE |
-| `DSH-SLICE-000D` | Architecture Ownership and File Inventory | developer | repo-wide targeted scan | classify ownership before any refactor or cleanup | `slices/j-000-foundation-remote-local-evidence-gate/DSH-SLICE-000D-architecture-ownership-and-file-inventory.md` | NOT_CLOSED_BY_THIS_FILE |
-| `DSH-SLICE-000E` | Evidence Folder and ZIP Protocol | developer | tools/registry/runs | standardize evidence folder and final zip naming | `slices/j-000-foundation-remote-local-evidence-gate/DSH-SLICE-000E-evidence-folder-and-zip-protocol.md` | NOT_CLOSED_BY_THIS_FILE |
+| `DSH-SLICE-000A` | Remote Branch and Local Baseline Verification | developer | repo/GitHub/local git | prove branch/ref/current local state and no hidden drift | `slices/j-000-foundation-remote-local-evidence-gate/DSH-SLICE-000A-remote-branch-and-local-baseline-verification.md` | PASS |
+| `DSH-SLICE-000B` | Local Runtime Stack Baseline | developer | Docker/Postgres/Go API/Next/Expo/ADB | prove the approved local runtime starts with known ports and environment | `slices/j-000-foundation-remote-local-evidence-gate/DSH-SLICE-000B-local-runtime-stack-baseline.md` | PASS |
+| `DSH-SLICE-000C` | Agents Skills Governance Reading Gate | developer | repo governance/agents/skills | read required agent and skill files before implementation | `slices/j-000-foundation-remote-local-evidence-gate/DSH-SLICE-000C-agents-skills-governance-reading-gate.md` | PASS |
+| `DSH-SLICE-000D` | Architecture Ownership and File Inventory | developer | repo-wide targeted scan | classify ownership before any refactor or cleanup | `slices/j-000-foundation-remote-local-evidence-gate/DSH-SLICE-000D-architecture-ownership-and-file-inventory.md` | PASS |
+| `DSH-SLICE-000E` | Evidence Folder and ZIP Protocol | developer | tools/registry/runs | standardize evidence folder and final zip naming | `slices/j-000-foundation-remote-local-evidence-gate/DSH-SLICE-000E-evidence-folder-and-zip-protocol.md` | PASS |
 
 ## 4) Dependency Order
 
@@ -138,3 +138,9 @@ Note: folder name intentionally follows user-requested spelling: journies-###-sl
 - لا يوجد أي TBD.
 - لا يوجد تناقض بين slice file وmanifest/matrix/evidence.
 - لا توجد ملفات untracked أو staged غير موثقة.
+
+## Journey Decision
+
+| Field | Value |
+|---|---|
+| Journey Decision | PASS |

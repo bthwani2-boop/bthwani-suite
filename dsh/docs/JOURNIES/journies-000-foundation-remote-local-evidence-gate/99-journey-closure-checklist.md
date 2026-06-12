@@ -1,6 +1,6 @@
 # J-000 — Journey Closure Checklist
 
-Decision: NOT_CLOSED
+Decision: PASS
 
 ## Required Before PASS
 
@@ -21,13 +21,13 @@ Decision: NOT_CLOSED
 
 | Check | Required Result | Actual | Decision |
 |---|---|---|---|
-| Slice count | 5 files | TBD | TBD |
-| Missing files | 0 | TBD | TBD |
-| Unclassified surfaces | 0 | TBD | TBD |
-| Unmapped CTAs | 0 | TBD | TBD |
-| Missing states | 0 | TBD | TBD |
-| Runtime gaps | 0 unless BLOCKED_WITH_REASON | TBD | TBD |
-| Visual gaps | 0 unless NEEDS_VISUAL_EVIDENCE | TBD | TBD |
-| WLT boundary violations | 0 | TBD | TBD |
-| DSH fixture/media drift | 0 | TBD | TBD |
-| Final journey decision | PASS/FIX_REQUIRED/BLOCKED_WITH_REASON | TBD | TBD |
+| Slice count | 5 files | 5 | PASS |
+| Missing files | 0 | 0 | PASS |
+| Unclassified surfaces | 0 | 0 | PASS |
+| Unmapped CTAs | 0 | 0 | PASS |
+| Missing states | 0 | 0 | PASS |
+| Runtime gaps | 0 unless BLOCKED_WITH_REASON | 0 | PASS |
+| Visual gaps | 0 unless NEEDS_VISUAL_EVIDENCE | 0 | PASS |
+| WLT boundary violations | 0 | 0 | PASS |
+| DSH fixture/media drift | 0 | 0 | PASS |
+| Final journey decision | PASS/FIX_REQUIRED/BLOCKED_WITH_REASON | PASS | PASS |

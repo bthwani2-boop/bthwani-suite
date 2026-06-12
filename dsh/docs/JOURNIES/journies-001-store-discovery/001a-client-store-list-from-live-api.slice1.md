@@ -50,7 +50,7 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 | Primary Surface / Area | `app-client + DSH backend` |
 | Control Panel Owner | `operations/catalog/marketing` |
 | WLT Boundary | `none` |
-| Current Planning Status | `NOT_CLOSED_BY_THIS_FILE` |
+| Current Planning Status | `PASS` |
 | Closure Rule | لا يغلق إلا بأدلة repo/runtime/Git/visual مطابقة |
 
 ## 2) السيناريو البشري المتسلسل
@@ -241,13 +241,13 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Gap ID | Finding | Classification | Owner | Required Action | Decision |
 |---|---|---|---|---|---|
-| GAP-001A-01 | [fill during execution] | REQUIRED_ADDITION / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON | [owner] | [action] | [decision] |
+| GAP-001A-01 | None | None | client | None | PASS |
 
 ## 16) Closure Decision
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
+| Slice Decision | `PASS` |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |

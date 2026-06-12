@@ -18,8 +18,6 @@ import {
 
 export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
 
-import { PARTNER_STORES_PREVIEW } from '../../data';
-
 // Minimal API response shape from GET /stores (DiscoveryStore in dsh.openapi.yaml)
 type ApiDiscoveryStore = {
   id: string;
@@ -80,45 +78,16 @@ function mapApiStoreToCpRow(s: ApiDiscoveryStore): CpStoreRow {
   };
 }
 
-const PREVIEW_STORES: CpStoreRow[] = [
-  ...PARTNER_STORES_PREVIEW,
-  {
-    id: 'store-1001',
-    name: 'Haddah Central Market',
-    branch: 'Sanaa',
-    status: 'مفتوح',
-    deliveryMode: 'bthwani_delivery' as const,
-    prepTime: '15 دقيقة',
-    readyOrders: 2,
-    issue: '',
-    suggestion: {
-      label: 'لا تدخل مطلوب',
-      reason: 'وضع المتجر مستقر',
-      confidence: 'high' as const,
-      action: 'عرض التفاصيل',
-      secondary: null,
-      auditRequired: false,
-    },
-    statusTone: 'success' as const,
-  },
-];
-
 export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: PartnerStoresScreenProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlStoreId = searchParams.get('orderId') ?? null;
   const [selectedStoreId, setSelectedStoreId] = React.useState<string | null>(null);
-  const [storesSource, setStoresSource] = React.useState<'preview' | 'api' | 'api-error' | 'offline'>('preview');
+  const [storesSource, setStoresSource] = React.useState<'loading' | 'api' | 'api-error' | 'offline'>('loading');
   const [retryCount, setRetryCount] = React.useState(0);
   const retry = React.useCallback(() => setRetryCount((n) => n + 1), []);
 
-  const [rows, setRows] = React.useState(() =>
-    PREVIEW_STORES.map((store) => ({
-      ...store,
-      customStatus: null as string | null,
-      customStatusTone: null as 'warning' | 'success' | 'danger' | 'neutral' | null,
-    }))
-  );
+  const [rows, setRows] = React.useState<Array<CpStoreRow & { customStatus: string | null; customStatusTone: 'warning' | 'success' | 'danger' | 'neutral' | null }>>([]);
 
   // Fetch live stores from GET /stores — replaces preview list when API is reachable
   React.useEffect(() => {
@@ -227,51 +196,67 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
     [],
   );
 
-  const handleTriggerAction = React.useCallback((storeId: string, actionLabel: string) => {
+  const handleTriggerAction = React.useCallback(async (storeId: string, actionLabel: string) => {
     setActionStatus('pending');
     setActionFeedback(null);
 
-    setTimeout(() => {
+    if (actionLabel === 'تواصل' || actionLabel === 'تواصل مع المتجر') {
       setActionStatus('success');
-
-      let feedback = `تمت عملية (${actionLabel}) بنجاح.`;
-      let statusUpdate: string | null = null;
-      let statusToneUpdate: 'warning' | 'success' | 'danger' | 'neutral' | null = null;
-
-      if (actionLabel === 'إيقاف مؤقت' || actionLabel === 'إيقاف استقبال') {
-        statusUpdate = 'موقف مؤقتاً';
-        statusToneUpdate = 'danger';
-        feedback = 'تم إيقاف استقبال الطلبات للمتجر مؤقتاً بنجاح.';
-      } else if (actionLabel === 'تحديث الجاهزية' || actionLabel === 'مستقر' || actionLabel === 'تنشيط استقبال') {
-        statusUpdate = 'مفتوح';
-        statusToneUpdate = 'success';
-        feedback = 'تم تحديث حالة جاهزية المتجر إلى مستقر بنجاح.';
-      } else if (actionLabel === 'تواصل' || actionLabel === 'تواصل مع المتجر') {
-        feedback = 'تم بدء تواصل الدعم الفوري مع إدارة المتجر بنجاح.';
-      }
-
-      setActionFeedback(feedback);
-
+      setActionFeedback('تم بدء تواصل الدعم الفوري مع إدارة المتجر.');
       setTimeout(() => {
-        if (statusUpdate) {
-          setRows((prevRows) =>
-            prevRows.map((r) =>
-              r.id === storeId
-                ? {
-                    ...r,
-                    customStatus: statusUpdate,
-                    customStatusTone: statusToneUpdate,
-                  }
-                : r
-            )
-          );
-        }
+        setActionStatus('idle');
+        setActionFeedback(null);
+      }, 1500);
+      return;
+    }
+
+    const baseUrl = resolveDshStoreVisibilityBaseUrl();
+    if (!baseUrl) {
+      setActionStatus('idle');
+      setActionFeedback('لم يُعثر على عنوان API — تحقق من NEXT_PUBLIC_DSH_API_BASE_URL.');
+      return;
+    }
+
+    try {
+      const client = createDshStoreVisibilityHttpClient(baseUrl);
+      const isPause = actionLabel === 'إيقاف مؤقت' || actionLabel === 'إيقاف استقبال';
+      const nextReadiness = isPause ? ('paused' as const) : ('ready' as const);
+      const res = await client.updatePartnerReadiness(storeId, nextReadiness);
+
+      const isNowPaused = res.partner_readiness_status === 'paused';
+      const newStatus = isNowPaused ? 'موقف مؤقتاً' : 'مفتوح';
+      const newStatusTone = (isNowPaused ? 'danger' : 'success') as 'danger' | 'success';
+
+      setRows((prevRows) =>
+        prevRows.map((r) =>
+          r.id === storeId
+            ? { ...r, customStatus: newStatus, customStatusTone: newStatusTone }
+            : r
+        )
+      );
+      setActionStatus('success');
+      setActionFeedback(
+        isNowPaused
+          ? 'تم إيقاف استقبال الطلبات مؤقتاً.'
+          : 'تم تنشيط استقبال الطلبات.',
+      );
+      setTimeout(() => {
         setActionStatus('idle');
         setActionFeedback(null);
         setSelectedStoreId(null);
         router.push(buildOperationsHref('partner-stores'));
       }, 1200);
-    }, 1000);
+    } catch (err: unknown) {
+      const typedErr = err as { kind?: string; status?: number };
+      const msg =
+        typedErr.kind === 'offline'
+          ? 'لا يوجد اتصال بالشبكة.'
+          : typedErr.kind === 'http'
+            ? `خطأ من الخادم (${typedErr.status}).`
+            : 'حدث خطأ غير متوقع.';
+      setActionStatus('idle');
+      setActionFeedback(msg);
+    }
   }, [router]);
 
   // Inspector component
@@ -503,9 +488,9 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
             ⚠ API غير متاح — بيانات معاينة
           </span>
         )}
-        {storesSource === 'preview' && (
+        {storesSource === 'loading' && (
           <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)' }}>
-            بيانات معاينة — API غير مهيأ
+            جارٍ التحميل من API...
           </span>
         )}
       </div>

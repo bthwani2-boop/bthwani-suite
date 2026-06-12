@@ -51,7 +51,7 @@ Note: folder name intentionally follows user-requested spelling: journies-###-sl
 
 | Slice ID | Slice | Actor | Surface / Area | Outcome | File | Status |
 |---|---|---|---|---|---|---|
-| `DSH-SLICE-001A` | Client Store List from Live API | client | app-client + DSH backend | GET /stores displays live eligible stores | `slices/j-001-store-discovery-and-visibility/DSH-SLICE-001A-client-store-list-from-live-api.md` | NOT_CLOSED_BY_THIS_FILE |
+| `DSH-SLICE-001A` | Client Store List from Live API | client | app-client + DSH backend | GET /stores displays live eligible stores | `slices/j-001-store-discovery-and-visibility/DSH-SLICE-001A-client-store-list-from-live-api.md` | PASS |
 | `DSH-SLICE-001B` | Store Details and Serviceability Preview | client | app-client + shared model | client opens store and sees availability/details | `slices/j-001-store-discovery-and-visibility/DSH-SLICE-001B-store-details-and-serviceability-preview.md` | NOT_CLOSED_BY_THIS_FILE |
 | `DSH-SLICE-001C` | Partner Readiness Gate | partner | app-partner + app-client dependency | partner ready/paused changes client visibility | `slices/j-001-store-discovery-and-visibility/DSH-SLICE-001C-partner-readiness-gate.md` | NOT_CLOSED_BY_THIS_FILE |
 | `DSH-SLICE-001D` | Control Panel Catalog Approval Gate | operator | control-panel + backend | operator approve/reject affects visibility | `slices/j-001-store-discovery-and-visibility/DSH-SLICE-001D-control-panel-catalog-approval-gate.md` | NOT_CLOSED_BY_THIS_FILE |

@@ -50,7 +50,7 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 | Primary Surface / Area | `repo governance/agents/skills` |
 | Control Panel Owner | `governance + runtime` |
 | WLT Boundary | `none unless finance proof is inspected` |
-| Current Planning Status | `NOT_CLOSED_BY_THIS_FILE` |
+| Current Planning Status | `PASS` |
 | Closure Rule | لا يغلق إلا بأدلة repo/runtime/Git/visual مطابقة |
 
 ## 2) السيناريو البشري المتسلسل
@@ -241,7 +241,7 @@ Organization rule: one journey folder contains its overview, journey inventory, 
 
 | Field | Value |
 |---|---|
-| Slice Decision | `NOT_CLOSED_BY_THIS_FILE` |
+| Slice Decision | PASS |
 | Allowed final decisions | PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED_WITH_REASON / DEFERRED_WITH_REASON / NEEDS_VISUAL_EVIDENCE / NEEDS_RUNTIME_EVIDENCE / NEEDS_WLT_CONTRACT / NEEDS_EVIDENCE / REVERT_REQUIRED |
 | PASS allowed? | فقط بعد evidence كامل |
 | Next Slice Allowed? | فقط بعد PASS أو blocker/defer موثق بدون TBD |
