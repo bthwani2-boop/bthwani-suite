@@ -1,12 +1,10 @@
 // Authority: control-panel/marketing — banner domain types and constants.
 // Extracted from BannersCommandDeckScreen as part of Giant Screen split.
 
-import type {
-  MarketingBannerAudience,
-  MarketingBannerStatus,
-  MarketingBannerActionType,
-  MarketingBannerMotionStyle,
-} from '../../data/legacy-preview/marketing.preview-data';
+type MarketingBannerActionType = 'main_category' | 'sub_category' | 'store' | 'store_category' | 'product' | 'external' | 'subscription';
+type MarketingBannerAudience = 'home' | 'stores' | 'client' | 'all';
+type MarketingBannerStatus = 'draft' | 'published';
+type MarketingBannerMotionStyle = 'slide' | 'soft-parallax' | 'subtle-fade' | 'snap-focus';
 
 export type BannerDraft = Record<
   | 'title'

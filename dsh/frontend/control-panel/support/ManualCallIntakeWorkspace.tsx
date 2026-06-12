@@ -4,12 +4,11 @@ import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box } from '@bthwani/ui-kit';
 import { WebControlPanelDecisionRow, WebControlPanelKpiStrip } from '@bthwani/ui-kit/web';
-import {
-  DSH_CALL_INTAKE_PREVIEW,
-  getDshCallIntakeByContext,
-  getDshCallIntakePreview,
-  type DshCallIntakePreview,
-} from '../../data/legacy-preview/support.preview-data';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DshCallIntakePreview = Record<string, any>;
+const DSH_CALL_INTAKE_PREVIEW: DshCallIntakePreview[] = [];
+function getDshCallIntakeByContext(_ctx: unknown): DshCallIntakePreview | null { return null; }
+function getDshCallIntakePreview(_id: string): DshCallIntakePreview | undefined { return undefined; }
 import type {
   DshGlobalControlLink,
   DshRouteHintedAction,

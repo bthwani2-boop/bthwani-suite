@@ -14,7 +14,6 @@ import {
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
 import { translateDshRuntimeBindingStatus } from '../shared';
-import { getMarketingReviewItems, approveMediaReviewItem, requestMediaFix, rejectMediaReviewItem, sendMediaToCatalog } from '../../data/legacy-preview/marketing.preview-data';
 import { ApprovalRecord, ApprovalStage, isPartnerOwnedException, resolveApprovalStageMeta, resolveNextOwner, translateEntityType, translateOwner, translateStage } from '../../shared/workflow';
 import { getMarketingPermissionResult } from '../../shared/dsh-role-permission.model';
 
@@ -111,7 +110,7 @@ export function MarketingReviewQueue() {
   const [actionMessage, setActionMessage] = React.useState('اختر عنصرًا من الصف لمراجعة قرار التسويق الحالي.');
   const [confirmPending, setConfirmPending] = React.useState<{ action: 'approve' | 'reject' | 'fix' | 'catalog'; label: string } | null>(null);
 
-  const refresh = () => setItems(getMarketingReviewItems());
+  const refresh = () => setItems([]);
 
   React.useEffect(() => {
     refresh();
@@ -123,16 +122,7 @@ export function MarketingReviewQueue() {
     }
   }, [items, selectedId]);
 
-  const handleAction = (id: string, action: 'approve' | 'reject' | 'fix' | 'catalog') => {
-    if (action === 'approve') {
-      approveMediaReviewItem(id);
-    } else if (action === 'reject') {
-      rejectMediaReviewItem(id);
-    } else if (action === 'fix') {
-      requestMediaFix(id);
-    } else if (action === 'catalog') {
-      sendMediaToCatalog(id);
-    }
+  const handleAction = (_id: string, _action: 'approve' | 'reject' | 'fix' | 'catalog') => {
     refresh();
   };
 

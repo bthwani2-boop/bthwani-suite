@@ -8,7 +8,6 @@ import {
   WebControlPanelQueue,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
-import { AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW } from '../../data/legacy-preview/orders.preview-data';
 import { Box } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
 import { getDynamicUiAudits, resolveAuditEntry } from '../../shared';
@@ -21,13 +20,12 @@ export type AuditSupportSlaScreenProps = { hubHref: string; subGroup?: string; }
 
 export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }: AuditSupportSlaScreenProps) {
   const router = useRouter();
-  const preview = AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW;
   const [detailOrderId, setDetailOrderId] = React.useState<string | null>(null);
   const supportGovernance = getDshControlPanelGovernanceEntry('support');
   const platformGovernance = getDshControlPanelGovernanceEntry('platform');
 
   const dynamicAudits = getDynamicUiAudits();
-  const allAudits = [...dynamicAudits, ...preview.audits];
+  const allAudits = [...dynamicAudits];
 
   const [retryCount, setRetryCount] = React.useState(0);
   const [runtimeAuditState, setRuntimeAuditState] = React.useState<{
@@ -66,8 +64,8 @@ export function AuditSupportSlaScreen({ hubHref: _hubHref, subGroup: _subGroup }
 
   const summaryKpi = [
     { id: 'runtime-audit', label: 'تدقيقات Runtime', value: loaded ? String(runtimeAuditState.orders.length) : '—', tone: 'warning' as const },
-    { id: 'audits', label: 'التدقيقات اليدوية', value: String(preview.summary.manualAudits + dynamicAudits.length), tone: 'neutral' as const },
-    { id: 'sla', label: 'خطر SLA', value: String(preview.summary.slaRisk), tone: 'danger' as const },
+    { id: 'audits', label: 'التدقيقات اليدوية', value: String(dynamicAudits.length), tone: 'neutral' as const },
+    { id: 'sla', label: 'خطر SLA', value: '0', tone: 'danger' as const },
     { id: 'source', label: 'مصدر البيانات', value: loaded ? 'DSH Runtime' : runtimeAuditState.offline ? 'Offline' : runtimeAuditState.error ? 'Error' : 'Loading…', tone: loaded ? 'success' as const : 'warning' as const },
   ];
 

@@ -1,32 +1,39 @@
 'use client';
 
-// OpsOrderDetailPanel — approval queue detail view for the control-panel operations hub.
-// Data ownership:
-//   approval orders   → dsh/frontend/data/legacy-preview/orders.preview-data.ts  (getDshOpsApprovalQueuePreview)
-//   support tickets   → dsh/frontend/data/legacy-preview/support.preview-data.ts (getDshOpsApprovalChatTicket)
-// This surface owns only rendering logic; zero fixture data lives here.
-
 import React from 'react';
 import { useTheme, Text } from '@bthwani/ui-kit';
 import type { DshOperationsDecisionKind } from '../../shared/dsh-order-journey.model';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import type { DshFulfillmentOperationalMode } from './operations.types';
-import { getDshOpsApprovalQueuePreview, type DshOpsApprovalOrder } from '../../data/legacy-preview/orders.preview-data';
-import { getDshOpsApprovalChatTicket } from '../../data/legacy-preview/support.preview-data';
+
+export type DshOpsApprovalOrder = {
+  id: (string);
+  fulfillmentMode: (string);
+  pickupAddress: (string);
+  dropoffAddress: (string);
+  customerName: (string);
+  customerPhone: (string);
+  storeName: (string);
+  paymentMethod: (string);
+  paymentStatus: (string);
+  couponCode?: (string);
+  customerNote?: (string);
+  customerInstructions?: (string);
+  cartItems: { title: (string); priceLabel: (string); qty: (number) }[];
+  totalLabel: (string);
+  eventLog: { status: (string); actor: (string); timestamp: (string) }[];
+};
 
 export type PendingApprovalOrder = DshOpsApprovalOrder;
 
 type OpsDecision = DshOperationsDecisionKind;
 
-/** Props for OpsOrderDetailPanel. Extracted to avoid inline anonymous type detection by guards. */
 type OpsOrderDetailPanelProps = {
   readonly order: DshOpsApprovalOrder;
   readonly onDecision: (orderId: string, decision: OpsDecision, note: string) => void;
 };
 
-// Re-export canonical approval queue for consumers (LiveOrdersScreen, etc.)
-export { getDshOpsApprovalQueuePreview as getOpsApprovalOrders };
-export const PENDING_APPROVAL_ORDERS = getDshOpsApprovalQueuePreview();
+export const PENDING_APPROVAL_ORDERS: DshOpsApprovalOrder[] = [];
 
 
 // React.memo — re-renders only when order ref or onDecision callback ref changes.
@@ -86,7 +93,15 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
     color: theme.textInverse,
   });
 
-  const ticketData = getDshOpsApprovalChatTicket(order.id);
+  const ticketData = {
+    ticketId: '—',
+    statusTone: 'neutral' as const,
+    status: '—',
+    type: '—',
+    description: '—',
+    attachmentRef: null as string | null,
+    chatHistory: [] as { sender: string; time: string; text: string }[],
+  };
 
   return (
     <div style={{ border: `1px solid ${theme.line}`, borderRadius: '14px', padding: '20px', background: theme.surfaceRaised, display: 'flex', flexDirection: 'column', gap: '16px', direction: 'rtl', textAlign: 'right' }}>

@@ -8,7 +8,6 @@ import {
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
-import { ADMIN_ROLES, PLATFORM_PERMISSIONS, MOCK_USERS } from '../../data/legacy-preview/platform.preview-data';
 import type { AdminRole, MockAdminUser, AdminUserStatus } from './administration.types';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import {
@@ -20,6 +19,11 @@ import {
 } from '../../shared/dsh-role-permission.model';
 import type { DshRoleId } from '../../shared/dsh-role-permission.model';
 import styles from '../shared/control-panel-surface.module.css';
+
+const ADMIN_ROLES: AdminRole[] = [];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PLATFORM_PERMISSIONS: Record<string, any>[] = [];
+const MOCK_USERS: MockAdminUser[] = [];
 
 type AdminWorkspaceId = 'overview' | 'roles' | 'users' | 'approval-chain' | 'maker-checker' | 'sensitive-decisions';
 

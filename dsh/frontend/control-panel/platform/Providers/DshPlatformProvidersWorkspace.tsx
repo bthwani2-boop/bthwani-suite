@@ -3,7 +3,8 @@
 import React from 'react';
 import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
-import { PREVIEW_PROVIDER_RECORDS } from '../../../data/legacy-preview/platform.preview-data';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PREVIEW_PROVIDER_RECORDS: Record<string, any>[] = [];
 import { useDemoPlatformState } from '../useDemoPlatformState';
 import styles from '../../shared/control-panel-surface.module.css';
 
@@ -127,6 +128,7 @@ export function DshPlatformProvidersWorkspace({ activeFilter }: { activeFilter: 
   }, [activeFilter]);
 
   const selectedRecord = PREVIEW_PROVIDER_RECORDS.find((r) => r.id === selectedProviderId) || PREVIEW_PROVIDER_RECORDS[0];
+  if (!selectedRecord) return null;
 
   const currentRecordState = providerStates[selectedRecord.id] || {
     statusLabel: resolveProviderStatusLabel(selectedRecord.status),

@@ -5,16 +5,13 @@ import { StyleSheet, View } from 'react-native';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import { useRouter } from 'next/navigation';
-import {
-  getGrowthRecommendations,
-  type GrowthRecommendation,
-} from '../../data/legacy-preview/marketing.preview-data';
+type GrowthRecommendation = { id: string; type: string; severity: string; [key: string]: unknown };
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
-import { getPartnerOfferItems } from '../../data/legacy-preview/offers.preview-data';
 import type { CampaignRecord } from '../../shared/dsh-marketing-types';
 import type { PartnerOfferRecord } from '../../shared/dsh-partner-offer-types';
-import type { SubscriptionPlan, Entitlement } from '../../data/legacy-preview/subscriptions.preview-data';
+type SubscriptionPlan = { id: (string); name: (string); monthlyFee: (number); features: string[]; status: (string) };
+type Entitlement = { id: string; type: string; referenceId: string; status: string; source: string };
 
 
 
@@ -111,7 +108,7 @@ function getActionTabLabel(tab: string): string {
 export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab }: GrowthCommandDeckScreenProps) {
   const { theme } = useTheme();
   const router = useRouter();
-  const recommendations = React.useMemo(() => getGrowthRecommendations(), []);
+  const recommendations = React.useMemo<GrowthRecommendation[]>(() => [], []);
   const [selectedRecId, setSelectedRecId] = React.useState<string | null>(recommendations[0]?.id || null);
   const [recommendationsPage, setRecommendationsPage] = React.useState(1);
   const sortedRecommendations = React.useMemo(
@@ -157,7 +154,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
 
   const parityContext = React.useMemo(() => ({
     storeId: 'preview-store-1',
-    activeOffers: getPartnerOfferItems().filter(o => o.status === 'published').slice(0, 2) as PartnerOfferRecord[],
+    activeOffers: [] as PartnerOfferRecord[],
     activeSubscriptions: [{ id: 'sub-pro', name: 'اشتراك برو', monthlyFee: 0, features: [], status: 'active' }] as SubscriptionPlan[],
     activeEntitlements: [{ id: 'ent-1', type: 'loyalty-reward', referenceId: 'sub-pro', status: 'active', source: 'loyalty' }] as Entitlement[],
     activeCampaigns: [] as CampaignRecord[],

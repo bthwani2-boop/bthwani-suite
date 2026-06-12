@@ -7,7 +7,24 @@ import React from 'react';
 import { Box, Button, Chip, KeyValueList, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import { resolveDshProductClientVisibility } from '../../shared/dsh-client-visibility.model';
-import { PublishGateStatus, CatalogPublishGateRecord, demoPublishGateRecord } from '../../data/legacy-preview/publishing-gates.preview-data';
+type PublishGateStatus = 'not-started' | 'in-review' | 'approved' | 'rejected' | 'published';
+type CatalogPublishGateRecord = {
+  id: string;
+  catalogLabel: string;
+  partnerLabel: string;
+  status: PublishGateStatus;
+  itemCount: number;
+  approvedItemCount: number;
+  auditRequired: boolean;
+  approvalStatus?: string;
+  partnerActivationStatus?: string;
+  deliveryModesReady?: boolean;
+  serviceabilityAvailable?: boolean;
+  catalogPublished?: boolean;
+  categoryMappingStatus?: string;
+  duplicateStatus?: string;
+  mediaPolicySatisfied?: boolean;
+};
 
 
 // Gate action result — SCAFFOLD
@@ -51,13 +68,17 @@ export type ListingGovernanceScreenProps = {
 };
 
 export function ListingGovernanceScreen({
-  record = demoPublishGateRecord,
+  record,
   onApproveForPublish,
   onReject,
   onRequestRevision,
 }: ListingGovernanceScreenProps) {
   const { theme } = useTheme();
   const [gateActionResult, setGateActionResult] = React.useState<GateActionResult>(null);
+
+  if (!record) {
+    return null;
+  }
 
   const readinessPercent = Math.round((record.approvedItemCount / record.itemCount) * 100);
 

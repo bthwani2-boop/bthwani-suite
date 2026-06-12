@@ -8,9 +8,6 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import {
-  DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW,
-} from '../../data/legacy-preview/orders.preview-data';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order-preview.contract';
 import {
@@ -103,14 +100,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   const [retryCount, setRetryCount] = React.useState(0);
   const retry = React.useCallback(() => setRetryCount((n) => n + 1), []);
 
-  const [rows, setRows] = React.useState<DispatchRowState[]>(() =>
-    DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.rows.map((row) => ({
-      ...row,
-      assignedCaptain: null as string | null,
-      customStatus: null as string | null,
-      customStatusTone: null as 'warning' | 'success' | 'danger' | 'neutral' | null,
-    }))
-  );
+  const [rows, setRows] = React.useState<DispatchRowState[]>(() => []);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -206,7 +196,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
 
   const summaryKpi = [
     { id: 'waiting', label: 'بانتظار الإسناد', value: String(rows.filter(r => !r.assignedCaptain && r.statusTone !== 'danger').length), tone: 'danger' as const },
-    { id: 'captains', label: 'كباتن متاحون', value: runtimeLoaded ? '—' : String(DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.summary.availableCaptains), tone: 'success' as const },
+    { id: 'captains', label: 'كباتن متاحون', value: '—', tone: 'success' as const },
     { id: 'source', label: 'مصدر البيانات', value: runtimeLoaded ? 'DSH Runtime' : 'Preview', tone: runtimeLoaded ? 'success' as const : 'warning' as const },
     { id: 'blockers', label: 'معوقات الإسناد', value: String(rows.filter(r => r.statusTone === 'danger').length), tone: 'warning' as const },
   ];

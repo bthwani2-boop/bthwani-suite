@@ -8,11 +8,6 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import {
-  DSH_ASSISTED_ORDER_PREVIEW,
-  getDshAssistedOrderByContext,
-} from '../../data/legacy-preview/orders.preview-data';
-import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/legacy-preview/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import styles from '../shared/control-panel-surface.module.css';
@@ -53,18 +48,14 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [desks, setDesks] = React.useState(() => [...DSH_ASSISTED_ORDER_PREVIEW]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [desks, setDesks] = React.useState<any[]>(() => []);
   // null = no selection = full width queue
   const [selectedDeskId, setSelectedDeskId] = React.useState<string | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const matchedDesk = getDshAssistedOrderByContext({
-      deskId: searchParams.get('deskId'),
-      orderId: searchParams.get('orderId'),
-      customerId: searchParams.get('customerId'),
-      ticketId: searchParams.get('ticketId'),
-    });
+    const matchedDesk: { deskId: string } | null = null;
     if (matchedDesk) {
       setSelectedDeskId(matchedDesk.deskId);
     }
@@ -76,7 +67,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
   );
 
   const relevantPlaybook = React.useMemo(
-    () => DSH_OPS_INTERVENTION_PLAYBOOKS.find((p) => p.triggerFlowIds.includes('assisted-order-desk')),
+    () => undefined,
     [],
   );
 

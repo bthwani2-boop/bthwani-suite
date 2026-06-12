@@ -5,19 +5,17 @@ import { Text } from '@bthwani/ui-kit';
 import marketingStyles from './control-panel-marketing.module.css';
 import styles from '../shared/control-panel-surface.module.css';
 import { dshPromotionCandidates } from '../../shared/workflow';
-import {
-  getCampaignItems,
-  type CampaignAudience,
-  type CampaignPlacement,
-  type CampaignRecord,
-  type CampaignStatus,
-  type CampaignTargetType,
-} from '../../data/legacy-preview/marketing.preview-data';
-import {
-  getPartnerOfferItems,
-  type PartnerOfferRecord,
-  type PartnerOfferStatus,
-} from '../../data/legacy-preview/offers.preview-data';
+import type {
+  CampaignAudience,
+  CampaignPlacement,
+  CampaignRecord,
+  CampaignStatus,
+  CampaignTargetType,
+} from '../../shared/dsh-marketing-types';
+import type {
+  PartnerOfferRecord,
+  PartnerOfferStatus,
+} from '../../shared/dsh-partner-offer-types';
 import {
   buildCommercialProjection,
   evaluateCommercialConflicts,
@@ -310,8 +308,8 @@ export function VisibilityCommandDeckScreen({
   productGates,
   setProductGates,
 }: VisibilityCommandDeckScreenProps) {
-  const partnerOfferRecords = getPartnerOfferItems();
-  const campaignRecords = getCampaignItems();
+  const partnerOfferRecords: PartnerOfferRecord[] = [];
+  const campaignRecords: CampaignRecord[] = [];
   const partnerOfferRows = partnerOfferRecords.map((offer) => ({
     offer,
     visibility: getPartnerOfferVisibilityRecord(offer, { targetSurface: 'control-panel' }),

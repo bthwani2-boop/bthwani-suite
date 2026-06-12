@@ -3,16 +3,16 @@ import { View } from 'react-native';
 import { Box, Button, SelectField, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
 import type { VideoDraft, EditorWorkspaceTab } from './video-types';
 import { TARGET_TYPE_OPTIONS } from './video-types';
-import { dshCategoryFixtures } from '../../data/legacy-preview/categories.preview-data';
-import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/legacy-preview/stores.preview-data';
-import {
-  upsertMarketingVideoItem,
-  type MarketingVideoRecord,
-  type MarketingVideoStatus,
-  type MarketingVideoAudience,
-  type MarketingVideoSource,
-  type MarketingVideoTargetType,
-} from '../../data/legacy-preview/marketing.preview-data';
+const dshCategoryFixtures: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
+const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
+const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
+type MarketingVideoStatus = 'published' | 'draft' | 'review' | 'paused';
+type MarketingVideoAudience = 'all' | 'client' | 'operations';
+type MarketingVideoSource = 'marketing' | 'partner';
+type MarketingVideoTargetType = 'home' | 'stores' | 'store' | 'category' | 'subcategory' | 'product' | 'offer' | 'campaign' | 'search' | 'custom' | 'loyalty';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MarketingVideoRecord = Record<string, any>;
+function upsertMarketingVideoItem(_item: unknown): void {}
 import type { MarketingPermission } from './marketing-permissions.contract';
 
 interface VideoEditorSectionProps {

@@ -4,7 +4,9 @@ import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebControlPanelWorkspaceTabs } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
-import { PREVIEW_TOP_SERVICES, type PlatformTopService } from '../../../data/legacy-preview/platform.preview-data';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PlatformTopService = Record<string, any>;
+const PREVIEW_TOP_SERVICES: PlatformTopService[] = [];
 import styles from '../../shared/control-panel-surface.module.css';
 
 export function DshPlatformServicesWorkspace({ activeFilter }: { activeFilter: string }) {
@@ -44,6 +46,7 @@ export function DshPlatformServicesWorkspace({ activeFilter }: { activeFilter: s
     : PREVIEW_TOP_SERVICES.filter((s) => s.filterGroup === activeFilter);
 
   const selectedService = PREVIEW_TOP_SERVICES.find((s) => s.code === selectedServiceCode) || PREVIEW_TOP_SERVICES[0];
+  if (!selectedService) return null;
   const serviceState = serviceStates[selectedService.code] || {
     status: selectedService.sovereignStatus,
     visibility: selectedService.customerVisibility,

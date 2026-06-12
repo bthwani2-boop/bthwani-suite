@@ -11,7 +11,6 @@ import {
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
-import { AREA_CAPACITY_OPERATIONAL_PREVIEW } from '../../data/legacy-preview/orders.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
 import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
@@ -20,20 +19,9 @@ export type AreaCapacityScreenProps = { hubHref: string; subGroup?: string; };
 
 export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: AreaCapacityScreenProps) {
   const router = useRouter();
-  const preview = AREA_CAPACITY_OPERATIONAL_PREVIEW;
 
-  // Stateful zones data list (extended to 10 zones for pagination demonstration)
+  // Stateful zones data list
   const [zones, setZones] = React.useState(() => [
-    ...preview.zones.map((z) => ({
-      ...z,
-      customZoneLoad: z.zoneLoad as string,
-      customStatusTone: z.statusTone as 'warning' | 'danger' | 'best' | 'brand',
-      customSurgeBonus: z.surgeBonus as string,
-      customProtectedZones: z.protectedZones as string,
-      customFreeZones: z.freeZones as string,
-      customNote: z.note as string,
-      customRecommendation: z.recommendation as string,
-    })),
     {
       id: 'AR-05',
       zone: 'غرب الرياض',
@@ -164,10 +152,10 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
 
   // Stateful KPIs summary
   const [kpis, setKpis] = React.useState<{ zoneLoad: string; protectedZones: number; freeZones: number; surgeBonus: string }>({
-    zoneLoad: preview.summary.zoneLoad,
-    protectedZones: preview.summary.protectedZones,
-    freeZones: preview.summary.freeZones,
-    surgeBonus: preview.summary.surgeBonus,
+    zoneLoad: '—',
+    protectedZones: 0,
+    freeZones: 0,
+    surgeBonus: '—',
   });
 
   // Pagination states

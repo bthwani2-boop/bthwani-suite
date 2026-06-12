@@ -9,11 +9,9 @@ import {
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerDisputes, updatePartnerDisputeStatus } from './workflow';
-import {
-  PARTNER_PERFORMANCE_METRICS,
-  PARTNER_VISIBILITY_TIMELINE_DATA,
-  type PartnerDispute,
-} from '../../data/legacy-preview/partner.preview-data';
+import type { PartnerDispute } from '../../shared/workflow';
+const PARTNER_PERFORMANCE_METRICS: { id: string; capacity: string; compliance: string; kpis: { onTime: string; cancelRate: string; rating: string }; disputes: number }[] = [];
+const PARTNER_VISIBILITY_TIMELINE_DATA: unknown[] = [];
 import styles from '../shared/control-panel-surface.module.css';
 
 function parseKpiPercent(value: string): number {

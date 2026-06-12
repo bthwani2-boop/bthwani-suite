@@ -6,7 +6,9 @@ import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
 import styles from '../../shared/control-panel-surface.module.css';
 
-import { PREVIEW_SYSTEM_WARNINGS, type SystemWarning } from '../../../data/legacy-preview/platform.preview-data';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SystemWarning = Record<string, any>;
+const PREVIEW_SYSTEM_WARNINGS: SystemWarning[] = [];
 
 export function DshPlatformHealthWorkspace({ activeFilter }: { activeFilter: string }) {
   const { addAuditEvent } = useDemoPlatformState();

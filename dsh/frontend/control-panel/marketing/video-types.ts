@@ -1,9 +1,7 @@
-import type {
-  MarketingVideoStatus,
-  MarketingVideoAudience,
-  MarketingVideoSource,
-  MarketingVideoTargetType,
-} from '../../data/legacy-preview/marketing.preview-data';
+type MarketingVideoStatus = 'published' | 'draft' | 'review' | 'paused';
+type MarketingVideoAudience = 'all' | 'client' | 'operations';
+type MarketingVideoSource = 'marketing' | 'partner';
+type MarketingVideoTargetType = 'home' | 'stores' | 'store' | 'category' | 'subcategory' | 'product' | 'offer' | 'campaign' | 'search' | 'custom' | 'loyalty';
 
 export type VideoDraft = Record<
   | 'title'

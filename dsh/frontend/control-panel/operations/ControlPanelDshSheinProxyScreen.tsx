@@ -6,7 +6,6 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { SHEIN_PROXY_OPERATIONAL_PREVIEW } from '../../data/legacy-preview/orders.preview-data';
 import { SHEIN_PROXY_STAGE_LABELS } from '../../shared/dsh-order-preview.contract';
 import { buildOperationsHref } from './operations.registry';
 import { Box } from '@bthwani/ui-kit';
@@ -22,17 +21,18 @@ const STAGE_ORDER = Object.keys(SHEIN_PROXY_STAGE_LABELS) as Array<keyof typeof 
 
 export function ControlPanelDshSheinProxyScreen({ hubHref: _hubHref, subGroup }: ControlPanelDshSheinProxyScreenProps) {
   const router = useRouter();
-  const preview = SHEIN_PROXY_OPERATIONAL_PREVIEW;
 
   const summaryKpi = STAGE_ORDER.map((stage) => ({
     id: stage,
     label: SHEIN_PROXY_STAGE_LABELS[stage],
-    value: String(preview.summary[stage]),
+    value: '0',
     tone: stage === 'exception' ? ('danger' as const)
       : stage === 'intake_review' || stage === 'quote_pending' || stage === 'customer_approval' ? ('neutral' as const)
       : stage === 'delivered' ? ('success' as const)
       : ('neutral' as const),
   }));
+
+  const requests: { id: string; customer: string; statusLabel: string; statusTone: string; nextStep: string; note: string; owner: string; sla: string; total: string }[] = [];
 
   return (
     <Box gap={3}>
@@ -43,7 +43,7 @@ export function ControlPanelDshSheinProxyScreen({ hubHref: _hubHref, subGroup }:
       <WebControlPanelKpiStrip items={summaryKpi} />
 
       <Box gap={2} style={{}}>
-        {preview.requests.map((request) => (
+        {requests.map((request) => (
           <WebControlPanelDecisionRow
             key={request.id}
             entityId={request.id}

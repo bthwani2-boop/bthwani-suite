@@ -6,29 +6,28 @@ import { Box, Button, Surface, Tabs, Text, TextField, useTheme,
   radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import {
-  getCampaignItems,
-  getCampaignSummaries,
-  getCampaignDetail,
-  getCampaignKpis,
-  upsertCampaignItem,
-  toggleCampaignStatus,
-  duplicateCampaignItem,
-  removeCampaignItem,
-  type CampaignRecord,
-  type CampaignSummary,
-  type CampaignStatus,
-  type CampaignGoal,
-  type CampaignAudience,
-  type CampaignChannel,
-  type CampaignPriority,
-  type CampaignTargetType,
-} from '../../data/legacy-preview/marketing.preview-data';
-import { dshCategoryFixtures } from '../../data/legacy-preview/categories.preview-data';
-import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/legacy-preview/stores.preview-data';
+import type { CampaignAudience, CampaignTargetType } from '../../shared/dsh-marketing-types';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CampaignRecord = Record<string, any>;
+type CampaignStatus = 'draft' | 'pending' | 'published' | 'paused' | 'archived';
+type CampaignGoal = 'awareness' | 'conversion' | 'retention' | 'acquisition';
+type CampaignChannel = 'banner' | 'promo' | 'video' | 'ticker' | 'store-card';
+type CampaignPriority = 'low' | 'normal' | 'high' | 'critical';
+type CampaignSummary = { id: (string); title: (string); status: (CampaignStatus); impressions: (number) };
+function getCampaignItems(): CampaignRecord[] { return []; }
+function getCampaignSummaries(_opts?: unknown): { items: CampaignSummary[]; total: number; page: number; pageSize: number } { return { items: [], total: 0, page: 1, pageSize: 20 }; }
+function getCampaignDetail(_id: string): CampaignRecord | null { return null; }
+function getCampaignKpis() { return { total: { value: 0 }, live: { value: 0 }, pending: { value: 0 }, impressions: { value: 0 } }; }
+function upsertCampaignItem(_item: unknown): void {}
+function toggleCampaignStatus(_id: string): void {}
+function duplicateCampaignItem(_id: string): void {}
+function removeCampaignItem(_id: string): void {}
+const dshCategoryFixtures: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
+const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
+const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
-import type { Entitlement } from '../../data/legacy-preview/subscriptions.preview-data';
+type Entitlement = { id: string; type: string; referenceId: string; status: string; source: string };
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
 /**

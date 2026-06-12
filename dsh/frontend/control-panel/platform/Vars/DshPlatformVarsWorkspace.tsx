@@ -4,15 +4,6 @@ import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
-import {
-  DSH_PLATFORM_AUDIT_PREVIEW,
-  DSH_PLATFORM_OPERATIONAL_VARS,
-  DSH_PLATFORM_PROVIDER_CONTROL_VARS,
-  DSH_PLATFORM_SCOPE_PRECEDENCE,
-  DSH_PLATFORM_SIMULATION_PREVIEW,
-  DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
-  DSH_PLATFORM_DESIGN_POLICY_VARS,
-} from '../../../data/legacy-preview/platform.preview-data';
 import type {
   DshPlatformProviderControlRecord,
   DshPlatformVarRecord,
@@ -20,6 +11,14 @@ import type {
   DshPlatformVarStatus,
 } from './vars.types';
 import styles from './dsh-platform-vars.module.css';
+
+const DSH_PLATFORM_AUDIT_PREVIEW: unknown[] = [];
+const DSH_PLATFORM_OPERATIONAL_VARS: DshPlatformVarRecord[] = [];
+const DSH_PLATFORM_PROVIDER_CONTROL_VARS: DshPlatformProviderControlRecord[] = [];
+const DSH_PLATFORM_SCOPE_PRECEDENCE: unknown[] = [];
+const DSH_PLATFORM_SIMULATION_PREVIEW: unknown[] = [];
+const DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS: DshPlatformVarRecord[] = [];
+const DSH_PLATFORM_DESIGN_POLICY_VARS: DshPlatformVarRecord[] = [];
 
 type VarsDomainId = 'dsh' | 'wlt' | 'provider' | 'policy' | 'design';
 

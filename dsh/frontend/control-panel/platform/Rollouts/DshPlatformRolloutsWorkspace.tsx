@@ -6,7 +6,10 @@ import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { useDemoPlatformState } from '../useDemoPlatformState';
 import styles from '../../shared/control-panel-surface.module.css';
 
-import { PREVIEW_ROLLOUT_RECORDS, type RolloutLevel, type RolloutRecord } from '../../../data/legacy-preview/platform.preview-data';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RolloutRecord = Record<string, any>;
+type RolloutLevel = 'service' | 'capability';
+const PREVIEW_ROLLOUT_RECORDS: RolloutRecord[] = [];
 import { FeatureFlagsRegistry } from '../../../shared';
 
 function RolloutLevelBadge({ level }: { level: RolloutLevel }) {
@@ -57,6 +60,7 @@ export function DshPlatformRolloutsWorkspace({ activeFilter }: { activeFilter: s
   });
 
   const selectedRecord = PREVIEW_ROLLOUT_RECORDS.find((r) => r.key === selectedKey) || PREVIEW_ROLLOUT_RECORDS[0];
+  if (!selectedRecord) return null;
   const currentState = rolloutStates[selectedRecord.key] || { activeStage: selectedRecord.initialStage };
 
   const isKillSwitch = currentState.activeStage.includes('Kill') || currentState.activeStage.includes('موقوف');

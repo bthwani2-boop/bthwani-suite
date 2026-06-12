@@ -9,7 +9,7 @@ import {
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerComplaints, updatePartnerComplaintStatus } from './workflow';
-import type { PartnerComplaint } from '../../data/legacy-preview/partner.preview-data';
+import type { PartnerComplaint } from '../../shared/workflow';
 import styles from '../shared/control-panel-surface.module.css';
 
 

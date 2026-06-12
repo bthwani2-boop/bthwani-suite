@@ -16,11 +16,6 @@ import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 // SSoT: delivery mode labels come from dsh-delivery-mode.model, not inline strings.
 import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';
-import {
-  DSH_CALL_INTAKE_PREVIEW,
-  DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS,
-  DSH_CUSTOMER_360_PREVIEW,
-} from '../../data/legacy-preview/support.preview-data';
 import { buildOperationsHref } from '../operations/operations.registry';
 import { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
 import { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';
@@ -30,11 +25,6 @@ import { ManualCallIntakeWorkspace } from './ManualCallIntakeWorkspace';
 import { OpsClientMessagingWorkspace } from './OpsClientMessagingWorkspace';
 import { OpsPartnerMessagingWorkspace } from './OpsPartnerMessagingWorkspace';
 import { OpsCaptainMessagingWorkspace } from './OpsCaptainMessagingWorkspace';
-import {
-  getOperationsSupportFlowPreview,
-  type DshControlPanelSupportRowSeed,
-  type DshOperationsSupportFlowId,
-} from '../../data/legacy-preview/support.preview-data';
 import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,
@@ -46,6 +36,16 @@ import {
   SUPPORT_TAB_WORKSPACE_MAP,
   type SupportTab,
 } from './support.types';
+
+type DshOperationsSupportFlowId = string;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DshControlPanelSupportRowSeed = Record<string, any>;
+function getOperationsSupportFlowPreview(_id: string) {
+  return { title: '—', forbiddenActions: [] as string[], severity: 'warning' as const, ownerLabel: '—', description: '—', nextAction: '—' };
+}
+const DSH_CALL_INTAKE_PREVIEW: unknown[] = [];
+const DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS: DshControlPanelSupportRowSeed[] = [];
+const DSH_CUSTOMER_360_PREVIEW: unknown[] = [];
 
 type SupportFulfillmentMode = DshFulfillmentDeliveryMode;
 

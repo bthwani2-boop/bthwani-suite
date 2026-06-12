@@ -6,7 +6,6 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { AWNAK_OPERATIONAL_PREVIEW } from '../../data/legacy-preview/orders.preview-data';
 import { AWNAK_STAGE_LABELS } from '../../shared/dsh-order-preview.contract';
 import { buildOperationsHref } from './operations.registry';
 import { Box } from '@bthwani/ui-kit';
@@ -22,17 +21,18 @@ const STAGE_ORDER = Object.keys(AWNAK_STAGE_LABELS) as Array<keyof typeof AWNAK_
 
 export function AwnakScreen({ hubHref: _hubHref, subGroup }: AwnakScreenProps) {
   const router = useRouter();
-  const preview = AWNAK_OPERATIONAL_PREVIEW;
 
   const summaryKpi = STAGE_ORDER.map((stage) => ({
     id: stage,
     label: AWNAK_STAGE_LABELS[stage],
-    value: String(preview.summary[stage]),
+    value: '0',
     tone: stage === 'escalated' || stage === 'dispatch_pending' ? ('danger' as const)
       : stage === 'quote_review' || stage === 'proof_review' ? ('neutral' as const)
       : stage === 'completed' ? ('success' as const)
       : ('neutral' as const),
   }));
+
+  const rows: { requestId: string; type: string; customer: string; status: string; statusTone: string; risk: string; nextAction: string; note: string; owner: string; sla: string; captainId?: string }[] = [];
 
   return (
     <Box gap={3}>
@@ -43,7 +43,7 @@ export function AwnakScreen({ hubHref: _hubHref, subGroup }: AwnakScreenProps) {
       <WebControlPanelKpiStrip items={summaryKpi} />
 
       <Box gap={2} style={{}}>
-        {preview.rows.map((item) => (
+        {rows.map((item) => (
           <WebControlPanelDecisionRow
             key={item.requestId}
             entityId={item.requestId}

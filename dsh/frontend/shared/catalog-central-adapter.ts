@@ -12,9 +12,10 @@
  * Media owner: dsh/frontend/media-fixtures (via resolve-dsh-image-source.ts)
  */
 
-import { storeItemsByStoreId } from '../data/legacy-preview/products.preview-data';
 import type { StoreItemsByStoreId } from './dshStoreProductCardModel';
-import { CATEGORY_TAXONOMY_MAP } from '../data/legacy-preview/categories.preview-data';
+
+const storeItemsByStoreId: StoreItemsByStoreId = {};
+const CATEGORY_TAXONOMY_MAP: Record<string, unknown> = {};
 
 import type { DshCatalogDomainId, DshCatalogMainCategoryId, DshCatalogSubcategoryId, DshProductFacetId } from './catalog';
 
@@ -128,14 +129,10 @@ export function buildCentralPartnerInventoryItems(
   return result;
 }
 
-import { dshCategoryFixtures } from '../data/legacy-preview/categories.preview-data';
-import {
-  type PartnerInventoryDetail,
-  CENTRAL_PRODUCT_DETAIL_LOOKUP,
-} from '../data/legacy-preview/partner.preview-data';
-
-export type { PartnerInventoryDetail };
-export { CENTRAL_PRODUCT_DETAIL_LOOKUP };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type PartnerInventoryDetail = Record<string, any>;
+export const CENTRAL_PRODUCT_DETAIL_LOOKUP: Record<string, PartnerInventoryDetail> = {};
+const dshCategoryFixtures: { id: string; subcategories: { id: string }[] }[] = [];
 
 /**
  * Maps the category ID to a path containing main category and optional subcategory.

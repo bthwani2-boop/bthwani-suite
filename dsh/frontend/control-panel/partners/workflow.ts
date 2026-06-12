@@ -57,11 +57,9 @@ export type DshPartnerFulfillmentAgreement = {
 
 // Data moved to central preview data
 
-export {
-  dshPartnerIntakeMetrics,
-  dshPartnerIntakeItems,
-  dshPartnerApprovalLanes,
-} from '../../data/legacy-preview/partner.preview-data';
+export const dshPartnerIntakeMetrics: ReadonlyArray<{ id: string; label: string; value: number; description: string }> = [];
+export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [];
+export const dshPartnerApprovalLanes: ReadonlyArray<string> = [];
 
 // Re-export centralized models and getters/setters from shared workflow store
 export type {

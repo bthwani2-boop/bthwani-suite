@@ -4,13 +4,13 @@ import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box } from '@bthwani/ui-kit';
 import { WebControlPanelDecisionRow, WebControlPanelKpiStrip } from '@bthwani/ui-kit/web';
-import {
-  DSH_CUSTOMER_360_PREVIEW,
-  getDshCustomer360ByContext,
-  getDshCustomer360Record,
-  type DshCustomer360OrderSummary,
-  type DshCustomer360Record,
-} from '../../data/legacy-preview/support.preview-data';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DshCustomer360OrderSummary = Record<string, any>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DshCustomer360Record = Record<string, any>;
+const DSH_CUSTOMER_360_PREVIEW: DshCustomer360Record[] = [];
+function getDshCustomer360ByContext(_ctx: unknown): DshCustomer360Record | null { return null; }
+function getDshCustomer360Record(_id: string): DshCustomer360Record | undefined { return undefined; }
 import type { DshGlobalControlLink } from '../../shared/dsh-order-preview.contract';
 import styles from '../shared/control-panel-surface.module.css';
 import { SUPPORT_VERIFICATION_STATUS_META, SUPPORT_TICKET_STATUS_META } from './support.types';

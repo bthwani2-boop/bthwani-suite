@@ -68,19 +68,17 @@ import type { MarketingControlView } from './types';
  * - retry: API-later
  * - guidance: HANDLED — توجيه نصي يظهر عند كل حالة فارغة أو محجوبة
  */
-import {
-  getCampaignItems,
-  type CampaignAudience,
-  type CampaignPlacement,
-  type CampaignRecord,
-  type CampaignStatus,
-  type CampaignTargetType,
-} from '../../data/legacy-preview/marketing.preview-data';
-import {
-  getPartnerOfferItems,
-  type PartnerOfferRecord,
-  type PartnerOfferStatus,
-} from '../../data/legacy-preview/offers.preview-data';
+import type {
+  CampaignAudience,
+  CampaignPlacement,
+  CampaignRecord,
+  CampaignStatus,
+  CampaignTargetType,
+} from '../../shared/dsh-marketing-types';
+import type {
+  PartnerOfferRecord,
+  PartnerOfferStatus,
+} from '../../shared/dsh-partner-offer-types';
 import {
   buildCommercialProjection,
   type CommercialCampaign,
@@ -245,8 +243,8 @@ export function ControlPanelDshMarketingScreen(props: ControlPanelDshMarketingSc
     PRODUCT_GATE_PREVIEW.map((product) => ({ ...product, bypassed: false }))
   );
 
-  const partnerOfferRecords = getPartnerOfferItems();
-  const campaignRecords = getCampaignItems();
+  const partnerOfferRecords: PartnerOfferRecord[] = [];
+  const campaignRecords: CampaignRecord[] = [];
   const partnerOfferRows = partnerOfferRecords.map((offer) => ({
     offer,
     visibility: getPartnerOfferVisibilityRecord(offer, { targetSurface: 'control-panel' }),

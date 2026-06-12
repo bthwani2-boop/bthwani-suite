@@ -4,11 +4,6 @@ import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Text } from '@bthwani/ui-kit';
 import { WebControlPanelKpiStrip } from '@bthwani/ui-kit/web';
-import {
-  DSH_ORDER_RESCUE_PREVIEW,
-  getDshOrderRescueByContext,
-} from '../../data/legacy-preview/orders.preview-data';
-import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/legacy-preview/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 // SSoT: rescue triggers are derived from the lifecycle handoffs table.
@@ -20,10 +15,11 @@ export type OrderRescueScreenProps = {
   subGroup?: string;
 };
 
-type RescueCase = (typeof DSH_ORDER_RESCUE_PREVIEW)[number];
-type DshOrderRescueReason = RescueCase['rescueReasonSelector']['selectedReason'];
-type DshOrderRescueOwner = RescueCase['ownerSelection']['selectedOwner'];
-type DshOrderRescueNextActionId = RescueCase['nextActionSelector']['selectedAction'];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RescueCase = Record<string, any>;
+type DshOrderRescueReason = string;
+type DshOrderRescueOwner = string;
+type DshOrderRescueNextActionId = string;
 
 // Label maps — enum keys only (values from data are already Arabic)
 const REASON_LABELS: Record<string, string> = {
@@ -547,23 +543,19 @@ export function OrderRescueScreen({ hubHref: _hubHref, subGroup: _subGroup }: Or
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [cases, setCases] = React.useState<RescueCase[]>(() => [...DSH_ORDER_RESCUE_PREVIEW]);
+  const [cases, setCases] = React.useState<RescueCase[]>(() => []);
   const [openRescueId, setOpenRescueId] = React.useState<string | null>(null);
   const [overriddenActions, setOverriddenActions] = React.useState<Record<string, boolean>>({});
   const [submitNotes, setSubmitNotes] = React.useState<Record<string, string | null>>({});
 
   // Deep-link: auto-open if URL contains a rescue/order context
   React.useEffect(() => {
-    const matched = getDshOrderRescueByContext({
-      rescueId: searchParams.get('rescueId'),
-      orderId: searchParams.get('orderId'),
-      customerId: searchParams.get('customerId'),
-    });
+    const matched: { rescueId: string } | null = null;
     if (matched) setOpenRescueId(matched.rescueId);
   }, [searchParams]);
 
   const playbook = React.useMemo(
-    () => DSH_OPS_INTERVENTION_PLAYBOOKS.find((p) => p.triggerFlowIds.includes('order-rescue')),
+    () => undefined,
     [],
   );
 

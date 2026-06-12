@@ -21,14 +21,6 @@ import { Box, Button, Surface, Text, useTheme,
   radius,
 } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader, WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import {
-  getCatalogAdoptionItems,
-  adoptCatalogCentral,
-  adoptCatalogException,
-  activateClientVisible,
-  returnToMarketing,
-  rejectFromCatalog,
-} from '../../../data/legacy-preview/marketing.preview-data';
 import { type ApprovalRecord, type ApprovalStage, translateStage, translateEntityType, translateOwner } from '../../../shared/workflow';
 import type { CatalogPreviewProposal } from '../catalogs.model';
 
@@ -109,7 +101,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
   const [page, setPage] = React.useState(1);
   const [lastResult, setLastResult] = React.useState<CatalogQueueActionResult | null>(null);
 
-  const refresh = React.useCallback(() => setItems(getCatalogAdoptionItems()), []);
+  const refresh = React.useCallback(() => setItems([]), []);
 
   React.useEffect(() => { refresh(); }, [refresh]);
 
@@ -140,15 +132,6 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
   const handleAction = React.useCallback((id: string, action: CatalogQueueAction) => {
     const item = items.find((i) => i.id === id);
     if (!item) return;
-
-    // Preview-state simulation (local only — no canonical mutation)
-    switch (action) {
-      case 'adopt-central':   adoptCatalogCentral(id); break;
-      case 'adopt-exception': adoptCatalogException(id); break;
-      case 'visible':         activateClientVisible(id); break;
-      case 'fix':             returnToMarketing(id); break;
-      case 'reject':          rejectFromCatalog(id); break;
-    }
 
     const result: CatalogQueueActionResult = {
       itemId: id,

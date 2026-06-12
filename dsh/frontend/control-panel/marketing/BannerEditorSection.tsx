@@ -19,13 +19,13 @@ import {
   useTheme,
   radius,
 } from '@bthwani/ui-kit';
-import type {
-  MarketingBannerAudience,
-  MarketingBannerRecord,
-  MarketingBannerStatus,
-} from '../../data/legacy-preview/marketing.preview-data';
-import { dshCategoryFixtures } from '../../data/legacy-preview/categories.preview-data';
-import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/legacy-preview/stores.preview-data';
+type MarketingBannerAudience = 'home' | 'stores' | 'client' | 'all';
+type MarketingBannerStatus = 'draft' | 'published';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MarketingBannerRecord = Record<string, any>;
+const dshCategoryFixtures: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
+const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
+const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
 import type { MarketingPermission } from './marketing-permissions.contract';
 import {
   BANNER_TEMPLATES,

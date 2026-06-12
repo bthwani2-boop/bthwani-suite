@@ -55,7 +55,7 @@ import {
   type PartnerWorkspaceTabId,
 } from './partners.types';
 import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
-import { partnerCoveragePreviewZones } from '../../data/legacy-preview/partner.preview-data';
+const partnerCoveragePreviewZones: { status: string }[] = [];
 
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {
   const activationStatus = mapApprovalStageToPartnerActivationStatus(item.stage);

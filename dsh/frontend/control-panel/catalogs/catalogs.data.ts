@@ -151,22 +151,22 @@ function resolveCatalogMediaPolicy(value: string | undefined): CatalogMediaPolic
   }
 }
 
-import { dshCategoryFixtures } from '../../data/legacy-preview/categories.preview-data';
-import { dshCommonMediaKeyOptions } from '../../data/legacy-preview/media.preview-data';
-import {
-  storeItemsByStoreId,
-  dshCatalogMetrics,
-  dshCatalogSmartFilters,
-  dshCatalogApprovalQueues,
-} from '../../data/legacy-preview/products.preview-data';
 import {
   getProductCategoryPath,
   deriveProductSku,
   deriveProductGtin,
   getSubcategoryClassifications,
 } from '../../shared/catalog-central-adapter';
+import type { StoreItemsByStoreId } from '../../shared/dshStoreProductCardModel';
 
-export { dshCatalogMetrics, dshCatalogSmartFilters, dshCatalogApprovalQueues };
+type DshCategorySubcategory = { id: string; label: string; subtitle: string; mediaKey?: string; imageUri?: string };
+type DshCategoryFixture = { id: string; label: string; subtitle: string; emojiFallback?: string; mediaKey?: string; imageUri?: string; renderMode?: 'stores' | 'manual-order'; isManualLike?: boolean; subcategories: DshCategorySubcategory[] };
+const dshCategoryFixtures: DshCategoryFixture[] = [];
+const dshCommonMediaKeyOptions: string[] = [];
+const storeItemsByStoreId: StoreItemsByStoreId = {};
+export const dshCatalogMetrics: { id: string; label: string; value: number; description: string }[] = [];
+export const dshCatalogSmartFilters: CatalogSmartFilter[] = [];
+export const dshCatalogApprovalQueues: CatalogApprovalQueueItem[] = [];
 
 export const dshCatalogCategories: CatalogMainCategory[] = dshCategoryFixtures.map((c) => {
   return {

@@ -19,8 +19,10 @@ import {
   WebControlPanelTertiaryFilters,
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
-import { GEO_HEATMAP_ZONES } from '../../data/legacy-preview/platform.preview-data';
 import { translateDshRuntimeBindingStatus } from '../shared';
+import type { GeoHeatmapZone } from './geo-heatmap.helpers';
+
+const GEO_HEATMAP_ZONES: GeoHeatmapZone[] = [];
 import styles from '../shared/control-panel-surface.module.css';
 import {
   buildRecommendation,

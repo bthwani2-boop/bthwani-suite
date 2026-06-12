@@ -22,16 +22,6 @@ export {
   normalizeOperationsLocation,
   resolveOperationsStateCopy,
 } from './operations.registry';
-export {
-  AREA_CAPACITY_OPERATIONAL_PREVIEW,
-  AUDIT_SUPPORT_SLA_OPERATIONAL_PREVIEW,
-  AWNAK_OPERATIONAL_PREVIEW,
-  DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW,
-  EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
-  LIVE_ORDERS_OPERATIONAL_PREVIEW,
-  OPERATIONS_PULSE_METRICS,
-  SHEIN_PROXY_OPERATIONAL_PREVIEW,
-} from '../../data/legacy-preview/orders.preview-data';
 export { default as ControlPanelDshOperationsScreen, DshOperationsHubSurface } from './OperationsHubScreen';
 export type { ControlPanelDshOperationsScreenProps } from './OperationsHubScreen';
 export { ControlPanelDshSheinProxyScreen } from './ControlPanelDshSheinProxyScreen';

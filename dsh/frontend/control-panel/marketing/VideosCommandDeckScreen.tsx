@@ -18,19 +18,18 @@ import {
   radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import {
-  getMarketingVideoItems,
-  getMarketingVideoSummaries,
-  getMarketingVideoDetail,
-  getMarketingVideoKpis,
-  upsertMarketingVideoItem,
-  toggleMarketingVideoStatus,
-  duplicateMarketingVideoItem,
-  removeMarketingVideoItem,
-  type MarketingVideoRecord,
-  type MarketingVideoSummary,
-  type MarketingVideoStatus,
-} from '../../data/legacy-preview/marketing.preview-data';
+type MarketingVideoStatus = 'published' | 'draft' | 'review' | 'paused';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MarketingVideoRecord = Record<string, any>;
+type MarketingVideoSummary = { id: (string); title: (string); status: (MarketingVideoStatus); impressions: (number); clicks: (number); order: (number) };
+function getMarketingVideoItems(): MarketingVideoRecord[] { return []; }
+function getMarketingVideoSummaries(_opts?: unknown): { items: MarketingVideoSummary[]; total: number; page: number; pageSize: number } { return { items: [], total: 0, page: 1, pageSize: 20 }; }
+function getMarketingVideoDetail(_id: string): MarketingVideoRecord | null { return null; }
+function getMarketingVideoKpis() { return { total: { value: 0 }, live: { value: 0 }, draft: { value: 0 }, review: { value: 0 }, impressions: { value: 0 }, clicks: { value: 0 } }; }
+function upsertMarketingVideoItem(_item: unknown): void {}
+function toggleMarketingVideoStatus(_id: string): void {}
+function duplicateMarketingVideoItem(_id: string): void {}
+function removeMarketingVideoItem(_id: string): void {}
 import { useMarketingPermissions } from './marketing-permissions.contract';
 import type { VideoDraft, EditorWorkspaceTab } from './video-types';
 import { createDraft } from './video-target-utils';

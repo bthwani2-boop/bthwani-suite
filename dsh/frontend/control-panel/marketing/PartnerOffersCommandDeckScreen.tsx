@@ -5,24 +5,19 @@ import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, Key
   radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import {
-  getPartnerOfferItems,
-  getPartnerOfferSummaries,
-  getPartnerOfferDetail,
-  getPartnerOfferKpis,
-  upsertPartnerOfferItem,
-  approvePartnerOfferItem,
-  publishPartnerOfferItem,
-  pausePartnerOfferItem,
-  rejectPartnerOfferItem,
-  archivePartnerOfferItem,
-  removePartnerOfferItem,
-  type PartnerOfferRecord,
-  type PartnerOfferSummary,
-  type PartnerOfferStatus,
-  type PartnerOfferType,
-  type PartnerOfferSource,
-} from '../../data/legacy-preview/offers.preview-data';
+import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType, PartnerOfferSource } from '../../shared/dsh-partner-offer-types';
+type PartnerOfferSummary = { id: (string); title: (string); status: (PartnerOfferStatus) };
+function getPartnerOfferItems(): PartnerOfferRecord[] { return []; }
+function getPartnerOfferSummaries(_opts?: unknown): { items: PartnerOfferSummary[]; total: number; page: number; pageSize: number } { return { items: [], total: 0, page: 1, pageSize: 20 }; }
+function getPartnerOfferDetail(_id: string): PartnerOfferRecord | null { return null; }
+function getPartnerOfferKpis() { return { total: 0, inbound: 0, review: 0, marketingReady: 0, published: 0, rejected: 0 }; }
+function upsertPartnerOfferItem(_item: unknown): void {}
+function approvePartnerOfferItem(_id: string): void {}
+function publishPartnerOfferItem(_id: string): void {}
+function pausePartnerOfferItem(_id: string): void {}
+function rejectPartnerOfferItem(_id: string, _reason: string): void {}
+function archivePartnerOfferItem(_id: string): void {}
+function removePartnerOfferItem(_id: string): void {}
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { validatePartnerOfferForPublish } from '../../shared/commercial.preview-contract';
 import { CommercialParityPreview } from './commercial-parity-preview';

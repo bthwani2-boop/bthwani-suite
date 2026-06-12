@@ -14,13 +14,29 @@ import {
   getDshControlPanelGovernanceEntry,
   resolveDshControlPanelSectionLabel,
 } from '../shared';
-import {
-  getDshSupportTicketById,
-  getDshSupportTicketStatusLabel,
-  getDshSupportTicketStatusTone,
-  type DshSupportTicketMessage,
-  DSH_DEMO_SUPPORT_TICKETS,
-} from '../../data/legacy-preview/support.preview-data';
+type DshSupportTicketMessage = {
+  id: string;
+  senderKind: 'ops' | 'client' | 'captain' | 'partner';
+  senderLabel: string;
+  body: string;
+  timestampLabel: string;
+  isSystem?: boolean;
+};
+type DshSupportTicket = {
+  ticketCode: string; subject: string; status: string; priorityLabel: string;
+  actorKind: 'client' | 'partner' | 'captain'; actorName: string;
+  createdAtLabel: string; slaLabel: string; flowId: string | null;
+  messagesPreview: DshSupportTicketMessage[]; auditRequired: boolean;
+};
+const EMPTY_TICKET: DshSupportTicket = {
+  ticketCode: '—', subject: '—', status: 'open', priorityLabel: '—',
+  actorKind: 'client', actorName: '—', createdAtLabel: '—', slaLabel: '—',
+  flowId: null, messagesPreview: [], auditRequired: false,
+};
+const DSH_DEMO_SUPPORT_TICKETS: DshSupportTicket[] = [];
+function getDshSupportTicketById(_id: string): DshSupportTicket { return EMPTY_TICKET; }
+function getDshSupportTicketStatusLabel(_status: string): string { return '—'; }
+function getDshSupportTicketStatusTone(_status: string): 'neutral' | 'warning' | 'danger' | 'success' { return 'neutral'; }
 
 function MessageBubble({ message }: { message: DshSupportTicketMessage }) {
   const isOps = message.senderKind === 'ops';

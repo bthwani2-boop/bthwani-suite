@@ -5,16 +5,15 @@ import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, ListItem, 
   radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import {
-  getMediaReviewItems,
-  getMediaReviewKpis,
-  approveMediaReviewItem,
-  requestMediaFix,
-  rejectMediaReviewItem,
-  sendMediaToCatalog,
-  type MediaReviewRecord,
-  type MediaPolicyKind,
-} from '../../data/legacy-preview/marketing.preview-data';
+type MediaPolicyKind = 'catalog-owned-media' | 'partner-owned-exception' | 'media-conflict' | 'restaurant-exception';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MediaReviewRecord = Record<string, any>;
+function getMediaReviewItems(): MediaReviewRecord[] { return []; }
+function getMediaReviewKpis() { return { pending: 0, approved: 0, needsFix: 0, catalogReady: 0, conflicts: 0 }; }
+function approveMediaReviewItem(_id: string): void {}
+function requestMediaFix(_id: string, _note: string): void {}
+function rejectMediaReviewItem(_id: string): void {}
+function sendMediaToCatalog(_id: string): void {}
 import {
   ApprovalStage,
   resolveApprovalStageMeta,

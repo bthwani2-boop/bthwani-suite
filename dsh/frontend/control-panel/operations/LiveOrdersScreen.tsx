@@ -8,7 +8,6 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
-import { LIVE_ORDERS_OPERATIONAL_PREVIEW, FULFILLMENT_MODE_ORDER_QUEUES } from '../../data/legacy-preview/orders.preview-data';
 import { Box, KeyValueList, useTheme } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshOperationsDecisionKind, DshOrderLifecycleStatus } from '../../shared/dsh-order-journey.model';
@@ -42,7 +41,7 @@ const FULFILLMENT_MODE_IDS: readonly DshFulfillmentOperationalMode[] = ['bthwani
 export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrdersScreenProps) {
   const router = useRouter();
   const { theme } = useTheme();
-  const preview = LIVE_ORDERS_OPERATIONAL_PREVIEW;
+  const PREVIEW_ROWS: { id: string; destination: string; captain: string; status: string; statusTone: string; suggestion: { label: string; reason: string; action: string; secondary: string }; eta: string; ringLabel: string; fulfillmentMode: DshFulfillmentOperationalMode; arrivalTimeline: string[]; actionPlans: string[] }[] = [];
   const activeMode = FULFILLMENT_MODE_IDS.find((m) => m === subGroup) ?? null;
   const [selectedItemId, setSelectedItemId] = React.useState<SelectedItem>(null);
   const [decisions, setDecisions] = React.useState<DecisionState>(() => getLiveOrderDecisions() as any);
@@ -118,15 +117,15 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   }
 
   const runtimeActive = runtimeState.loaded;
-  const liveOrderCount = runtimeActive ? runtimeState.total : preview.rows.length;
-  const dataSourceLabel = runtimeActive ? 'DSH Runtime' : 'Preview';
+  const liveOrderCount = runtimeActive ? runtimeState.total : PREVIEW_ROWS.length;
+  const dataSourceLabel = runtimeActive ? 'DSH Runtime' : '—';
   const dataSourceTone: 'success' | 'warning' = runtimeActive ? 'success' : 'warning';
 
   const summaryKpi = [
     { id: 'live', label: 'الطلبات النشطة', value: String(liveOrderCount), tone: 'neutral' as const },
     { id: 'pending-approval', label: 'قيد الموافقة', value: String(PENDING_APPROVAL_ORDERS.filter((o) => !decisions[o.id]).length), tone: 'warning' as const },
     { id: 'source', label: 'مصدر البيانات', value: dataSourceLabel, tone: dataSourceTone },
-    { id: 'blocked', label: 'رنينات محجوبة', value: runtimeActive ? '—' : String(preview.summary.blockedRings), tone: 'danger' as const },
+    { id: 'blocked', label: 'رنينات محجوبة', value: '—', tone: 'danger' as const },
   ];
 
   const pendingApprovalsCount = PENDING_APPROVAL_ORDERS.filter((o) => !decisions[o.id]).length;
@@ -149,7 +148,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
         );
       }
     } else if (selectedItemId.type === 'live') {
-      const order = preview.rows.find((r) => r.id === selectedItemId.id);
+      const order = PREVIEW_ROWS.find((r) => r.id === selectedItemId.id);
       if (order) {
         inspectorContent = (
           <WebControlPanelInspectorShell
@@ -260,7 +259,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
         );
       }
     } else if (selectedItemId.type === 'fulfillment') {
-      const rows = FULFILLMENT_MODE_ORDER_QUEUES[selectedItemId.mode] || [];
+      const rows: { id: string; storeName: string; customerName: string; slaLabel: string; statusTone: string; statusLabel: string; nextAction: string; fulfillmentMode: DshFulfillmentOperationalMode }[] = [];
       const order = rows.find((r) => r.id === selectedItemId.id);
       if (order) {
         inspectorContent = (
@@ -396,7 +395,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                     } : undefined}
                   />
                 ))
-              : preview.rows.map((order) => (
+              : PREVIEW_ROWS.map((order) => (
                   <WebControlPanelDecisionRow
                     key={order.id}
                     entityId={order.id}
@@ -429,7 +428,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
               title={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.label || activeMode}
               meta={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.operationalOwner}
             >
-              {(FULFILLMENT_MODE_ORDER_QUEUES[activeMode] || []).map((row) => (
+              {([] as { id: string; customerName: string; storeName: string; statusLabel: string; statusTone: string; slaLabel: string; nextAction: string }[]).map((row) => (
                 <WebControlPanelDecisionRow
                   key={row.id}
                   entityId={row.id}

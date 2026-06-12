@@ -4,9 +4,14 @@
 import React from 'react';
 import { Box, Button, Chip, Surface, Text, TextField } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
-import { DSH_DEMO_SUPPORT_TICKETS, type DshSupportTicketMessage } from '../../data/legacy-preview/support.preview-data';
-
-const DEMO_TICKET = DSH_DEMO_SUPPORT_TICKETS[1]; // catalog/partner-linked demo ticket
+type DshSupportTicketMessage = {
+  id: string;
+  senderKind: 'ops' | 'client' | 'captain' | 'partner';
+  senderLabel: string;
+  body: string;
+  timestampLabel: string;
+  isSystem?: boolean;
+};
 
 function OpsMessageBubble({ message }: { message: DshSupportTicketMessage }) {
   const isOps = message.senderKind === 'ops';
@@ -51,11 +56,11 @@ export function OpsPartnerMessagingWorkspace({
   orderId,
 }: OpsPartnerMessagingWorkspaceProps) {
   const [draft, setDraft] = React.useState('');
-  const [messages, setMessages] = React.useState<ReadonlyArray<DshSupportTicketMessage>>(DEMO_TICKET.messagesPreview);
-  const [isEscalated, setIsEscalated] = React.useState(DEMO_TICKET.status === 'escalated');
+  const [messages, setMessages] = React.useState<ReadonlyArray<DshSupportTicketMessage>>([]);
+  const [isEscalated, setIsEscalated] = React.useState(false);
 
-  const resolvedPartnerName = partnerName ?? DEMO_TICKET.actorName;
-  const resolvedEntityId = orderId ?? DEMO_TICKET.entityId;
+  const resolvedPartnerName = partnerName ?? '—';
+  const resolvedEntityId = orderId ?? null;
 
   const handleSend = () => {
     if (!draft.trim()) return;

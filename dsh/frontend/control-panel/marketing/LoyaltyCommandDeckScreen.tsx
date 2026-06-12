@@ -13,19 +13,20 @@ import {
   useTheme,
   radius,
 } from '@bthwani/ui-kit';
-import {
-  getEntitlements,
-  getLoyaltyKpis,
-  getLoyaltyPrograms,
-  getLoyaltyRewards,
-  getLoyaltyTiers,
-  getSubscriptionPlans,
-  type LoyaltyProgram,
-  type LoyaltyTier,
-  type LoyaltyReward,
-  type SubscriptionPlan,
-  type Entitlement,
-} from '../../data/legacy-preview/subscriptions.preview-data';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LoyaltyProgram = Record<string, any>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LoyaltyTier = Record<string, any>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LoyaltyReward = Record<string, any>;
+type SubscriptionPlan = { id: (string); name: (string); monthlyFee: (number); features: string[]; status: (string) };
+type Entitlement = { id: string; type: string; referenceId: string; status: string; source: string };
+function getEntitlements(): Entitlement[] { return []; }
+function getLoyaltyKpis() { return { total: 0, active: 0, subscriptions: 0, points: 0, impressions: 0, clicks: 0 }; }
+function getLoyaltyPrograms(): LoyaltyProgram[] { return []; }
+function getLoyaltyRewards(): LoyaltyReward[] { return []; }
+function getLoyaltyTiers(): LoyaltyTier[] { return []; }
+function getSubscriptionPlans(): SubscriptionPlan[] { return []; }
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-preview';
 

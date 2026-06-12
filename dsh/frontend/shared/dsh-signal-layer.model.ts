@@ -15,7 +15,6 @@ import {
   MARKETING_SIGNAL_STAGES,
   type ApprovalRecord,
 } from './workflow';
-import { dshSignalPreviewEvents } from '../data/legacy-preview/signals.preview-data';
 
 type MediaReviewRecord = ApprovalRecord & {
   systemNote?: string;
@@ -291,8 +290,7 @@ const DSH_SIGNAL_TONES: Record<DshSignalEventKind, 'brand' | 'success' | 'warnin
 // ─── Signal Layer Preview Events ─────────────────────────────────────────────
 // Canonical data lives in dsh/frontend/data/legacy-preview/signals.preview-data.ts
 // Re-exported here typed for the signal layer contract.
-export const DSH_SIGNAL_PREVIEW_EVENTS =
-  dshSignalPreviewEvents as unknown as ReadonlyArray<DshSignalEvent>;
+export const DSH_SIGNAL_PREVIEW_EVENTS: ReadonlyArray<DshSignalEvent> = [];
 
 function resolveMarketingReviewSignalKind(item: MediaReviewRecord): DshSignalEventKind | null {
   if (item.stage === 'marketing-approved') {

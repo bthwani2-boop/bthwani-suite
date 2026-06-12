@@ -10,14 +10,9 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
-import {
-  EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW,
-  DSH_ORDER_RESCUE_PREVIEW,
-} from '../../data/legacy-preview/orders.preview-data';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 import { resolveDshOrderApiBaseUrl } from '../../shared';
 import { EXCEPTION_TICKET_MAP } from '../../shared/dsh-order-preview.contract';
-import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/legacy-preview/support.preview-data';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
@@ -112,7 +107,6 @@ export function ExceptionsEscalationsScreen({
   subGroup: _subGroup,
 }: ExceptionsEscalationsScreenProps) {
   const router = useRouter();
-  const preview = EXCEPTIONS_ESCALATIONS_OPERATIONAL_PREVIEW;
   const [filterId, setFilterId] = React.useState<WorkspaceFilterId>('all');
   const [selectedItemId, setSelectedItemId] = React.useState<SelectedItem>(null);
 
@@ -162,18 +156,7 @@ type ExceptionsStateItem = {
   realId?: string;
 };
 
-  // Stateful exceptions state — initialized from preview; real API items prepended after fetch
-  const [exceptions, setExceptions] = React.useState<ExceptionsStateItem[]>(() =>
-    preview.exceptions.map((exc) => ({
-      ...exc,
-      customOwner: exc.currentOwner as string,
-      customQueue: exc.ownerQueue as string,
-      customSlaState: 'نشط' as 'نشط' | 'مصعّد' | 'محلول',
-      customNote: exc.note as string,
-      customStatusTone: exc.statusTone as 'warning' | 'danger' | 'best' | 'brand',
-      realId: undefined as string | undefined,
-    }))
-  );
+  const [exceptions, setExceptions] = React.useState<ExceptionsStateItem[]>(() => []);
 
   // Fetch real support escalations from backend and prepend them to the list.
   React.useEffect(() => {
@@ -220,10 +203,10 @@ type ExceptionsStateItem = {
 
   // Stateful KPIs statistics
   const [kpis, setKpis] = React.useState<{ open: number; escalate: number; resolve: number; close: number }>(() => ({
-    open: preview.summary.open,
-    escalate: preview.summary.escalate,
-    resolve: preview.summary.resolve,
-    close: preview.summary.close,
+    open: 0,
+    escalate: 0,
+    resolve: 0,
+    close: 0,
   }));
 
   const [activeForm, setActiveForm] = React.useState<null | 'escalate' | 'resolve'>(null);
@@ -770,123 +753,9 @@ type ExceptionsStateItem = {
         );
       }
     } else if (selectedItemId.type === 'rescue') {
-      const item = DSH_ORDER_RESCUE_PREVIEW.find((r) => r.rescueId === selectedItemId.id);
-      if (item) {
-        inspectorContent = (
-          <WebControlPanelInspectorShell
-            title={`إنقاذ الطلب — ${item.orderId}`}
-            onClose={() => setSelectedItemId(null)}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '8px', overflowY: 'auto', flex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '12px', fontWeight: 800 }}>حالة المشكلة:</span>
-                <WebControlPanelStatusTag
-                  label={
-                    item.issueKind === 'item_unavailable' ? 'صنف غير متاح' :
-                    item.issueKind === 'payment_failure' ? 'فشل الدفع' :
-                    item.issueKind === 'captain_no_show' ? 'الكابتن لم يظهر' :
-                    item.issueKind === 'delivery_failed' ? 'فشل التوصيل' :
-                    item.issueKind
-                  }
-                  tone={item.severity === 'danger' ? 'danger' : 'warning'}
-                />
-              </div>
-
-              <KeyValueList
-                items={[
-                  { label: 'رقم الطلب', value: item.orderId },
-                  { label: 'العميل', value: item.customerName },
-                  { label: 'العائق التشغيلي', value: item.blocker },
-                  { label: 'الإجراء المالي المقترح', value: item.wltBoundary },
-                  { label: 'الإجراء المقترح التالي', value: item.nextBestAction },
-                ]}
-              />
-
-              <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    background: 'var(--bthwani-control-panel-brand)',
-                    color: 'var(--bthwani-brand-contrast)',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: 700,
-                    fontSize: '11px',
-                  }}
-                  onClick={() => router.push(buildOperationsHref('order-rescue', { orderId: item.orderId }))}
-                >
-                  فتح إنقاذ الطلب
-                </button>
-              </div>
-            </div>
-          </WebControlPanelInspectorShell>
-        );
-      }
+      // no live rescue data — inspector not shown
     } else if (selectedItemId.type === 'playbook') {
-      const playbook = DSH_OPS_INTERVENTION_PLAYBOOKS.find((p) => p.playbookId === selectedItemId.id);
-      if (playbook) {
-        inspectorContent = (
-          <WebControlPanelInspectorShell
-            title={`دليل العمل — ${playbook.title}`}
-            onClose={() => setSelectedItemId(null)}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '8px', overflowY: 'auto', flex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '12px', fontWeight: 800 }}>القسم المالك:</span>
-                <WebControlPanelStatusTag label={playbook.ownerSection} tone={playbook.severity === 'danger' ? 'danger' : 'warning'} />
-              </div>
-
-              <KeyValueList
-                items={[
-                  { label: 'عنوان الدليل', value: playbook.title },
-                  { label: 'القرار المقترح التالي', value: playbook.nextDecision },
-                  { label: 'المساحات المدعومة', value: playbook.supportedWorkspaces.join(' · ') },
-                ]}
-              />
-
-              <div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--bthwani-control-panel-text)', marginBottom: '4px' }}>النقاط المرجعية للتحقق (Checkpoints):</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  {playbook.checkpoints.map((item, index) => (
-                    <div key={index} style={{ fontSize: '11px', padding: '4px 6px', background: 'var(--bthwani-control-panel-surface-inset)', borderRadius: '4px' }}>
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
-                <button
-                  type="button"
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    background: 'var(--bthwani-control-panel-brand)',
-                    color: 'var(--bthwani-brand-contrast)',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: 700,
-                    fontSize: '11px',
-                  }}
-                  onClick={() =>
-                    router.push(
-                      buildOperationsHref(
-                        playbook.supportedWorkspaces.includes('order-rescue') ? 'order-rescue' : 'assisted-order-desk'
-                      )
-                    )
-                  }
-                >
-                  {playbook.supportedWorkspaces.includes('order-rescue') ? 'فتح إنقاذ الطلب' : 'فتد الطلب المساعد'}
-                </button>
-              </div>
-            </div>
-          </WebControlPanelInspectorShell>
-        );
-      }
+      // no live playbook data — inspector not shown
     }
   }
 
@@ -956,41 +825,7 @@ type ExceptionsStateItem = {
 
           {/* 2. Playbooks & Rescue Queue */}
           <WebControlPanelQueue title="دليل العمل وإنقاذ الطلب" meta="توجيه الإجراء السريع">
-            {DSH_ORDER_RESCUE_PREVIEW.map((item) => (
-              <WebControlPanelDecisionRow
-                key={item.rescueId}
-                entityId={item.orderId}
-                entityLabel={`إنقاذ | العميل: ${item.customerName} | العائق: ${item.blocker}`}
-                status={item.issueKind === 'payment_failure' ? 'فشل الدفع' : item.issueKind === 'item_unavailable' ? 'صنف غير متاح' : item.issueKind}
-                statusTone={item.severity === 'danger' ? 'danger' : 'warning'}
-                sla={item.wltBoundary}
-                onInspect={() => setSelectedItemId({ type: 'rescue', id: item.rescueId })}
-                primaryAction={{
-                  id: `${item.rescueId}-open`,
-                  label: 'فتح الإنقاذ',
-                  onAction: () => router.push(buildOperationsHref('order-rescue', { orderId: item.orderId })),
-                }}
-              />
-            ))}
-
-            {DSH_OPS_INTERVENTION_PLAYBOOKS.map((playbook) => (
-              <WebControlPanelDecisionRow
-                key={playbook.playbookId}
-                entityId={playbook.playbookId}
-                entityLabel={`دليل | ${playbook.title}`}
-                status={playbook.ownerSection}
-                statusTone={playbook.severity === 'danger' ? 'danger' : 'warning'}
-                sla={playbook.nextDecision}
-                onInspect={() => setSelectedItemId({ type: 'playbook', id: playbook.playbookId })}
-                primaryAction={{
-                  id: `${playbook.playbookId}-open`,
-                  label: playbook.supportedWorkspaces.includes('order-rescue') ? 'فتح الإنقاذ' : 'فتح المساعدة',
-                  onAction: () => router.push(buildOperationsHref(
-                    playbook.supportedWorkspaces.includes('order-rescue') ? 'order-rescue' : 'assisted-order-desk',
-                  )),
-                }}
-              />
-            ))}
+            {/* rescue and playbook rows: no live data — populated via API */}
           </WebControlPanelQueue>
 
           {/* 3. Central Registry display */}

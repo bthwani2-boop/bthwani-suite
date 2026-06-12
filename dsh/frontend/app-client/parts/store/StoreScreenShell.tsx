@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Animated,
   Dimensions,
+  FlatList,
   Image,
   Platform,
   StatusBar,
@@ -21,6 +22,7 @@ import { useStorePreviewState } from '../../hooks/useStorePreviewState';
 import { useStoreShellDerivedState } from '../../hooks/useStoreShellDerivedState';
 import { StoreMeasurementSheet } from '../../sheets/StoreMeasurementSheet';
 import type { DshStoreGetScreenShellProps } from '../../contracts/dsh-store-screen-props';
+import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
 import { resolveMeasurementOptions } from '../../shared/store-formatting';
 import { StoreHeroSection } from './StoreHeroSection';
 import { StoreImagePreviewSheet } from './StoreImagePreviewSheet';
@@ -94,9 +96,9 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
     }
   }, [categories, selectedCategory, setSelectedCategory]);
 
-  const listRef = React.useRef<import('react-native').FlatList<import('../../../shared/dshStoreProductCardModel').DshStoreFixtureItem> | null>(null);
+  const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
   const scrollY = React.useRef(new Animated.Value(0)).current;
-  const previewListRef = React.useRef<import('react-native').FlatList<import('../../../shared/dshStoreProductCardModel').DshStoreFixtureItem> | null>(null);
+  const previewListRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
   const previewScrollY = React.useRef(new Animated.Value(0)).current;
 
   const { openInlineSearch, closeInlineSearch } = useStoreInlineSearch({ headerSearchVisible, setHeaderSearchVisible, headerSearchQuery, setHeaderSearchQuery });

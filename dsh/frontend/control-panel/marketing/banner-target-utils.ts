@@ -2,8 +2,9 @@
 // Extracted from BannersCommandDeckScreen as part of Giant Screen split.
 // No React dependency — all functions are pure or data-driven only.
 
-import { dshCategoryFixtures } from '../../data/legacy-preview/categories.preview-data';
-import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/legacy-preview/stores.preview-data';
+const dshCategoryFixtures: { id: string; label: string; subcategories: { id: string; label: string }[] }[] = [];
+const dshDiscoveryStores: { id: string; name: string }[] = [];
+const storeItemsByStoreId: Record<string, { id: string; name: string }[]> = {};
 import type { MarketingBannerRecord } from '../../shared/dsh-marketing-types';
 import { SUBSCRIPTION_OPTIONS } from './banner-types';
 import type { BannerDraft, SmartBannerTargetType, SmartTargetSummary } from './banner-types';

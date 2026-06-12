@@ -1,16 +1,23 @@
 import type { DshPartnerActivationStatus } from './dsh-partner-activation.model';
 import { addDshAuditEntry, DshAuditEntry } from './dsh-role-permission.model';
-import {
-  PARTNER_COMPLAINTS_DATA,
-  PARTNER_MODIFICATION_REQUESTS,
-  PARTNER_DISPUTES_DATA,
-  PARTNER_FULFILLMENT_AGREEMENTS as PARTNER_FULFILLMENT_AGREEMENTS_SEED,
-} from '../data/legacy-preview/partner.preview-data';
-import type {
-  PartnerComplaint,
-  PartnerModificationRequest,
-  PartnerDispute,
-} from '../data/legacy-preview/partner.preview-data';
+export type PartnerComplaint = {
+  id: string; partnerId: string; status: 'open' | 'investigating' | 'resolved';
+  category: string; severity: 'high' | 'medium' | 'low'; description: string;
+  submittedAt: string; relatedOrderId?: string;
+};
+export type PartnerModificationRequest = {
+  id: string; partnerId: string; status: 'pending' | 'approved' | 'rejected';
+  type: string; risk: 'danger' | 'warning'; reason: string; submittedAt: string;
+  changes: { field: string; old: string; new: string }[];
+};
+export type PartnerDispute = {
+  id: string; partnerId: string; status: string; type: string; date: string; sla: string;
+};
+type DshPartnerFulfillmentAgreementSeed = { partnerId: string; storeName: string };
+const PARTNER_COMPLAINTS_DATA: PartnerComplaint[] = [];
+const PARTNER_MODIFICATION_REQUESTS: PartnerModificationRequest[] = [];
+const PARTNER_DISPUTES_DATA: PartnerDispute[] = [];
+const PARTNER_FULFILLMENT_AGREEMENTS_SEED: DshPartnerFulfillmentAgreementSeed[] = [];
 
 
 export type DshPartnerIntakeSource = 'app-field' | 'app-partner';

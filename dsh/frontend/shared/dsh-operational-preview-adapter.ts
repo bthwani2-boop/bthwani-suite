@@ -1,7 +1,3 @@
-import {
-  dshOperationalPreviewRecords,
-  type DshOperationalPreviewRecord,
-} from '../data/legacy-preview/operational.preview-data';
 import type { DshOperationalEntityId } from './dsh-operational.contract';
 import {
   getDshOperationalEntriesBySurface,
@@ -9,6 +5,10 @@ import {
   getDshOperationalEntryById,
 } from './dsh-operational-registry';
 import type { DshSurfaceId } from './dsh-flow-registry';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DshOperationalPreviewRecord = Record<string, any>;
+const dshOperationalPreviewRecords: readonly DshOperationalPreviewRecord[] = [];
 
 export const dshOperationalPreviewAdapterMeta = {
   dataKind: 'SCAFFOLD_ADAPTER',

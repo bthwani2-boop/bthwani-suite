@@ -6,7 +6,6 @@
 
 import React from 'react';
 import { useTheme } from '@bthwani/ui-kit';
-import { FULFILLMENT_MODE_ORDER_QUEUES } from '../../data/legacy-preview/orders.preview-data';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import type { DshFulfillmentOperationalMode } from './operations.types';
 
@@ -21,7 +20,7 @@ export function getOperationsActorLabel(mode: DshFulfillmentOperationalMode): st
 export const FulfillmentModeQueueSection = React.memo(function FulfillmentModeQueueSection({ mode }: { mode: DshFulfillmentOperationalMode }) {
   const { theme } = useTheme();
   const modeMeta = DSH_FULFILLMENT_OPERATIONAL_MODE_META[mode];
-  const rows = FULFILLMENT_MODE_ORDER_QUEUES[mode];
+  const rows: { id: (string); storeName: (string); customerName: (string); slaLabel: (string); statusTone: (string); statusLabel: (string); nextAction: (string) }[] = [];
 
   return (
     <div style={{ marginTop: '16px', direction: 'rtl', textAlign: 'right' }}>
