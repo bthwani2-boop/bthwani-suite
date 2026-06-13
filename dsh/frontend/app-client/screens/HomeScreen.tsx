@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { useWindowDimensions } from 'react-native';
 import { useDirection, useTheme, useUiText } from '@bthwani/ui-kit';
 
@@ -10,7 +10,7 @@ import { useHomeFilterRail } from '../hooks/useHomeFilterRail';
 import { useHomeVideoHandlers } from '../hooks/useHomeVideoHandlers';
 import { useHomeTickerState } from '../hooks/useHomeTickerState';
 import { useDebounce } from '../hooks/useDebounce';
-import { resolveDshImageSource } resolve-image-source';
+import { resolveDshImageSource } from 'resolve-image-source';
 import { HomeScreenShell } from '../parts/home/HomeScreenShell';
 import { buildHomeScreenStyles } from '../parts/home/home-screen.styles';
 import type { DshHomeGetPromo, DshHomeGetStore } from '../contracts/dsh-home-types';

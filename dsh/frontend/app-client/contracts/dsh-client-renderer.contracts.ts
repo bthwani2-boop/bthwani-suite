@@ -1,4 +1,4 @@
-﻿import type { Dispatch, SetStateAction, ReactNode } from 'react';
+import type { Dispatch, SetStateAction, ReactNode } from 'react';
 import type { DshHomeCategory, DshHomeGetPromo, DshHomeGetStore, DshHomeRecentOrder } from './dsh-home-types';
 import type { ClientOperationScreenId } from '../screens/parts/OperationScreenView';
 import type { DshFulfillmentDeliveryMode } from './dsh-client-binding.contracts';
@@ -7,15 +7,15 @@ import type { DshRoute } from '../dsh-client.types';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import type { DshClientWltIntentEntry } from '../dsh-client-wlt-payment-bridge';
 import type { DshTrackingTimelineItem } from '../hooks/useDshOrderTracking';
-import type { DshDiscoveryStoresBridgeResult } dsh-discovery-stores-bridge';
+import type { DshDiscoveryStoresBridgeResult } from 'dsh-discovery-stores-bridge';
 import type { DshClientState } from '../dsh-client.types';
-import type { DshCheckoutAuthContext } api/dsh-checkout-client';
-import type { DshStoreMenuItem, DshDiscoveryStore } presentation-models/dshStoreProductCardModel';
-import type { HomePromoRecord, MarketingGrowthRecord, MarketingVideoRecord } contracts/dsh-marketing-types';
+import type { DshCheckoutAuthContext } from 'api/dsh-checkout-client';
+import type { DshStoreMenuItem, DshDiscoveryStore } from 'presentation-models/dshStoreProductCardModel';
+import type { HomePromoRecord, MarketingGrowthRecord, MarketingVideoRecord } from 'contracts/dsh-marketing-types';
 import type { WltDshWalletSessionState } from '../../../../wlt/frontend/dsh/app-client/wlt-dsh-client.types';
 import type { DshStoreGetScreenProps } from '../screens/StoreScreen';
-import type { DshSignalSummary } contracts/dsh-signal-layer.model';
-import type { DshOrderDetailsResponse } api/dsh-order-lifecycle-client';
+import type { DshSignalSummary } from 'contracts/dsh-signal-layer.model';
+import type { DshOrderDetailsResponse } from 'api/dsh-order-lifecycle-client';
 
 export type DshClientSessionContext = {
   dshAuthBearerToken: string | null | undefined;
@@ -127,11 +127,12 @@ export type DshClientMarketingContext = {
   recordMarketingGrowthImpression: ((id: string) => void) | undefined;
 };
 
-export type DshClientRouteRendererProps =
-  DshClientSessionContext &
-  DshClientRouteContext &
-  DshClientHomeContext &
-  DshClientStoreContext &
-  DshClientCheckoutContext &
-  DshClientOrdersContext &
-  DshClientMarketingContext;
+export type DshClientRouteRendererProps = {
+  readonly session: DshClientSessionContext;
+  readonly routeContext: DshClientRouteContext;
+  readonly home: DshClientHomeContext;
+  readonly store: DshClientStoreContext;
+  readonly checkout: DshClientCheckoutContext;
+  readonly orders: DshClientOrdersContext;
+  readonly marketing: DshClientMarketingContext;
+};

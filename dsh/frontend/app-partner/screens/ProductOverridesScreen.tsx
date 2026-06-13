@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ScrollView } from 'react-native';
 import {
   Box,
@@ -19,10 +19,7 @@ import {
   type DshProductRecord,
   type DshCatalogOverrideInput,
 } from '../../shared/api/dsh-product-api.client';
-import {
-  createDshProductApiHttpClient,
-  resolveDshProductApiBaseUrl,
-} from '../../shared/api/dsh-product-api.transport';
+import { getDshProductRuntimeClient } from '../../shared';
 
 export type ProductOverridesScreenProps = {
   productId: string;
@@ -62,7 +59,7 @@ export function ProductOverridesScreen({
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const client = React.useMemo(
-    () => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()),
+    () => getDshProductRuntimeClient(),
     [],
   );
 

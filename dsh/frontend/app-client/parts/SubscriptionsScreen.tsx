@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import {
   Badge,
@@ -13,7 +13,7 @@ import {
   useTheme,
   radius,
 } from '@bthwani/ui-kit';
-import type { SubscriptionClientCard } contracts/commercial-contract';
+import type { SubscriptionClientCard } from 'contracts/commercial-contract';
 
 export type DshSubscriptionsScreenProps = {
   compact?: boolean;

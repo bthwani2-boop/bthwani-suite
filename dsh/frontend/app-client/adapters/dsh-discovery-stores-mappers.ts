@@ -1,5 +1,5 @@
-﻿import type { DshDiscoveryStore } presentation-models/dshStoreProductCardModel';
-import type { components } from '../contracts/dsh-openapi.types';
+import type { DshDiscoveryStore } from 'presentation-models/dshStoreProductCardModel';
+import type { components } from '../../shared/contracts/openapi/dsh-openapi.types';
 import type { DshHomeGetStore } from '../contracts/dsh-home-types';
 import type { DshListDiscoveryStoresResponse } from './dsh-discovery-stores-client';
 

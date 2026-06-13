@@ -1,87 +1,22 @@
-﻿import React from 'react';
-import { createWltDshTypedClient, type WltSettlement } from '../contracts';
+import React from 'react';
 import {
-  formatWltYer,
-  type WltDshFinanceSummaryRecord,
-  type WltPartnerFinanceSnapshot,
+  EMPTY_PARTNER_FINANCE_SNAPSHOT,
+  getPartnerSnapshot,
 } from '../shared';
-
-const EMPTY_PARTNER_SNAPSHOT: WltPartnerFinanceSnapshot = {
-  settlementRecords: [],
-  grossSalesMinorUnits: 0, grossSalesLabel: '—',
-  platformCommissionMinorUnits: 0, platformCommissionLabel: '—',
-  deductionsMinorUnits: 0, deductionsLabel: '—',
-  netSettlementMinorUnits: 0, netSettlementLabel: '—',
-  nextSettlementMinorUnits: 0, nextSettlementLabel: '—',
-  totalLabel: '—',
-  cycleStatus: 'empty', cycleStartDate: '—', cycleEndDate: '—', nextPayoutDate: '—',
-  contractState: 'CONTRACT_TBD',
-  dataKind: 'preview', runtimeTruth: 'none — runtime_unbound',
-  backendSource: 'none — preview_seeds_only', bindingSource: 'wlt_frontend_shared_finance',
-  moneySemantics: 'display_only — no_accounting_effect',
-  sourceLabel: '—', warnings: [], isPreview: false,
-};
 import { mapWltDshPartnerPreviewTransactions } from './wlt-dsh-partner.adapter';
 
-function settlementRecord(s: WltSettlement): WltDshFinanceSummaryRecord {
-  const amount = Math.round(s.partner_payout * 100);
-  const isDone = s.status === 'COMPLETED';
-  return {
-    id: s.id,
-    actor: 'partner',
-    kind: 'partner-settlement',
-    currencyCode: s.currency,
-    amountMinorUnits: amount,
-    amountLabel: formatWltYer(amount),
-    tone: amount >= 0 ? 'positive' : 'negative',
-    title: `ØªØ³ÙˆÙŠØ© Ø´Ø±ÙŠÙƒ Â· ${s.partner_id}`,
-    subtitle: `WLT runtime Â· ${s.status}`,
-    statusLabel: s.status,
-    statusTone: isDone ? 'success' : 'warning',
-    timeLabel: s.created_at,
-    sourceStoreId: s.partner_id,
-    sourceOrderId: s.order_id,
-    settlementCycleId: s.id,
-    isPreview: false,
-  };
-}
-
 export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerToken?: string | null) {
-  const [partnerPreview, setPartnerPreview] = React.useState<WltPartnerFinanceSnapshot>(EMPTY_PARTNER_SNAPSHOT);
+  const [partnerPreview, setPartnerPreview] = React.useState(EMPTY_PARTNER_FINANCE_SNAPSHOT);
   const [lastError, setLastError] = React.useState<string | null>(null);
 
   const activePartnerId = partnerId || 'partner-demo';
-  const client = React.useMemo(() => {
-    return createWltDshTypedClient({
-      bearerToken: dshAuthBearerToken || undefined,
-      devClientId: activePartnerId,
-    });
-  }, [dshAuthBearerToken, activePartnerId]);
 
   React.useEffect(() => {
     let cancelled = false;
-    void client.listPartnerSettlements(activePartnerId)
-      .then(({ settlements }) => {
+    void getPartnerSnapshot(activePartnerId, dshAuthBearerToken)
+      .then((snapshot) => {
         if (cancelled) return;
-        const settlementRecords = settlements.map(settlementRecord);
-        const netSettlementMinorUnits = settlements.reduce((sum, s) => sum + Math.round(s.partner_payout * 100), 0);
-        setPartnerPreview({
-          ...EMPTY_PARTNER_SNAPSHOT,
-          settlementRecords,
-          grossSalesMinorUnits: netSettlementMinorUnits,
-          grossSalesLabel: formatWltYer(netSettlementMinorUnits),
-          netSettlementMinorUnits,
-          netSettlementLabel: formatWltYer(netSettlementMinorUnits),
-          nextSettlementMinorUnits: netSettlementMinorUnits,
-          nextSettlementLabel: formatWltYer(netSettlementMinorUnits),
-          totalLabel: formatWltYer(netSettlementMinorUnits),
-          cycleStatus: settlements[0]?.status ?? 'empty',
-          cycleStartDate: settlements[0]?.created_at ?? '—',
-          cycleEndDate: settlements[0]?.created_at ?? '—',
-          sourceLabel: 'WLT runtime',
-          warnings: [],
-          isPreview: false,
-        });
+        setPartnerPreview(snapshot);
         setLastError(null);
       })
       .catch((error) => {
@@ -91,7 +26,7 @@ export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerT
     return () => {
       cancelled = true;
     };
-  }, [client, activePartnerId]);
+  }, [activePartnerId, dshAuthBearerToken]);
 
   const previewTransactions = React.useMemo(
     () => mapWltDshPartnerPreviewTransactions(partnerPreview.settlementRecords),

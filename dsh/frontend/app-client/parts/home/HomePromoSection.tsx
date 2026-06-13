@@ -1,9 +1,9 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { Image, Pressable, ScrollView, View } from 'react-native';
 import { BannerCarousel, Icon, Text, colorPalette, spacing } from '@bthwani/ui-kit';
 
 import { CategoryHubIcon, CategoryIconImage, CategorySelectorItem } from './HomeCategoryCarousel';
-import { normalizeHomePromoActionType } home-promo-mappers';
+import { normalizeHomePromoActionType } from 'home-promo-mappers';
 import type { DshHomeGetPromo } from '../../contracts/dsh-home-types';
 import type { HomeScreenShellProps } from './HomeScreenShell';
 

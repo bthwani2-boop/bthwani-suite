@@ -24,15 +24,12 @@ import {
   getActionableHandoffsForSurface,
 } from '../shared/contracts/dsh-order-lifecycle-handoffs';
 import {
-  resolveDshOrderApiBaseUrl,
-  createDshOrderLifecycleHttpClient,
-  fetchDshRuntimeOrders,
-  type DshRuntimeOrderRow,
   PlatformVarsProvider,
   FeatureFlagProvider,
   usePlatformVars,
+  usePartnerOrdersRuntime,
 } from '../shared';
-import type { PartnerOrderItem, PartnerOrdersInboxScreenState } from './screens/OrdersInboxScreen';
+import type { PartnerOrderItem } from './screens/OrdersInboxScreen';
 import { DshPartnerHubSurface } from './screens/PartnerHubScreen';
 import { InventoryCatalogScreen } from './screens/InventoryCatalogScreen';
 import {
@@ -103,55 +100,6 @@ function PartnerStoreScopeSheet({
   );
 }
 
-function mapRuntimeRowToPartnerItem(row: DshRuntimeOrderRow): PartnerOrderItem {
-  const statusMap: Record<string, PartnerOrderItem['status']> = {
-    CREATED: 'needs_accept',
-    ACCEPTED: 'preparation_started',
-    READY_FOR_PICKUP: 'ready',
-    ACCEPTED_BY_CAPTAIN: 'captain_assigned',
-    PICKED_UP: 'handoff',
-    EN_ROUTE: 'delivering',
-    ARRIVED: 'delivering',
-    DELIVERED: 'completed',
-    CANCELLED: 'cancelled',
-    REFUNDED: 'cancelled',
-    FAILED_DELIVERY: 'cancelled',
-    RETURNING_TO_STORE: 'cancelled',
-    RETURNED: 'cancelled',
-  };
-  const partnerStatus: PartnerOrderItem['status'] = statusMap[row.status] ?? 'needs_accept';
-  const nextActionMap: Record<PartnerOrderItem['status'], string> = {
-    new: 'قبول الطلب',
-    needs_accept: 'قبول الطلب',
-    preparation_started: 'بدء التحضير',
-    preparing: 'جاري التحضير',
-    items_ready: 'جاهز',
-    ready: 'جاهز للاستلام',
-    handoff: 'تم التسليم للكابتن',
-    captain_assigned: 'الكابتن في الطريق',
-    captain_arriving: 'الكابتن يقترب',
-    delivering: 'قيد التوصيل',
-    completed: 'مكتمل',
-    cancelled: 'ملغي',
-  };
-  const created = new Date(row.createdAt);
-  const elapsed = Math.max(0, Math.floor((Date.now() - created.getTime()) / 60000));
-  return {
-    id: row.id,
-    orderCode: `#${row.id.slice(-6).toUpperCase()}`,
-    branchLabel: row.storeId,
-    status: partnerStatus,
-    priority: 'normal',
-    orderTypeLabel: 'توصيل بثواني',
-    orderMode: 'bthwani_delivery',
-    itemsCountLabel: '—',
-    amountLabel: `${row.totalPrice.toFixed(2)} ر.س`,
-    createdAtLabel: created.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
-    elapsedLabel: elapsed < 60 ? `${elapsed} د` : `${Math.floor(elapsed / 60)} س`,
-    nextActionLabel: nextActionMap[partnerStatus],
-  };
-}
-
 export function DshPartnerSurface(props: DshPartnerSurfaceProps) {
   return (
     <PlatformVarsProvider>
@@ -187,48 +135,15 @@ function DshPartnerSurfaceInner({
   const routeTransitionFromBackRef = React.useRef(false);
   const supportDirectoryIntentRef = React.useRef(false);
 
-  const [partnerOrders, setPartnerOrders] = React.useState<readonly PartnerOrderItem[]>([]);
-  const [partnerOrdersState, setPartnerOrdersState] = React.useState<PartnerOrdersInboxScreenState>('loading');
-
-  const apiBaseUrl = React.useMemo(() => resolveDshOrderApiBaseUrl(), []);
-  const orderLifecycleClient = React.useMemo(
-    () => createDshOrderLifecycleHttpClient(apiBaseUrl),
-    [apiBaseUrl],
-  );
-
-  React.useEffect(() => {
-    if (route !== 'inbox') return;
-    setPartnerOrdersState('loading');
-    fetchDshRuntimeOrders({ limit: 100 }).then((result) => {
-      if (result.kind === 'ok') {
-        const items = result.orders.map(mapRuntimeRowToPartnerItem);
-        setPartnerOrders(items);
-        setPartnerOrdersState(items.length === 0 ? 'empty' : 'ready');
-      } else if (result.kind === 'offline') {
-        setPartnerOrdersState('offline');
-      } else {
-        setPartnerOrdersState('error');
-      }
-    }).catch(() => setPartnerOrdersState('error'));
-  }, [route]);
-
-  const handleMarkReady = React.useCallback(
-    (orderId: string) => {
-      orderLifecycleClient
-        .updateOrderStatus(orderId, { actor: 'partner', status: 'READY_FOR_PICKUP' })
-        .then(() => {
-          setPartnerOrders((prev) =>
-            prev.map((item) =>
-              item.id === orderId ? { ...item, status: 'ready' as const } : item,
-            ),
-          );
-        })
-        .catch(() => {
-          // status mutation failed — leave item as-is so user can retry
-        });
-    },
-    [orderLifecycleClient],
-  );
+  const {
+    orders: partnerOrders,
+    state: partnerOrdersState,
+    markReady: handleMarkReady,
+  } = usePartnerOrdersRuntime(route) as {
+    orders: readonly PartnerOrderItem[];
+    state: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled' | 'partial';
+    markReady: (orderId: string) => void;
+  };
 
   React.useEffect(() => {
     if (route !== 'inbox' && ordersSearchMode) {

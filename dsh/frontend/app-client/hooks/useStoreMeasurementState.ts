@@ -1,5 +1,5 @@
-﻿import * as React from 'react';
-import type { DshStoreMenuItem } presentation-models/dshStoreProductCardModel';
+import * as React from 'react';
+import type { DshStoreMenuItem } from 'presentation-models/dshStoreProductCardModel';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 
 type MeasurementPickerAnchor = {

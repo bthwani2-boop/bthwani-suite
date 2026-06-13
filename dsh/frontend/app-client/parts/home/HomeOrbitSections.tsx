@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import {
   Image,
   Pressable,
@@ -14,9 +14,9 @@ import { Text } from '@bthwani/ui-kit';
 
 import type { DshServiceId } from '../../contracts/dsh-home-types';
 import type { HomeScreenShellProps } from './HomeScreenShell';
-import type { DshHomeServiceDialItem } adapters/home-service-config';
-import { DSH_HOME_SERVICE_DIAL_ITEMS as dshHomeServiceDialFixtures } adapters/home-service-config';
-import { resolveDshImageSource } media/resolve-dsh-image-source';
+import type { DshHomeServiceDialItem } from 'adapters/home-service-config';
+import { DSH_HOME_SERVICE_DIAL_ITEMS as dshHomeServiceDialFixtures } from 'adapters/home-service-config';
+import { resolveDshImageSource } from 'media/resolve-dsh-image-source';
 
 // --------------------------------------------------------------------------
 // Local DSH category tile — uses runtime media resolution or emoji fallback.

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   Modal,
   Platform,
@@ -17,12 +17,12 @@ import {
   spacing,
   typographyRoles,
 } from '@bthwani/ui-kit';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
 import {
   formatCurrencyValue,
   normalizeDisplayText,
   resolveMeasurementUnitPrice,
-} store-formatting';
+} from 'store-formatting';
 
 // ---------------------------------------------------------------------------
 // Appearance token subset passed from the Store screen shell.

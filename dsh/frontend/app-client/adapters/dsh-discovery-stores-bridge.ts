@@ -1,4 +1,4 @@
-﻿import type { DshDiscoveryStore } presentation-models/dshStoreProductCardModel';
+import type { DshDiscoveryStore } from 'presentation-models/dshStoreProductCardModel';
 import type { DshHomeGetStore } from '../contracts/dsh-home-types';
 import type { DshListDiscoveryStoresResponse } from './dsh-discovery-stores-client';
 import {

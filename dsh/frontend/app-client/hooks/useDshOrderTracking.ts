@@ -1,16 +1,15 @@
-﻿import React from 'react';
+import React from 'react';
 import { Platform } from 'react-native';
 import {
-  createDshOrderLifecycleHttpClient,
   type DshCheckoutAuthContext,
   type DshOrderDetailsResponse,
 } from '../../shared';
-import { resolveDshDiscoveryStoresRuntimeConfig } dsh-discovery-stores-runtime-config';
+import { resolveDshDiscoveryStoresRuntimeConfig } from 'dsh-discovery-stores-runtime-config';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import { initialOrders, hostClientStates } from '../dsh-client.navigation-bridge';
 import { getClientWltIntentForState, type DshClientWltIntentEntry } from '../dsh-client-wlt-payment-bridge';
-import { getDshClientStateMeta, type DshClientState } state-machines/client-state';
+import { getDshClientStateMeta, type DshClientState } from 'state-machines/client-state';
 import type { DshRoute } from '../dsh-client.types';
 
 const TERMINAL_STATUSES = new Set(['DELIVERED', 'CANCELLED', 'REFUNDED', 'FAILED_DELIVERY', 'RETURNED']);
@@ -149,7 +148,7 @@ export function useDshOrderTracking({
     const config = resolveDshDiscoveryStoresRuntimeConfig();
     if (!config) return undefined;
     let cancelled = false;
-    const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
+    const orderClient = getDshOrderLifecycleRuntimeClient(checkoutAuth);
     orderClient.listOrders({ limit: 50 })
       .then((resp) => {
         if (cancelled || !resp.orders.length) return;
@@ -180,7 +179,7 @@ export function useDshOrderTracking({
     const config = resolveDshDiscoveryStoresRuntimeConfig();
     if (!config) { setLiveOrderDetails(null); return undefined; }
 
-    const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
+    const orderClient = getDshOrderLifecycleRuntimeClient(checkoutAuth);
     let cancelled = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let nextDelayMs = 2000;
@@ -281,7 +280,7 @@ export function useDshOrderTracking({
     const config = resolveDshDiscoveryStoresRuntimeConfig();
     if (!config || !selectedOrderId) return;
 
-    const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
+    const orderClient = getDshOrderLifecycleRuntimeClient(checkoutAuth);
     orderClient.cancelOrder(selectedOrderId, { actor: 'client', note: 'إلغاء الطلب من قبل العميل' })
       .then(() => orderClient.getOrder(selectedOrderId))
       .then((details) => {
@@ -297,7 +296,7 @@ export function useDshOrderTracking({
     const config = resolveDshDiscoveryStoresRuntimeConfig();
     if (!config || !selectedOrderId) return;
 
-    const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
+    const orderClient = getDshOrderLifecycleRuntimeClient(checkoutAuth);
     await orderClient.createSupportEscalation({ order_id: selectedOrderId, actor: 'client', issue_type: issueType as any, description });
     const details = await orderClient.getOrder(selectedOrderId);
     setLiveOrderDetails(details);

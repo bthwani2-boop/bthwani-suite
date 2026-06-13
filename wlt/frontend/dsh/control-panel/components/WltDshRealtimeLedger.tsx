@@ -4,8 +4,9 @@ import React from 'react';
 import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
-import { resolveWltDshApiBaseUrl, type WltLedgerEntry } from '../../contracts';
+import type { WltLedgerEntry } from '../../contracts';
 import { loadWltDshFinanceRuntimeReadModel, type WltDshFinanceRuntimeResult } from '../adapters/wltDshFinanceRuntime.adapter';
+import { resolveWltDshRealtimeLedgerWsUrl } from '../../shared/adapters/wlt-dsh-realtime-ledger-runtime';
 import { formatWltYer } from '../models/dshFinance.types';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -65,11 +66,8 @@ export function WltDshRealtimeLedger() {
 
     const connectWs = () => {
       if (!active) return;
-      const apiBase = resolveWltDshApiBaseUrl();
-      const wsUrl = apiBase.replace(/^http/, 'ws') + '/payment/sessions/ledger/ws';
-
       setWsStatus('reconnecting');
-      ws = new WebSocket(wsUrl);
+      ws = new WebSocket(resolveWltDshRealtimeLedgerWsUrl());
 
       ws.onopen = () => {
         if (!active) return;

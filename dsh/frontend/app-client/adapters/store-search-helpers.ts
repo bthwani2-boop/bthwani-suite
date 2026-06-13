@@ -1,4 +1,4 @@
-﻿import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
 
 import { normalizeDisplayText } from './store-formatting';
 

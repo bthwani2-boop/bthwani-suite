@@ -1,5 +1,5 @@
-﻿import { Platform } from 'react-native';
-import type { DshClientState } state-machines/client-state';
+import { Platform } from 'react-native';
+import type { DshClientState } from 'state-machines/client-state';
 import {
   type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,

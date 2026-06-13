@@ -1,7 +1,7 @@
-﻿import React from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import { CancelOrderSheet } from '../sheets/CancelOrderSheet';
-import { getDshClientStateMeta } state-machines/client-state';
+import { getDshClientStateMeta } from 'state-machines/client-state';
 import {
   defaultCreateOrderValues,
   FULL_JOURNEY_STEPS,

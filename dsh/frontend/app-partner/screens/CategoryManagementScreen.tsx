@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ScrollView, Alert } from 'react-native';
 import {
   Box,
@@ -20,10 +20,7 @@ import {
   type DshCreateCategoryRequest,
   type DshUpdateCategoryRequest,
 } from '../../shared/api/dsh-product-api.client';
-import {
-  createDshProductApiHttpClient,
-  resolveDshProductApiBaseUrl,
-} from '../../shared/api/dsh-product-api.transport';
+import { getDshProductRuntimeClient } from '../../shared';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -117,7 +114,7 @@ export function CategoryManagementScreen({
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const client = React.useMemo(
-    () => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()),
+    () => getDshProductRuntimeClient(),
     [],
   );
 

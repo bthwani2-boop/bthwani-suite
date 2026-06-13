@@ -1,23 +1,23 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import type {
   DshHomeCategory,
   DshHomeGetStore,
   DiscoveryFilter,
   StorePagerPage,
 } from '../contracts/dsh-home-types';
-import type { DshPartnerActivationStatus } contracts/dsh-partner-activation.model';
-import { resolveDshStoreClientVisibility } contracts/dsh-client-visibility.model';
+import type { DshPartnerActivationStatus } from 'contracts/dsh-partner-activation.model';
+import { resolveDshStoreClientVisibility } from 'contracts/dsh-client-visibility.model';
 import {
   getHomePromoVisibilityRecord,
   isMarketingRenderable,
-} contracts/marketing-visibility.contract';
-import type { HomePromoRecord } contracts/dsh-marketing-types';
+} from 'contracts/marketing-visibility.contract';
+import type { HomePromoRecord } from 'contracts/dsh-marketing-types';
 import type { HomeStoreCardEntry } from '../parts/home/HomeStoreFeedSection';
-import { resolveHomePromoPublishStage } home-promo-mappers';
-import { resolveHomeStoresForCategory } home-search-helpers';
-import { resolveDshRuntimeImageSource } resolve-runtime-image-source';
+import { resolveHomePromoPublishStage } from 'home-promo-mappers';
+import { resolveHomeStoresForCategory } from 'home-search-helpers';
+import { resolveDshRuntimeImageSource } from 'resolve-runtime-image-source';
 // getPublishedHomePromos removed — home promos come from API.
-import { canRenderInClientSurface } state-machines/workflow';
+import { canRenderInClientSurface } from 'state-machines/workflow';
 
 type UseHomeDerivedStoresParams = {
   stores?: DshHomeGetStore[];

@@ -1,7 +1,8 @@
-﻿import React from 'react';
+import React from 'react';
 import type { DshHomeCategory, DshHomeGetStore } from '../contracts/dsh-home-types';
-import { createDshProductApiHttpClient, isDshProductApiOfflineError } api/dsh-product-api.transport';
-import { resolveDshDiscoveryStoresRuntimeConfig } dsh-discovery-stores-runtime-config';
+import { isDshProductApiOfflineError } from 'api/dsh-product-api.transport';
+import { getDshProductRuntimeClient } from '../../shared';
+import { resolveDshDiscoveryStoresRuntimeConfig } from 'dsh-discovery-stores-runtime-config';
 
 export type CategoriesBridgeResult = {
   state: 'loading' | 'ready' | 'empty' | 'error' | 'offline';
@@ -33,7 +34,7 @@ export function useDshClientHomeCategories(
     let cancelled = false;
     setCategoriesState('loading');
 
-    const client = createDshProductApiHttpClient(config.baseUrl);
+    const client = getDshProductRuntimeClient();
 
     // Fetch categories for all visible stores in parallel
     const fetchPromises = visibleStores.map((store) =>

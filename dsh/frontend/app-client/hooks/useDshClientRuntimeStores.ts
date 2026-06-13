@@ -1,14 +1,15 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   resolveDshDiscoveryStoresBridge,
   type DshDiscoveryStoresBridgeResult,
-} dsh-discovery-stores-bridge';
+} from 'dsh-discovery-stores-bridge';
 import {
   clientVisibleDiscoveryStores as initialDiscoveryStores,
   clientVisibleHomeStores as initialHomeStores,
 } from '../dsh-client.navigation-bridge';
-import { resolveDshDiscoveryStoresRuntimeConfig } dsh-discovery-stores-runtime-config';
-import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } dsh-discovery-stores-transport';
+import { resolveDshDiscoveryStoresRuntimeConfig } from 'dsh-discovery-stores-runtime-config';
+import { isDshDiscoveryStoresOfflineError } from 'dsh-discovery-stores-transport';
+import { getDshDiscoveryStoresRuntimeClient } from '../../shared';
 
 export function useDshClientRuntimeStores() {
   const [runtimeBridge, setRuntimeBridge] = React.useState<DshDiscoveryStoresBridgeResult>(() =>
@@ -41,7 +42,7 @@ export function useDshClientRuntimeStores() {
       }),
     );
 
-    const client = createDshDiscoveryStoresClient(config);
+    const client = getDshDiscoveryStoresRuntimeClient(config);
 
     client.listDiscoveryStores().then((response) => {
       if (cancelled) return;

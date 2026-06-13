@@ -20,7 +20,8 @@ import {
 } from '@bthwani/ui-kit';
 import { useWltDshWalletSession } from './useWltDshWalletSession';
 import { listLedgerEntries } from './wlt-dsh-client.adapter';
-import { formatWltYer } from '../shared';
+import { adaptClientLedgerEntries, formatWltYer } from '../shared';
+import type { WltDshClientWalletLedgerRow } from '../shared';
 
 export type CustomerWalletScreenProps = {
 	clientId?: string;
@@ -30,7 +31,7 @@ export type CustomerWalletScreenProps = {
 export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken }: CustomerWalletScreenProps) {
 	const { theme } = useTheme();
 	const wallet = useWltDshWalletSession(clientId, bearerToken);
-	const [transactions, setTransactions] = React.useState<any[]>([]);
+	const [transactions, setTransactions] = React.useState<readonly WltDshClientWalletLedgerRow[]>([]);
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
 	const [offline, setOffline] = React.useState<boolean>(false);
 	const [rechargeAmount, setRechargeAmount] = React.useState<string>('');
@@ -45,7 +46,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 		setOffline(false);
 		try {
 			const res = await listLedgerEntries(clientId, bearerToken, 20, 0);
-			setTransactions(res.entries || []);
+			setTransactions(adaptClientLedgerEntries(res.entries || []));
 		} catch (err) {
 			console.error('Failed to fetch ledger entries:', err);
 			const isOffline = !globalThis.navigator?.onLine || (err instanceof TypeError && /network|fetch/i.test(String(err)));
@@ -202,8 +203,8 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 							) : (
 								<Surface tone="default" style={styles.txListContainer}>
 									{transactions.map((tx, idx) => {
-										const isCredit = tx.transaction_type === 'CREDIT';
-										const dateLabel = new Date(tx.created_at).toLocaleDateString('ar-YE', {
+										const isCredit = tx.direction === 'credit';
+										const dateLabel = new Date(tx.createdAt).toLocaleDateString('ar-YE', {
 											month: 'short',
 											day: 'numeric',
 											hour: '2-digit',
@@ -213,7 +214,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 											<React.Fragment key={tx.id}>
 												{idx > 0 && <Divider />}
 												<ListItem
-													title={tx.description || (isCredit ? 'شحن رصيد' : 'دفع قيمة طلب')}
+													title={tx.description || tx.typeLabel}
 													subtitle={dateLabel}
 													meta={
 														<View style={{ alignItems: 'flex-start' }}>
@@ -223,7 +224,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 																	color: isCredit ? colorPalette.success : colorPalette.danger,
 																}}
 															>
-																{isCredit ? '+' : '-'} {formatWltYer(tx.amount * 100)}
+																{isCredit ? '+' : '-'} {tx.amountLabel}
 															</Text>
 															<Badge
 																label={tx.status === 'COMPLETED' ? 'مكتمل' : 'معلق'}

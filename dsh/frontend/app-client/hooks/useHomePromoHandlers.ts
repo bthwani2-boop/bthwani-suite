@@ -1,11 +1,11 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import type {
   DshHomeCategory,
   DshHomeGetPromo,
   DiscoveryFilter,
 } from '../contracts/dsh-home-types';
-import { resolveColorToken } adapters/dsh-color-resolver';
-import { resolveHomeCategoryContext } home-promo-mappers';
+import { resolveColorToken } from 'adapters/dsh-color-resolver';
+import { resolveHomeCategoryContext } from 'home-promo-mappers';
 
 type UseHomePromoHandlersParams = {
   categoryItems: DshHomeCategory[];

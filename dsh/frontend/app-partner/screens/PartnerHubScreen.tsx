@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Pressable, Switch as RNSwitch, View, Share, BackHandler } from 'react-native';
 import {
   AppearanceOptionCard,
@@ -47,8 +47,8 @@ import {
   type DshPartnerLifecycleStage,
 } from '../../shared/state-machines/dsh-partner-onboarding-journey.map';
 import { getDshPartnerActivationStatusLabel } from '../../shared/contracts/dsh-partner-activation.model';
-import { createDshMediaApiHttpClient, type DshMediaAsset } from '../../shared/api/dsh-media-api.client';
-import { resolveDshProductApiBaseUrl } from '../../shared/api/dsh-product-api.transport';
+import type { DshMediaAsset } from '../../shared/api/dsh-media-api.client';
+import { getDshMediaRuntimeClient } from '../../shared';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';
@@ -1568,11 +1568,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
   const [isAvailable, setIsAvailable] = React.useState<boolean>(storeOpen);
 
-  const _mediaBaseUrl = React.useMemo(() => resolveDshProductApiBaseUrl(), []);
-  const _mediaClient = React.useMemo(
-    () => (_mediaBaseUrl ? createDshMediaApiHttpClient(_mediaBaseUrl) : null),
-    [_mediaBaseUrl],
-  );
+  const _mediaClient = React.useMemo(() => getDshMediaRuntimeClient(), []);
   const [storeMediaAssets, setStoreMediaAssets] = React.useState<DshMediaAsset[]>([]);
 
   const { direction } = useDirection();

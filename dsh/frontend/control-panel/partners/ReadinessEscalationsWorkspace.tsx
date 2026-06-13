@@ -9,8 +9,7 @@ import {
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
 import {
-  createDshFieldReadinessHttpClient,
-  resolveDshFieldReadinessBaseUrl,
+  getDshFieldReadinessRuntimeClient,
   type FieldReadinessEscalationRecord,
 } from '../../shared';
 
@@ -23,7 +22,7 @@ export function ReadinessEscalationsWorkspace() {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
   const client = React.useMemo(() => {
-    return createDshFieldReadinessHttpClient(resolveDshFieldReadinessBaseUrl());
+    return getDshFieldReadinessRuntimeClient();
   }, []);
 
   const loadEscalations = React.useCallback(async () => {

@@ -1,11 +1,11 @@
-﻿import * as React from 'react';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+import * as React from 'react';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
-import type { DshStoreSearchCategory } store-search-helpers';
-import { buildStoreSearchCategories } store-search-helpers';
-import { getAllDeliveryModes } store-formatting';
+import type { DshStoreSearchCategory } from 'store-search-helpers';
+import { buildStoreSearchCategories } from 'store-search-helpers';
+import { getAllDeliveryModes } from 'store-formatting';
 import { getDshFulfillmentDeliveryModeMeta } from '../contracts/dsh-client-binding.contracts';
-import { canRenderInClientSurface } state-machines/workflow';
+import { canRenderInClientSurface } from 'state-machines/workflow';
 
 type StoreDeliveryModeOption = {
   id: DshFulfillmentDeliveryMode;

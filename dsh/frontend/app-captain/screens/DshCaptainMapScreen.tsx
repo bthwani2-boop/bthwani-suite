@@ -6,7 +6,7 @@ import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
 import { getDshFlowPolicySummary } from '../../shared/policies/dsh-flow-registry';
 
-import { DshOrderLifecycleClient } from '../../shared/api/dsh-order-lifecycle-client';
+import type { DshCaptainLifecycleStatus } from '../../shared/runtime';
 import { type DshOperationScreenState } from '../parts/OperationScreen';
 
 type CaptainFieldStage = 'to-store' | 'to-customer' | 'near-customer' | 'at-door' | 'bell-rang' | 'proof';
@@ -98,14 +98,21 @@ export interface DshCaptainMapScreenProps {
   readonly orderId: string;
   readonly captainId?: string;
   readonly onBack: () => void;
-  readonly orderLifecycleClient: DshOrderLifecycleClient;
+  readonly onPushLocation: (push: {
+    readonly orderId: string;
+    readonly captainId: string;
+    readonly latitude: number;
+    readonly longitude: number;
+    readonly lifecycleStatus: string;
+    readonly orderStatus?: DshCaptainLifecycleStatus;
+  }) => Promise<unknown>;
 }
 
 export function DshCaptainMapScreen({
   orderId,
   captainId = 'captain-1',
   onBack,
-  orderLifecycleClient,
+  onPushLocation,
 }: DshCaptainMapScreenProps) {
   const [taskStage, setTaskStage] = React.useState<CaptainFieldStage>('to-store');
   const [stagesVisible, setStagesVisible] = React.useState(false);
@@ -134,12 +141,13 @@ export function DshCaptainMapScreen({
     }
 
     try {
-      await orderLifecycleClient.pushLocation(orderId, {
-        captain_id: captainId,
+      await onPushLocation({
+        orderId,
+        captainId,
         latitude: STAGE_COORDINATES[next].lat,
         longitude: STAGE_COORDINATES[next].lng,
-        lifecycle_status: STAGE_CONFIG[next].lifecycleStatus,
-        order_status: nextOrderStatus,
+        lifecycleStatus: STAGE_CONFIG[next].lifecycleStatus,
+        orderStatus: nextOrderStatus,
       });
       setTaskStage(next);
       setScreenState('ready');
@@ -163,12 +171,13 @@ export function DshCaptainMapScreen({
     }
 
     try {
-      await orderLifecycleClient.pushLocation(orderId, {
-        captain_id: captainId,
+      await onPushLocation({
+        orderId,
+        captainId,
         latitude: STAGE_COORDINATES[stage].lat,
         longitude: STAGE_COORDINATES[stage].lng,
-        lifecycle_status: STAGE_CONFIG[stage].lifecycleStatus,
-        order_status: nextOrderStatus,
+        lifecycleStatus: STAGE_CONFIG[stage].lifecycleStatus,
+        orderStatus: nextOrderStatus,
       });
       setTaskStage(stage);
       setScreenState('ready');

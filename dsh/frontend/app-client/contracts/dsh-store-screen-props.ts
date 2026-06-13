@@ -1,7 +1,7 @@
-﻿import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
+import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 
 import type { DshFulfillmentDeliveryMode } from './dsh-client-binding.contracts';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
 import type { useStoreState } from '../hooks/useStoreState';
 import type { useStoreDerivedItems } from '../hooks/useStoreDerivedItems';
 

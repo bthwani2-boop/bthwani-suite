@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ScrollView } from 'react-native';
 import {
   Box,
@@ -25,10 +25,7 @@ import {
   type DshCreateProductRequest,
   type DshUpdateProductRequest,
 } from '../../shared/api/dsh-product-api.client';
-import {
-  createDshProductApiHttpClient,
-  resolveDshProductApiBaseUrl,
-} from '../../shared/api/dsh-product-api.transport';
+import { getDshProductRuntimeClient } from '../../shared';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -109,7 +106,7 @@ export function ProductEditScreen({
   const [approvalStatus, setApprovalStatus] = React.useState<DshProductIdentityApprovalStatus>('partner_submitted');
 
   const client = React.useMemo(
-    () => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()),
+    () => getDshProductRuntimeClient(),
     [],
   );
 

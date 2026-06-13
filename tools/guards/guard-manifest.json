@@ -1289,6 +1289,150 @@
         ".mjs",
         ".md"
       ]
+    },
+    {
+      "id": "GUARD_NO_BROKEN_IMPORTS",
+      "file": "tools/guards/guard-no-broken-imports.mjs",
+      "ownerPolicy": [
+        "governance/03_REPO_BOUNDARIES.md",
+        "governance/14_GUARDS_CATALOG.md"
+      ],
+      "purpose": "detect malformed ES import/export declarations and broken layout imports in DSH/WLT frontend routes",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/app-client/**",
+        "dsh/frontend/app-partner/**",
+        "dsh/frontend/app-captain/**",
+        "dsh/frontend/app-field/**",
+        "dsh/frontend/control-panel/**",
+        "dsh/frontend/shared/**",
+        "wlt/frontend/dsh/**",
+        "tools/guards/guard-no-broken-imports.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".cjs"
+      ]
+    },
+    {
+      "id": "GUARD_SURFACE_LIGHTWEIGHT_BINDINGS",
+      "file": "tools/guards/guard-surface-lightweight-bindings.mjs",
+      "ownerPolicy": [
+        "governance/07_SURFACES_AND_SERVICES.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "detect direct API client, money adapters, media upload flows, status mapping, or large mapping functions in DSH surface shells",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/app-client/DshClientSurface.tsx",
+        "dsh/frontend/app-partner/DshPartnerSurface.tsx",
+        "dsh/frontend/app-captain/DshCaptainSurface.tsx",
+        "dsh/frontend/app-field/DshFieldSurface.tsx",
+        "tools/guards/guard-surface-lightweight-bindings.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_UI_ONLY_ROOTS_OWNERSHIP",
+      "file": "tools/guards/guard-ui-only-roots-ownership.mjs",
+      "ownerPolicy": [
+        "governance/03_REPO_BOUNDARIES.md",
+        "governance/06_APPS_AND_SHELLS.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "prevent runtime client creation, env reads, network fetch, and storage usage in UI-only roots",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/app-captain/**",
+        "dsh/frontend/app-client/**",
+        "dsh/frontend/app-field/**",
+        "dsh/frontend/app-partner/**",
+        "dsh/frontend/control-panel/**",
+        "wlt/frontend/dsh/app-captain/**",
+        "wlt/frontend/dsh/app-client/**",
+        "wlt/frontend/dsh/app-field/**",
+        "wlt/frontend/dsh/app-partner/**",
+        "wlt/frontend/dsh/control-panel/**",
+        "tools/guards/guard-ui-only-roots-ownership.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx"
+      ]
+    },
+    {
+      "id": "GUARD_WLT_DSH_SHARED_OWNERSHIP",
+      "file": "tools/guards/guard-wlt-dsh-shared-ownership.mjs",
+      "ownerPolicy": [
+        "governance/03_REPO_BOUNDARIES.md",
+        "governance/05_PACKAGE_BOUNDARIES.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "WLT app-* must call WLT shared adapters/hooks and must not construct typed clients or perform mutations/direct ledger mapping",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "wlt/frontend/dsh/app-client/**",
+        "wlt/frontend/dsh/app-partner/**",
+        "wlt/frontend/dsh/app-captain/**",
+        "wlt/frontend/dsh/app-field/**",
+        "tools/guards/guard-wlt-dsh-shared-ownership.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx"
+      ]
     }
   ]
 }

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Box, Button, Text, useTheme,
   radius,
 } from '@bthwani/ui-kit';
@@ -15,7 +15,7 @@ import {
   type ApprovalRecord,
   type ApprovalStage,
 } from '../../shared/state-machines/workflow';
-import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../shared/api/dsh-product-api.transport';
+import { getDshProductRuntimeClient, getDshProductRuntimeBaseUrl } from '../../shared';
 
 type ItemApprovalStatus = 'pending' | 'approved' | 'rejected' | 'needs-revision';
 
@@ -90,14 +90,14 @@ export function ItemApprovalScreen({
   onRequestRevision: propsOnRequestRevision,
 }: ItemApprovalScreenProps) {
   const { theme } = useTheme();
-  const client = React.useMemo(() => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()), []);
+  const client = React.useMemo(() => getDshProductRuntimeClient(), []);
 
   // Live products fetched from GET /products?approval_status=...
   // Falls back to workflow store records when API is unreachable.
   const [liveProducts, setLiveProducts] = React.useState<CatalogItemApprovalRecord[] | null>(null);
 
   React.useEffect(() => {
-    const baseUrl = resolveDshProductApiBaseUrl();
+    const baseUrl = getDshProductRuntimeBaseUrl();
     if (!baseUrl) return;
     let cancelled = false;
     client.listAllProducts({ limit: 100 })

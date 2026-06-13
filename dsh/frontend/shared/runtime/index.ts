@@ -1,6 +1,11 @@
 // DSH Runtime — surface runtime contracts, operational bindings, platform providers
 export * from './dsh-surface-runtime.contract';
 export * from './dsh-operational-surface-binding';
+export * from './use-partner-orders-runtime';
+export * from './use-field-runtime-actions';
+export * from './use-captain-order-runtime';
+export * from './field-onboarding-storage';
+export * from './ui-only-runtime-clients';
 export type { PlatformVarsConfig } from '../platform/PlatformVarsProvider';
 export {
   PlatformVarsProvider,

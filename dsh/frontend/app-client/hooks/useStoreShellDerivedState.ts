@@ -1,13 +1,13 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { Share } from 'react-native';
-import { getDshClientStateMeta } state-machines/client-state';
-import { resolveDshRuntimeImageSource } resolve-runtime-image-source';
+import { getDshClientStateMeta } from 'state-machines/client-state';
+import { resolveDshRuntimeImageSource } from 'resolve-runtime-image-source';
 import {
   normalizeDisplayText,
   resolveStoreOperationalState,
-} store-formatting';
-import { resolveDshStoreClientVisibility } contracts/dsh-client-visibility.model';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+} from 'store-formatting';
+import { resolveDshStoreClientVisibility } from 'contracts/dsh-client-visibility.model';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
 
 type StoreShellStore = {
   name?: string;

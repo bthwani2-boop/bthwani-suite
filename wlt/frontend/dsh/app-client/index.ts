@@ -27,5 +27,5 @@ export {
 	listLedgerEntries,
 } from './wlt-dsh-client.adapter';
 export type { WalletAccount } from './wlt-dsh-client.adapter';
-export { resolveWltDshFinanceEventKindForPaymentMethod } from '../control-panel/models/dshFinance.types';
-export type { WltDshFinanceEventKind } from '../control-panel/models/dshFinance.types';
+export { resolveWltDshFinanceEventKindForPaymentMethod } from '../shared';
+export type { WltDshFinanceEventKind } from '../shared';

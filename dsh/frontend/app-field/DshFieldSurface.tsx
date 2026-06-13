@@ -22,14 +22,10 @@ import {
   type FieldStoreFile,
 } from '../shared/contracts/field-store-model';
 import {
-  createDshFieldVisitHttpClient,
-  createDshFieldStoreOnboardingHttpClient,
-  createDshFieldDocumentHttpClient,
-  resolveDshFieldVisitBaseUrl,
-  resolveDshFieldStoreOnboardingBaseUrl,
-  resolveDshFieldDocumentBaseUrl,
   PlatformVarsProvider,
   FeatureFlagProvider,
+  applyFieldDocumentUploadToStore,
+  useFieldRuntimeActions,
 } from '../shared';
 import type { DshFieldNavigationCommand, DshFieldRouteState, DshFieldSurfaceProps } from './dsh-field.types';
 import {
@@ -92,18 +88,7 @@ function DshFieldSurfaceInner({ command, onExit }: DshFieldSurfaceProps = {}) {
   const [visitErrors, setVisitErrors] = React.useState<Record<string, DshFieldStoreVisitErrors>>({});
   const [selectedEscalationTargetByStore, setSelectedEscalationTargetByStore] = React.useState<Record<string, string>>({});
   const [readinessEscalationStateByStore, setReadinessEscalationStateByStore] = React.useState<Record<string, DshFieldReadinessEscalationState>>({});
-  const fieldStoreOnboardingClient = React.useMemo(
-    () => createDshFieldStoreOnboardingHttpClient(resolveDshFieldStoreOnboardingBaseUrl()),
-    [],
-  );
-  const fieldVisitClient = React.useMemo(
-    () => createDshFieldVisitHttpClient(resolveDshFieldVisitBaseUrl()),
-    [],
-  );
-  const fieldDocumentClient = React.useMemo(
-    () => createDshFieldDocumentHttpClient(resolveDshFieldDocumentBaseUrl()),
-    [],
-  );
+  const fieldRuntime = useFieldRuntimeActions();
 
   const route = routeStack[routeStack.length - 1] ?? { kind: 'stores' };
   const activeStore = route.kind === 'onboarding' || route.kind === 'visit'
@@ -228,17 +213,7 @@ function DshFieldSurfaceInner({ command, onExit }: DshFieldSurfaceProps = {}) {
           }))
         }
         onSubmitReview={() => {
-          const name = (activeStore.draft.basics.storeName || activeStore.name).trim();
-          const address = (activeStore.draft.location.addressLine || activeStore.location).trim();
-          const categoryId = (activeStore.draft.classification.mainCategory || activeStore.category).trim();
-
-          void fieldStoreOnboardingClient.createFieldStore({
-            name: name || activeStore.name,
-            address: address || activeStore.location,
-            category_id: categoryId || undefined,
-            supports_pickup: false,
-            supports_partner_delivery: true,
-          }).catch(() => {
+          void fieldRuntime.createStoreFromDraft(activeStore).catch(() => {
             // Keep the field workflow usable offline; runtime evidence validates the API path.
           });
 
@@ -293,12 +268,7 @@ function DshFieldSurfaceInner({ command, onExit }: DshFieldSurfaceProps = {}) {
             return;
           }
 
-          void fieldVisitClient.createFieldVisit(activeStore.id, {
-            visit_summary: nextValues.visitSummary.trim(),
-            follow_up_action: nextValues.followUpAction.trim(),
-            evidence_media_keys: [],
-            location_confidence: 'manual_confirmed',
-          }).catch(() => {
+          void fieldRuntime.submitVisit(activeStore.id, nextValues).catch(() => {
             // Runtime failure leaves the draft in-memory only; no local runtime truth is persisted.
           });
 
@@ -350,37 +320,10 @@ function DshFieldSurfaceInner({ command, onExit }: DshFieldSurfaceProps = {}) {
       <DshFieldDocumentUploadScreen
         storeId={activeStore.id}
         onBack={popRoute}
-        onSubmit={async (kind, mediaKey) => {
-          await fieldDocumentClient.createFieldDocument(activeStore.id, {
-            document_kind: kind,
-            media_key: mediaKey,
-          });
-
-          // Update store draft documents status to 'uploaded'
+        onSubmit={async (kind, uploadedRef) => {
+          await fieldRuntime.submitDocument(activeStore.id, kind, uploadedRef);
           updateStore(activeStore.id, (store) => {
-            const docs = { ...store.draft.documents };
-            if (kind === 'commercial_registration') {
-              docs.commercialRegistrationStatus = 'uploaded';
-              docs.commercialRegistrationRef = mediaKey;
-            } else if (kind === 'identity_proof') {
-              docs.ownerIdStatus = 'uploaded';
-              docs.ownerIdRef = mediaKey;
-            } else if (kind === 'tax_certificate') {
-              docs.tradeLicenseStatus = 'uploaded';
-              docs.tradeLicenseRef = mediaKey;
-            } else if (kind === 'storefront_photo') {
-              store.draft.photos.storefrontPhotoRef = mediaKey;
-            } else if (kind === 'interior_photo') {
-              store.draft.photos.interiorPhotoRef = mediaKey;
-            }
-            return {
-              ...store,
-              lastUpdatedLabel: 'الآن',
-              draft: {
-                ...store.draft,
-                documents: docs,
-              },
-            };
+            return applyFieldDocumentUploadToStore(store, kind, uploadedRef);
           });
         }}
       />

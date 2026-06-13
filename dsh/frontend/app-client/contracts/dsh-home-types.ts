@@ -1,6 +1,6 @@
-﻿import type { CommercialSourceMap } adapters/store-card-commercial-map';
-import type { DshPartnerVisibilityBadge } contracts/dsh-partner-activation.model';
-import type { HomePromoRecord, MarketingVideoRecord } contracts/dsh-marketing-types';
+import type { CommercialSourceMap } from 'adapters/store-card-commercial-map';
+import type { DshPartnerVisibilityBadge } from 'contracts/dsh-partner-activation.model';
+import type { HomePromoRecord, MarketingVideoRecord } from 'contracts/dsh-marketing-types';
 
 export type DshServiceId = 'dsh' | 'knz' | 'amn' | 'arb' | 'wlt' | 'esf' | 'kwd' | 'mrf' | 'snd';
 

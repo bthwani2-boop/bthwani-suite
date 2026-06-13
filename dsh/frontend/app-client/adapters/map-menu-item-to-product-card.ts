@@ -1,6 +1,6 @@
-﻿import type { ProductCardProps } from '@bthwani/ui-kit';
+import type { ProductCardProps } from '@bthwani/ui-kit';
 
-import type { DshStoreMenuItem as DshStoreMenuItem } presentation-models/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreMenuItem } from 'presentation-models/dshStoreProductCardModel';
 
 import { resolveDshRuntimeImageSource } from './resolve-runtime-image-source';
 

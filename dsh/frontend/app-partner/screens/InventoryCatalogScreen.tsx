@@ -1,4 +1,4 @@
-﻿/**
+/**
  * InventoryCatalogScreen — Partner Surface
  *
  * Runtime truth: GET /stores/{store_id}/products via dsh-product-api.client.ts.
@@ -9,8 +9,7 @@
  */
 import React from 'react';
 import type { DshCanonicalProductCard } from '../../shared/presentation-models/dshStoreProductCardModel';
-import { createDshMediaApiHttpClient } from '../../shared/api/dsh-media-api.client';
-import { resolveDshProductApiBaseUrl, createDshProductApiHttpClient } from '../../shared/api/dsh-product-api.transport';
+import { getDshMediaRuntimeClient, getDshProductRuntimeClient, getDshStoreVisibilityRuntimeClient } from '../../shared';
 import {
   type DshCatalogDomainId,
   type DshCatalogMainCategoryId,
@@ -23,11 +22,7 @@ import {
   DSH_OPERATIONAL_FACETS,
   isDshOperationalFacet,
 } from '../../shared/contracts/catalog';
-import {
-  createDshStoreVisibilityHttpClient,
-  resolveDshStoreVisibilityBaseUrl,
-  type DshStoreVisibilityTransportError,
-} from '../../shared/api/dsh-store-visibility-transport';
+import type { DshStoreVisibilityTransportError } from '../../shared/api/dsh-store-visibility-transport';
 import type { PartnerReadinessStatus } from '../../shared/api/dsh-store-visibility-client';
 
 import {
@@ -408,14 +403,14 @@ function StoreReadinessGate({ storeId }: { storeId: string }) {
 
   const handleToggle = React.useCallback(
     async (nextStatus: PartnerReadinessStatus) => {
-      const baseUrl = resolveDshStoreVisibilityBaseUrl();
-      if (!baseUrl) {
+      const client = getDshStoreVisibilityRuntimeClient();
+      if (!client) {
         setGate({ kind: 'error', message: 'لم يُعثر على عنوان API — تحقق من EXPO_PUBLIC_DSH_API_BASE_URL.' });
         return;
       }
       setGate({ kind: 'loading' });
       try {
-        const client = createDshStoreVisibilityHttpClient(baseUrl);
+
         const res = await client.updatePartnerReadiness(storeId, nextStatus);
         setGate({ kind: 'success', clientVisible: res.client_visible, status: res.partner_readiness_status });
       } catch (err: unknown) {
@@ -993,11 +988,7 @@ function InventoryCatalogCardPanel({
 }) {
   const { direction } = useDirection();
 
-  const _mediaBaseUrl = React.useMemo(() => resolveDshProductApiBaseUrl(), []);
-  const _mediaClient = React.useMemo(
-    () => (_mediaBaseUrl ? createDshMediaApiHttpClient(_mediaBaseUrl) : null),
-    [_mediaBaseUrl],
-  );
+  const _mediaClient = React.useMemo(() => getDshMediaRuntimeClient(), []);
   const [thumbnailUrl, setThumbnailUrl] = React.useState<string | undefined>(undefined);
   React.useEffect(() => {
     if (!_mediaClient) return;
@@ -1191,10 +1182,9 @@ function InventoryCatalogContent({
 
   // Fetch live products from GET /stores/{store_id}/products
   React.useEffect(() => {
-    const baseUrl = resolveDshProductApiBaseUrl();
-    if (!baseUrl || !canonicalStoreId) return;
+    if (!canonicalStoreId) return;
     let cancelled = false;
-    const apiClient = createDshProductApiHttpClient(baseUrl);
+    const apiClient = getDshProductRuntimeClient();
     apiClient.listProducts(canonicalStoreId, { limit: 100 })
       .then((resp) => {
         if (cancelled || !resp.products.length) return;

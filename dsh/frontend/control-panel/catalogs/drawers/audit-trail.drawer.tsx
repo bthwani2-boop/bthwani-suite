@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * CatalogAuditTrailWorkspace — SCAFFOLD: ربط API قيد التنفيذ
@@ -21,7 +21,7 @@ import { Box, Button, Surface, Text, useTheme,
 } from '@bthwani/ui-kit';
 import { WorkspacePreviewNotice } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
-import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../../shared/api/dsh-product-api.transport';
+import { getDshProductRuntimeClient } from '../../../shared';
 import type { DshCatalogConflict } from '../../../shared/api/dsh-product-api.client';
 
 export type CatalogAuditTrailWorkspaceProps = {
@@ -171,7 +171,7 @@ export function CatalogAuditTrailWorkspace({
   const selectedProduct = products.find((p) => p.id === selectedProductId) ?? (productId ? undefined : products[0]);
   const auditEvents = selectedProduct ? derivePreviewAuditEvents(selectedProduct) : [];
 
-  const client = React.useMemo(() => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()), []);
+  const client = React.useMemo(() => getDshProductRuntimeClient(), []);
   const [conflicts, setConflicts] = useState<readonly DshCatalogConflict[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

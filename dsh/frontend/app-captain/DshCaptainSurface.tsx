@@ -13,6 +13,7 @@ try {
     useSafeAreaInsets = safe.useSafeAreaInsets;
   }
 } catch (err) {
+  void err;
   // fallback is already a zero-insets function
 }
 import { Badge, borders, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, shadowPresets, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha,
@@ -51,11 +52,12 @@ import {
   isCaptainCodCollectorForMode,
 } from '../shared/contracts/dsh-fulfillment-surface-visibility';
 import {
-  resolveDshOrderApiBaseUrl,
-  createDshOrderLifecycleHttpClient,
   PlatformVarsProvider,
   FeatureFlagProvider,
   usePlatformVars,
+  resolveDshRuntimeOrderId,
+  useCaptainActiveLocationPush,
+  useCaptainOrderRuntime,
 } from '../shared';
 import { OfferDeclineSheet } from './sheets';
 import { CaptainSupportScreenRouter } from './CaptainSupportScreenRouter';
@@ -166,6 +168,35 @@ const captainAppearanceOptions: ReadonlyArray<{
     description: 'مظهر داكن فاخر مع حواف زجاجية وطبقات واضحة بدون إزعاج بصري',
   },
 ] as const;
+
+type ObjectStateAction<S> = {
+  readonly key: keyof S;
+  readonly value: S[keyof S] | ((current: S[keyof S]) => S[keyof S]);
+};
+
+function useObjectState<S extends Record<string, unknown>>(initialState: S) {
+  const reducer = React.useCallback((state: S, action: ObjectStateAction<S>): S => {
+    const current = state[action.key];
+    const next = typeof action.value === 'function'
+      ? (action.value as (current: S[keyof S]) => S[keyof S])(current)
+      : action.value;
+
+    return {
+      ...state,
+      [action.key]: next,
+    };
+  }, []);
+
+  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const setValue = React.useCallback(
+    <K extends keyof S>(key: K, value: S[K] | ((current: S[K]) => S[K])) => {
+      dispatch({ key, value: value as ObjectStateAction<S>['value'] });
+    },
+    [],
+  );
+
+  return [state, setValue] as const;
+}
 
 const availabilityStatusMeta: Record<
   CaptainAvailabilityStatus,
@@ -350,10 +381,6 @@ function CaptainAccountNavRow({
   );
 }
 
-function resolveRuntimeOrderId(orderId: string): string {
-  return orderId.startsWith('captain-order-') ? orderId.replace('captain-order-', '') : orderId;
-}
-
 export function DshCaptainSurface(props: DshCaptainSurfaceProps) {
   return (
     <PlatformVarsProvider>
@@ -374,18 +401,76 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
     setMode: setAppearanceMode,
   } = useAppCaptainAppearance();
   const insets = useSafeAreaInsets();
-  const [activeServiceType, setActiveServiceType] = React.useState<CaptainServiceType>('dsh');
-  const [route, setRoute] = React.useState<DshCaptainRoute>(() => getRouteForCommandTarget(command.target));
-  const [inboxState, setInboxState] = React.useState<CaptainOrdersInboxScreenState>('ready');
-  const [activeOrderId, setActiveOrderId] = React.useState<string>('');
-  const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<CaptainSupportRoute>('orders-list');
-  const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
-  const [isDeliverySheetVisible, setIsDeliverySheetVisible] = React.useState(false);
-  const [captainAvailabilityStatus, setCaptainAvailabilityStatus] = React.useState<CaptainAvailabilityStatus>('available');
-  const [gpsStatus, setGpsStatus] = React.useState<CaptainGpsStatus>('limited');
-  const [activeOrderExpanded, setActiveOrderExpanded] = React.useState(false);
-  const [activeOrderPhase, setActiveOrderPhase] = React.useState<ActiveOrderPhase>('pickup');
-  const [captainAppMode, setCaptainAppMode] = React.useState<CaptainAppMode>('bthwani_captain_mode');
+  const [captainUi, setCaptainUiValue] = useObjectState({
+    activeServiceType: 'dsh' as CaptainServiceType,
+    route: getRouteForCommandTarget(command.target),
+    inboxState: 'ready' as CaptainOrdersInboxScreenState,
+    activeOrderId: '',
+    selectedSupportScreen: 'orders-list' as CaptainSupportRoute,
+    isPickupSheetVisible: false,
+    isDeliverySheetVisible: false,
+    captainAvailabilityStatus: 'available' as CaptainAvailabilityStatus,
+    gpsStatus: 'limited' as CaptainGpsStatus,
+    activeOrderExpanded: false,
+    activeOrderPhase: 'pickup' as ActiveOrderPhase,
+    captainAppMode: 'bthwani_captain_mode' as CaptainAppMode,
+    activeOrderDraft: '',
+    activeOrderMessages: [] as CompactOrderChatMessage[],
+    storeCourierStage: 'ready_for_pickup' as StoreCourierStage,
+    captainPodState: 'ready' as DshCaptainPodState,
+    captainPodPhotoUri: undefined as string | undefined,
+    captainPodMediaKey: undefined as string | undefined,
+    isDeclineSheetVisible: false,
+    declineSheetState: 'ready' as 'ready' | 'loading' | 'success' | 'error',
+    declineOrderId: '',
+    pickupSheetState: 'ready' as 'ready' | 'loading' | 'success' | 'error',
+  });
+  const {
+    activeServiceType,
+    route,
+    inboxState,
+    activeOrderId,
+    selectedSupportScreen,
+    isPickupSheetVisible,
+    isDeliverySheetVisible,
+    captainAvailabilityStatus,
+    gpsStatus,
+    activeOrderExpanded,
+    activeOrderPhase,
+    captainAppMode,
+    activeOrderDraft,
+    activeOrderMessages,
+    storeCourierStage,
+    captainPodState,
+    captainPodPhotoUri,
+    captainPodMediaKey,
+    isDeclineSheetVisible,
+    declineSheetState,
+    declineOrderId,
+    pickupSheetState,
+  } = captainUi;
+  const setActiveServiceType = React.useCallback((value: CaptainServiceType | ((current: CaptainServiceType) => CaptainServiceType)) => setCaptainUiValue('activeServiceType', value), [setCaptainUiValue]);
+  const setRoute = React.useCallback((value: DshCaptainRoute | ((current: DshCaptainRoute) => DshCaptainRoute)) => setCaptainUiValue('route', value), [setCaptainUiValue]);
+  const setInboxState = React.useCallback((value: CaptainOrdersInboxScreenState | ((current: CaptainOrdersInboxScreenState) => CaptainOrdersInboxScreenState)) => setCaptainUiValue('inboxState', value), [setCaptainUiValue]);
+  const setActiveOrderId = React.useCallback((value: string | ((current: string) => string)) => setCaptainUiValue('activeOrderId', value), [setCaptainUiValue]);
+  const setSelectedSupportScreen = React.useCallback((value: CaptainSupportRoute | ((current: CaptainSupportRoute) => CaptainSupportRoute)) => setCaptainUiValue('selectedSupportScreen', value), [setCaptainUiValue]);
+  const setIsPickupSheetVisible = React.useCallback((value: boolean | ((current: boolean) => boolean)) => setCaptainUiValue('isPickupSheetVisible', value), [setCaptainUiValue]);
+  const setIsDeliverySheetVisible = React.useCallback((value: boolean | ((current: boolean) => boolean)) => setCaptainUiValue('isDeliverySheetVisible', value), [setCaptainUiValue]);
+  const setCaptainAvailabilityStatus = React.useCallback((value: CaptainAvailabilityStatus | ((current: CaptainAvailabilityStatus) => CaptainAvailabilityStatus)) => setCaptainUiValue('captainAvailabilityStatus', value), [setCaptainUiValue]);
+  const setGpsStatus = React.useCallback((value: CaptainGpsStatus | ((current: CaptainGpsStatus) => CaptainGpsStatus)) => setCaptainUiValue('gpsStatus', value), [setCaptainUiValue]);
+  const setActiveOrderExpanded = React.useCallback((value: boolean | ((current: boolean) => boolean)) => setCaptainUiValue('activeOrderExpanded', value), [setCaptainUiValue]);
+  const setActiveOrderPhase = React.useCallback((value: ActiveOrderPhase | ((current: ActiveOrderPhase) => ActiveOrderPhase)) => setCaptainUiValue('activeOrderPhase', value), [setCaptainUiValue]);
+  const setCaptainAppMode = React.useCallback((value: CaptainAppMode | ((current: CaptainAppMode) => CaptainAppMode)) => setCaptainUiValue('captainAppMode', value), [setCaptainUiValue]);
+  const setActiveOrderDraft = React.useCallback((value: string | ((current: string) => string)) => setCaptainUiValue('activeOrderDraft', value), [setCaptainUiValue]);
+  const setActiveOrderMessages = React.useCallback((value: CompactOrderChatMessage[] | ((current: CompactOrderChatMessage[]) => CompactOrderChatMessage[])) => setCaptainUiValue('activeOrderMessages', value), [setCaptainUiValue]);
+  const setStoreCourierStage = React.useCallback((value: StoreCourierStage | ((current: StoreCourierStage) => StoreCourierStage)) => setCaptainUiValue('storeCourierStage', value), [setCaptainUiValue]);
+  const setCaptainPodState = React.useCallback((value: DshCaptainPodState | ((current: DshCaptainPodState) => DshCaptainPodState)) => setCaptainUiValue('captainPodState', value), [setCaptainUiValue]);
+  const setCaptainPodPhotoUri = React.useCallback((value: string | undefined | ((current: string | undefined) => string | undefined)) => setCaptainUiValue('captainPodPhotoUri', value), [setCaptainUiValue]);
+  const setCaptainPodMediaKey = React.useCallback((value: string | undefined | ((current: string | undefined) => string | undefined)) => setCaptainUiValue('captainPodMediaKey', value), [setCaptainUiValue]);
+  const setIsDeclineSheetVisible = React.useCallback((value: boolean | ((current: boolean) => boolean)) => setCaptainUiValue('isDeclineSheetVisible', value), [setCaptainUiValue]);
+  const setDeclineSheetState = React.useCallback((value: 'ready' | 'loading' | 'success' | 'error' | ((current: 'ready' | 'loading' | 'success' | 'error') => 'ready' | 'loading' | 'success' | 'error')) => setCaptainUiValue('declineSheetState', value), [setCaptainUiValue]);
+  const setDeclineOrderId = React.useCallback((value: string | ((current: string) => string)) => setCaptainUiValue('declineOrderId', value), [setCaptainUiValue]);
+  const setPickupSheetState = React.useCallback((value: 'ready' | 'loading' | 'success' | 'error' | ((current: 'ready' | 'loading' | 'success' | 'error') => 'ready' | 'loading' | 'success' | 'error')) => setCaptainUiValue('pickupSheetState', value), [setCaptainUiValue]);
   const isStoreCourierMode = captainAppMode === 'store_courier_mode';
   // SSoT: bthwani_delivery is the only mode visible in captain inbox
   const bthwaniDeliveryVisibleInInbox = isModeVisibleInCaptainInbox('bthwani_delivery') && isCaptainInboxVisibleForMode('bthwani_delivery');
@@ -394,27 +479,20 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
   const showCaptainBottomNav = isStoreCourierMode
     ? route === 'home' || route === 'account'
     : CAPTAIN_BOTTOM_NAV_ROUTES.has(route);
-  const [activeOrderDraft, setActiveOrderDraft] = React.useState('');
-  const [activeOrderMessages, setActiveOrderMessages] = React.useState<CompactOrderChatMessage[]>([]);
-  const [storeCourierStage, setStoreCourierStage] = React.useState<StoreCourierStage>('ready_for_pickup');
-  const [captainPodState, setCaptainPodState] = React.useState<DshCaptainPodState>('ready');
-  const [captainPodPhotoUri, setCaptainPodPhotoUri] = React.useState<string | undefined>();
-  const [captainPodMediaKey, setCaptainPodMediaKey] = React.useState<string | undefined>();
-  const [isDeclineSheetVisible, setIsDeclineSheetVisible] = React.useState(false);
-  const [declineSheetState, setDeclineSheetState] = React.useState<'ready' | 'loading' | 'success' | 'error'>('ready');
-  const [declineOrderId, setDeclineOrderId] = React.useState<string>('');
-  const [pickupSheetState, setPickupSheetState] = React.useState<'ready' | 'loading' | 'success' | 'error'>('ready');
-
-  const apiBaseUrl = React.useMemo(() => resolveDshOrderApiBaseUrl(), []);
-  const orderLifecycleClient = React.useMemo(() => createDshOrderLifecycleHttpClient(apiBaseUrl), [apiBaseUrl]);
+  const captainOrderRuntime = useCaptainOrderRuntime();
+  useCaptainActiveLocationPush({
+    activeOrderId,
+    captainId: captainRuntimeId,
+    lifecycleStatus: inboxState,
+  });
 
   const handleAcceptTask = React.useCallback(async (orderId: string) => {
     if (!captainRuntimeId) return void setInboxState('error');
 
-    const rawOrderId = resolveRuntimeOrderId(orderId);
+    const rawOrderId = resolveDshRuntimeOrderId(orderId);
     try {
       setInboxState('offer-accepting');
-      await orderLifecycleClient.acceptTask(rawOrderId, { captain_id: captainRuntimeId });
+      await captainOrderRuntime.acceptTask(rawOrderId, captainRuntimeId);
       setInboxState('offer-accepted');
       setActiveOrderId(orderId);
       setRoute('detail');
@@ -423,15 +501,15 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
       console.error("Failed to accept task", err);
       setInboxState('error');
     }
-  }, [captainRuntimeId, orderLifecycleClient]);
+  }, [captainOrderRuntime, captainRuntimeId]);
 
   const handleDeclineConfirm = React.useCallback(async (orderId: string, reason: string) => {
     if (!captainRuntimeId) return void setDeclineSheetState('error');
 
-    const rawOrderId = resolveRuntimeOrderId(orderId);
+    const rawOrderId = resolveDshRuntimeOrderId(orderId);
     try {
       setDeclineSheetState('loading');
-      await orderLifecycleClient.declineTask(rawOrderId, { captain_id: captainRuntimeId, reason });
+      await captainOrderRuntime.declineTask(rawOrderId, captainRuntimeId, reason);
       setDeclineSheetState('success');
       setTimeout(() => {
         setIsDeclineSheetVisible(false);
@@ -442,12 +520,13 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
       console.error("Failed to decline task", err);
       setDeclineSheetState('error');
     }
-  }, [captainRuntimeId, orderLifecycleClient]);
+  }, [captainOrderRuntime, captainRuntimeId]);
   const routeHistoryRef = React.useRef<DshCaptainRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
+  const commandKeyRef = React.useRef(`${command.target}:${command.token ?? ''}`);
 
   const activeSummary: CaptainOrderDetailSummary = EMPTY_ORDER_SUMMARY;
-  const activeOrderDisplayId = activeOrderId ? resolveRuntimeOrderId(activeOrderId) : '';
+  const activeOrderDisplayId = activeOrderId ? resolveDshRuntimeOrderId(activeOrderId) : '';
   const captainDisplayName = '';
   const orderChatState = inboxState === 'delivered' ? 'readOnly' : 'active';
   const isCaptainAvailable = captainAvailabilityStatus === 'available';
@@ -481,8 +560,17 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
   }, [route]);
 
   React.useEffect(() => {
-    const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1];
+    const commandKey = `${command.target}:${command.token ?? ''}`;
+    if (commandKey !== commandKeyRef.current) {
+      commandKeyRef.current = commandKey;
+      const nextRoute = getRouteForCommandTarget(command.target);
+      routeHistoryRef.current = [nextRoute];
+      routeTransitionFromBackRef.current = false;
+      setRoute(nextRoute);
+      return;
+    }
 
+    const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1];
     if (route !== previousRoute) {
       if (routeTransitionFromBackRef.current) {
         routeTransitionFromBackRef.current = false;
@@ -490,18 +578,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
         routeHistoryRef.current.push(route);
       }
     }
-  }, [route]);
-
-  React.useEffect(() => {
-    if (!command) {
-      return;
-    }
-
-    const nextRoute = getRouteForCommandTarget(command.target);
-    routeHistoryRef.current = [nextRoute];
-    routeTransitionFromBackRef.current = false;
-    setRoute(nextRoute);
-  }, [command?.target, command?.token]);
+  }, [command.target, command.token, route, setRoute]);
 
   React.useEffect(() => {
     if (Platform.OS !== 'android') {
@@ -516,68 +593,33 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
   }, [goBack]);
 
   React.useEffect(() => {
-    if (inboxState !== 'ready') {
-      return;
+    if (inboxState === 'ready') {
+      setActiveOrderExpanded(false);
+      setActiveOrderPhase('pickup');
+      setActiveOrderDraft('');
+      setActiveOrderMessages([]);
     }
 
-    setActiveOrderExpanded(false);
-    setActiveOrderPhase('pickup');
-    setActiveOrderDraft('');
-    setActiveOrderMessages([]);
-  }, [activeOrderId, inboxState]);
-
-  React.useEffect(() => {
     setCaptainPodState('ready');
     setCaptainPodPhotoUri(undefined);
     setCaptainPodMediaKey(undefined);
-  }, [activeOrderId]);
 
-  React.useEffect(() => {
     if (captainAppMode !== 'store_courier_mode') {
       setStoreCourierStage('ready_for_pickup');
-      setCaptainPodState('ready');
-      setCaptainPodPhotoUri(undefined);
-      setCaptainPodMediaKey(undefined);
     }
-  }, [captainAppMode]);
-
-  // DSH-SLICE-005D: push captain GPS location to backend while on active delivery
-  React.useEffect(() => {
-    const activeDeliveryStates = new Set(['offer-accepting', 'offer-accepted']);
-    if (!inboxState || !activeDeliveryStates.has(inboxState) || !apiBaseUrl) return undefined;
-    const rawOrderId = resolveRuntimeOrderId(activeOrderId);
-    if (!rawOrderId) return undefined;
-    if (!captainRuntimeId) return undefined;
-    let cancelled = false;
-    let watchId: number | null = null;
-
-    const postLocation = (lat: number, lng: number) => {
-      if (cancelled) return;
-      orderLifecycleClient.pushLocation(rawOrderId, {
-        captain_id: captainRuntimeId,
-        latitude: lat,
-        longitude: lng,
-        lifecycle_status: inboxState ?? 'active',
-        order_status: 'EN_ROUTE',
-      })
-        .catch(() => { /* location push failure is non-fatal */ });
-    };
-
-    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
-      watchId = navigator.geolocation.watchPosition(
-        (pos) => postLocation(pos.coords.latitude, pos.coords.longitude),
-        () => { /* GPS unavailable — no-op */ },
-        { enableHighAccuracy: true, maximumAge: 5000, timeout: 8000 },
-      );
-    }
-
-    return () => {
-      cancelled = true;
-      if (watchId !== null && Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
-        navigator.geolocation.clearWatch(watchId);
-      }
-    };
-  }, [activeOrderId, apiBaseUrl, captainRuntimeId, inboxState, orderLifecycleClient]);
+  }, [
+    activeOrderId,
+    captainAppMode,
+    inboxState,
+    setActiveOrderDraft,
+    setActiveOrderExpanded,
+    setActiveOrderMessages,
+    setActiveOrderPhase,
+    setCaptainPodMediaKey,
+    setCaptainPodPhotoUri,
+    setCaptainPodState,
+    setStoreCourierStage,
+  ]);
 
   const openOrderDetail = React.useCallback((orderId: string) => {
     setActiveOrderId(orderId);
@@ -608,13 +650,10 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
     setCaptainPodState('loading');
 
     try {
-      const rawOrderId = resolveRuntimeOrderId(activeOrderId);
+      const rawOrderId = resolveDshRuntimeOrderId(activeOrderId);
 
       // WLT BOUNDARY: no payout mutation here. Payout is WLT responsibility post-DELIVERED.
-      await orderLifecycleClient.deliverOrder(rawOrderId, {
-        captain_id: captainRuntimeId,
-        pod_media_key: captainPodMediaKey,
-      });
+      await captainOrderRuntime.deliverOrder(rawOrderId, captainRuntimeId, captainPodMediaKey);
 
       setCaptainPodState('success');
 
@@ -626,21 +665,17 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
       console.error("Failed to confirm delivery API call:", err);
       setCaptainPodState('error');
     }
-  }, [activeOrderId, captainAppMode, captainRuntimeId, captainPodMediaKey, captainPodPhotoUri, orderLifecycleClient]);
+  }, [activeOrderId, captainAppMode, captainOrderRuntime, captainRuntimeId, captainPodMediaKey, captainPodPhotoUri]);
 
   const reportPodFailure = React.useCallback(async () => {
     if (!captainRuntimeId) return void setCaptainPodState('error');
 
-    const rawOrderId = resolveRuntimeOrderId(activeOrderId);
+    const rawOrderId = resolveDshRuntimeOrderId(activeOrderId);
 
     try {
       // DSH-SLICE-005F: report delivery failure. Transitions ARRIVED → RETURNING_TO_STORE.
       // WLT BOUNDARY: no financial mutation. wlt_refund_trigger_ref (if any) is bridge ref only.
-      await orderLifecycleClient.failDelivery(rawOrderId, {
-        captain_id: captainRuntimeId,
-        failure_reason: 'CLIENT_UNREACHABLE',
-        return_required: true,
-      });
+      await captainOrderRuntime.failDelivery(rawOrderId, captainRuntimeId);
 
       setCaptainPodState('retry-required');
 
@@ -651,7 +686,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
       console.error("Failed to report delivery failure API call:", err);
       setCaptainPodState('error');
     }
-  }, [activeOrderId, captainAppMode, captainRuntimeId, orderLifecycleClient]);
+  }, [activeOrderId, captainAppMode, captainOrderRuntime, captainRuntimeId]);
 
   const openCaptainSupportScreen = React.useCallback((screenId: CaptainSupportRoute) => {
     setSelectedSupportScreen(screenId);
@@ -669,10 +704,10 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
   const confirmPickup = React.useCallback(async () => {
     if (!captainRuntimeId) return void setPickupSheetState('error');
 
-    const rawOrderId = resolveRuntimeOrderId(activeOrderId);
+    const rawOrderId = resolveDshRuntimeOrderId(activeOrderId);
     try {
       setPickupSheetState('loading');
-      await orderLifecycleClient.confirmPickup(rawOrderId, { captain_id: captainRuntimeId });
+      await captainOrderRuntime.confirmPickup(rawOrderId, captainRuntimeId);
       setPickupSheetState('success');
       setTimeout(() => {
         setIsPickupSheetVisible(false);
@@ -693,22 +728,22 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
       console.error("Failed to confirm pickup", err);
       setPickupSheetState('error');
     }
-  }, [activeOrderId, captainRuntimeId, orderLifecycleClient]);
+  }, [activeOrderId, captainOrderRuntime, captainRuntimeId]);
 
   const confirmDelivery = React.useCallback(async () => {
     if (!captainRuntimeId) return void setCaptainPodState('error');
 
-    const rawOrderId = resolveRuntimeOrderId(activeOrderId);
+    const rawOrderId = resolveDshRuntimeOrderId(activeOrderId);
 
     try {
-      await orderLifecycleClient.deliverOrder(rawOrderId, { captain_id: captainRuntimeId });
+      await captainOrderRuntime.deliverOrder(rawOrderId, captainRuntimeId);
       setInboxState('delivered');
       setActiveOrderExpanded(false);
     } catch (err) {
       console.error("Failed to confirm delivery", err);
       setCaptainPodState('error');
     }
-  }, [activeOrderId, captainRuntimeId, orderLifecycleClient]);
+  }, [activeOrderId, captainOrderRuntime, captainRuntimeId]);
 
   const sendQuickMessage = React.useCallback(() => {
     const text = activeOrderDraft.trim();
@@ -849,7 +884,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
           orderId={activeOrderId}
           captainId={captainRuntimeId || undefined}
           onBack={() => setRoute('detail')}
-          orderLifecycleClient={orderLifecycleClient}
+          onPushLocation={captainOrderRuntime.pushLocation}
         />
       );
     }

@@ -1,5 +1,5 @@
-﻿import { dshCategoryMeasurementPolicies } contracts/catalog';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+import { dshCategoryMeasurementPolicies } from 'contracts/catalog';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
 
 import {
   type DshFulfillmentDeliveryMode,

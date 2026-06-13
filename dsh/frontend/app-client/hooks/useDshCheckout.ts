@@ -1,13 +1,12 @@
-﻿import React from 'react';
+import React from 'react';
 import {
-  createDshCheckoutHttpClient,
-  createDshOrderLifecycleHttpClient,
+  getDshCheckoutRuntimeClient,
   type DshCheckoutAuthContext,
   type DshCheckoutClient,
   type DshOrderItemInput,
 } from '../../shared';
-import { resolveDshDiscoveryStoresRuntimeConfig } dsh-discovery-stores-runtime-config';
-import { parseCartItemPrice } store-formatting';
+import { resolveDshDiscoveryStoresRuntimeConfig } from '../adapters/dsh-discovery-stores-runtime-config';
+import { parseCartItemPrice } from '../adapters/store-formatting';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostCartItem, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import { hostClientStates } from '../dsh-client.navigation-bridge';
@@ -65,7 +64,7 @@ export function useDshCheckout({
   // Stable client — recreated only when baseUrl or auth changes
   const checkoutClientMemo = React.useMemo(() => {
     const apiConfig = resolveDshDiscoveryStoresRuntimeConfig();
-    return apiConfig ? createDshCheckoutHttpClient(apiConfig.baseUrl, globalThis.fetch, checkoutAuth) : undefined;
+    return apiConfig ? getDshCheckoutRuntimeClient(apiConfig.baseUrl, checkoutAuth) : undefined;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkoutAuth]);
 
@@ -80,7 +79,7 @@ export function useDshCheckout({
 
     if (apiConfig && !resolvedIntentId) {
       try {
-        const client: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl, globalThis.fetch, checkoutAuth);
+        const client: DshCheckoutClient = getDshCheckoutRuntimeClient(apiConfig.baseUrl, checkoutAuth);
         const intentResp = await client.createCheckoutIntent(
           {
             store_id: activeStore.id,

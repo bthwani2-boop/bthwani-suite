@@ -1,10 +1,10 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react-native';
 import { Box, Icon, Text, colorPalette, shadowPresets,
   radius,
   spacing,
 } from '@bthwani/ui-kit';
-import type { MarketingVideoRecord } contracts/dsh-marketing-types';
+import type { MarketingVideoRecord } from 'contracts/dsh-marketing-types';
 
 import { usePlatformVars } from '../../shared';
 

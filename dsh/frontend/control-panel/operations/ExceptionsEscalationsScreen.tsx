@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -11,7 +11,7 @@ import {
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/adapters/dsh-operational-runtime-adapter';
-import { resolveDshOrderApiBaseUrl } from '../../shared';
+import { getDshOrderRuntimeBaseUrl } from '../../shared';
 import { EXCEPTION_TICKET_MAP } from '../../shared/contracts/dsh-order.contract';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
@@ -160,7 +160,7 @@ type ExceptionsStateItem = {
 
   // Fetch real support escalations from backend and prepend them to the list.
   React.useEffect(() => {
-    const baseUrl = resolveDshOrderApiBaseUrl();
+    const baseUrl = getDshOrderRuntimeBaseUrl();
     if (!baseUrl) return;
     let cancelled = false;
     globalThis['fetch'](`${baseUrl.replace(/\/$/, '')}/support/escalations?status=open&limit=50`, {
@@ -277,7 +277,7 @@ type ExceptionsStateItem = {
 
     const exc = exceptions.find((e) => e.id === id);
     if (exc?.realId) {
-      const baseUrl = resolveDshOrderApiBaseUrl();
+      const baseUrl = getDshOrderRuntimeBaseUrl();
       if (baseUrl) {
         globalThis['fetch'](`${baseUrl.replace(/\/$/, '')}/support/escalations/${exc.realId}`, {
           method: 'PATCH',
@@ -318,7 +318,7 @@ type ExceptionsStateItem = {
 
     const exc = exceptions.find((e) => e.id === id);
     if (exc?.realId) {
-      const baseUrl = resolveDshOrderApiBaseUrl();
+      const baseUrl = getDshOrderRuntimeBaseUrl();
       if (baseUrl) {
         globalThis['fetch'](`${baseUrl.replace(/\/$/, '')}/support/escalations/${exc.realId}`, {
           method: 'PATCH',

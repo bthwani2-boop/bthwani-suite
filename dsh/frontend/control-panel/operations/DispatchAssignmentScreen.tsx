@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -10,10 +10,7 @@ import {
 } from '@bthwani/ui-kit/web';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/adapters/dsh-operational-runtime-adapter';
 import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/contracts/dsh-order.contract';
-import {
-  resolveDshOrderApiBaseUrl,
-  createDshOrderLifecycleHttpClient,
-} from '../../shared';
+import { getDshOrderLifecycleRuntimeClient } from '../../shared';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
@@ -141,9 +138,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   const handleConfirmAssignment = React.useCallback((orderId: string, captainName: string) => {
     setActionStatus('pending');
 
-    const baseUrl = resolveDshOrderApiBaseUrl();
-    if (baseUrl) {
-      const client = createDshOrderLifecycleHttpClient(baseUrl);
+    if (client) {
       client.assignCaptain(orderId, { captain_id: captainName })
         .then(() => {
           setActionStatus('success');

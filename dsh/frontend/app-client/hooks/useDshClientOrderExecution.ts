@@ -1,8 +1,7 @@
-﻿import React from 'react';
-import { resolveDshDiscoveryStoresRuntimeConfig } dsh-discovery-stores-runtime-config';
-import { parseCartItemPrice } store-formatting';
+import React from 'react';
+import { resolveDshDiscoveryStoresRuntimeConfig } from '../adapters/dsh-discovery-stores-runtime-config';
+import { parseCartItemPrice } from '../adapters/store-formatting';
 import {
-  createDshOrderLifecycleHttpClient,
   type DshOrderItemInput,
   type DshCheckoutAuthContext,
 } from '../../shared';
@@ -12,7 +11,7 @@ import { hostClientStates } from '../dsh-client.navigation-bridge';
 import { mapLiveOrderToSummary } from '../adapters/dshClientOrderAdapters';
 import { useDshCheckout, type WalletSessionContext, type ActiveStore } from './useDshCheckout';
 import type { DshRoute } from '../dsh-client.types';
-import type { DshClientState } state-machines/client-state';
+import type { DshClientState } from '../../shared';
 
 type UseDshClientOrderExecutionOptions = {
   cartItems: HostCartItem[];
@@ -68,10 +67,10 @@ export function useDshClientOrderExecution({
         price: parseCartItemPrice(item.priceLabel),
       }));
 
-      const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);
+      const orderClient = getDshOrderLifecycleRuntimeClient(checkoutAuth);
       orderClient.createOrder({
         store_id: activeStore.id,
-        client_id: checkoutAuth.clientId ?? 'client-101',
+        client_id: checkoutAuth.clientId ?? '',
         total_price: totalPrice,
         wlt_payment_ref_id: payload?.wltPaymentRefId,
         items,

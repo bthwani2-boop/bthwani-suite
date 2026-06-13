@@ -1,7 +1,7 @@
-﻿import React from 'react';
+import React from 'react';
 import { Badge, Box, Button, KeyValueList, MobileScrollView, SectionHeader, StateView, StatCard, Surface, Text } from '@bthwani/ui-kit';
-import type { DshSignalSummary } contracts/dsh-signal-layer.model';
-import { getDshSignalEventLabel, getDshSignalEventTone } contracts/dsh-signal-layer.model';
+import type { DshSignalSummary } from 'contracts/dsh-signal-layer.model';
+import { getDshSignalEventLabel, getDshSignalEventTone } from 'contracts/dsh-signal-layer.model';
 
 type DshClientBellScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 

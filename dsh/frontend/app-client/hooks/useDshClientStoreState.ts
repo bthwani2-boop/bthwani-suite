@@ -1,12 +1,12 @@
-﻿import React from 'react';
-import { resolveDshDiscoveryStoresRuntimeConfig } dsh-discovery-stores-runtime-config';
-import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } dsh-discovery-stores-transport';
-import { createDshProductApiHttpClient } api/dsh-product-api.transport';
+import React from 'react';
+import { resolveDshDiscoveryStoresRuntimeConfig } from 'dsh-discovery-stores-runtime-config';
+import { isDshDiscoveryStoresOfflineError } from 'dsh-discovery-stores-transport';
+import { getDshDiscoveryStoresRuntimeClient, getDshProductRuntimeClient } from '../../shared';
 import { mapProductRecordToItem } from '../adapters/dshClientStoreAdapters';
 import type { DshRoute } from '../dsh-client.types';
-import type { DshDiscoveryStore } presentation-models/dshStoreProductCardModel';
-import type { DshGetDiscoveryStoreResponse } dsh-discovery-stores-client';
-import type { DshStoreMenuItem } presentation-models/dshStoreProductCardModel';
+import type { DshDiscoveryStore } from 'presentation-models/dshStoreProductCardModel';
+import type { DshGetDiscoveryStoreResponse } from 'dsh-discovery-stores-client';
+import type { DshStoreMenuItem } from 'presentation-models/dshStoreProductCardModel';
 
 type UseDshClientStoreStateOptions = {
   route: DshRoute;
@@ -56,8 +56,8 @@ export function useDshClientStoreState({
     setStoreDetailState('loading');
     let cancelled = false;
 
-    const client = createDshDiscoveryStoresClient(config);
-    const prodClient = createDshProductApiHttpClient(config.baseUrl);
+    const client = getDshDiscoveryStoresRuntimeClient(config);
+    const prodClient = getDshProductRuntimeClient();
 
     Promise.all([
       client.getDiscoveryStore(storeId),

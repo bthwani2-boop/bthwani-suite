@@ -1,4 +1,4 @@
-﻿import type { HomePromoRecord } contracts/dsh-marketing-types';
+import type { HomePromoRecord } from 'contracts/dsh-marketing-types';
 
 import type {
   DshHomeBannerActionType,

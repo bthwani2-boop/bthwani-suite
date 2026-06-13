@@ -1,9 +1,9 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import type { DshHomeCategory } from '../contracts/dsh-home-types';
-import type { DshPartnerActivationStatus } contracts/dsh-partner-activation.model';
-import { resolveHomeCategoryContext } home-promo-mappers';
-import { getMarketingVideoVisibilityRecord, isMarketingRenderable } contracts/marketing-visibility.contract';
-import type { MarketingVideoRecord } contracts/dsh-marketing-types';
+import type { DshPartnerActivationStatus } from 'contracts/dsh-partner-activation.model';
+import { resolveHomeCategoryContext } from 'home-promo-mappers';
+import { getMarketingVideoVisibilityRecord, isMarketingRenderable } from 'contracts/marketing-visibility.contract';
+import type { MarketingVideoRecord } from 'contracts/dsh-marketing-types';
 
 export function useHomeVideoHandlers({
   categoryItems,

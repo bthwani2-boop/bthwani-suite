@@ -76,3 +76,4 @@ export * from './dsh-marketing-types';
 export * from './dsh-partner-offer-types';
 export * from './field-store-model';
 export * from './dsh-order-lifecycle-handoffs';
+export type { components, operations, paths } from './openapi';

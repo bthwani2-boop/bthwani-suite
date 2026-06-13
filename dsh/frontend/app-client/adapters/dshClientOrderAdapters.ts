@@ -1,8 +1,8 @@
-﻿import { hostClientStates } from '../dsh-client.navigation-bridge';
+import { hostClientStates } from '../dsh-client.navigation-bridge';
 import type { HostOrderSummary, HostCartItem } from '../dsh-client.navigation-bridge';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { ActiveStore } from '../hooks/useDshCheckout';
-import type { DshDiscoveryStore } presentation-models/dshStoreProductCardModel';
+import type { DshDiscoveryStore } from 'presentation-models/dshStoreProductCardModel';
 
 export function mapLiveOrderToSummary(
   liveOrder: { id: string },

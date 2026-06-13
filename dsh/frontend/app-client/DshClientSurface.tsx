@@ -1,6 +1,16 @@
 ﻿import React from 'react';
 import { Platform, View } from 'react-native';
-import { usePlatformVars, FeatureFlagProvider, PlatformVarsProvider, useFeatureFlag, listNotifications, resolveDshAuthBaseUrl } from '../shared';
+import {
+  usePlatformVars,
+  FeatureFlagProvider,
+  PlatformVarsProvider,
+  useFeatureFlag,
+  listNotifications,
+  getDshAuthRuntimeBaseUrl,
+  buildStoreCategories,
+  buildStoreDeliveryModes,
+  buildStoreTags,
+} from '../shared';
 import type { DshSignalSummary, DshSignalEventKind, DshSignalEntityType } from '../shared';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
 import type { DshClientSurfaceProps, DshRoute } from './dsh-client.types';
@@ -25,7 +35,7 @@ import type { ClientOperationScreenId } from './screens/parts/OperationScreenVie
 import type { DshFulfillmentDeliveryMode } from './contracts/dsh-client-binding.contracts';
 import { useWltDshWalletSession } from '../../../wlt/frontend/dsh/app-client';
 
-const defaultTrackingOrderId = initialOrders[0]?.id ?? 'dsh-10021';
+const defaultTrackingOrderId = initialOrders[0]?.id;
 
 export function DshClientSurface(props: DshClientSurfaceProps) {
   return (
@@ -142,8 +152,8 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     checkoutAuth: React.useMemo(() => {
       const bearerToken = (authToken ?? dshAuthBearerToken ?? undefined)?.trim();
       if (bearerToken) return { bearerToken };
-      const clientId = (devClientId ?? dshClientId ?? 'client-101').trim();
-      return { clientId };
+      const clientId = (devClientId ?? dshClientId ?? '').trim();
+      return clientId ? { clientId } : {};
     }, [authToken, dshAuthBearerToken, devClientId, dshClientId]),
     createOrderValues,
     selectedFulfillmentMode,
@@ -157,8 +167,8 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
   const checkoutAuth = React.useMemo(() => {
     const bearerToken = (authToken ?? dshAuthBearerToken ?? undefined)?.trim();
     if (bearerToken) return { bearerToken };
-    const clientId = (devClientId ?? dshClientId ?? 'client-101').trim();
-    return { clientId };
+    const clientId = (devClientId ?? dshClientId ?? '').trim();
+    return clientId ? { clientId } : {};
   }, [authToken, dshAuthBearerToken, devClientId, dshClientId]);
 
   const walletSession = useWltDshWalletSession(checkoutAuth.clientId, checkoutAuth.bearerToken);
@@ -227,7 +237,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
   const [bellSignalEvents, setBellSignalEvents] = React.useState<readonly DshSignalSummary[]>([]);
   React.useEffect(() => {
     if (route !== 'bell') return undefined;
-    const authBaseUrl = resolveDshAuthBaseUrl();
+    const authBaseUrl = getDshAuthRuntimeBaseUrl();
     const dshBase = checkoutAuth.bearerToken ? dshApiBaseUrl : null;
     const baseUrl = dshBase?.trim() || authBaseUrl?.replace(':18082', ':8080') || null;
     if (!baseUrl) return undefined;
@@ -256,8 +266,10 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
   // Command routing reset to tracking default
   React.useEffect(() => {
     if (commandTargetToRoute(command.target) === 'tracking') {
-      setSelectedOrderId(defaultTrackingOrderId);
-      setTrackingClientState(hostClientStates.trackingActive);
+      if (defaultTrackingOrderId) {
+        setSelectedOrderId(defaultTrackingOrderId);
+        setTrackingClientState(hostClientStates.trackingActive);
+      }
     }
   }, [command, setSelectedOrderId, setTrackingClientState]);
 
@@ -394,95 +406,38 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     <View style={{ flex: 1, position: 'relative' }}>
       <View style={{ flex: 1, paddingBottom: Platform.OS === 'android' ? 112 : 80 }}>
         <DshClientRouteRenderer
-          categories={homeCategories}
-          homeScreenState={homeScreenState}
-          route={route}
-          setRoute={setRoute}
-          dshAuthBearerToken={dshAuthBearerToken}
-          dshClientId={dshClientId}
-          cartItems={cartItems}
-          selectedFulfillmentMode={selectedFulfillmentMode}
-          walletSession={walletSession}
-          selectedPaymentMethod={selectedPaymentMethod}
-          setSelectedPaymentMethod={setSelectedPaymentMethod}
-          paymentErrorMessage={paymentErrorMessage}
-          checkoutState={checkoutState}
-          setCheckoutState={setCheckoutState}
-          createOrderValues={createOrderValues}
-          setCreateOrderValues={setCreateOrderValues}
-          handleConfirmCheckout={handleConfirmCheckout}
-          handleConfirmedOrderExecution={handleConfirmedOrderExecution}
-          appearanceHydrated={appearanceHydrated}
-          appearanceMode={appearanceMode}
-          setAppearanceMode={setAppearanceMode}
-          liveMarketingPrograms={liveMarketingPrograms}
-          setSelectedOperationScreen={setSelectedOperationScreen}
-          openTrackedOrder={openTrackedOrder}
-          openCreateOrderJourney={openCreateOrderJourney}
-          returnHome={returnHome}
-          storeDetailState={storeDetailState}
-          activeStoreScreenStore={activeStoreScreenStore}
-          activeStoreItems={activeStoreItems}
-          addItemToHostCart={addItemToHostCart}
-          handleOpenActiveStoreItems={handleOpenActiveStoreItems}
-          handleOpenActiveStoreCart={handleOpenActiveStoreCart}
-          fetchStoreDetail={fetchStoreDetail}
-          activeStoreId={activeStoreId}
-          activeStore={activeStore}
-          itemsQuery={itemsQuery}
-          setItemsQuery={setItemsQuery}
-          itemsCategory={itemsCategory}
-          setItemsCategory={setItemsCategory}
-          storeItemsEntryOrigin={storeItemsEntryOrigin}
-          setSelectedItemId={setSelectedItemId}
-          checkoutClientMemo={checkoutClientMemo}
-          checkoutAuth={checkoutAuth}
-          onOpenService={onOpenService}
-          selectedOperationScreen={selectedOperationScreen}
-          returnOrdersList={returnOrdersList}
-          filteredOrders={filteredOrders}
-          ordersQuery={ordersQuery}
-          setOrdersQuery={setOrdersQuery}
-          handleReorderClick={handleReorderClick}
-          trackingClientState={trackingClientState}
-          activeTrackedOrder={activeTrackedOrder}
-          trackingWltIntent={trackingWltIntent}
-          liveOrderDetails={liveOrderDetails}
-          trackingOrderValues={trackingOrderValues}
-          trackingTimeline={trackingTimeline}
-          reopenTracking={reopenTracking}
-          handleCancelOrder={handleCancelOrder}
-          handleSupportEscalation={handleSupportEscalation}
-          clientDiscoveryStoresBridge={clientDiscoveryStoresBridge}
-          serviceDialTrigger={serviceDialTrigger}
-          favoriteOverrides={favoriteOverrides}
-          handleToggleFavorite={handleToggleHomeFavorite}
-          homeMarketingPromos={homeMarketingPromos}
-          homePromos={homePromos}
-          liveMarketingShorts={liveMarketingShorts}
-          clientVisibleHomeStores={clientVisibleHomeStores}
-          homeRecentOrders={homeRecentOrders}
-          onExit={onExit}
-          handleOpenHomeCategory={handleOpenHomeCategory}
-          handleOpenHomeStoreCategory={handleOpenHomeStoreCategory}
-          handleOpenHomeProduct={handleOpenHomeProduct}
-          handleOpenHomeBenefits={handleOpenHomeBenefits}
-          openHomeInlineSearch={openHomeInlineSearch}
-          recordMarketingBannerClick={recordMarketingBannerClick}
-          recordMarketingBannerImpression={recordMarketingBannerImpression}
-          recordMarketingGrowthClick={recordMarketingGrowthClick}
-          recordMarketingGrowthImpression={recordMarketingGrowthImpression}
-          sheinInlineOpen={sheinInlineOpen}
-          setSheinInlineOpen={setSheinInlineOpen}
-          awnakInlineOpen={awnakInlineOpen}
-          setAwnakInlineOpen={setAwnakInlineOpen}
-          handleOpenHomeStore={handleOpenHomeStore}
-          homeSearchAutoOpenToken={homeSearchAutoOpenToken}
-          handleRegisterBackHandler={handleRegisterBackHandler}
-          renderApprovedVideoReelsViewer={renderApprovedVideoReelsViewer}
-          setHomeRetryToken={setHomeRetryToken}
-          openSupportFlow={openSupportFlow}
-          bellSignalEvents={bellSignalEvents}
+          session={{ dshAuthBearerToken, dshClientId, appearanceHydrated, appearanceMode, setAppearanceMode, bellSignalEvents, walletSession }}
+          routeContext={{
+            route, setRoute, returnHome, openCreateOrderJourney, openTrackedOrder, setSelectedOperationScreen,
+            selectedOperationScreen, onExit, openSupportFlow, handleRegisterBackHandler, serviceDialTrigger, onOpenService,
+          }}
+          home={{
+            categories: homeCategories, homeScreenState, homeMarketingPromos, homePromos, liveMarketingShorts,
+            clientVisibleHomeStores, homeRecentOrders, homeSearchAutoOpenToken, favoriteOverrides,
+            handleToggleFavorite: handleToggleHomeFavorite,
+            handleOpenHomeCategory, handleOpenHomeStoreCategory, handleOpenHomeProduct, handleOpenHomeBenefits,
+            openHomeInlineSearch, handleOpenHomeStore, setHomeRetryToken, sheinInlineOpen, setSheinInlineOpen,
+            awnakInlineOpen, setAwnakInlineOpen, renderApprovedVideoReelsViewer, clientDiscoveryStoresBridge,
+          }}
+          store={{
+            storeDetailState, activeStoreScreenStore, activeStoreItems, activeStoreId, activeStore, itemsQuery,
+            setItemsQuery, itemsCategory, setItemsCategory, storeItemsEntryOrigin, setSelectedItemId,
+            addItemToHostCart, handleOpenActiveStoreItems, handleOpenActiveStoreCart, fetchStoreDetail,
+          }}
+          checkout={{
+            cartItems, selectedFulfillmentMode, selectedPaymentMethod, setSelectedPaymentMethod, paymentErrorMessage,
+            checkoutState, setCheckoutState, createOrderValues, setCreateOrderValues, handleConfirmCheckout,
+            handleConfirmedOrderExecution, checkoutClientMemo, checkoutAuth,
+          }}
+          orders={{
+            filteredOrders, ordersQuery, setOrdersQuery, handleReorderClick, trackingClientState, activeTrackedOrder,
+            trackingWltIntent, liveOrderDetails, trackingOrderValues, trackingTimeline, reopenTracking,
+            handleCancelOrder, handleSupportEscalation, returnOrdersList,
+          }}
+          marketing={{
+            liveMarketingPrograms, recordMarketingBannerClick, recordMarketingBannerImpression,
+            recordMarketingGrowthClick, recordMarketingGrowthImpression,
+          }}
         />
       </View>
       <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
@@ -495,10 +450,3 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     </View>
   );
 }
-
-// Imports required for helper derivations
-import {
-  buildStoreCategories,
-  buildStoreDeliveryModes,
-  buildStoreTags,
-} adapters/dsh-store-builders';

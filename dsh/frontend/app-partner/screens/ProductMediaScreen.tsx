@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Platform, ScrollView, Image, ActivityIndicator } from 'react-native';
 import {
 	Box,
@@ -15,13 +15,11 @@ import {
   typographyRoles,
 } from '@bthwani/ui-kit';
 import {
-	createDshMediaApiHttpClient,
-	type DshMediaAsset,
-	type DshMediaApiError,
+	 type DshMediaAsset,
+	 type DshMediaApiError,
 } from '../../shared/api/dsh-media-api.client';
-import { resolveDshProductApiBaseUrl } from '../../shared/api/dsh-product-api.transport';
+import { getDshMediaRuntimeClient } from '../../shared';
 
-// DEV_ALLOWED: resolveDshProductApiBaseUrl is the shared DSH API base — same base URL for media.
 // RUNTIME_VIOLATION_FIXED: removed DSH_PRODUCT_MEDIA_FIXTURE_KEYS, resolveDshImageSource, Manifest selector.
 // TRACKING: RETIRE_DEV_FIXTURES_AFTER_RUNTIME_MEDIA_CLOSURE
 
@@ -67,11 +65,7 @@ export function ProductMediaScreen({ productId, partnerId, onBack }: ProductMedi
 	const { direction } = useDirection();
 	const { theme } = useTheme();
 
-	const baseUrl = React.useMemo(() => resolveDshProductApiBaseUrl(), []);
-	const client = React.useMemo(
-		() => (baseUrl ? createDshMediaApiHttpClient(baseUrl) : null),
-		[baseUrl],
-	);
+	const client = React.useMemo(() => getDshMediaRuntimeClient(), []);
 
 	const [screenState, setScreenState] = React.useState<ScreenState>('loading');
 	const [assets, setAssets] = React.useState<DshMediaAsset[]>([]);

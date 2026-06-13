@@ -9,8 +9,7 @@ import {
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
 import {
-  createDshFieldReadinessHttpClient,
-  resolveDshFieldReadinessBaseUrl,
+  getDshFieldReadinessRuntimeClient,
   type FieldReadinessApprovalRecord,
 } from '../../shared';
 
@@ -23,7 +22,7 @@ export function ReadinessApprovalsWorkspace() {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
   const client = React.useMemo(() => {
-    return createDshFieldReadinessHttpClient(resolveDshFieldReadinessBaseUrl());
+    return getDshFieldReadinessRuntimeClient();
   }, []);
 
   const loadLatestApproval = React.useCallback(async (storeId: string) => {

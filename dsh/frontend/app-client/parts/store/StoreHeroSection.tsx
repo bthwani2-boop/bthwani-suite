@@ -1,4 +1,4 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { Animated, TouchableOpacity, View } from 'react-native';
 import {
   BannerCarousel,
@@ -10,7 +10,7 @@ import {
   radius,
 } from '@bthwani/ui-kit';
 
-import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
 import type { DshFulfillmentDeliveryMode } from '../../contracts/dsh-client-binding.contracts';
 import type { useStoreShellDerivedState } from '../../hooks/useStoreShellDerivedState';
 import type { useStoreAppearanceChrome } from './store-appearance-chrome';
@@ -20,8 +20,8 @@ import {
   normalizeDisplayText,
   normalizeTagLabel,
   type StoreScreenDeliveryLabels,
-} store-formatting';
-import { isNewItem, isOfferItem } store-search-helpers';
+} from 'store-formatting';
+import { isNewItem, isOfferItem } from 'store-search-helpers';
 import { resolveDshStoreMenuItemImageSource } from './StoreMenuItemCard';
 import { stylesTokens, styles as storeScreenStyles } from './store-screen.styles';
 

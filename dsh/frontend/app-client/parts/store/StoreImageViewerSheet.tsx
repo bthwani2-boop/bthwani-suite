@@ -1,14 +1,14 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { Modal, View, Pressable, Animated, Platform, Image, TouchableOpacity } from 'react-native';
 import { Icon, Text,
   radius,
   spacing,
 } from '@bthwani/ui-kit';
 
-import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
 import type { useStoreAppearanceChrome } from './store-appearance-chrome';
 import type { DshStoreGetScreenProps } from '../../contracts/dsh-store-screen-props';
-import { normalizeDisplayText } store-formatting';
+import { normalizeDisplayText } from 'store-formatting';
 import { resolveDshStoreMenuItemImageSource } from './StoreMenuItemCard';
 import { stylesTokens, styles as storeScreenStyles } from './store-screen.styles';
 

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,8 +12,7 @@ import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
 import {
-  createDshStoreVisibilityHttpClient,
-  resolveDshStoreVisibilityBaseUrl,
+  getDshStoreVisibilityRuntimeClient,
 } from '../../shared/api/dsh-store-visibility-transport';
 
 export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
@@ -91,8 +90,8 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
 
   // Fetch live stores from GET /stores — replaces preview list when API is reachable
   React.useEffect(() => {
-    const baseUrl = resolveDshStoreVisibilityBaseUrl();
-    if (!baseUrl) return;
+    const client = getDshStoreVisibilityRuntimeClient();
+    if (!client) return;
 
     let cancelled = false;
     const fetchFn = globalThis.fetch;
@@ -140,8 +139,8 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
 
   const handleCatalogApproval = React.useCallback(
     async (storeId: string, approve: boolean) => {
-      const baseUrl = resolveDshStoreVisibilityBaseUrl();
-      if (!baseUrl) {
+      const client = getDshStoreVisibilityRuntimeClient();
+      if (!client) {
         setCatalogGateStatus('error');
         setCatalogGateFeedback('لم يُعثر على عنوان API — تحقق من NEXT_PUBLIC_DSH_API_BASE_URL.');
         return;
@@ -149,7 +148,7 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
       setCatalogGateStatus('loading');
       setCatalogGateFeedback(null);
       try {
-        const client = createDshStoreVisibilityHttpClient(baseUrl);
+
         const status = approve ? 'approved' : 'rejected';
         const res = await client.updateCatalogApproval(storeId, status, status);
         setCatalogGateStatus(approve ? 'approved' : 'rejected');
@@ -172,8 +171,8 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
 
   const handleMarketingVisibility = React.useCallback(
     async (storeId: string, activate: boolean) => {
-      const baseUrl = resolveDshStoreVisibilityBaseUrl();
-      if (!baseUrl) {
+      const client = getDshStoreVisibilityRuntimeClient();
+      if (!client) {
         setMarketingGateStatus('error');
         setMarketingGateFeedback('لم يُعثر على عنوان API — تحقق من NEXT_PUBLIC_DSH_API_BASE_URL.');
         return;
@@ -181,7 +180,7 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
       setMarketingGateStatus('loading');
       setMarketingGateFeedback(null);
       try {
-        const client = createDshStoreVisibilityHttpClient(baseUrl);
+
         const status = activate ? 'active' : 'inactive';
         const res = await client.updateMarketingVisibility(storeId, status);
         setMarketingGateStatus(activate ? 'active' : 'inactive');
@@ -210,15 +209,15 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
       return;
     }
 
-    const baseUrl = resolveDshStoreVisibilityBaseUrl();
-    if (!baseUrl) {
+    const client = getDshStoreVisibilityRuntimeClient();
+    if (!client) {
       setActionStatus('idle');
       setActionFeedback('لم يُعثر على عنوان API — تحقق من NEXT_PUBLIC_DSH_API_BASE_URL.');
       return;
     }
 
     try {
-      const client = createDshStoreVisibilityHttpClient(baseUrl);
+
       const isPause = actionLabel === 'إيقاف مؤقت' || actionLabel === 'إيقاف استقبال';
       const nextReadiness = isPause ? ('paused' as const) : ('ready' as const);
       const res = await client.updatePartnerReadiness(storeId, nextReadiness);

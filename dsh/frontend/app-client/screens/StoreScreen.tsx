@@ -1,11 +1,11 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { useDirection } from '@bthwani/ui-kit';
 import { StoreScreenShell, type DshStoreGetScreenProps, type DshStoreGetScreenShellProps } from '../parts/store/StoreScreenShell';
 
 import { useStoreState } from '../hooks/useStoreState';
 import { useStoreDerivedItems } from '../hooks/useStoreDerivedItems';
 import { useDebounce } from '../hooks/useDebounce';
-import { resolveStoreItemsForCategory } store-search-helpers';
+import { resolveStoreItemsForCategory } from 'store-search-helpers';
 
 export const DshStoreGetScreen = React.memo(function DshStoreGetScreenComponent(props: DshStoreGetScreenProps) {
   const storeState = useStoreState();
