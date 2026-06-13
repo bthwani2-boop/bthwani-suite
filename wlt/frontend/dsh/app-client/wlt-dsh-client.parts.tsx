@@ -11,7 +11,7 @@ import {
 	spacing,
 	useTheme,
 } from '@bthwani/ui-kit';
-import useWltDshWalletPreview from './useWltDshWalletPreview';
+import useWltDshWalletSession from './useWltDshWalletSession';
 
 /**
  * WLT-owned parts for DSH integration.
@@ -19,11 +19,11 @@ import useWltDshWalletPreview from './useWltDshWalletPreview';
 
 // --- Balance Preview ---
 
-export type WltDshBalancePreviewProps = {
+export type WltDshBalanceSummaryProps = {
 	balance: number | null;
 };
 
-export function WltDshBalancePreview({ balance }: WltDshBalancePreviewProps) {
+export function WltDshBalanceSummary({ balance }: WltDshBalanceSummaryProps) {
 	if (balance == null) {
 		return null;
 	}
@@ -38,7 +38,7 @@ export type WltDshConnectorPanelProps = {
 };
 
 export function WltDshConnectorPanel({ onLinked }: WltDshConnectorPanelProps) {
-	const { linked, link } = useWltDshWalletPreview();
+	const { linked, link } = useWltDshWalletSession();
 
 	return (
 		<Button

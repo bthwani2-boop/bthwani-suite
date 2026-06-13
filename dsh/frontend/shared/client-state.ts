@@ -511,7 +511,7 @@ export type DshCaptainProfileSnapshot = {
 	readinessLabel: string;
 };
 
-export function selectDshCaptainOperationalStatusesPreview(captainId?: string) {
+export function selectDshCaptainOperationalStatuses(captainId?: string) {
   void captainId;
   return Object.values(stateMetaMap);
 }

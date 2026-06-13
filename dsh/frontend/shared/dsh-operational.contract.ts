@@ -102,6 +102,13 @@ export type DshOperationalClosureStatus =
   | 'runtime-unproven'
   | 'blocked-by-wlt';
 
+export type CanonicalOperationsGroupId =
+  | 'command-center'
+  | 'live-orders'
+  | 'dispatch-capacity'
+  | 'exceptions'
+  | 'special-ops';
+
 export type DshControlPanelOperationalWorkspace =
   | 'orders-queue'
   | 'trips-board'

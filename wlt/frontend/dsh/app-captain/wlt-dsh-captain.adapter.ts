@@ -3,7 +3,7 @@ import {
 	formatWltYer,
 	type WltCaptainFinanceSection,
 	type WltCaptainFinanceSnapshot,
-	type WltDshFinancePreviewRecord,
+	type WltDshFinanceSummaryRecord,
 } from '../control-panel/financeContracts';
 
 const DEFAULT_CAPTAIN_ID = 'captain-demo';
@@ -15,7 +15,7 @@ function getClient(bearerToken?: string | null, devClientId?: string | null) {
 	});
 }
 
-function earningRecord(entry: WltLedgerEntry): WltDshFinancePreviewRecord {
+function earningRecord(entry: WltLedgerEntry): WltDshFinanceSummaryRecord {
 	const amount = Math.round(entry.amount * 100);
 	return {
 		id: entry.id,
@@ -71,7 +71,7 @@ export async function getSnapshot(captainId?: string | null, bearerToken?: strin
 	};
 }
 
-export async function getRecords(captainId?: string | null, bearerToken?: string | null): Promise<WltDshFinancePreviewRecord[]> {
+export async function getRecords(captainId?: string | null, bearerToken?: string | null): Promise<WltDshFinanceSummaryRecord[]> {
 	const activeCaptainId = captainId || DEFAULT_CAPTAIN_ID;
 	const { entries } = await getClient(bearerToken, activeCaptainId).listCaptainEarnings(activeCaptainId);
 	return entries.map(earningRecord);
@@ -81,7 +81,7 @@ export function getSections() {
 	return ['eligibility', 'cod-liability', 'earnings', 'settlement'] as const satisfies readonly WltCaptainFinanceSection[];
 }
 
-export async function getRecordsForSection(section: WltCaptainFinanceSection, captainId?: string | null, bearerToken?: string | null): Promise<WltDshFinancePreviewRecord[]> {
+export async function getRecordsForSection(section: WltCaptainFinanceSection, captainId?: string | null, bearerToken?: string | null): Promise<WltDshFinanceSummaryRecord[]> {
 	const records = await getRecords(captainId, bearerToken);
 	if (section === 'earnings') return records.filter((r) => r.kind === 'captain-earning');
 	// cod-liability and settlement stubs â€” WLT COD tracking not yet surfaced via captain endpoint

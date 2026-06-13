@@ -1,18 +1,18 @@
 import type {
   WltCaptainFinanceSection,
   WltCaptainFinanceSnapshot,
-  WltDshFinancePreviewRecord,
+  WltDshFinanceSummaryRecord,
 } from '../control-panel/financeContracts';
 
 export type WltDshCaptainBridgeSection = WltCaptainFinanceSection;
 
-export type WltDshCaptainFinancePreviewState = {
+export type WltDshCaptainFinanceSummaryState = {
   snapshot: WltCaptainFinanceSnapshot;
-  records: readonly WltDshFinancePreviewRecord[];
+  records: readonly WltDshFinanceSummaryRecord[];
   sections: readonly WltDshCaptainBridgeSection[];
   defaultSection: WltDshCaptainBridgeSection;
 };
 
 export type WltDshCaptainBridgeState = {
-  finance: WltDshCaptainFinancePreviewState;
+  finance: WltDshCaptainFinanceSummaryState;
 };

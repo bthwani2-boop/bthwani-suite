@@ -2215,7 +2215,7 @@ export {
   storeItemsByStoreId,
 } from './products.preview-data';
 export type {
-  DshStoreFixtureItem,
+  DshStoreMenuItem,
   StoreItemsByStoreId,
 } from '../../shared/dshStoreProductCardModel';
 

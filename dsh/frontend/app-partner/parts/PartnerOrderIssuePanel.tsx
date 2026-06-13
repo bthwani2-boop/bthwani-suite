@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable } from 'react-native';
 import { Box, Button, Chip, SectionHeader, Surface, Text, TextField } from '@bthwani/ui-kit';
 import type { DshPartnerOperationalFlowId, DshPartnerSupportIssueCategoryId } from '../dsh-partner.types';
-import { getOperationsSupportFlowPreview } from '../../shared/support-flows';
+import { getOperationsSupportFlowSpec } from '../../shared/support-flows';
 
 export type PartnerOrderIssueFlowId = 'order-issue-queue' | 'order-reject';
 
@@ -31,21 +31,21 @@ const partnerIssueNextFlowMap: Record<DshPartnerSupportIssueCategoryId, DshPartn
 function buildPartnerIssueCategorySpec(
   categoryId: DshPartnerSupportIssueCategoryId
 ): PartnerOrderIssueCategorySpec {
-  const preview = getOperationsSupportFlowPreview(categoryId);
+  const flowSpec = getOperationsSupportFlowSpec(categoryId);
 
   return {
     id: categoryId,
-    title: preview.title,
-    description: preview.description,
-    owner: preview.ownerLabel as PartnerOrderIssueCategorySpec['owner'],
+    title: flowSpec.title,
+    description: flowSpec.description,
+    owner: flowSpec.ownerLabel as PartnerOrderIssueCategorySpec['owner'],
     severity:
-      preview.severity === 'danger'
+      flowSpec.severity === 'danger'
         ? 'danger'
-        : preview.severity === 'warning'
+        : flowSpec.severity === 'warning'
           ? 'warning'
           : 'info',
-    allowedActions: preview.allowedActions,
-    forbiddenActions: preview.forbiddenActions,
+    allowedActions: flowSpec.allowedActions,
+    forbiddenActions: flowSpec.forbiddenActions,
     nextFlowId: partnerIssueNextFlowMap[categoryId],
   };
 }

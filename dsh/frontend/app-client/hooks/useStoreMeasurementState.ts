@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { DshStoreFixtureItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem } from '../../shared/dshStoreProductCardModel';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 
 type MeasurementPickerAnchor = {
@@ -9,19 +9,19 @@ type MeasurementPickerAnchor = {
 };
 
 type UseStoreMeasurementStateOptions = {
-  setPickerItem: React.Dispatch<React.SetStateAction<DshStoreFixtureItem | null>>;
+  setPickerItem: React.Dispatch<React.SetStateAction<DshStoreMenuItem | null>>;
   setSelectedMeasureOption: React.Dispatch<React.SetStateAction<string | null>>;
   setSelectedMeasureQty: React.Dispatch<React.SetStateAction<number>>;
   setPickerAnchor: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
   setIsAddedToCart: React.Dispatch<React.SetStateAction<boolean>>;
   setAddedItemLabel: React.Dispatch<React.SetStateAction<string>>;
-  onAddItemToCart?: (item: DshStoreFixtureItem, payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string }) => void;
+  onAddItemToCart?: (item: DshStoreMenuItem, payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string }) => void;
   onOpenCart?: (mode?: DshFulfillmentDeliveryMode) => void;
-  pickerItem: DshStoreFixtureItem | null;
+  pickerItem: DshStoreMenuItem | null;
   selectedMeasureOption: string | null;
   selectedMeasureQty: number;
   selectedMode: DshFulfillmentDeliveryMode;
-  resolveMeasurementOptions: (item: DshStoreFixtureItem) => readonly string[];
+  resolveMeasurementOptions: (item: DshStoreMenuItem) => readonly string[];
 };
 
 export function useStoreMeasurementState({
@@ -39,7 +39,7 @@ export function useStoreMeasurementState({
   selectedMode,
   resolveMeasurementOptions,
 }: UseStoreMeasurementStateOptions) {
-  const openMeasurementPicker = React.useCallback((item: DshStoreFixtureItem, anchor?: MeasurementPickerAnchor) => {
+  const openMeasurementPicker = React.useCallback((item: DshStoreMenuItem, anchor?: MeasurementPickerAnchor) => {
     const options = resolveMeasurementOptions(item);
     setPickerItem(item);
     setSelectedMeasureOption(options[0] ?? null);

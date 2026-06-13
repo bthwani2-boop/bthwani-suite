@@ -1,4 +1,4 @@
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 
 import { normalizeDisplayText } from './store-formatting';
 

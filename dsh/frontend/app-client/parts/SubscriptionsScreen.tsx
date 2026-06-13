@@ -13,7 +13,7 @@ import {
   useTheme,
   radius,
 } from '@bthwani/ui-kit';
-import type { SubscriptionClientCard } from '../../shared/commercial.preview-contract';
+import type { SubscriptionClientCard } from '../../shared/commercial-contract';
 
 export type DshSubscriptionsScreenProps = {
   compact?: boolean;

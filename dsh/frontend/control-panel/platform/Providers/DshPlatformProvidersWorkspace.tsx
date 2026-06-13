@@ -5,7 +5,7 @@ import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PREVIEW_PROVIDER_RECORDS: Record<string, any>[] = [];
-import { useDemoPlatformState } from '../useDemoPlatformState';
+import { usePlatformAuditState } from '../usePlatformAuditState';
 import styles from '../../shared/control-panel-surface.module.css';
 
 type ProviderRecord = (typeof PREVIEW_PROVIDER_RECORDS)[number];
@@ -98,7 +98,7 @@ function resolveActionImpact(
 }
 
 export function DshPlatformProvidersWorkspace({ activeFilter }: { activeFilter: string }) {
-  const { addAuditEvent } = useDemoPlatformState();
+  const { addAuditEvent } = usePlatformAuditState();
   const [selectedProviderId, setSelectedProviderId] = React.useState<string>('maps');
   const [showConfirm, setShowConfirm] = React.useState<ProviderPreviewActionId | null>(null);
 

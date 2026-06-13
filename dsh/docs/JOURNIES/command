@@ -818,7 +818,340 @@ Next slice:
 
 الهدف هو تحقيق أكبر إنجاز عملي بأسرع وقت داخل الكود الحي، مع إغلاق كل شريحة إغلاقًا حقيقيًا قابلًا للتشغيل والمراجعة، بصفر تسويف، صفر هروب، صفر preview runtime، صفر mock runtime، صفر tolerated violations، وصفر انتقال نهائي قبل الإغلاق.
 
-## 16) مخالفة مُثبَّتة: استيراد من legacy-preview ممنوع
+## 16) قانون النطاق الإلزامي الكامل
+
+أي شريحة DSH/WLT frontend أو data/media أو finance boundary أو structure cleanup يجب أن تفحص وتعالج النطاق التالي بالكامل حسب الارتباط الفعلي:
+
+```text
+C:\bthwani-suite\dsh\frontend\shared
+C:\bthwani-suite\dsh\frontend\control-panel
+C:\bthwani-suite\dsh\frontend\app-client
+C:\bthwani-suite\dsh\frontend\app-partner
+C:\bthwani-suite\dsh\frontend\app-captain
+C:\bthwani-suite\dsh\frontend\app-field
+C:\bthwani-suite\wlt\frontend\dsh
+```
+
+ممنوع إغلاق أي شريحة إذا تم إصلاح app-* فقط وترك shared أو control-panel أو wlt/frontend/dsh خارج الفحص.
+
+أي ملف خارج النطاق أعلاه يدخل تلقائيًا في الشريحة إذا ظهر في: imports, exports, routes, navigation, screen registry, OpenAPI/client binding, API adapter, WLT bridge, media resolver, PostgreSQL/MinIO/media flow, test, story, guard, docker/env/runtime config.
+
+لا يوجد "خارج النطاق" لملف مرتبط دون دليل عكسي.
+
+## 17) قانون dsh/frontend/shared
+
+`C:\bthwani-suite\dsh\frontend\shared` ليس مجلد رمي عشوائي.
+
+المسموح داخل shared فقط:
+```text
+contracts/types مشتركة
+pure helpers
+view-model primitives
+API client primitives العامة
+media resolver contracts
+UI-neutral utilities
+constants تشغيلية عامة فقط
+```
+
+الممنوع داخل shared:
+```text
+screen logic
+surface routing
+navigation state
+app-specific state
+control-panel-specific forms
+preview/demo/mock/sample/fallback data
+imports من app-client/app-partner/app-captain/app-field
+imports من control-panel
+imports من dsh/frontend/data
+imports من dsh/frontend/media-fixtures
+WLT money mutation
+media fixture resolving runtime
+local runtime truth
+```
+
+اتجاه الاعتماد الصحيح:
+```text
+app-*          -> shared
+control-panel  -> shared
+shared         -> لا يستورد من app-* أو control-panel
+shared         -> لا يكون مصدر runtime truth
+shared         -> لا يملك منطقًا خاصًا بسطح واحد
+```
+
+إذا وجد داخل shared منطق خاص بسطح واحد: انقله إلى السطح المالك.
+إذا وجد داخل shared بيانات preview أو fixture: اعزلها فورًا إلى test/story/dev-only أو احذفها بعد import/reference proof.
+
+يجب إنتاج `shared-ownership-report.json` يثبت: الملفات المشتركة الحقيقية، الملفات الخاصة بسطح واحد التي نُقلت، أي preview/fixture أُزيل، اتجاه الاعتماد، عدم وجود reverse imports من shared إلى apps/control-panel.
+
+## 18) قانون dsh/frontend/control-panel
+
+`C:\bthwani-suite\dsh\frontend\control-panel` سطح إداري مستقل، وتنظيمه حسب الأقسام التشغيلية لا حسب mobile surface folders.
+
+المطلوب تنظيمه حسب الأقسام التشغيلية (أنشئ section فقط عند وجود مسؤولية تشغيلية حقيقية):
+```text
+sections/
+  stores/
+  products/
+  categories/
+  media/
+  campaigns/
+  orders/
+  operations/
+  field-readiness/
+  support/
+  finance-readonly/
+  settings/
+```
+
+مسؤولية control-panel:
+- إدخال البيانات الحقيقية
+- إدارة المنتجات والمتاجر والتصنيفات
+- رفع الصور والفيديوهات عبر Media Runtime API
+- ربط الوسائط بـ dsh_media_assets
+- عرض finance read-model فقط من WLT
+- تعويض أي fixture سابق بمسار إدخال حقيقي
+
+ممنوع داخل control-panel:
+```text
+استخدام dsh/frontend/data كمصدر runtime
+استخدام dsh/frontend/media-fixtures كمصدر runtime
+preview/demo/mock/sample/fallback data
+تخزين image/video binary داخل PostgreSQL
+WLT money mutation
+finance mutation أو wallet mutation أو settlement mutation
+```
+
+يجب إنتاج `control-panel-input-path-report.json` يثبت: الأقسام الموجودة، forms/input paths التي أُنشئت أو أُصلحت، media upload path، الربط مع API/PostgreSQL/MinIO، عدم وجود runtime imports من data/media-fixtures.
+
+## 19) قانون تطبيقات DSH الأربعة
+
+التطبيقات الأربعة تفحص كبنية runtime surfaces لا تُوحَّد ملفاتها. كل سطح يختلف حسب دوره التشغيلي:
+
+```text
+app-client  = customer discovery/cart/checkout/tracking/my-space/WLT summary
+app-partner = partner inbox/catalog/store ops/support/store-courier/WLT settlement summary
+app-captain = availability/offers/trip lifecycle/map/pickup-dropoff/PoD/support/earnings summary
+app-field   = store onboarding/visit/document upload/readiness escalation/history/profile/finance summary
+```
+
+Surface host وظيفته orchestration فقط. ممنوع داخله:
+```text
+route switch ضخم
+screen registry inline كبير
+API mapping متعدد
+WLT money logic
+business calculations
+hardcoded operational identities
+preview/demo/sample/fallback data
+storage read/write مباشر
+media fixture resolving
+```
+
+إذا كان Surface host ضخمًا وموجودًا قبل الشريحة: ثبّت ratchet baseline (line-count baseline + منع نمو جديد فوق baseline + منع direct data/media-fixtures import).
+
+شرط الإغلاق لكل Surface:
+```text
+Surface host = orchestration فقط
+لا preview data
+لا route switch ضخم
+لا WLT money logic
+لا API mapping مباشر كبير
+لا hardcoded operational identities
+لا media-fixtures
+لا dsh/frontend/data
+tsc ينجح
+guards تنجح
+visual evidence موجود عند تغيير UI
+```
+
+## 20) قانون Route Renderer وProp Drilling
+
+أي route renderer أو screen router يجب أن يكون mapping واضحًا فقط.
+
+ممنوع أن يجمع: business calculations, cart totals, payment method building, hardcoded addresses, preview ids, screen-specific handlers الضخمة, props object ضخم, WLT screen bridge مع business state, media fixture resolving.
+
+إذا احتاج route renderer أكثر من 25 prop أو احتوى أكثر من 10 branches مباشرة، يجب تفكيكه إلى: route-registry, route-renderer, feature-screen-presenters, feature adapters, contracts واضحة.
+
+ابدأ عمليًا بـ: `dsh/frontend/app-client/DshClientRouteRenderer.tsx`
+
+## 21) قانون الملفات الضخمة والتكرار
+
+قانون الملفات:
+```text
+0-20 lines:   MERGE_DUPLICATE إلا إذا كان public entrypoint أو generated type أو explicit barrel مبرر
+21-300 lines: KEEP_ACTIVE إذا كانت مسؤولية واحدة واضحة
+301-600 lines: REVIEW_FOR_SPLIT إذا احتوى أكثر من مسؤولية
+601+ lines:   REFACTOR_SPLIT إلزامي إلا إذا كان generated أو data contract موثق
+1000+ lines:  BLOCKING_STRUCTURE_VIOLATION داخل runtime الحي
+```
+
+التقسيم يكون فقط حسب المسؤولية الحقيقية: route, screen, state, adapter, contract, copy, view-model, storage, test.
+
+قانون التكرار: افحص التكرار على مستويين (duplicate file purpose + duplicate content/responsibility). أي موضوع موجود بأسماء متعددة يجب توحيده تحت owner واحد.
+
+يجب إنتاج `file-size-report.json` و`duplication-report.json` لكل شريحة تنظيم/تنظيف.
+
+## 22) شرط الحذف النهائي لـ dsh/frontend/data و dsh/frontend/media-fixtures
+
+الحذف يتم فقط بعد إثبات جميع الشروط التالية:
+
+```text
+1)  صفر runtime import مباشر أو غير مباشر من dsh/frontend/data
+2)  صفر runtime import مباشر أو غير مباشر من dsh/frontend/media-fixtures
+3)  صفر barrel أو re-export يخفي الاعتماد على data/media-fixtures
+4)  صفر preview/demo/mock/fake/sample/fallback مستخدم داخل runtime الحي
+5)  كل مستهلك سابق تحوّل إلى API/PostgreSQL/Control Panel input/MinIO-S3/WLT bridge صحيح
+6)  dsh_media_assets migration مطبقة
+7)  MinIO bucket جاهز
+8)  media upload flow يعمل end-to-end
+9)  control-panel يملك أو يربط مسارات الإدخال الحقيقي المطلوبة
+10) app-client/app-partner/app-captain/app-field لا تعتمد على fixture/data runtime
+11) shared لا يحتوي أي data/media-fixtures runtime dependency
+12) wlt/frontend/dsh لا يحتوي أي import أو re-export أو adapter fallback أو preview-data dependency
+13) tsc ينجح
+14) import/reference graph يثبت عدم وجود consumers
+15) guards تنجح
+16) git diff check ينجح
+17) slice-coverage-matrix يثبت صفر uncovered
+18) uncovered-files.md فارغ
+```
+
+ممنوع: إنشاء retired folder، إنشاء data بديل، إنشاء media-fixtures بديل، إنشاء fixture بديل.
+
+## 23) Evidence Session الإلزامي
+
+ابدأ كل تنفيذ بهذا:
+
+```powershell
+Set-Location -LiteralPath "C:\bthwani-suite"
+$ErrorActionPreference = "Stop"
+$SessionId = "DSH_WLT_FINAL_CLOSURE-$((Get-Date).ToString('yyyyMMdd-HHmmss'))"
+$RunRoot = Join-Path "tools\registry\runs" $SessionId
+New-Item -ItemType Directory -Force -Path $RunRoot | Out-Null
+
+git branch --show-current | Tee-Object -FilePath "$RunRoot\branch.txt"
+git rev-parse HEAD | Tee-Object -FilePath "$RunRoot\commit.txt"
+git --no-pager status --short | Tee-Object -FilePath "$RunRoot\git-status-before.txt"
+git --no-pager diff --check | Tee-Object -FilePath "$RunRoot\git-diff-check-before.txt"
+```
+
+لا يبدأ أي refactor أو حذف أو نقل قبل وجود RunRoot.
+
+يجب إنتاج داخل Evidence Session:
+```text
+file-inventory.json
+slice-coverage-matrix.json
+uncovered-files.md
+missing-slice-content.md
+import-reference-report.json
+route-screen-navigation-report.json
+preview-data-media-report.json
+wlt-dsh-boundary-report.json
+control-panel-input-path-report.json
+shared-ownership-report.json
+media-runtime-gate-report.json
+file-size-report.json
+duplication-report.json
+guard-output.txt
+commands.log
+git-status-before.txt
+git-status-after.txt
+tsc-noemit.txt
+final-decision.md
+_HANDOFF.zip
+```
+
+## 24) ترتيب التنفيذ الإلزامي
+
+نفّذ بهذا التسلسل بدون قفز:
+
+```text
+1)  تحديث command بكل القواعد من command_additional
+2)  إنشاء Evidence Session
+3)  بناء file inventory كامل للنطاق السبعة
+4)  بناء import/export graph
+5)  بناء route/navigation/screen registry graph
+6)  بناء OpenAPI/client binding graph
+7)  بناء PostgreSQL/MinIO/media flow scan
+8)  بناء WLT/DSH boundary scan
+9)  بناء control-panel input path scan
+10) بناء shared ownership scan
+11) بناء preview/data/media-fixtures scan
+12) بناء duplicate/dead/small/giant file scan
+13) إنتاج slice-coverage-matrix.json
+14) إنتاج uncovered-files.md
+15) أي uncovered file يدخل فورًا في الشريحة الحالية أو sub-slice داخل نفس Evidence Session
+16) إصلاح الحراس حتى تفشل على النطاق الكامل
+17) إصلاح guard:jscpd:live ليصبح failing لا report-only
+18) إصلاح fixture/media/preview guard ليصبح failing داخل scope
+19) إضافة/تفعيل guard:dsh-surface-structure
+20) إضافة/تفعيل guard:real-media-runtime
+21) تثبيت PostgreSQL + MinIO + dsh_media_assets + Media Runtime Gate
+22) تشغيل real media gate وإثبات upload-intent/PUT/complete/read/list
+23) إغلاق كل runtime imports من dsh/frontend/data و dsh/frontend/media-fixtures
+24) تنظيف wlt/frontend/dsh من Preview/preview-data/FinancePreview/PaymentPreview naming
+25) ضمان أن WLT يملك الماليات وDSH لا يملك money mutation
+26) تنظيم shared وإزالة أي تلوث
+27) تنظيم control-panel sections كمسار إدخال حقيقي
+28) تفكيك app-client تدريجيًا: Surface host, Route renderer, state/routes/adapters/copy/parts/screens/contracts/storage
+29) تفكيك app-partner تدريجيًا: Surface host, route/state/API/support/store ops
+30) تفكيك app-captain تدريجيًا: Surface host, trip/availability/map/PoD/support/earnings
+31) تفكيك app-field تدريجيًا: Surface host, visit/document/readiness/escalation/storage
+32) إعادة تشغيل coverage matrix بعد كل شريحة
+33) تنظيف duplicate/dead/small/noise files مع graph proof
+34) تحديث OpenAPI/client binding إذا تغير API
+35) تشغيل visual/RTL evidence عند وجود UI changes
+36) إثبات صفر references إلى data/media-fixtures في كل النطاق
+37) حذف dsh/frontend/data و dsh/frontend/media-fixtures فقط بعد نجاح كل Gates
+38) تشغيل verify كامل بعد الحذف
+39) إنتاج final-decision.md
+40) إنتاج _HANDOFF.zip
+```
+
+## 25) أوامر VERIFY الأساسية في نهاية كل شريحة
+
+```powershell
+Set-Location -LiteralPath "C:\bthwani-suite"
+git --no-pager status --short | Tee-Object -FilePath "$RunRoot\git-status-after.txt"
+git --no-pager diff --check | Tee-Object -FilePath "$RunRoot\git-diff-check-after.txt"
+pnpm -w exec tsc --noEmit *> "$RunRoot\tsc-noemit.txt"
+pnpm run guard:jscpd:live *> "$RunRoot\guard-jscpd-live.txt"
+pnpm run guard:fixture-media-identity *> "$RunRoot\guard-fixture-media-identity.txt"
+pnpm run guard:ast-grep:live-boundaries *> "$RunRoot\guard-ast-grep-live-boundaries.txt"
+pnpm run guard:depcruise:live-boundaries *> "$RunRoot\guard-depcruise-live-boundaries.txt"
+pnpm run guard:binding-proof *> "$RunRoot\guard-binding-proof.txt"
+```
+
+إذا أي أمر غير موجود أو report-only: شغّل probe بديل يفشل فعليًا عند المخالفة.
+ممنوع اعتبار guard غير موجود دليل نجاح.
+
+## 26) شرط الإغلاق النهائي 100%
+
+لا يوجد CLOSED_WITH_EVIDENCE ولا إعلان 100% إلا إذا ثبت بالأدلة كل ما يلي:
+
+```text
+صفر uncovered files — صفر uncovered runtime imports
+صفر unowned shared files — صفر unowned control-panel sections
+صفر unhandled preview/data/media-fixtures usage
+صفر guard report-only داخل نطاق الإغلاق
+صفر runtime import من dsh/frontend/data
+صفر runtime import من dsh/frontend/media-fixtures
+صفر Preview/preview-data runtime داخل wlt/frontend/dsh
+PostgreSQL healthy — migrations applied — dsh_media_assets موجود
+MinIO healthy — bucket bthwani-media-local موجود
+media upload flow يعمل end-to-end
+control-panel يملك real input paths
+WLT يملك الماليات فقط — DSH لا يحتوي money mutation
+Surface hosts orchestration فقط — Route renderers ليست business containers
+tsc ناجح — binding guard ناجح — diff check ناجح
+file-inventory.json موجود — slice-coverage-matrix.json موجود
+uncovered-files.md فارغ — final-decision.md موجود — _HANDOFF.zip موجود
+```
+
+أي نقطة تفشل = لا يوجد إغلاق. ارجع مباشرة إلى APPLY ثم VERIFY.
+
+## 27) مخالفة مُثبَّتة: استيراد من legacy-preview ممنوع
 
 **مخالفة موثقة (2026-06-12):**
 تم رصد imports مباشرة من:

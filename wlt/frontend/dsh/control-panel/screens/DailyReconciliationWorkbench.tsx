@@ -42,8 +42,8 @@ type DshFinancePreviewRow = {
   auditTrailId?: string;
   allowedAction: 'review' | 'view_evidence' | 'prepare_decision' | 'none';
   blockedReason?: string;
-  expectedSource: 'order-invoice' | 'settlement-cycle' | 'commission-schedule' | 'eligibility-calc' | 'preview-seed';
-  actualSource: 'bank-deposit' | 'wallet-debit' | 'cash-bag-delivery' | 'pos-receipt' | 'preview-seed';
+  expectedSource: 'order-invoice' | 'settlement-cycle' | 'commission-schedule' | 'eligibility-calc' | 'unbound';
+  actualSource: 'bank-deposit' | 'wallet-debit' | 'cash-bag-delivery' | 'pos-receipt' | 'unbound';
   evidenceSource: 'bank-statement' | 'pos-log' | 'audit-entry' | 'receipt-upload' | 'none';
   varianceReason?: string;
   bankDepositRef?: string;
@@ -81,8 +81,8 @@ function computeCurrentStage(rows: ReadonlyArray<DshFinancePreviewRow>): DayLife
   if (rows.some((r) => r.reconciliationStatus === 'unmatched' || r.reconciliationStatus === 'disputed')) return 'reconciliation';
   if (rows.some((r) => r.evidenceStatus !== 'complete')) return 'maker-review';
   if (rows.some((r) => r.workflowState !== 'checked' && r.workflowState !== 'approved')) return 'maker-review';
-  if (rows.some((r) => r.expectedSource === 'preview-seed' && r.id !== 'FIN-EMPTY-1')) return 'expected-registered';
-  if (rows.some((r) => r.actualSource === 'preview-seed' && r.id !== 'FIN-EMPTY-1')) return 'actual-registered';
+  if (rows.some((r) => r.expectedSource === 'unbound' && r.id !== 'FIN-EMPTY-1')) return 'expected-registered';
+  if (rows.some((r) => r.actualSource === 'unbound' && r.id !== 'FIN-EMPTY-1')) return 'actual-registered';
   return 'checker-approval';
 }
 
@@ -124,7 +124,7 @@ const EXPECTED_SOURCE_LABEL: Record<string, string> = {
   'settlement-cycle': 'دورة التسوية',
   'commission-schedule': 'جدول العمولات',
   'eligibility-calc': 'حسب الأهلية',
-  'preview-seed': 'بيانات معاينة',
+  'unbound': 'بيانات معاينة',
 };
 
 const ACTUAL_SOURCE_LABEL: Record<string, string> = {
@@ -132,7 +132,7 @@ const ACTUAL_SOURCE_LABEL: Record<string, string> = {
   'wallet-debit': 'خصم محفظة',
   'cash-bag-delivery': 'حقيبة نقدية',
   'pos-receipt': 'إيصال دفع',
-  'preview-seed': 'بيانات معاينة',
+  'unbound': 'بيانات معاينة',
 };
 
 function buildPreviewWorkbenchRows(): ReadonlyArray<DshFinancePreviewRow> {

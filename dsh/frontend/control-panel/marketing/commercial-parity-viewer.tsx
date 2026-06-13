@@ -33,7 +33,7 @@
 import React from 'react';
 import { colorPalette } from '@bthwani/ui-kit';
 import type { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import type { CommercialBadge } from '../../shared/commercial.preview-contract';
+import type { CommercialBadge } from '../../shared/commercial-contract';
 
 type CommercialParityPreviewProps = {
   features: ReturnType<typeof mapStoreCommercialFeatures>;

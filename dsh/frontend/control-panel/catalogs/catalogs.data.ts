@@ -159,15 +159,15 @@ import {
 import type { StoreItemsByStoreId } from '../../shared/dshStoreProductCardModel';
 
 type DshCategorySubcategory = { id: string; label: string; subtitle: string; mediaKey?: string; imageUri?: string };
-type DshCategoryFixture = { id: string; label: string; subtitle: string; emojiFallback?: string; mediaKey?: string; imageUri?: string; renderMode?: 'stores' | 'manual-order'; isManualLike?: boolean; subcategories: DshCategorySubcategory[] };
-const dshCategoryFixtures: DshCategoryFixture[] = [];
+type DshCategoryData = { id: string; label: string; subtitle: string; emojiFallback?: string; mediaKey?: string; imageUri?: string; renderMode?: 'stores' | 'manual-order'; isManualLike?: boolean; subcategories: DshCategorySubcategory[] };
+const dshCategoryData: DshCategoryData[] = [];
 const dshCommonMediaKeyOptions: string[] = [];
 const storeItemsByStoreId: StoreItemsByStoreId = {};
 export const dshCatalogMetrics: { id: string; label: string; value: number; description: string }[] = [];
 export const dshCatalogSmartFilters: CatalogSmartFilter[] = [];
 export const dshCatalogApprovalQueues: CatalogApprovalQueueItem[] = [];
 
-export const dshCatalogCategories: CatalogMainCategory[] = dshCategoryFixtures.map((c) => {
+export const dshCatalogCategories: CatalogMainCategory[] = dshCategoryData.map((c) => {
   return {
     id: c.id,
     label: c.label,

@@ -63,7 +63,7 @@ export type MeasurementOption = {
   unit?: string;
 };
 
-export type DshStoreFixtureItem = {
+export type DshStoreMenuItem = {
   id: string;
   name: string;
   subtitle?: string;
@@ -94,7 +94,7 @@ export type DshStoreFixtureItem = {
   mediaPolicy?: string;
 };
 
-export type StoreItemsByStoreId = Record<string, DshStoreFixtureItem[]>;
+export type StoreItemsByStoreId = Record<string, DshStoreMenuItem[]>;
 
 
 export type DshCanonicalStoreCard = {
@@ -172,7 +172,7 @@ export type DshCanonicalProductCard = {
   canonicalProductId?: string;
 };
 
-export type DshCanonicalPreviewEvidence = {
+export type DshCanonicalEvidence = {
   storeId: string;
   productId: string;
   sourceRecordId: string;
@@ -256,7 +256,7 @@ export function mapCanonicalStoreToDiscoveryStore(store: DshCanonicalStoreCard):
   };
 }
 
-export function mapCanonicalProductToStoreFixtureItem(product: DshCanonicalProductCard): DshStoreFixtureItem {
+export function mapCanonicalProductToStoreMenuItem(product: DshCanonicalProductCard): DshStoreMenuItem {
   return {
     id: product.id,
     name: product.name,

@@ -6,16 +6,16 @@ import type { DshOnDemandPolicy } from '../../shared/dsh-flow-registry';
 import { getDshSectionAuditPolicy } from '../../shared/dsh-role-permission.model';
 import type { DshFulfillmentDeliveryMode } from '../../shared/dsh-delivery-mode.model';
 import {
-  buildDshSignalRoutePreview,
+  buildDshSignalRoute,
   type DshGlobalControlLink,
-  type DshLookupInputPreview,
-  type DshPreviewPlaceholderStatus,
+  type DshLookupInput,
+  type DshPlaceholderStatus,
   type DshReadOnlyFinanceVisibility,
   type DshRouteHintedAction,
-  type DshSignalRoutePreview,
+  type DshSignalRoute,
   type DshVerificationStatus,
-  type DshVerificationStepPreview,
-} from '../../shared/dsh-order-preview.contract';
+  type DshVerificationStep,
+} from '../../shared/dsh-order.contract';
 
 // -----------------------------------------------------------------------------
 // Operations support preview
@@ -880,7 +880,7 @@ export type DshCallIntakeCloseOutcome =
   | 'duplicate'
   | 'blocked_identity';
 
-export type DshCallIntakeVerificationStep = DshVerificationStepPreview;
+export type DshCallIntakeVerificationStep = DshVerificationStep;
 
 export type DshCallIntakePreview = {
   readonly intakeId: string;
@@ -899,19 +899,19 @@ export type DshCallIntakePreview = {
   readonly nextAction: string;
   readonly quickActions: readonly DshGlobalControlLink[];
   readonly lookupPanel: {
-    readonly inputs: readonly DshLookupInputPreview[];
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly inputs: readonly DshLookupInput[];
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly callReasonSelector: {
     readonly selectedReason: DshCallIntakeReason;
     readonly options: readonly DshCallIntakeReason[];
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly identityVerificationResult: {
     readonly verificationStatus: DshVerificationStatus;
     readonly verificationSteps: readonly DshCallIntakeVerificationStep[];
     readonly sensitiveFieldsLocked: readonly string[];
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly ticketPreview: {
     readonly mode: 'create' | 'link';
@@ -919,15 +919,15 @@ export type DshCallIntakePreview = {
     readonly summary: string;
     readonly routeHint: string;
     readonly auditRequired: boolean;
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly transferContextToOperations: readonly DshRouteHintedAction[];
   readonly closeCallOutcome: {
     readonly outcome: DshCallIntakeCloseOutcome;
     readonly summary: string;
     readonly auditRequired: boolean;
-    readonly signal: DshSignalRoutePreview;
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly signal: DshSignalRoute;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly auditRequired: boolean;
 };
@@ -952,7 +952,7 @@ function buildDshCallIntakeLookupInputs(values: {
   readonly orderId?: string;
   readonly customerId: string;
   readonly ticketId?: string;
-}): readonly DshLookupInputPreview[] {
+}): readonly DshLookupInput[] {
   return [
     { key: 'phone', label: 'phone', value: values.phone, summaryFirst: true },
     { key: 'orderId', label: 'orderId', value: values.orderId ?? '—', summaryFirst: true },
@@ -1068,7 +1068,7 @@ export const DSH_CALL_INTAKE_PREVIEW: readonly DshCallIntakePreview[] = [
       outcome: 'transferred_to_ops',
       summary: 'المكالمة انتهت بتحويل واضح إلى العمليات بعد تحقق الهوية وتثبيت السبب.',
       auditRequired: true,
-      signal: buildDshSignalRoutePreview('manual_call_intake_requested'),
+      signal: buildDshSignalRoute('manual_call_intake_requested'),
       previewClassification: 'ACCEPTED_PREVIEW_LABEL',
     },
     auditRequired: manualCallAuditRequired,
@@ -1177,7 +1177,7 @@ export const DSH_CALL_INTAKE_PREVIEW: readonly DshCallIntakePreview[] = [
       outcome: 'blocked_identity',
       summary: 'الهوية لم تكتمل، لذا أغلقت المكالمة كحالة blocked identity مع بقاء WLT مرجعًا فقط.',
       auditRequired: true,
-      signal: buildDshSignalRoutePreview('manual_call_intake_requested'),
+      signal: buildDshSignalRoute('manual_call_intake_requested'),
       previewClassification: 'ACCEPTED_PREVIEW_LABEL',
     },
     auditRequired: manualCallAuditRequired,
@@ -1271,13 +1271,13 @@ export type DshCustomer360Record = {
   readonly onDemandPolicy: DshOnDemandPolicy;
   readonly quickActions: readonly DshGlobalControlLink[];
   readonly searchFilters: {
-    readonly lookupInputs: readonly DshLookupInputPreview[];
+    readonly lookupInputs: readonly DshLookupInput[];
     readonly dateRangeLabel: string;
     readonly deliveryMode: DshFulfillmentDeliveryMode;
     readonly ticketStatus: DshCustomer360TicketFilterStatus;
     readonly wltVisibilityLabel: string;
     readonly areaZoneLabel: string;
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly lastFiveOrdersSummary: readonly DshCustomer360OrderSummary[];
   readonly ticketsHistory: readonly DshCustomer360TicketHistoryEntry[];
@@ -1286,10 +1286,10 @@ export type DshCustomer360Record = {
     readonly lastAddress: string;
     readonly serviceabilityStatus: 'serviceable' | 'blocked';
     readonly outOfZoneReason?: string;
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly notesTimeline: readonly DshCustomer360NoteEntry[];
-  readonly contextSignal: ReturnType<typeof buildDshSignalRoutePreview>;
+  readonly contextSignal: ReturnType<typeof buildDshSignalRoute>;
 };
 
 function buildDshCustomer360LookupInputs(values: {
@@ -1297,7 +1297,7 @@ function buildDshCustomer360LookupInputs(values: {
   readonly customerId: string;
   readonly orderId?: string;
   readonly ticketId?: string;
-}): readonly DshLookupInputPreview[] {
+}): readonly DshLookupInput[] {
   return [
     { key: 'phone', label: 'phone', value: values.phone, summaryFirst: true },
     { key: 'customerId', label: 'customerId', value: values.customerId, summaryFirst: true },
@@ -1489,7 +1489,7 @@ export const DSH_CUSTOMER_360_PREVIEW: readonly DshCustomer360Record[] = [
       { noteId: 'note-1102-2', source: 'ops note', body: 'العمليات تراجع serviceability فقط ولا تنفذ أي أثر مالي.', timestampLabel: 'منذ 12 دقيقة' },
       { noteId: 'note-1102-3', source: 'audit note', body: 'سبب التدخل موثق ضمن سجل assisted-order.', timestampLabel: 'منذ 10 دقائق' },
     ],
-    contextSignal: buildDshSignalRoutePreview('customer_360_followup'),
+    contextSignal: buildDshSignalRoute('customer_360_followup'),
   },
   {
     customerId: 'cus-4188',
@@ -1664,7 +1664,7 @@ export const DSH_CUSTOMER_360_PREVIEW: readonly DshCustomer360Record[] = [
       { noteId: 'note-1184-2', source: 'ops note', body: 'العمليات لن تتابع الحالة قبل اكتمال التحقق أو تحويلها رسميًا.', timestampLabel: 'منذ 15 دقيقة' },
       { noteId: 'note-1184-3', source: 'audit note', body: 'أي تسليم لاحق يجب أن يحمل ملاحظة المشغل وسبباً واضحين.', timestampLabel: 'منذ 11 دقيقة' },
     ],
-    contextSignal: buildDshSignalRoutePreview('customer_360_followup'),
+    contextSignal: buildDshSignalRoute('customer_360_followup'),
   },
 ] as const;
 

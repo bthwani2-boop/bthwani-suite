@@ -290,7 +290,7 @@ const DSH_SIGNAL_TONES: Record<DshSignalEventKind, 'brand' | 'success' | 'warnin
 // ─── Signal Layer Preview Events ─────────────────────────────────────────────
 // Canonical signal seed data lives in the archived preview signal source.
 // Re-exported here typed for the signal layer contract.
-export const DSH_SIGNAL_PREVIEW_EVENTS: ReadonlyArray<DshSignalEvent> = [];
+export const DSH_SIGNAL_EVENTS: ReadonlyArray<DshSignalEvent> = [];
 
 function resolveMarketingReviewSignalKind(item: MediaReviewRecord): DshSignalEventKind | null {
   if (item.stage === 'marketing-approved') {
@@ -369,7 +369,7 @@ function getAllSignalEvents(): ReadonlyArray<DshSignalEvent> {
     })
     .filter((event): event is NonNullable<typeof event> => event !== null) as DshSignalEvent[];
 
-  return [...DSH_SIGNAL_PREVIEW_EVENTS, ...marketingReviewSignals];
+  return [...DSH_SIGNAL_EVENTS, ...marketingReviewSignals];
 }
 
 // ─── Helper Functions ─────────────────────────────────────────────────────────

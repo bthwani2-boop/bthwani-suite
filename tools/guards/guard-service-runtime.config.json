@@ -298,6 +298,88 @@
           "requiresScreenshot": false
         }
       }
-    }
+    },
+    "wlt": {
+    "displayName": "Wallet & Ledger",
+    "backendPath": "wlt/backend",
+    "goModPath": "wlt/backend/go.mod",
+    "mainPath": "wlt/backend/cmd/wlt-api/main.go",
+    "repositoryInterfacePath": "wlt/backend/internal/store/repository.go",
+    "postgresRepositoryPath": "wlt/backend/internal/store/postgres_repository.go",
+    "routeRegistrationPaths": [
+      "wlt/backend/internal/http/wallet_handler.go",
+      "wlt/backend/internal/http/payment_handler.go",
+      "wlt/backend/internal/http/refund_handler.go",
+      "wlt/backend/internal/http/settlement_handler.go",
+      "wlt/backend/internal/http/reporting_handler.go",
+      "wlt/backend/internal/http/operator_handler.go"
+    ],
+    "repositoryRequiredMethods": [
+      "CreatePaymentSession",
+      "GetPaymentSession",
+      "ConfirmPaymentSession",
+      "CreateRefund",
+      "GetRefund",
+      "ProcessRefund",
+      "CreateSettlement",
+      "GetSettlement",
+      "ProcessSettlement",
+      "GetOrCreateWallet",
+      "GetWalletSummary",
+      "CreateLedgerEntry",
+      "ListLedger",
+      "RunReconciliation"
+    ],
+    "postgresRequiredPatterns": [
+      "pgx",
+      "NewPostgresRepository",
+      "CreatePaymentSession",
+      "CreateRefund",
+      "CreateSettlement",
+      "GetOrCreateWallet"
+    ],
+    "composePath": "wlt/backend/docker-compose.local.yml",
+    "allowedComposeServices": [
+      "wlt-postgres",
+      "wlt-api",
+      "wlt-postgres-data",
+      "bthwani-local"
+    ],
+    "forbiddenComposeTerms": [
+      "redis",
+      "kafka",
+      "rabbit",
+      "rabbitmq",
+      "kubernetes"
+    ],
+    "migrationFiles": [
+      "wlt/backend/migrations/001_wallets.sql",
+      "wlt/backend/migrations/002_payment_sessions.sql",
+      "wlt/backend/migrations/003_ledger.sql",
+      "wlt/backend/migrations/004_refunds.sql",
+      "wlt/backend/migrations/005_settlements.sql",
+      "wlt/backend/migrations/006_settlement_dsh_callback.sql",
+      "wlt/backend/migrations/007_operator_features.sql"
+    ],
+    "seedFiles": [],
+    "allowedTables": [
+      "wlt_wallets",
+      "wlt_payment_sessions",
+      "wlt_ledger",
+      "wlt_refunds",
+      "wlt_settlements",
+      "wlt_callback_events",
+      "wlt_reconciliation_runs",
+      "wlt_payout_decisions",
+      "wlt_finance_close",
+      "wlt_operator_rbac_grants"
+    ],
+    "requiredTableColumns": [
+      "id",
+      "status",
+      "created_at"
+    ],
+    "slices": {}
+  }
   }
 }

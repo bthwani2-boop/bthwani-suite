@@ -53,7 +53,7 @@ export type DshOperationsSupportFlowVisibility = {
   notes?: string;
 };
 
-export type DshOperationsSupportFlowPreview = {
+export type DshOperationsSupportFlowSpec = {
   flowId: DshOperationsSupportFlowId;
   title: string;
   description: string;
@@ -66,7 +66,7 @@ export type DshOperationsSupportFlowPreview = {
   allowedActions: readonly string[];
   forbiddenActions: readonly string[];
   relatedOrderState: string;
-  financialImpactPreview?: string;
+  financialImpactRef?: string;
   requiresEvidence: boolean;
   nextAction: string;
   hiddenCompat?: boolean;
@@ -85,7 +85,7 @@ const controlPanelEscalationOwnerLabel = 'لوحة التحكم';
 const wltEscalationOwnerLabel = 'WLT';
 const partnerManagementEscalationOwnerLabel = 'Partner Management';
 
-export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPreview[] = [
+export const DSH_OPERATIONS_SUPPORT_FLOWS: readonly DshOperationsSupportFlowSpec[] = [
   {
     flowId: 'delayed-preparation',
     title: 'تأخر التحضير',
@@ -244,7 +244,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     allowedActions: ['تمييز الحالة Preview', 'تحويل للمراجعة', 'فتح مرجع WLT للقراءة فقط'],
     forbiddenActions: ['بدء استرداد', 'تعديل تسوية', 'تغيير عمولة أو ledger'],
     relatedOrderState: 'financial_review_pending',
-    financialImpactPreview: 'refund-adjustment / partner-settlement / store-courier-compensation',
+    financialImpactRef: 'refund-adjustment / partner-settlement / store-courier-compensation',
     requiresEvidence: true,
     nextAction: 'صعّد الحالة للمراجعة التشغيلية واترك أي حساب مالي لـ WLT.',
   },
@@ -264,7 +264,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     allowedActions: ['تسجيل المكالمة', 'فتح Customer 360', 'تحويل إلى مساعدة الطلب بعد التحقق'],
     forbiddenActions: ['كشف الحقول الحساسة قبل التحقق', 'تغيير المصدر اليدوي', 'بدء refund محلي'],
     relatedOrderState: 'manual_call_intake',
-    financialImpactPreview: 'wlt-visibility-only',
+    financialImpactRef: 'wlt-visibility-only',
     requiresEvidence: true,
     nextAction: 'أكمل الهوية أو أبقِ الحقول الحساسة محجوبة ثم افتح المسار المناسب.',
   },
@@ -284,7 +284,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     allowedActions: ['فتح الطلب أو التذكرة', 'فتح مساعدة الطلب', 'فتح إنقاذ الطلب'],
     forbiddenActions: ['بدء refund أو settlement', 'نسخ منطق الشاشات العميلية', 'إغلاق ticket خارج owner الدعم'],
     relatedOrderState: 'customer_360_review',
-    financialImpactPreview: 'wlt-preview-links',
+    financialImpactRef: 'wlt-preview-links',
     requiresEvidence: false,
     nextAction: 'اجمع السياق أولاً ثم افتح workspace التدخل الصحيح بدل تكرار التنقل.',
   },
@@ -305,7 +305,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     allowedActions: ['إعادة بناء السلة', 'تثبيت البديل', 'فتح رؤية WLT المرجعية'],
     forbiddenActions: ['إرسال الطلب قبل الهوية', 'بدء money mutation', 'حل نزاع الشريك من داخل العمليات'],
     relatedOrderState: 'assisted_order_desk',
-    financialImpactPreview: 'payment-visibility-only',
+    financialImpactRef: 'payment-visibility-only',
     requiresEvidence: true,
     nextAction: 'إذا بقي المعوق التشغيلي مفتوحًا فحوّل الحالة مباشرة إلى إنقاذ الطلب.',
   },
@@ -327,7 +327,7 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
     allowedActions: ['تحديد المعوق الرئيسي', 'فتح تذكرة دعم', 'فتح مرجع WLT', 'تحويل الحالة إلى الشريك أو الكتالوج أو الدعم'],
     forbiddenActions: ['إغلاق الحالة بلا معوق واضح', 'إطلاق استرداد محلي', 'تكرار نفس القرار عبر أكثر من مالك'],
     relatedOrderState: 'order_rescue',
-    financialImpactPreview: 'refund-visibility-only',
+    financialImpactRef: 'refund-visibility-only',
     requiresEvidence: true,
     nextAction: 'ثبّت المالك النهائي وأغلق التشتيت بدل فتح تدخلات متضاربة.',
   },
@@ -506,32 +506,32 @@ export const DSH_OPERATIONS_SUPPORT_PREVIEW: readonly DshOperationsSupportFlowPr
   },
 ] as const;
 
-export const DSH_OPERATIONS_SUPPORT_HIDDEN_COMPAT_FLOW_IDS = DSH_OPERATIONS_SUPPORT_PREVIEW
+export const DSH_OPERATIONS_SUPPORT_HIDDEN_COMPAT_FLOW_IDS = DSH_OPERATIONS_SUPPORT_FLOWS
   .filter((item) => item.hiddenCompat)
   .map((item) => item.flowId) as readonly DshOperationsSupportFlowId[];
 
-export const DSH_OPERATIONS_SUPPORT_PREVIEW_BY_ID = Object.fromEntries(
-  DSH_OPERATIONS_SUPPORT_PREVIEW.map((item) => [item.flowId, item])
-) as Record<DshOperationsSupportFlowId, DshOperationsSupportFlowPreview>;
+export const DSH_OPERATIONS_SUPPORT_FLOWS_BY_ID = Object.fromEntries(
+  DSH_OPERATIONS_SUPPORT_FLOWS.map((item) => [item.flowId, item])
+) as Record<DshOperationsSupportFlowId, DshOperationsSupportFlowSpec>;
 
-export function getOperationsSupportFlowPreview(
+export function getOperationsSupportFlowSpec(
   flowId: DshOperationsSupportFlowId
-): DshOperationsSupportFlowPreview {
-  return DSH_OPERATIONS_SUPPORT_PREVIEW_BY_ID[flowId];
+): DshOperationsSupportFlowSpec {
+  return DSH_OPERATIONS_SUPPORT_FLOWS_BY_ID[flowId];
 }
 
 export function getOperationsSupportSurfaceEntry(
   flowId: DshOperationsSupportFlowId,
   surfaceId: DshOperationsSupportSurfaceId
 ): DshOperationsSupportFlowVisibility | undefined {
-  return getOperationsSupportFlowPreview(flowId).surfaceVisibility.find((entry) => entry.surfaceId === surfaceId);
+  return getOperationsSupportFlowSpec(flowId).surfaceVisibility.find((entry) => entry.surfaceId === surfaceId);
 }
 
 export function getOperationsSupportFlowsForSurface(
   surfaceId: DshOperationsSupportSurfaceId,
   options: { includeHiddenCompat?: boolean; includeReferenceOnly?: boolean } = {}
-): readonly DshOperationsSupportFlowPreview[] {
-  return DSH_OPERATIONS_SUPPORT_PREVIEW.filter((item) => {
+): readonly DshOperationsSupportFlowSpec[] {
+  return DSH_OPERATIONS_SUPPORT_FLOWS.filter((item) => {
     const surfaceEntry = item.surfaceVisibility.find((entry) => entry.surfaceId === surfaceId);
     if (!surfaceEntry) return false;
     if (surfaceEntry.mode === 'reference-only' && !options.includeReferenceOnly) return false;

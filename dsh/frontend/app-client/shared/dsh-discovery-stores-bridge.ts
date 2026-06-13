@@ -11,8 +11,8 @@ export type DshDiscoveryStoresBridgeSource = 'openapi-response' | 'preview-fallb
 
 export type DshDiscoveryStoresBridgeInput = {
   response?: DshListDiscoveryStoresResponse;
-  previewHomeStores: DshHomeGetStore[];
-  previewDiscoveryStores: DshDiscoveryStore[];
+  initialHomeStores: DshHomeGetStore[];
+  initialDiscoveryStores: DshDiscoveryStore[];
   state?: DshDiscoveryStoresBridgeState;
 };
 
@@ -39,13 +39,13 @@ export function resolveDshDiscoveryStoresBridge(
     };
   }
 
-  const hasPreviewStores = input.previewHomeStores.length > 0 || input.previewDiscoveryStores.length > 0;
+  const hasPreviewStores = input.initialHomeStores.length > 0 || input.initialDiscoveryStores.length > 0;
 
   return {
     source: 'preview-fallback',
     state: input.state ?? (hasPreviewStores ? 'ready' : 'empty'),
-    homeStores: input.previewHomeStores,
-    discoveryStores: input.previewDiscoveryStores,
+    homeStores: input.initialHomeStores,
+    discoveryStores: input.initialDiscoveryStores,
     fallbackReason: input.state && input.state !== 'ready' ? 'RUNTIME_NOT_READY' : 'NO_RUNTIME_RESPONSE',
   };
 }

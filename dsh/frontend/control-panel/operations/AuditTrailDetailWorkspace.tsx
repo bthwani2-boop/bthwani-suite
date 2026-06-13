@@ -14,7 +14,7 @@ import {
   getDshAuditEntryById,
   getDshRoleArabicName,
   getDshRolePermission,
-  DSH_AUDIT_PREVIEW_ENTRIES,
+  DSH_AUDIT_ENTRIES,
 } from '../../shared/dsh-role-permission.model';
 
 export type AuditTrailDetailWorkspaceProps = {
@@ -46,7 +46,7 @@ export function AuditTrailDetailWorkspace({
 }: AuditTrailDetailWorkspaceProps) {
   const entry =
     auditEntryProp ??
-    (entryId ? getDshAuditEntryById(entryId) : DSH_AUDIT_PREVIEW_ENTRIES[0]);
+    (entryId ? getDshAuditEntryById(entryId) : DSH_AUDIT_ENTRIES[0]);
   const policy = entry ? getDshRolePermission(entry.section) : undefined;
 
   const shellTitle = entry

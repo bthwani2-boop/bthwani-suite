@@ -17,7 +17,7 @@ import {
   spacing,
   typographyRoles,
 } from '@bthwani/ui-kit';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 import {
   formatCurrencyValue,
   normalizeDisplayText,

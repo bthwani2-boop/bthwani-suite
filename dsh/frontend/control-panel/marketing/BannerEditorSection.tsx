@@ -23,7 +23,7 @@ type MarketingBannerAudience = 'home' | 'stores' | 'client' | 'all';
 type MarketingBannerStatus = 'draft' | 'published';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type MarketingBannerRecord = Record<string, any>;
-const dshCategoryFixtures: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
+const dshCategoryData: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
 const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
 const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
 import type { MarketingPermission } from './marketing-permissions.contract';
@@ -99,10 +99,10 @@ export function BannerEditorSection({
 
   // --- Default IDs used when switching smart target type ---
   const firstStoreId = dshDiscoveryStores[0]?.id ?? 'store-1001';
-  const firstCategoryId = dshCategoryFixtures[0]?.id ?? 'restaurants';
+  const firstCategoryId = dshCategoryData[0]?.id ?? 'restaurants';
 
   const firstCategoryWithSubcategories = React.useMemo(
-    () => dshCategoryFixtures.find((c) => c.subcategories.length > 0) ?? dshCategoryFixtures[1],
+    () => dshCategoryData.find((c) => c.subcategories.length > 0) ?? dshCategoryData[1],
     [],
   );
   const firstSubcategoryId = firstCategoryWithSubcategories?.subcategories[0]?.id ?? '';
@@ -157,7 +157,7 @@ export function BannerEditorSection({
 
   const categoryOptions = React.useMemo(
     () =>
-      dshCategoryFixtures
+      dshCategoryData
         .filter((c) => {
           const query = normalizeSearchText(categorySearch);
           if (!query) return true;
@@ -169,7 +169,7 @@ export function BannerEditorSection({
 
   const selectedSubcategorySource = React.useMemo(
     () =>
-      dshCategoryFixtures.find((c) => c.id === draft.actionTarget) ??
+      dshCategoryData.find((c) => c.id === draft.actionTarget) ??
       firstCategoryWithSubcategories ??
       null,
     [draft.actionTarget, firstCategoryWithSubcategories],
@@ -177,7 +177,7 @@ export function BannerEditorSection({
 
   const parentCategoryOptions = React.useMemo(
     () =>
-      dshCategoryFixtures
+      dshCategoryData
         .filter((c) => c.subcategories.length > 0)
         .filter((c) => {
           const query = normalizeSearchText(subcategoryParentSearch);
@@ -286,10 +286,10 @@ export function BannerEditorSection({
       setDraft((current) => {
         const currentStoreIsValid = (id: string) => Boolean(dshDiscoveryStores.find((s) => s.id === id));
         const currentCategoryIsValid = (id: string) =>
-          Boolean(dshCategoryFixtures.find((c) => c.id === id));
+          Boolean(dshCategoryData.find((c) => c.id === id));
         const currentSubcategoryIsValid = (catId: string, subId: string) =>
           Boolean(
-            dshCategoryFixtures
+            dshCategoryData
               .find((c) => c.id === catId)
               ?.subcategories.find((s) => s.id === subId),
           );

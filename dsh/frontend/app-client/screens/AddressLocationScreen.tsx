@@ -28,7 +28,7 @@ type SavedAddress = {
   isDefault: boolean;
 };
 
-const mockSavedAddresses: SavedAddress[] = [
+const savedAddresses: SavedAddress[] = [
   { id: 'addr-home', label: 'المنزل', isDefault: true },
   { id: 'addr-work', label: 'العمل', isDefault: false },
   { id: 'addr-other', label: 'عنوان آخر', isDefault: false },
@@ -95,7 +95,7 @@ function AddressRow({ address, isLast = false, onSetDefault, onEdit }: AddressRo
 export function DshAddressLocationScreen({ onBack }: DshAddressLocationScreenProps) {
   const { theme } = useTheme();
   const [addressText, setAddressText] = React.useState('');
-  const [savedAddresses, setSavedAddresses] = React.useState<SavedAddress[]>(mockSavedAddresses);
+  const [savedAddresses, setSavedAddresses] = React.useState<SavedAddress[]>(savedAddresses);
 
   const handleSetDefault = (id: string) => {
     setSavedAddresses((prev) =>

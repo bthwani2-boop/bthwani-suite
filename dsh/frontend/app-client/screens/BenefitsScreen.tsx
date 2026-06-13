@@ -26,7 +26,7 @@ import {
   type LoyaltyReward,
   type CommercialEntitlement,
   type SubscriptionClientCard,
-} from '../../shared/commercial.preview-contract';
+} from '../../shared/commercial-contract';
 import {
   DSH_LOYALTY_UI_BOUNDARY_NOTE,
   getCampaignVisibilityRecord,

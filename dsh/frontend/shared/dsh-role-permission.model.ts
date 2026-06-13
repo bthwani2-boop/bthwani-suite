@@ -330,7 +330,7 @@ export function getDshRoleArabicName(roleId: DshRoleId): string {
 
 // ─── Preview audit entries (4 representative entries) ─────────────────────────
 
-export const DSH_AUDIT_PREVIEW_ENTRIES: ReadonlyArray<DshAuditEntry> = [
+export const DSH_AUDIT_ENTRIES: ReadonlyArray<DshAuditEntry> = [
   {
     entryId: 'audit-001',
     actorRoleId: 'platform-approver',
@@ -497,7 +497,7 @@ export function addDshAuditEntry(entry: DshAuditEntry) {
 }
 
 export function getDshAuditEntries(): DshAuditEntry[] {
-  return [...DSH_AUDIT_PREVIEW_ENTRIES, ..._dynamicAuditEntries];
+  return [...DSH_AUDIT_ENTRIES, ..._dynamicAuditEntries];
 }
 
 export function resolveAuditEntry(id: string): DshAuditEntry | undefined {

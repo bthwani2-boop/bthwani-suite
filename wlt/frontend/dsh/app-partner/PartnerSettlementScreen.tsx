@@ -17,7 +17,7 @@ import {
 	spacing,
   typographyRoles,
 } from '@bthwani/ui-kit';
-import { useWltDshPartnerWalletPreview } from './useWltDshPartnerWalletPreview';
+import { useWltDshPartnerWalletSummary } from './useWltDshPartnerWalletSummary';
 import { formatWltYer } from '../control-panel/financeContracts';
 
 export type PartnerSettlementScreenProps = {
@@ -27,7 +27,7 @@ export type PartnerSettlementScreenProps = {
 
 export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerToken }: PartnerSettlementScreenProps) {
 	const { theme } = useTheme();
-	const { partnerPreview, previewTransactions, warnings } = useWltDshPartnerWalletPreview(partnerId, bearerToken);
+	const { partnerSummary, summaryTransactions, warnings } = useWltDshPartnerWalletSummary(partnerId, bearerToken);
 	const [refreshing, setRefreshing] = React.useState<boolean>(false);
 
 	const handleRefresh = async () => {
@@ -68,7 +68,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 							إجمالي المبيعات
 						</Text>
 						<Text role="bodyStrong" weight="black" style={[styles.metricValue, { color: theme.brand }]}>
-							{formatWltYer(partnerPreview.grossSalesMinorUnits)}
+							{formatWltYer(partnerSummary.grossSalesMinorUnits)}
 						</Text>
 					</Surface>
 
@@ -77,7 +77,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 							صافي مستحقات التسوية
 						</Text>
 						<Text role="bodyStrong" weight="black" style={[styles.metricValue, { color: theme.success }]}>
-							{formatWltYer(partnerPreview.netSettlementMinorUnits)}
+							{formatWltYer(partnerSummary.netSettlementMinorUnits)}
 						</Text>
 					</Surface>
 				</View>
@@ -90,10 +90,10 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 					<Divider />
 					<View style={styles.cycleInfoRow}>
 						<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-							تاريخ البدء: {partnerPreview.cycleStartDate}
+							تاريخ البدء: {partnerSummary.cycleStartDate}
 						</Text>
 						<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-							تاريخ الانتهاء: {partnerPreview.cycleEndDate}
+							تاريخ الانتهاء: {partnerSummary.cycleEndDate}
 						</Text>
 					</View>
 					<View style={styles.cycleStatusRow}>
@@ -102,13 +102,13 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 						</Text>
 						<Badge
 							label={
-								partnerPreview.cycleStatus === 'COMPLETED'
+								partnerSummary.cycleStatus === 'COMPLETED'
 									? 'مكتملة ومدفوعة'
-									: partnerPreview.cycleStatus === 'PENDING'
+									: partnerSummary.cycleStatus === 'PENDING'
 									? 'جاهزة للمراجعة'
 									: 'معلقة'
 							}
-							tone={partnerPreview.cycleStatus === 'COMPLETED' ? 'success' : 'warning'}
+							tone={partnerSummary.cycleStatus === 'COMPLETED' ? 'success' : 'warning'}
 						/>
 					</View>
 				</Surface>
@@ -118,7 +118,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 					<Text role="bodyStrong" style={{ textAlign: 'right', marginBottom: spacing[2] }}>
 						سجل التسويات والعمليات المكتملة
 					</Text>
-					{previewTransactions.length === 0 ? (
+					{summaryTransactions.length === 0 ? (
 						<StateView
 							kind="empty"
 							title="لا توجد تسويات سابقة"
@@ -126,7 +126,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 						/>
 					) : (
 						<Surface tone="default" style={styles.listContainer}>
-							{previewTransactions.map((tx, idx) => {
+							{summaryTransactions.map((tx, idx) => {
 								return (
 									<React.Fragment key={tx.id}>
 										{idx > 0 && <Divider />}

@@ -1,5 +1,5 @@
 import { dshCategoryMeasurementPolicies } from '../../shared/catalog';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 
 import {
   type DshFulfillmentDeliveryMode,
@@ -150,4 +150,10 @@ export function formatCurrencyValue(value: number) {
 
 export function resolveMeasurementUnitPrice(item: DshStoreGetMenuItem, option: string) {
   return extractPriceValue(item.priceLabel) * resolveMeasurementMultiplier(option);
+}
+
+export function parseCartItemPrice(priceLabel?: string): number {
+  if (!priceLabel) return 10.0;
+  const match = priceLabel.match(/\d+(\.\d+)?/);
+  return match ? parseFloat(match[0]) : 10.0;
 }

@@ -23,7 +23,7 @@ import { DshClientRouteRenderer } from './DshClientRouteRenderer';
 import { commandTargetToRoute, initialOrders, hostClientStates, resolveStorePickupAddress } from './dsh-client.navigation-bridge';
 import type { ClientOperationScreenId } from './screens/parts/OperationScreenView';
 import type { DshFulfillmentDeliveryMode } from './contracts/dsh-client-binding.contracts';
-import { useWltDshWalletPreview } from '../../../wlt/frontend/dsh/app-client';
+import { useWltDshWalletSession } from '../../../wlt/frontend/dsh/app-client';
 
 const defaultTrackingOrderId = initialOrders[0]?.id ?? 'dsh-10021';
 
@@ -161,7 +161,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     return { clientId };
   }, [authToken, dshAuthBearerToken, devClientId, dshClientId]);
 
-  const walletPreview = useWltDshWalletPreview(checkoutAuth.clientId, checkoutAuth.bearerToken);
+  const walletSession = useWltDshWalletSession(checkoutAuth.clientId, checkoutAuth.bearerToken);
 
   const {
     handleConfirmedOrderExecution,
@@ -181,7 +181,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     selectedFulfillmentMode,
     setSelectedFulfillmentMode,
     checkoutAuth,
-    walletPreview,
+    walletSession,
     createOrderValues,
     setCreateOrderValues,
     setRoute,
@@ -400,7 +400,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
           dshClientId={dshClientId}
           cartItems={cartItems}
           selectedFulfillmentMode={selectedFulfillmentMode}
-          walletPreview={walletPreview}
+          walletSession={walletSession}
           selectedPaymentMethod={selectedPaymentMethod}
           setSelectedPaymentMethod={setSelectedPaymentMethod}
           paymentErrorMessage={paymentErrorMessage}

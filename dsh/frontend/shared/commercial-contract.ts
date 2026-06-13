@@ -1,12 +1,12 @@
 /**
- * COMMERCIAL PREVIEW CONTRACT — DEV_ONLY (offline fallback, not UI preview mode)
+ * COMMERCIAL CONTRACT — DSH commercial domain type definitions.
  *
- * Single source of truth for all commercial domain types in DSH preview/UI layer.
- * This file is the authoritative type contract. Individual preview-stores implement
+ * Single source of truth for all commercial domain types in the DSH UI layer.
+ * This file is the authoritative type contract. Adapters implement
  * the data layer; this contract defines the shape.
  *
  * NOT runtime truth. NOT backend/API/binding source.
- * All values are UI preview fixtures for development/preview only.
+ * All values are type shapes consumed by view-model adapters.
  */
 export const commercialContractMeta = {
   dataKind: 'DEV_OFFLINE_FALLBACK',

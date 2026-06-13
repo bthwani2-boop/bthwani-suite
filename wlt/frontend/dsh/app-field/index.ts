@@ -1,16 +1,16 @@
 export { WltDshFieldBridge } from './WltDshFieldBridge';
 export type { WltDshFieldBridgeProps } from './WltDshFieldBridge';
-export { WltDshFieldFinancePreview } from './WltDshFieldFinancePreview';
+export { WltDshFieldFinanceSummary } from './WltDshFieldFinanceSummary';
 export { wltDshFieldBridgeDataContract } from './wlt-dsh-field.contract';
 export type { WltDshFieldBridgeContract } from './wlt-dsh-field.contract';
 export type {
   WltDshFieldBridgeState,
-  WltDshFieldFinancePreviewState,
+  WltDshFieldFinanceSummaryState,
 } from './wlt-dsh-field.types';
 export {
-  default as useWltDshFieldFinancePreviewDefault,
-  useWltDshFieldFinancePreview,
-} from './useWltDshFieldFinancePreview';
+  default as useWltDshFieldFinanceSummaryDefault,
+  useWltDshFieldFinanceSummary,
+} from './useWltDshFieldFinanceSummary';
 export {
   getCommissionRecords,
   getPayoutRecords,
@@ -18,6 +18,6 @@ export {
   getSnapshot,
 } from './wlt-dsh-field.adapter';
 export type {
-  WltDshFinancePreviewRecord,
+  WltDshFinanceSummaryRecord,
   WltFieldFinanceSnapshot,
 } from '../control-panel/financeContracts';

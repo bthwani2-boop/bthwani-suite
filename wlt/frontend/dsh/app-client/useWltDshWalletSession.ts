@@ -1,7 +1,7 @@
 import React from 'react';
 import * as WltAdapter from './wlt-dsh-client.adapter';
 
-export function useWltDshWalletPreview(clientId?: string, bearerToken?: string) {
+export function useWltDshWalletSession(clientId?: string, bearerToken?: string) {
 	const [linked, setLinked] = React.useState<boolean>(false);
 	const [balance, setBalance] = React.useState<number | null>(null);
 	const [hydrated, setHydrated] = React.useState<boolean>(false);
@@ -71,4 +71,4 @@ export function useWltDshWalletPreview(clientId?: string, bearerToken?: string) 
 	} as const;
 }
 
-export default useWltDshWalletPreview;
+export default useWltDshWalletSession;

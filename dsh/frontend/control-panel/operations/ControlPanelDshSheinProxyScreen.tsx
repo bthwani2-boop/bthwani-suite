@@ -6,7 +6,7 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { SHEIN_PROXY_STAGE_LABELS } from '../../shared/dsh-order-preview.contract';
+import { SHEIN_PROXY_STAGE_LABELS } from '../../shared/dsh-order.contract';
 import { buildOperationsHref } from './operations.registry';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';

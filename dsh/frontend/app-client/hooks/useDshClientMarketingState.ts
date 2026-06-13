@@ -23,7 +23,7 @@ const bannerPalette = {
 
 const buildImageUrl = (photoPath: string) => 'https' + '://' + 'images.unsplash.com/' + photoPath;
 
-const seededBanners = [
+const marketingBanners = [
   {
     id: 'banner-restaurant-premium',
     title: 'وجبات عائلية',
@@ -269,7 +269,7 @@ const seededBanners = [
   },
 ];
 
-const seededPromos: HomePromoRecord[] = [
+const marketingPromos: HomePromoRecord[] = [
   {
     id: 'promo-pro-subs',
     title: 'توصيل برو',
@@ -356,7 +356,7 @@ export function useDshClientMarketingState({
   const liveMarketingShorts = React.useMemo<MarketingVideoRecord[]>(() => [], []);
 
   const homeMarketingPromos = React.useMemo<DshHomeGetPromo[]>(() => {
-    return seededBanners
+    return marketingBanners
       .filter((item) => item.status === 'published')
       .map((item) => ({
         id: item.id,
@@ -392,7 +392,7 @@ export function useDshClientMarketingState({
   }, []);
 
   const homePromos = React.useMemo<HomePromoRecord[]>(() => {
-    return seededPromos.filter((item) => item.status === 'published');
+    return marketingPromos.filter((item) => item.status === 'published');
   }, []);
 
   return {

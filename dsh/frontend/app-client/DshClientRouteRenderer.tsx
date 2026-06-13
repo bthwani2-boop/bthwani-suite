@@ -1,24 +1,16 @@
 import React from 'react';
 import { View, Platform } from 'react-native';
-import { Text, colorPalette,
-  spacing,
-} from '@bthwani/ui-kit';
+import { Text, colorPalette, spacing } from '@bthwani/ui-kit';
 
 import { DshEntryScreen } from './screens/EntryScreen';
 import { DshClientBellScreen } from './screens/BellScreen';
 import { DshHomeGetScreen } from './screens/HomeScreen';
-import type {
-  DshHomeCategory,
-  DshHomeGetPromo,
-  DshHomeGetStore,
-  DshHomeRecentOrder,
-} from './contracts/dsh-home-types';
 import { DshMySpaceScreen } from './screens/MySpaceScreen';
 import { DshNotificationsScreen } from './screens/NotificationsScreen';
 import { DshBenefitsHubScreen } from './screens/BenefitsScreen';
 import { DshOrdersListScreen } from './screens/DshOrdersListScreen';
 import { DshTrackingScreen } from './screens/DshTrackingScreen';
-import { DshStoreGetScreen, type DshStoreGetScreenProps } from './screens/StoreScreen';
+import { DshStoreGetScreen } from './screens/StoreScreen';
 import { DshStoreItemsScreen } from './screens/StoreItemsScreen';
 import { DshCartGetScreen } from './screens/CartScreen';
 import { DshCheckoutIntentScreen } from './screens/DshCheckoutIntentScreen';
@@ -34,120 +26,11 @@ import { DshIdentityHubScreen } from './screens/DshIdentityHubScreen';
 import { DshPreferencesHubScreen } from './screens/DshPreferencesHubScreen';
 import { DshAppearanceHubScreen } from './screens/DshAppearanceHubScreen';
 import { WltHomeGetScreen } from '../../../wlt/frontend/app-client-wlt';
-
-import type { ClientOperationScreenId } from './screens/parts/OperationScreenView';
-import type { DshFulfillmentDeliveryMode } from './contracts/dsh-client-binding.contracts';
-import { hostClientStates, type CreateOrderValues, type HostCartItem, type HostOrderSummary } from './dsh-client.navigation-bridge';
+import { hostClientStates } from './dsh-client.navigation-bridge';
 import { buildPaymentMethodsList } from './adapters/dshClientCheckoutAdapters';
-import type { DshRoute } from './dsh-client.types';
-import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
-import type { DshClientWltIntentEntry } from './dsh-client-wlt-payment-bridge';
-import type { DshTrackingTimelineItem } from './hooks/useDshOrderTracking';
-import type { DshDiscoveryStoresBridgeResult } from './shared/dsh-discovery-stores-bridge';
-import type { DshClientState } from './dsh-client.types';
-import type { DshCheckoutAuthContext } from '../shared/dsh-checkout-client';
-import type { ActiveStore } from './hooks/useDshCheckout';
-import type { DshStoreFixtureItem, DshDiscoveryStore } from '../shared/dshStoreProductCardModel';
-import type { HomePromoRecord, MarketingGrowthRecord, MarketingVideoRecord } from '../shared/dsh-marketing-types';
-import type { WltDshWalletPreviewState } from '../../../wlt/frontend/dsh/app-client/wlt-dsh-client.types';
-
-function parsePrice(priceLabel?: string): number {
-  if (!priceLabel) return 10.0;
-  const match = priceLabel.match(/\d+(\.\d+)?/);
-  return match ? parseFloat(match[0]) : 10.0;
-}
-
-type DshClientRouteRendererProps = {
-  categories: DshHomeCategory[];
-  homeScreenState: 'ready' | 'loading' | 'empty' | 'error' | 'offline';
-  route: DshRoute;
-  setRoute: React.Dispatch<React.SetStateAction<DshRoute>>;
-  dshAuthBearerToken: string | null | undefined;
-  dshClientId: string | null | undefined;
-  cartItems: HostCartItem[];
-  selectedFulfillmentMode: DshFulfillmentDeliveryMode;
-  walletPreview: WltDshWalletPreviewState;
-  selectedPaymentMethod: string;
-  setSelectedPaymentMethod: (method: string) => void;
-  paymentErrorMessage: string | undefined;
-  checkoutState: 'ready' | 'loading' | 'payment-failed';
-  setCheckoutState: (state: 'ready' | 'loading' | 'payment-failed') => void;
-  createOrderValues: CreateOrderValues;
-  setCreateOrderValues: React.Dispatch<React.SetStateAction<CreateOrderValues>>;
-  handleConfirmCheckout: () => void;
-  handleConfirmedOrderExecution: (payload?: { fulfillmentMode?: DshFulfillmentDeliveryMode; orderDraft?: Partial<CreateOrderValues>; wltPaymentRefId?: string }) => void;
-  appearanceHydrated: boolean;
-  appearanceMode: BThwaniAppearanceMode;
-  setAppearanceMode: (mode: BThwaniAppearanceMode) => void;
-  liveMarketingPrograms: MarketingGrowthRecord[];
-  setSelectedOperationScreen: React.Dispatch<React.SetStateAction<ClientOperationScreenId>>;
-  openTrackedOrder: (orderId?: string) => void;
-  openCreateOrderJourney: () => void;
-  returnHome: () => void;
-  storeDetailState: 'loading' | 'ready' | 'empty' | 'error' | 'offline' | 'not-found';
-  activeStoreScreenStore: DshStoreGetScreenProps['store'] | undefined;
-  activeStoreItems: DshStoreFixtureItem[];
-  addItemToHostCart: (item: { id: string; name?: string; title?: string; priceLabel?: string; canonicalStoreId?: string; canonicalProductId?: string; sourceRecordId?: string; publishStage?: string }, payload?: { quantity?: number; measurementOption?: string | null; deliveryMode?: string }) => void;
-  handleOpenActiveStoreItems: () => void;
-  handleOpenActiveStoreCart: (mode?: DshFulfillmentDeliveryMode) => void;
-  fetchStoreDetail: (storeId: string, store: unknown, limit?: number) => () => void;
-  activeStoreId: string;
-  activeStore: DshDiscoveryStore;
-  itemsQuery: string;
-  setItemsQuery: (q: string) => void;
-  itemsCategory: string;
-  setItemsCategory: (c: string) => void;
-  storeItemsEntryOrigin: string;
-  setSelectedItemId: (id: string) => void;
-  checkoutClientMemo: import('../shared/dsh-checkout-client').DshCheckoutClient | undefined;
-  checkoutAuth: DshCheckoutAuthContext;
-  onOpenService?: (serviceId: string) => void;
-  selectedOperationScreen: ClientOperationScreenId;
-  returnOrdersList: () => void;
-  filteredOrders: HostOrderSummary[];
-  ordersQuery: string;
-  setOrdersQuery: (q: string) => void;
-  handleReorderClick: (orderId: string) => void;
-  trackingClientState: DshClientState;
-  activeTrackedOrder: HostOrderSummary | undefined;
-  trackingWltIntent: DshClientWltIntentEntry | undefined;
-  liveOrderDetails: import('../shared/dsh-order-lifecycle-client').DshOrderDetailsResponse | null;
-  trackingOrderValues: CreateOrderValues;
-  trackingTimeline: DshTrackingTimelineItem[];
-  reopenTracking: () => void;
-  handleCancelOrder: () => void;
-  handleSupportEscalation: (issueType: string, description: string) => Promise<void>;
-  clientDiscoveryStoresBridge: DshDiscoveryStoresBridgeResult;
-  serviceDialTrigger: number;
-  favoriteOverrides: Record<string, boolean>;
-  handleToggleFavorite: (storeId: string) => void;
-  homeMarketingPromos: DshHomeGetPromo[];
-  homePromos: HomePromoRecord[];
-  liveMarketingShorts: MarketingVideoRecord[];
-  clientVisibleHomeStores: DshHomeGetStore[];
-  homeRecentOrders: DshHomeRecentOrder[];
-  onExit?: () => void;
-  handleOpenHomeCategory: (categoryId: string) => void;
-  handleOpenHomeStoreCategory: (storeId: string, categoryId: string) => void;
-  handleOpenHomeProduct: (storeId: string, itemId: string) => void;
-  handleOpenHomeBenefits: (screenId?: string) => void;
-  openHomeInlineSearch: () => void;
-  recordMarketingBannerClick: ((id: string) => void) | undefined;
-  recordMarketingBannerImpression: ((id: string) => void) | undefined;
-  recordMarketingGrowthClick: ((id: string) => void) | undefined;
-  recordMarketingGrowthImpression: ((id: string) => void) | undefined;
-  sheinInlineOpen: boolean;
-  setSheinInlineOpen: (open: boolean) => void;
-  awnakInlineOpen: boolean;
-  setAwnakInlineOpen: (open: boolean) => void;
-  handleOpenHomeStore: (storeId: string) => void;
-  homeSearchAutoOpenToken: number;
-  handleRegisterBackHandler: ((handler: (() => boolean) | null) => void) | undefined;
-  renderApprovedVideoReelsViewer: ((props: any) => React.ReactNode) | undefined;
-  setHomeRetryToken: React.Dispatch<React.SetStateAction<number>>;
-  openSupportFlow: () => void;
-  bellSignalEvents: readonly import('../shared/dsh-signal-layer.model').DshSignalSummary[];
-};
+import { getDshClientStateMeta } from '../shared/client-state';
+import { parseCartItemPrice } from './shared/store-formatting';
+import type { DshClientRouteRendererProps } from './contracts/dsh-client-renderer.contracts';
 
 export function DshClientRouteRenderer({
   categories,
@@ -158,7 +41,7 @@ export function DshClientRouteRenderer({
   dshClientId,
   cartItems,
   selectedFulfillmentMode,
-  walletPreview,
+  walletSession,
   selectedPaymentMethod,
   setSelectedPaymentMethod,
   paymentErrorMessage,
@@ -286,13 +169,13 @@ export function DshClientRouteRenderer({
 
   if (route === 'checkout-intent') {
     const cartSubtotal = cartItems.reduce(
-      (sum, item) => sum + parsePrice(item.priceLabel) * item.qty,
+      (sum, item) => sum + parseCartItemPrice(item.priceLabel) * item.qty,
       0
     );
     const deliveryFeeNum = selectedFulfillmentMode === 'pickup' ? 0 : 1500;
     const cartTotal = cartSubtotal + deliveryFeeNum;
 
-    const formattedBalance = walletPreview.balance !== null ? `${walletPreview.balance} ر.ي` : '...';
+    const formattedBalance = walletSession.balance !== null ? `${walletSession.balance} ر.ي` : '...';
     const paymentMethods = buildPaymentMethodsList(formattedBalance, selectedPaymentMethod);
 
     return (
@@ -714,6 +597,3 @@ export function DshClientRouteRenderer({
     />
   );
 }
-
-// Private helper to lookup operational states
-import { getDshClientStateMeta } from '../shared/client-state';

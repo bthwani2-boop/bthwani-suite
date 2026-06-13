@@ -1171,7 +1171,7 @@ export function getDshEscalationFlowsForSurface(surfaceId: DshSurfaceId): readon
  * All flows with financialImpact=true.
  * These must remain finance-preview-only — no mutation from DSH.
  */
-export function getDshFinancePreviewFlows(): readonly DshFlowRegistryEntry[] {
+export function getDshFinanceImpactFlows(): readonly DshFlowRegistryEntry[] {
   return DSH_FLOW_REGISTRY.filter((entry) => entry.financialImpact === true);
 }
 

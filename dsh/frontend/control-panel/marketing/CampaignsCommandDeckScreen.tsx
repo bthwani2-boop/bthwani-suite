@@ -22,11 +22,11 @@ function upsertCampaignItem(_item: unknown): void {}
 function toggleCampaignStatus(_id: string): void {}
 function duplicateCampaignItem(_id: string): void {}
 function removeCampaignItem(_id: string): void {}
-const dshCategoryFixtures: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
+const dshCategoryData: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
 const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
 const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import { CommercialParityPreview } from './commercial-parity-preview';
+import { CommercialParityPreview } from './commercial-parity-viewer';
 type Entitlement = { id: string; type: string; referenceId: string; status: string; source: string };
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
@@ -472,7 +472,7 @@ export function CampaignsCommandDeckScreen() {
         return (
           <select value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
             <option value="">-- اختر الفئة --</option>
-            {dshCategoryFixtures.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+            {dshCategoryData.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
           </select>
         );
       case 'store':
@@ -483,12 +483,12 @@ export function CampaignsCommandDeckScreen() {
           </select>
         );
       case 'subcategory': {
-        const parentCat = dshCategoryFixtures.find(c => c.id === draft.targetId) ?? dshCategoryFixtures[0];
+        const parentCat = dshCategoryData.find(c => c.id === draft.targetId) ?? dshCategoryData[0];
         return (
           <Box gap={2}>
             <select title="الفئة الرئيسية" value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
               <option value="">-- اختر الفئة الرئيسية --</option>
-              {dshCategoryFixtures.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+              {dshCategoryData.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
             <select title="الفئة الفرعية" value={draft.targetId} onChange={(e) => setDraft({ ...draft, targetId: e.target.value })} style={inlineStyles.selectInput}>
               <option value="">-- اختر الفئة الفرعية --</option>

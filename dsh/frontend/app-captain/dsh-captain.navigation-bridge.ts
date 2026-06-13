@@ -14,7 +14,7 @@
  */
 
 import type { DshCaptainRoute } from './dsh-captain.types';
-import type { DshCaptainOrderStage } from '../shared/dsh-order-preview.contract';
+import type { DshCaptainOrderStage } from '../shared/dsh-order.contract';
 import type { DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
 import type { DshSignalEventKind } from '../shared/dsh-signal-layer.model';
 import { getHandoffsForSurface, type DshOrderLifecycleHandoff } from '../shared/dsh-order-lifecycle-handoffs';

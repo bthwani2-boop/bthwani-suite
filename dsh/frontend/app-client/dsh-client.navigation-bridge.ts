@@ -78,8 +78,8 @@ export const publishedPromoCategoryIds = new Set<string>();
 
 // Store lists — populated at runtime from GET /stores API.
 // Empty on first load; components should render loading state until API responds.
-export const clientVisibleDiscoveryPreviewStores: never[] = [];
-export const clientVisibleHomePreviewStores: never[] = [];
+export const clientVisibleDiscoveryStores: never[] = [];
+export const clientVisibleHomeStores: never[] = [];
 
 // Order and cart initial state — empty; populated from GET /orders API.
 export const initialOrders: HostOrderSummary[] = [];

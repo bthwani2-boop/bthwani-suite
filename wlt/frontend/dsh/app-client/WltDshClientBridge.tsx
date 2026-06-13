@@ -1,10 +1,10 @@
 import React from 'react';
-import { WltDshClientPaymentPreview } from './WltDshClientPaymentPreview';
+import { WltDshClientPaymentSelector } from './WltDshClientPaymentSelector';
 
-export type WltDshClientBridgeProps = React.ComponentProps<typeof WltDshClientPaymentPreview>;
+export type WltDshClientBridgeProps = React.ComponentProps<typeof WltDshClientPaymentSelector>;
 
 export function WltDshClientBridge(props: WltDshClientBridgeProps) {
-	return <WltDshClientPaymentPreview {...props} />;
+	return <WltDshClientPaymentSelector {...props} />;
 }
 
 export default WltDshClientBridge;

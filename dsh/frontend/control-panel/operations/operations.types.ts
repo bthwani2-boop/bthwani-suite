@@ -1,4 +1,5 @@
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+export type { CanonicalOperationsGroupId } from '../../shared/dsh-operational.contract';
 
 export type OperationsPanelId = 'detail' | 'chat' | 'batches';
 
@@ -54,13 +55,6 @@ export type DshOperationsOrderRow = {
   nextAction: string;
   slaLabel: string;
 };
-
-export type CanonicalOperationsGroupId =
-  | 'command-center'
-  | 'live-orders'
-  | 'dispatch-capacity'
-  | 'exceptions'
-  | 'special-ops';
 
 export type LegacyOperationsWorkspaceId =
   | 'overview'

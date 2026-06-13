@@ -1,17 +1,14 @@
 /**
- * SCAFFOLD: DSH store preview builder helpers.
- * These pure builder functions derive structured data from fixture types
- * for use in store-detail and home preview screens.
- *
- * Moved here from dsh/frontend/app-client/shared/store-builders to correct
- * the dependency direction: archived seed data must not import from surfaces.
+ * DSH store builder helpers.
+ * Pure builder functions that derive structured data from domain types
+ * for use in store-detail and home screens.
  *
  * Owner: dsh/frontend/shared
  * Not a runtime binding — not API/backend source.
  */
 
 import type { DshFulfillmentDeliveryMode } from './dsh-delivery-mode.model';
-import type { DshDiscoveryStore, DshStoreFixtureItem } from './dshStoreProductCardModel';
+import type { DshDiscoveryStore, DshStoreMenuItem } from './dshStoreProductCardModel';
 
 export const dshStoreBuildersContractMeta = {
   dataKind: 'SCAFFOLD_PENDING_BINDING',
@@ -30,7 +27,7 @@ export type StoreDeliveryModeEntry = {
   fee?: number;
 };
 
-export function buildStoreCategories(items: DshStoreFixtureItem[]) {
+export function buildStoreCategories(items: DshStoreMenuItem[]) {
   const uniqueCategories = Array.from(
     new Map(items.map((item) => [item.categoryId, item.categoryLabel])).entries(),
   );

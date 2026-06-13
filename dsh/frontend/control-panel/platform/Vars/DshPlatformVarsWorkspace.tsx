@@ -3,7 +3,7 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
-import { useDemoPlatformState } from '../useDemoPlatformState';
+import { usePlatformAuditState } from '../usePlatformAuditState';
 import type {
   DshPlatformProviderControlRecord,
   DshPlatformVarRecord,
@@ -159,7 +159,7 @@ function RefCard({ title, desc, footer }: { title: string; desc: string; footer?
 
 /* ─── MAIN ─── */
 export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainFilter: VarsDomainId }) {
-  const { addAuditEvent } = useDemoPlatformState();
+  const { addAuditEvent } = usePlatformAuditState();
 
   const activeDomain = activeDomainFilter;
   const [activeScope,  setActiveScope]  = React.useState<string>('all');

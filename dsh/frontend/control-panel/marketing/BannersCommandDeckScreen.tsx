@@ -2,7 +2,7 @@
 
 // Authority: control-panel/marketing — BannersCommandDeckScreen (slim entry point).
 // Giant Screen split: types → banner-types.ts | utils → banner-target-utils.ts
-//                     preview → BannerPreview.tsx | editor → BannerEditorSection.tsx
+//                     preview → BannerViewer.tsx | editor → BannerEditorSection.tsx
 // This file retains: component state, URL param management, data handlers, layout JSX, motion panel.
 
 import React from 'react';
@@ -39,7 +39,7 @@ import { useMarketingPermissions } from './marketing-permissions.contract';
 import { createDraft, bannerActionTypeLabel } from './banner-target-utils';
 import { BANNER_MOTION_OPTIONS, BANNER_TEMPLATES } from './banner-types';
 import type { BannerDraft, EditorWorkspaceTab } from './banner-types';
-import { BannerPreview } from './BannerPreview';
+import { BannerViewer } from './BannerViewer';
 import { BannerEditorSection } from './BannerEditorSection';
 
 /**
@@ -372,7 +372,7 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
             <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
               المعاينة والحركة
             </Text>
-            <BannerPreview draft={draft} templates={BANNER_TEMPLATES} />
+            <BannerViewer draft={draft} templates={BANNER_TEMPLATES} />
 
             {/* Content Quality Meter */}
             <Box gap={2} style={styles.qualityPanel}>

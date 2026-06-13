@@ -85,7 +85,7 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
   {
     file: 'dsh/frontend/app-client/screens/DshOrdersListScreen.tsx',
     classification: 'RUNTIME_VIOLATION_FIXED',
-    reason: 'Orders list no longer defaults to fallbackOrderListItems. Empty-state is shown until DSH API provides live order rows.',
+    reason: 'Orders list no longer defaults to defaultOrderListItems. Empty-state is shown until DSH API provides live order rows.',
   },
   {
     file: 'dsh/frontend/app-client/screens/parts/OrdersTrackingHelpers.tsx',

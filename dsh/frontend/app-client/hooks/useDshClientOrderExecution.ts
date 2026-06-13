@@ -1,5 +1,6 @@
 import React from 'react';
 import { resolveDshDiscoveryStoresRuntimeConfig } from '../shared/dsh-discovery-stores-runtime-config';
+import { parseCartItemPrice } from '../shared/store-formatting';
 import {
   createDshOrderLifecycleHttpClient,
   type DshOrderItemInput,
@@ -7,17 +8,11 @@ import {
 } from '../../shared';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostOrderSummary, HostCartItem } from '../dsh-client.navigation-bridge';
-import { hostClientStates, initialOrders } from '../dsh-client.navigation-bridge';
+import { hostClientStates } from '../dsh-client.navigation-bridge';
 import { mapLiveOrderToSummary } from '../adapters/dshClientOrderAdapters';
-import { useDshCheckout, type WalletPreview, type ActiveStore } from './useDshCheckout';
+import { useDshCheckout, type WalletSessionContext, type ActiveStore } from './useDshCheckout';
 import type { DshRoute } from '../dsh-client.types';
 import type { DshClientState } from '../../shared/client-state';
-
-function parsePrice(priceLabel?: string): number {
-  if (!priceLabel) return 10.0;
-  const match = priceLabel.match(/\d+(\.\d+)?/);
-  return match ? parseFloat(match[0]) : 10.0;
-}
 
 type UseDshClientOrderExecutionOptions = {
   cartItems: HostCartItem[];
@@ -26,7 +21,7 @@ type UseDshClientOrderExecutionOptions = {
   selectedFulfillmentMode: DshFulfillmentDeliveryMode;
   setSelectedFulfillmentMode: (mode: DshFulfillmentDeliveryMode) => void;
   checkoutAuth: DshCheckoutAuthContext;
-  walletPreview: WalletPreview;
+  walletPreview: WalletSessionContext;
   createOrderValues: CreateOrderValues;
   setCreateOrderValues: React.Dispatch<React.SetStateAction<CreateOrderValues>>;
   setRoute: React.Dispatch<React.SetStateAction<DshRoute>>;
@@ -63,14 +58,14 @@ export function useDshClientOrderExecution({
     const config = resolveDshDiscoveryStoresRuntimeConfig();
     if (config && cartItems.length > 0) {
       const totalPrice = cartItems.reduce(
-        (sum, item) => sum + parsePrice(item.priceLabel) * item.qty,
+        (sum, item) => sum + parseCartItemPrice(item.priceLabel) * item.qty,
         0
       );
 
       const items: DshOrderItemInput[] = cartItems.map((item) => ({
         product_id: item.id,
         quantity: item.qty,
-        price: parsePrice(item.priceLabel),
+        price: parseCartItemPrice(item.priceLabel),
       }));
 
       const orderClient = createDshOrderLifecycleHttpClient(config.baseUrl, undefined, checkoutAuth);

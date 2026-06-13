@@ -3,7 +3,7 @@
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
-import { useDemoPlatformState } from '../useDemoPlatformState';
+import { usePlatformAuditState } from '../usePlatformAuditState';
 import styles from '../../shared/control-panel-surface.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,7 +28,7 @@ function RolloutLevelBadge({ level }: { level: RolloutLevel }) {
 }
 
 export function DshPlatformRolloutsWorkspace({ activeFilter }: { activeFilter: string }) {
-  const { addAuditEvent } = useDemoPlatformState();
+  const { addAuditEvent } = usePlatformAuditState();
   const [selectedKey, setSelectedKey] = React.useState<string>('DSH:sanaa-pilot');
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
 

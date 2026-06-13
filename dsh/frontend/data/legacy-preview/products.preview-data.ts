@@ -1,5 +1,5 @@
 import {
-  type DshStoreFixtureItem,
+  type DshStoreMenuItem,
   type StoreItemsByStoreId,
 } from '../../shared/dshStoreProductCardModel';
 import {
@@ -55,7 +55,7 @@ export const itemsFixturesDataContract = {
 	moneySemantics: 'preview-only display values / not accounting source',
 } as const;
 
-function withPublishedPreviewStage(items: DshStoreFixtureItem[]): DshStoreFixtureItem[] {
+function withPublishedPreviewStage(items: DshStoreMenuItem[]): DshStoreMenuItem[] {
 	return items.map((item) => {
 		if (item.publishStage) {
 			return item;

@@ -52,7 +52,7 @@
     "guard:agent": "pwsh -NoProfile -ExecutionPolicy Bypass -File tools/guards/RUN_GOVERNANCE_GUARDS.ps1 -Mode Local -Profile Agent",
     "guard:code-hygiene": "node tools/guards/guard-live-code-organization-hygiene.mjs",
     "guard:service-go-runtime": "node tools/guards/guard-service-go-runtime.mjs",
-    "guard:service-postgres-runtime": "node tools/guards/guard-service-postgres-runtime.mjs",
+    "guard:service-postgres-runtime": "node tools/guards/guard-service-postgres-runtime.mjs --service dsh && node tools/guards/guard-service-postgres-runtime.mjs --service wlt",
     "guard:service-l7-closure": "node tools/guards/guard-service-l7-closure.mjs",
     "guard:service-runtime": "node tools/guards/guard-service-runtime.mjs",
     "guard:platform-vars": "node tools/guards/guard-platform-vars-control.mjs",

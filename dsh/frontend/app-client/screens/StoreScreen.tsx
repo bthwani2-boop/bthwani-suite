@@ -34,7 +34,7 @@ export const DshStoreGetScreen = React.memo(function DshStoreGetScreenComponent(
     () => resolveItemsForCategory(storeState.selectedCategory),
     [resolveItemsForCategory, storeState.selectedCategory]
   );
-  const previewItems = visibleItems;
+  const viewerItems = visibleItems;
 
   const appearanceMode = props.appearanceMode ?? 'lightPremium';
 
@@ -45,7 +45,7 @@ export const DshStoreGetScreen = React.memo(function DshStoreGetScreenComponent(
     storeState,
     derivedItems,
     visibleItems,
-    previewItems,
+    viewerItems,
   };
 
   return <StoreScreenShell {...shellProps} />;

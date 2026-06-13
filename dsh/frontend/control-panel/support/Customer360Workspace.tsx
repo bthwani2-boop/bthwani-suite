@@ -11,7 +11,7 @@ type DshCustomer360Record = Record<string, any>;
 const DSH_CUSTOMER_360_PREVIEW: DshCustomer360Record[] = [];
 function getDshCustomer360ByContext(_ctx: unknown): DshCustomer360Record | null { return null; }
 function getDshCustomer360Record(_id: string): DshCustomer360Record | undefined { return undefined; }
-import type { DshGlobalControlLink } from '../../shared/dsh-order-preview.contract';
+import type { DshGlobalControlLink } from '../../shared/dsh-order.contract';
 import styles from '../shared/control-panel-surface.module.css';
 import { SUPPORT_VERIFICATION_STATUS_META, SUPPORT_TICKET_STATUS_META } from './support.types';
 

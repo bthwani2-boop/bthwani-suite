@@ -19,8 +19,8 @@ function rejectPartnerOfferItem(_id: string, _reason: string): void {}
 function archivePartnerOfferItem(_id: string): void {}
 function removePartnerOfferItem(_id: string): void {}
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import { validatePartnerOfferForPublish } from '../../shared/commercial.preview-contract';
-import { CommercialParityPreview } from './commercial-parity-preview';
+import { validatePartnerOfferForPublish } from '../../shared/commercial-contract';
+import { CommercialParityPreview } from './commercial-parity-viewer';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
 type PartnerOfferEditorSection = 'details' | 'governance' | 'preview';

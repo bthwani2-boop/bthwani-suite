@@ -1,5 +1,5 @@
 ﻿import * as React from 'react';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 
 export function useStoreState() {
@@ -12,11 +12,11 @@ export function useStoreState() {
 	const [headerSearchVisible, setHeaderSearchVisible] = React.useState(false);
 	const [headerSearchQuery, setHeaderSearchQuery] = React.useState('');
 	const [addedItemLabel, setAddedItemLabel] = React.useState('');
-	const [previewItem, setPreviewItem] = React.useState<DshStoreGetMenuItem | null>(null);
+	const [viewerItem, setPreviewItem] = React.useState<DshStoreGetMenuItem | null>(null);
 	const [favoriteIds, setFavoriteIds] = React.useState<Set<string>>(new Set());
 	const [isAddedToCart, setIsAddedToCart] = React.useState(false);
 	const [stickyThreshold, setStickyThreshold] = React.useState(1000);
-	const [previewActiveIndex, setPreviewActiveIndex] = React.useState(-1);
+	const [viewerActiveIndex, setPreviewActiveIndex] = React.useState(-1);
 
 	return {
 		selectedMode,
@@ -37,7 +37,7 @@ export function useStoreState() {
 		setHeaderSearchQuery,
 		addedItemLabel,
 		setAddedItemLabel,
-		previewItem,
+		viewerItem,
 		setPreviewItem,
 		favoriteIds,
 		setFavoriteIds,
@@ -45,7 +45,7 @@ export function useStoreState() {
 		setIsAddedToCart,
 		stickyThreshold,
 		setStickyThreshold,
-		previewActiveIndex,
+		viewerActiveIndex,
 		setPreviewActiveIndex,
 	};
 }

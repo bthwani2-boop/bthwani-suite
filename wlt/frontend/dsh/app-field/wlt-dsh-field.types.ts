@@ -1,18 +1,18 @@
 import type {
-  WltDshFinancePreviewRecord,
+  WltDshFinanceSummaryRecord,
   WltFieldFinanceSnapshot,
 } from '../control-panel/financeContracts';
 
-export type WltDshFieldFinancePreviewState = {
+export type WltDshFieldFinanceSummaryState = {
   storeIds?: readonly string[];
   snapshot: WltFieldFinanceSnapshot;
-  records: readonly WltDshFinancePreviewRecord[];
-  commissionRecords: readonly WltDshFinancePreviewRecord[];
-  pendingRecords: readonly WltDshFinancePreviewRecord[];
-  rejectedRecords: readonly WltDshFinancePreviewRecord[];
-  payoutRecords: readonly WltDshFinancePreviewRecord[];
+  records: readonly WltDshFinanceSummaryRecord[];
+  commissionRecords: readonly WltDshFinanceSummaryRecord[];
+  pendingRecords: readonly WltDshFinanceSummaryRecord[];
+  rejectedRecords: readonly WltDshFinanceSummaryRecord[];
+  payoutRecords: readonly WltDshFinanceSummaryRecord[];
 };
 
 export type WltDshFieldBridgeState = {
-  finance: WltDshFieldFinancePreviewState;
+  finance: WltDshFieldFinanceSummaryState;
 };

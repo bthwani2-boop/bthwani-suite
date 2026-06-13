@@ -3,14 +3,14 @@
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebControlPanelWorkspaceTabs } from '@bthwani/ui-kit/web';
-import { useDemoPlatformState } from '../useDemoPlatformState';
+import { usePlatformAuditState } from '../usePlatformAuditState';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PlatformTopService = Record<string, any>;
 const PREVIEW_TOP_SERVICES: PlatformTopService[] = [];
 import styles from '../../shared/control-panel-surface.module.css';
 
 export function DshPlatformServicesWorkspace({ activeFilter }: { activeFilter: string }) {
-  const { addAuditEvent } = useDemoPlatformState();
+  const { addAuditEvent } = usePlatformAuditState();
   const [selectedServiceCode, setSelectedServiceCode] = React.useState<string>('DSH');
 
   React.useEffect(() => {

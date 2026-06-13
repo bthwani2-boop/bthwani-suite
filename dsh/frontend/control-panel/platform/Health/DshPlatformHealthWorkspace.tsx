@@ -3,7 +3,7 @@
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
-import { useDemoPlatformState } from '../useDemoPlatformState';
+import { usePlatformAuditState } from '../usePlatformAuditState';
 import styles from '../../shared/control-panel-surface.module.css';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,7 +11,7 @@ type SystemWarning = Record<string, any>;
 const PREVIEW_SYSTEM_WARNINGS: SystemWarning[] = [];
 
 export function DshPlatformHealthWorkspace({ activeFilter }: { activeFilter: string }) {
-  const { addAuditEvent } = useDemoPlatformState();
+  const { addAuditEvent } = usePlatformAuditState();
   const [dismissedWarnings, setDismissedWarnings] = React.useState<Set<string>>(new Set());
   const [selectedWarningId, setSelectedWarningId] = React.useState<string | null>('store-pickup');
   const [lastHealthCheck, setLastHealthCheck] = React.useState<string>('لم يتم الفحص بعد');

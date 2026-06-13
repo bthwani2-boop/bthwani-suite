@@ -1,4 +1,4 @@
-import { mapLoyaltyProgramToClientBenefits, mapSubscriptionPlansToClientCards, type CommercialEntitlement, type CommercialEarningRule, type CommercialProgram, type CommercialRedemptionRule, type LoyaltyClientBenefits, type LoyaltyClientMetric, type LoyaltyClientSection, type LoyaltyReward, type LoyaltyTier, type SubscriptionClientCard, type SubscriptionPlan } from '../../shared/commercial.preview-contract';
+import { mapLoyaltyProgramToClientBenefits, mapSubscriptionPlansToClientCards, type CommercialEntitlement, type CommercialEarningRule, type CommercialProgram, type CommercialRedemptionRule, type LoyaltyClientBenefits, type LoyaltyClientMetric, type LoyaltyClientSection, type LoyaltyReward, type LoyaltyTier, type SubscriptionClientCard, type SubscriptionPlan } from '../../shared/commercial-contract';
 
 // -----------------------------------------------------------------------------
 // Loyalty and subscription source records

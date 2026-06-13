@@ -40,17 +40,17 @@ export type {
   WltDshFinanceBindingState,
   WltDshFinanceEventKind,
   WltDshFinanceOwnership,
-  WltDshFinancePreviewMetadata,
-  WltDshFinancePreviewRecord,
+  WltDshFinanceReadModelMetadata,
+  WltDshFinanceSummaryRecord,
   WltDshFinanceStatusTone,
   WltDshFinanceTone,
   WltDshFulfillmentMode,
   WltDshOrderCommissionBreakdown,
   WltDshOrderLineItemApplicability,
-  WltDshPartnerModeRatePreview,
+  WltDshPartnerModeRate,
   WltDshPaymentMethod,
-  WltDshPaymentOptionPreview,
-  WltDshPaymentPreviewState,
+  WltDshPaymentOption,
+  WltDshPaymentState,
   WltFieldFinanceSnapshot,
   WltPartnerFinanceSnapshot,
 } from './models/dshFinance.types';
@@ -58,7 +58,7 @@ export type {
 export {
   formatWltYer,
   WLT_DSH_FINANCE_OWNERSHIP,
-  getWltDshFinancePreviewMetadata,
+  getWltDshFinanceReadModelMetadata,
   resolveWltDshFinanceEventKindForPaymentMethod,
 } from './models/dshFinance.types';
 

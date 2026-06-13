@@ -4,14 +4,14 @@ import {
   AWNAK_STAGE_LABELS,
   buildDshAssistedOrderDeliveryModeSummary,
   buildDshAssistedOrderLookupInputs,
-  buildDshSignalRoutePreview,
+  buildDshSignalRoute,
   ORDER_RESCUE_ACTIONS,
   ORDER_RESCUE_OWNERS,
   ORDER_RESCUE_REASONS,
   SHEIN_PROXY_STAGE_LABELS,
   type AwnakStage,
   type CartItem,
-  type DshAssistedOrderPreview,
+  type DshAssistedOrder,
   type DshCaptainOrderBellItem,
   type DshCaptainOrderId,
   type DshOrderRescueCase,
@@ -21,7 +21,7 @@ import {
   type DshWltFinanceAlert,
   type RecommendationProduct,
   type SheinProxyStage,
-} from '../../shared/dsh-order-preview.contract';
+} from '../../shared/dsh-order.contract';
 import { getDshClientStateMeta, type DshClientState } from './operational-statuses.preview-data';
 
 // -----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ export const dshPartnerOrdersPreviewDataContract = {
 // -----------------------------------------------------------------------------
 // Assisted order desk preview
 // -----------------------------------------------------------------------------
-export const DSH_ASSISTED_ORDER_PREVIEW: readonly DshAssistedOrderPreview[] = [
+export const DSH_ASSISTED_ORDER_PREVIEW: readonly DshAssistedOrder[] = [
   {
     deskId: 'assist-ord-1102',
     customerId: 'cus-9021',
@@ -187,7 +187,7 @@ export const DSH_ASSISTED_ORDER_PREVIEW: readonly DshAssistedOrderPreview[] = [
       noOrderCreationClaim: true,
       previewState: 'ready_for_preview',
       nextAction: 'ارسل الإشارة التشغيلية ثم افتح الـ route المقابل عند قبول المشغل للخطوة التالية.',
-      signal: buildDshSignalRoutePreview('assisted_order_requested'),
+      signal: buildDshSignalRoute('assisted_order_requested'),
       previewClassification: 'ACCEPTED_PREVIEW_LABEL',
     },
   },
@@ -304,13 +304,13 @@ export const DSH_ASSISTED_ORDER_PREVIEW: readonly DshAssistedOrderPreview[] = [
       noOrderCreationClaim: true,
       previewState: 'blocked_by_identity',
       nextAction: 'أكمل identity verification أو غيّر المسار إلى Manual Call Intake قبل أي draft submit preview.',
-      signal: buildDshSignalRoutePreview('assisted_order_requested'),
+      signal: buildDshSignalRoute('assisted_order_requested'),
       previewClassification: 'ACCEPTED_PREVIEW_LABEL',
     },
   },
 ] as const;
 
-export function getDshAssistedOrderById(deskId: string): DshAssistedOrderPreview | undefined {
+export function getDshAssistedOrderById(deskId: string): DshAssistedOrder | undefined {
   return DSH_ASSISTED_ORDER_PREVIEW.find((entry) => entry.deskId === deskId);
 }
 
@@ -319,7 +319,7 @@ export function getDshAssistedOrderByContext(context: {
   readonly orderId?: string | null;
   readonly customerId?: string | null;
   readonly ticketId?: string | null;
-}): DshAssistedOrderPreview | undefined {
+}): DshAssistedOrder | undefined {
   if (context.deskId) {
     const byDeskId = getDshAssistedOrderById(context.deskId);
     if (byDeskId) {
@@ -433,7 +433,7 @@ export const DSH_ORDER_RESCUE_PREVIEW: readonly DshOrderRescueCase[] = [
       onDemandPolicy: 'detail-on-open',
       placeholderClassification: 'ACCEPTED_PREVIEW_LABEL',
     },
-    decisionSignal: buildDshSignalRoutePreview('order_rescue_requested'),
+    decisionSignal: buildDshSignalRoute('order_rescue_requested'),
   },
   {
     rescueId: 'rescue-1184',
@@ -521,7 +521,7 @@ export const DSH_ORDER_RESCUE_PREVIEW: readonly DshOrderRescueCase[] = [
       onDemandPolicy: 'detail-on-open',
       placeholderClassification: 'ACCEPTED_PREVIEW_LABEL',
     },
-    decisionSignal: buildDshSignalRoutePreview('order_rescue_requested'),
+    decisionSignal: buildDshSignalRoute('order_rescue_requested'),
   },
 ] as const;
 

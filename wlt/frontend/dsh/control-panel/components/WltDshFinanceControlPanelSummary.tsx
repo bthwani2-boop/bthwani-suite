@@ -18,8 +18,8 @@ export function WltDshFinanceControlPanelContent({
   );
 }
 
-export function WltDshFinanceControlPanelPreview() {
+export function WltDshFinanceControlPanelSummary() {
   return <WltDshFinanceControlPanelContent />;
 }
 
-export default WltDshFinanceControlPanelPreview;
+export default WltDshFinanceControlPanelSummary;

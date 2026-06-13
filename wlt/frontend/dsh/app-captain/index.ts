@@ -1,6 +1,6 @@
 export { WltDshCaptainBridge } from './WltDshCaptainBridge';
 export type { WltDshCaptainBridgeProps } from './WltDshCaptainBridge';
-export { WltDshCaptainFinancePreview } from './WltDshCaptainFinancePreview';
+export { WltDshCaptainFinanceSummary } from './WltDshCaptainFinanceSummary';
 export { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
 export type { WltDshCaptainBridgeContract } from './wlt-dsh-captain.contract';
 export { wltDshCaptainUiCopy } from './wlt-dsh-captain.ui-copy';
@@ -10,12 +10,12 @@ export type {
 export type {
   WltDshCaptainBridgeSection,
   WltDshCaptainBridgeState,
-  WltDshCaptainFinancePreviewState,
+  WltDshCaptainFinanceSummaryState,
 } from './wlt-dsh-captain.types';
 export {
-  default as useWltDshCaptainFinancePreviewDefault,
-  useWltDshCaptainFinancePreview,
-} from './useWltDshCaptainFinancePreview';
+  default as useWltDshCaptainFinanceSummaryDefault,
+  useWltDshCaptainFinanceSummary,
+} from './useWltDshCaptainFinanceSummary';
 export {
   getRecords,
   getRecordsForSection,
@@ -25,5 +25,5 @@ export {
 export type {
   WltCaptainFinanceSection,
   WltCaptainFinanceSnapshot,
-  WltDshFinancePreviewRecord,
+  WltDshFinanceSummaryRecord,
 } from '../control-panel/financeContracts';

@@ -124,7 +124,7 @@ export function shouldShowDshPartnerOrderConversation(
   return mode === 'bthwani_delivery' ? 'disabled-for-mode' : 'enabled';
 }
 
-export type DshPreviewPlaceholderStatus =
+export type DshPlaceholderStatus =
   | 'ACCEPTED_PREVIEW_LABEL'
   | 'BLOCKED_BY_CONTRACT'
   | 'BLOCKED_BY_WLT'
@@ -132,7 +132,7 @@ export type DshPreviewPlaceholderStatus =
   | 'DEAD_PLACEHOLDER_REMOVE';
 
 export type DshLookupFieldId = 'phone' | 'orderId' | 'customerId' | 'ticketId';
-export type DshLookupInputPreview = {
+export type DshLookupInput = {
   readonly key: DshLookupFieldId;
   readonly label: string;
   readonly value: string;
@@ -140,13 +140,13 @@ export type DshLookupInputPreview = {
 };
 
 export type DshVerificationStatus = 'required' | 'verified' | 'blocked';
-export type DshVerificationStepPreview = {
+export type DshVerificationStep = {
   readonly stepId: string;
   readonly label: string;
   readonly completed: boolean;
 };
 
-export type DshSignalRoutePreview = {
+export type DshSignalRoute = {
   readonly signalKind: DshSignalEventKind;
   readonly routeId: string;
   readonly auditRequired: boolean;
@@ -174,7 +174,7 @@ export type DshReadOnlyFinanceVisibility = {
   readonly calculationTruthOwner: string;
   readonly routeHint: string;
   readonly onDemandPolicy: string;
-  readonly placeholderClassification: DshPreviewPlaceholderStatus;
+  readonly placeholderClassification: DshPlaceholderStatus;
 };
 
 export type DshGlobalControlLink = DshRouteHintedAction & {
@@ -206,7 +206,7 @@ export type DshAssistedOrderDeliveryModeOption = {
   readonly supportFallback: string;
 };
 
-export type DshAssistedOrderPreview = {
+export type DshAssistedOrder = {
   readonly deskId: string;
   readonly customerId: string;
   readonly customerName: string;
@@ -224,15 +224,15 @@ export type DshAssistedOrderPreview = {
   readonly nextAction: string;
   readonly crossSurfaceLinks: readonly DshGlobalControlLink[];
   readonly lookupPanel: {
-    readonly inputs: readonly DshLookupInputPreview[];
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly inputs: readonly DshLookupInput[];
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly identityVerification: {
     readonly verificationStatus: DshVerificationStatus;
-    readonly verificationSteps: readonly DshVerificationStepPreview[];
+    readonly verificationSteps: readonly DshVerificationStep[];
     readonly sensitiveFieldsLocked: readonly string[];
     readonly forbiddenActionsBeforeVerification: readonly string[];
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly cartBuilderPreview: {
     readonly publishedProductsOnly: true;
@@ -242,21 +242,21 @@ export type DshAssistedOrderPreview = {
     readonly replaceItemPreview: string;
     readonly substituteItemPreview: string;
     readonly unavailableItemHandling: string;
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly deliveryModeSelector: {
     readonly selectedMode: DshFulfillmentDeliveryMode;
     readonly options: readonly DshAssistedOrderDeliveryModeOption[];
     readonly selectedModeSummary: string;
     readonly forbiddenLifecycleStates: readonly string[];
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly serviceabilitySummary: {
     readonly zoneLabel: string;
     readonly serviceabilityStatus: 'serviceable' | 'blocked';
     readonly blockedReason?: string;
     readonly fallbackAction: string;
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly wltReadOnlyHandoff: DshReadOnlyFinanceVisibility;
   readonly auditReason: {
@@ -264,7 +264,7 @@ export type DshAssistedOrderPreview = {
     readonly auditRequired: true;
     readonly operatorNote: string;
     readonly reasonLabel: string;
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly submitDraftPreview: {
     readonly previewOnly: true;
@@ -272,8 +272,8 @@ export type DshAssistedOrderPreview = {
     readonly noOrderCreationClaim: true;
     readonly previewState: 'ready_for_preview' | 'blocked_by_identity' | 'blocked_by_serviceability';
     readonly nextAction: string;
-    readonly signal: DshSignalRoutePreview;
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly signal: DshSignalRoute;
+    readonly previewClassification: DshPlaceholderStatus;
   };
 };
 
@@ -283,7 +283,7 @@ function translateSignalPriority(priority: DshSignalPriority): string {
   return 'اعتيادي';
 }
 
-export function buildDshSignalRoutePreview(signalKind: DshSignalEventKind): DshSignalRoutePreview {
+export function buildDshSignalRoute(signalKind: DshSignalEventKind): DshSignalRoute {
   const route = getDshSignalActorRoute(signalKind);
   return {
     signalKind,
@@ -299,7 +299,7 @@ export function buildDshAssistedOrderLookupInputs(values: {
   readonly orderId?: string;
   readonly customerId: string;
   readonly ticketId?: string;
-}): readonly DshLookupInputPreview[] {
+}): readonly DshLookupInput[] {
   return [
     { key: 'phone', label: 'phone', value: values.phone, summaryFirst: true },
     { key: 'orderId', label: 'orderId', value: values.orderId ?? '—', summaryFirst: true },
@@ -323,7 +323,7 @@ export function buildDshAssistedOrderDeliveryModeSummary(modeId: DshFulfillmentD
   readonly options: readonly DshAssistedOrderDeliveryModeOption[];
   readonly selectedModeSummary: string;
   readonly forbiddenLifecycleStates: readonly string[];
-  readonly previewClassification: DshPreviewPlaceholderStatus;
+  readonly previewClassification: DshPlaceholderStatus;
 } {
   const mode = getDshDeliveryModeDefinition(modeId);
   return {
@@ -376,17 +376,17 @@ export type DshOrderRescueCase = {
   readonly rescueReasonSelector: {
     readonly selectedReason: DshOrderRescueReason;
     readonly options: readonly DshOrderRescueReason[];
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly ownerSelection: {
     readonly selectedOwner: DshOrderRescueOwner;
     readonly options: readonly DshOrderRescueOwner[];
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly nextActionSelector: {
     readonly selectedAction: DshOrderRescueNextActionId;
     readonly options: readonly DshOrderRescueNextActionId[];
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly requiredEvidence: {
     readonly reason: string;
@@ -394,17 +394,17 @@ export type DshOrderRescueCase = {
     readonly affectedEntity: string;
     readonly auditRequired: true;
     readonly reasonRequired: true;
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly supportHandoff: {
     readonly ticketLink: string;
     readonly escalationOwner: string;
     readonly sla: string;
     readonly routeHint: string;
-    readonly previewClassification: DshPreviewPlaceholderStatus;
+    readonly previewClassification: DshPlaceholderStatus;
   };
   readonly wltImpactVisibility: DshReadOnlyFinanceVisibility;
-  readonly decisionSignal: DshSignalRoutePreview;
+  readonly decisionSignal: DshSignalRoute;
 };
 
 export const ORDER_RESCUE_REASONS: readonly DshOrderRescueReason[] = [

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { ImageSourcePropType } from 'react-native';
 import { ProductCard } from '@bthwani/ui-kit';
-import { type DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
+import { type DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
 import { canRenderInClientSurface } from '../../../shared/workflow';
 import { mapMenuItemToProductCard } from '../../shared/map-menu-item-to-product-card';
 import { resolveDshRuntimeImageSource } from '../../shared/resolve-runtime-image-source';

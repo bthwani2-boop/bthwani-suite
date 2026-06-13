@@ -4,7 +4,7 @@ import { Box, Surface, Text } from '@bthwani/ui-kit';
 import type { VideoDraft } from './video-types';
 import { TARGET_TYPE_OPTIONS } from './video-types';
 
-interface VideoPreviewProps {
+interface VideoViewerProps {
   draft: VideoDraft;
   theme: any;
   styles: any;
@@ -12,7 +12,7 @@ interface VideoPreviewProps {
   rtlText: any;
 }
 
-export function VideoPreview({ draft, theme, styles, isRtl, rtlText }: VideoPreviewProps) {
+export function VideoViewer({ draft, theme, styles, isRtl, rtlText }: VideoViewerProps) {
   return (
     <Surface tone="inset" style={styles.previewPanel}>
       <View style={[styles.panelHeader]}>

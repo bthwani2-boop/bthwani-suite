@@ -4,8 +4,8 @@ import type {
   DshOperationalEntityId,
   DshOperationalWltImpact,
 } from './dsh-operational.contract';
-import type { DshOperationalSurfaceSummary } from './dsh-operational-preview-adapter';
-import { buildDshOperationalSummaryForSurface } from './dsh-operational-preview-adapter';
+import type { DshOperationalSurfaceSummary } from './dsh-operational-summary-adapter';
+import { buildDshOperationalSummaryForSurface } from './dsh-operational-summary-adapter';
 
 export const dshOperationalSurfaceBindingMeta = {
   dataKind: 'OPERATIONAL_SURFACE_BINDING_METADATA',
@@ -226,7 +226,7 @@ export function getDshOperationalScreenBindingsByRegistryEntry(
   );
 }
 
-export function getDshOperationalPreviewSummariesForScreen(
+export function getDshOperationalSummariesForScreen(
   screenId: string,
 ): readonly DshOperationalSurfaceSummary[] {
   const bindingRecord = getDshOperationalScreenBindingByScreenId(screenId);

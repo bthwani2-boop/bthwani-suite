@@ -19,7 +19,7 @@ import {
   useDirection,
   spacing,
 } from '@bthwani/ui-kit';
-import type { DshPartnerOrderConversationMode } from '../../shared/dsh-order-preview.contract';
+import type { DshPartnerOrderConversationMode } from '../../shared/dsh-order.contract';
 import { AcceptanceTimerSheet } from '../sheets';
 // SSoT: delivery mode labels from dsh-delivery-mode.model.
 import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';

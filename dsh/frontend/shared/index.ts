@@ -32,7 +32,7 @@ export type {
   LoyaltyClientBenefits,
   CommercialEligibilityContext,
   CommercialProjectionInput,
-} from './commercial.preview-contract';
+} from './commercial-contract';
 export {
   commercialContractMeta,
   isClientVisibleStatus,
@@ -54,7 +54,7 @@ export {
   mapRewardsToClientSections,
   mapPartnerOfferToCommercialOffer,
   mapCampaignToCommercialProjection,
-} from './commercial.preview-contract';
+} from './commercial-contract';
 
 export type {
   MarketingRouteHint,
@@ -105,7 +105,6 @@ export {
   DSH_SUBCATEGORY_LABELS,
   DSH_OPERATIONAL_FACETS,
   isDshOperationalFacet,
-  dshCatalogMetrics,
   dshCatalogPipeline,
   dshCategoryMeasurementPolicies,
   getDshTaxonomyLabel,
@@ -190,7 +189,7 @@ export {
   isDshHiddenCompatFlow,
   getDshEscalationFlows,
   getDshEscalationFlowsForSurface,
-  getDshFinancePreviewFlows,
+  getDshFinanceImpactFlows,
   getDshFlowPolicySummary,
   getDshFlowRegistryStats,
   getDshFlowRegistryValidationSummary,
@@ -260,20 +259,20 @@ export {
 } from './dsh-operational-registry';
 
 export type {
-  DshControlPanelOperationsPreview,
+  DshControlPanelOperationsSummary,
   DshOperationalSurfaceSummary,
-} from './dsh-operational-preview-adapter';
+} from './dsh-operational-summary-adapter';
 export {
-  buildDshCodQueuePreview,
-  buildDshControlPanelOperationsPreview,
-  buildDshExceptionQueuePreview,
+  buildDshCodQueueSummary,
+  buildDshControlPanelOperationsSummary,
+  buildDshExceptionQueueSummary,
   buildDshOperationalSummaryForSurface,
-  buildDshPodReviewPreview,
-  buildDshSettlementInputPreview,
-  buildDshTripPreviewForOrder,
-  dshOperationalPreviewAdapterMeta,
-  getDshOperationalPreviewRegistryEntry,
-} from './dsh-operational-preview-adapter';
+  buildDshPodReviewSummary,
+  buildDshSettlementInputSummary,
+  buildDshTripSummaryForOrder,
+  dshOperationalSummaryAdapterMeta,
+  getDshOperationalSummaryRegistryEntry,
+} from './dsh-operational-summary-adapter';
 
 export type {
   DshOperationalRuntimeBindingStatus,
@@ -282,7 +281,7 @@ export type {
 export {
   DSH_OPERATIONAL_SCREEN_BINDINGS,
   dshOperationalSurfaceBindingMeta,
-  getDshOperationalPreviewSummariesForScreen,
+  getDshOperationalSummariesForScreen,
   getDshOperationalScreenBindingByScreenId,
   getDshOperationalScreenBindings,
   getDshOperationalScreenBindingsByRegistryEntry,
@@ -329,7 +328,7 @@ export type {
   DshAssistedOrderCartItemStatus,
   DshAssistedOrderDeliveryModeOption,
   DshAssistedOrderIdentityStatus,
-  DshAssistedOrderPreview,
+  DshAssistedOrder,
   DshAssistedOrderStage,
   DshCaptainOrderAction,
   DshCaptainOrderBellItem,
@@ -342,7 +341,7 @@ export type {
   DshCaptainOrderStage,
   DshGlobalControlLink,
   DshLookupFieldId,
-  DshLookupInputPreview,
+  DshLookupInput,
   DshOpsMonitoringItem,
   DshOrderRescueCase,
   DshOrderRescueNextActionId,
@@ -355,22 +354,22 @@ export type {
   DshPartnerOrderConversationMessage,
   DshPartnerOrderConversationMode,
   DshPartnerOrderConversationVisibility,
-  DshPreviewPlaceholderStatus,
+  DshPlaceholderStatus,
   DshReadOnlyFinanceVisibility,
   DshRouteHintedAction,
-  DshSignalRoutePreview,
+  DshSignalRoute,
   DshVerificationStatus,
-  DshVerificationStepPreview,
+  DshVerificationStep,
   DshWltFinanceAlert,
   RecommendationProduct,
   SheinProxyStage,
-} from './dsh-order-preview.contract';
+} from './dsh-order.contract';
 export {
   AWNAK_STAGE_LABELS,
   buildDshAssistedOrderDeliveryModeOptions,
   buildDshAssistedOrderDeliveryModeSummary,
   buildDshAssistedOrderLookupInputs,
-  buildDshSignalRoutePreview,
+  buildDshSignalRoute,
   DISPATCH_LIFECYCLE_STATE_MAP,
   EXCEPTION_TICKET_MAP,
   ORDER_RESCUE_ACTIONS,
@@ -378,7 +377,7 @@ export {
   ORDER_RESCUE_REASONS,
   SHEIN_PROXY_STAGE_LABELS,
   shouldShowDshPartnerOrderConversation,
-} from './dsh-order-preview.contract';
+} from './dsh-order.contract';
 
 export type {
   DshControlPanelSectionId,
@@ -513,7 +512,7 @@ export type {
 } from './dsh-signal-layer.model';
 export {
   DSH_SIGNAL_ACTOR_ROUTES,
-  DSH_SIGNAL_PREVIEW_EVENTS,
+  DSH_SIGNAL_EVENTS,
   getDshSignalEventLabel,
   getDshSignalEventTone,
   getDshSignalActorRoute,
@@ -536,7 +535,7 @@ export type {
 } from './dsh-role-permission.model';
 export {
   DSH_ROLE_PERMISSIONS,
-  DSH_AUDIT_PREVIEW_ENTRIES,
+  DSH_AUDIT_ENTRIES,
   DSH_MAKER_CHECKER_MATRIX,
   DSH_REASON_EVIDENCE_POLICY,
   getDshRoleCanPerform,
@@ -624,9 +623,9 @@ export {
 } from './dsh-store-builders';
 
 export {
-  resolvePreviewColor,
-  dshPreviewColorContractMeta,
-} from './dsh-preview-color';
+  resolveColorToken,
+  dshColorResolverMeta,
+} from './dsh-color-resolver';
 
 // --- Catalog Central Adapter (DEV_ONLY offline fallback) ---
 // Maps archived seed catalog data to surface view models.

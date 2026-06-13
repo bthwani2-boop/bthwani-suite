@@ -23,7 +23,7 @@ import {
   type CommercialConflict,
   type CommercialLifecycleStatus,
   type PartnerOffer,
-} from '../../shared/commercial.preview-contract';
+} from '../../shared/commercial-contract';
 import {
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,

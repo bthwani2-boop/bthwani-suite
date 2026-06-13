@@ -1,5 +1,5 @@
 ﻿import * as React from 'react';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { DshStoreSearchCategory } from '../shared/store-search-helpers';
 import { buildStoreSearchCategories } from '../shared/store-search-helpers';
@@ -37,19 +37,19 @@ export function useStoreDerivedItems({
   storeDeliveryModes,
   favoriteIds,
 }: UseStoreDerivedItemsParams): UseStoreDerivedItemsResult {
-  const fallbackMenuItems = React.useMemo<DshStoreGetMenuItem[]>(
+  const resolvedMenuItems = React.useMemo<DshStoreGetMenuItem[]>(
     () => menuItems ?? [],
     [menuItems],
   );
 
   const clientVisibleItems = React.useMemo(
     () =>
-      fallbackMenuItems.filter(
+      resolvedMenuItems.filter(
         (item) =>
           item.isAvailable !== false &&
           canRenderInClientSurface(item.publishStage, 'product'),
       ),
-    [fallbackMenuItems],
+    [resolvedMenuItems],
   );
 
   const categories = React.useMemo(

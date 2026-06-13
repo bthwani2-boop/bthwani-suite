@@ -14,13 +14,6 @@ export type DshCatalogMeasurementPolicy = {
   options: ReadonlyArray<string>;
 };
 
-// DATA_CENTRALIZATION_DONE: dshCatalogMetrics was previously duplicated here with stale values.
-// It has been removed. The authoritative version lives in:
-//   control-panel/catalogs/catalog.ts → re-exported via control-panel/catalogs/index.ts
-// SCAFFOLD — not runtime truth, not backend source.
-// Consumers should import dshCatalogMetrics from control-panel/catalogs (if in control-panel context)
-// or from shared/index.ts (which re-exports the CP version below).
-export { dshCatalogMetrics } from '../control-panel/catalogs/catalogs.data';
 
 
 export const dshCategoryMeasurementPolicies: Readonly<Record<string, DshCatalogMeasurementPolicy>> = {

@@ -2,7 +2,7 @@
 
 // Authority: control-panel/marketing — VideosCommandDeckScreen (slim entry point).
 // Giant Screen split: types → video-types.ts | utils → video-target-utils.ts
-//                     preview → VideoPreview.tsx | editor → VideoEditorSection.tsx
+//                     preview → VideoViewer.tsx | editor → VideoEditorSection.tsx
 // This file retains: component state, URL param management, data handlers, layout JSX.
 
 import React from 'react';
@@ -33,7 +33,7 @@ function removeMarketingVideoItem(_id: string): void {}
 import { useMarketingPermissions } from './marketing-permissions.contract';
 import type { VideoDraft, EditorWorkspaceTab } from './video-types';
 import { createDraft } from './video-target-utils';
-import { VideoPreview } from './VideoPreview';
+import { VideoViewer } from './VideoViewer';
 import { VideoEditorSection } from './VideoEditorSection';
 
 export type VideosCommandDeckScreenProps = {
@@ -295,7 +295,7 @@ export function VideosCommandDeckScreen({ hubHref, operationsHref }: VideosComma
         />
 
         {/* Right: Preview Panel */}
-        <VideoPreview
+        <VideoViewer
           draft={draft}
           theme={theme}
           styles={styles}

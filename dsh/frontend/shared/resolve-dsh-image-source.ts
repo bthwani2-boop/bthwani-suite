@@ -12,9 +12,9 @@ import type { ImageSourcePropType } from 'react-native';
  * Callers use emojiFallback from DshCategoryFixture as the active fallback.
  */
 
-const dshSeedMediaSources: Record<string, ImageSourcePropType | undefined> = {};
+const dshStaticMediaSources: Record<string, ImageSourcePropType | undefined> = {};
 
-export const DSH_PRODUCT_MEDIA_FIXTURE_KEYS = [
+export const DSH_PRODUCT_MEDIA_KEYS = [
   'dsh.product.apple.v1',
   'dsh.product.bread.v1',
   'dsh.product.chicken.v1',
@@ -28,14 +28,11 @@ export const DSH_PRODUCT_MEDIA_FIXTURE_KEYS = [
   'dsh.product.yogurt.v1',
 ] as const;
 
-export type DshProductMediaFixtureKey = (typeof DSH_PRODUCT_MEDIA_FIXTURE_KEYS)[number];
+export type DshProductMediaKey = (typeof DSH_PRODUCT_MEDIA_KEYS)[number];
 
-/**
- * Category key namespace router.
- * Archived category seed keys intentionally resolve to undefined.
- */
+/** Category key namespace router — archived keys resolve to undefined. */
 function resolveCategoryKey(key: string): ImageSourcePropType | undefined {
-  return dshSeedMediaSources[key];
+  return dshStaticMediaSources[key];
 }
 
 export function resolveDshImageSource(source?: string | ImageSourcePropType | null): ImageSourcePropType | undefined {
@@ -45,6 +42,6 @@ export function resolveDshImageSource(source?: string | ImageSourcePropType | nu
   if (source.startsWith('dsh.category.main.') || source.startsWith('dsh.category.sub.')) {
     return resolveCategoryKey(source);
   }
-  if (source.startsWith('dsh.')) return dshSeedMediaSources[source];
+  if (source.startsWith('dsh.')) return dshStaticMediaSources[source];
   return { uri: source };
 }

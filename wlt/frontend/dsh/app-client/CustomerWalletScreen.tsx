@@ -18,7 +18,7 @@ import {
 	radius,
 	spacing,
 } from '@bthwani/ui-kit';
-import { useWltDshWalletPreview } from './useWltDshWalletPreview';
+import { useWltDshWalletSession } from './useWltDshWalletSession';
 import { listLedgerEntries } from './wlt-dsh-client.adapter';
 import { formatWltYer } from '../control-panel/financeContracts';
 
@@ -29,7 +29,7 @@ export type CustomerWalletScreenProps = {
 
 export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken }: CustomerWalletScreenProps) {
 	const { theme } = useTheme();
-	const wallet = useWltDshWalletPreview(clientId, bearerToken);
+	const wallet = useWltDshWalletSession(clientId, bearerToken);
 	const [transactions, setTransactions] = React.useState<any[]>([]);
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
 	const [offline, setOffline] = React.useState<boolean>(false);

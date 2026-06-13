@@ -88,9 +88,9 @@ type CaptainAppMode = 'bthwani_captain_mode' | 'store_courier_mode';
 type StoreCourierStage = 'ready_for_pickup' | 'picked_up' | 'out_for_delivery' | 'delivery_failed' | 'delivered';
 type DshCaptainPodState = NonNullable<React.ComponentProps<typeof DshCaptainPoDSubmissionScreen>['state']>;
 
-const CAPTAIN_POD_PREVIEW_MEDIA_KEY = 'proof.delivery.preview.v1';
+const CAPTAIN_POD_MEDIA_KEY = 'proof.delivery.preview.v1';
 const CAPTAIN_POD_PLACEHOLDER_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+kG7wAAAAASUVORK5CYII=';
-const DSH_CAPTAIN_PREVIEW_ID = 'CAP-0041';
+const DSH_CAPTAIN_FALLBACK_ID = 'CAP-0041';
 
 const CAPTAIN_BOTTOM_NAV_ROUTES = new Set<DshCaptainRoute>([
   'home', 'map', 'inbox', 'account', 'account-finance', 'account-orders',
@@ -405,7 +405,7 @@ export function DshCaptainSurface(props: DshCaptainSurfaceProps) {
   );
 }
 
-function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID, walletBalanceLabel }: DshCaptainSurfaceProps) {
+function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, walletBalanceLabel }: DshCaptainSurfaceProps) {
   const { theme } = useTheme();
   const { dshAuthBearerToken, dshClientId } = usePlatformVars();
   const {
@@ -636,7 +636,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_PREVIEW_ID, w
 
   const capturePodPhotoPreview = React.useCallback(() => {
     setCaptainPodPhotoUri(CAPTAIN_POD_PLACEHOLDER_URI);
-    setCaptainPodMediaKey(CAPTAIN_POD_PREVIEW_MEDIA_KEY);
+    setCaptainPodMediaKey(CAPTAIN_POD_MEDIA_KEY);
     setCaptainPodState('ready');
   }, []);
 

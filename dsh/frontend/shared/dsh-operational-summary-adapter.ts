@@ -7,16 +7,16 @@ import {
 import type { DshSurfaceId } from './dsh-flow-registry';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DshOperationalPreviewRecord = Record<string, any>;
-const dshOperationalPreviewRecords: readonly DshOperationalPreviewRecord[] = [];
+type DshOperationalSummaryRecord = Record<string, any>;
+const dshOperationalSummaryRecords: readonly DshOperationalSummaryRecord[] = [];
 
-export const dshOperationalPreviewAdapterMeta = {
+export const dshOperationalSummaryAdapterMeta = {
   dataKind: 'SCAFFOLD_ADAPTER',
   runtimeTruth: false,
   backendSource: false,
   bindingSource: false,
-  sourceDataOwner: 'archived-seed/operational',
-  adapterOwner: 'dsh/frontend/shared/dsh-operational-preview-adapter.ts',
+  sourceDataOwner: 'api-runtime/operational',
+  adapterOwner: 'dsh/frontend/shared/dsh-operational-summary-adapter.ts',
 } as const;
 
 export type DshOperationalSurfaceSummary = {
@@ -25,24 +25,24 @@ export type DshOperationalSurfaceSummary = {
   readonly label: string;
   readonly summary: string;
   readonly ownerSurface: DshSurfaceId;
-  readonly status: DshOperationalPreviewRecord['status'];
-  readonly controlPanelWorkspace: DshOperationalPreviewRecord['controlPanelWorkspace'];
-  readonly dataClassification: DshOperationalPreviewRecord['dataClassification'];
+  readonly status: DshOperationalSummaryRecord['status'];
+  readonly controlPanelWorkspace: DshOperationalSummaryRecord['controlPanelWorkspace'];
+  readonly dataClassification: DshOperationalSummaryRecord['dataClassification'];
   readonly detailRef: string;
   readonly evidenceRef?: string;
-  readonly wltImpact: DshOperationalPreviewRecord['wltImpact'];
+  readonly wltImpact: DshOperationalSummaryRecord['wltImpact'];
   readonly runtimeTruth: false;
   readonly backendSource: false;
   readonly bindingSource: false;
 };
 
-export type DshControlPanelOperationsPreview = {
-  readonly workspace: DshOperationalPreviewRecord['controlPanelWorkspace'];
+export type DshControlPanelOperationsSummary = {
+  readonly workspace: DshOperationalSummaryRecord['controlPanelWorkspace'];
   readonly purpose: string;
   readonly records: readonly DshOperationalSurfaceSummary[];
 };
 
-function toSummary(record: DshOperationalPreviewRecord): DshOperationalSurfaceSummary {
+function toSummary(record: DshOperationalSummaryRecord): DshOperationalSurfaceSummary {
   return {
     summaryId: record.recordId,
     registryEntryId: record.registryEntryId,
@@ -62,26 +62,26 @@ function toSummary(record: DshOperationalPreviewRecord): DshOperationalSurfaceSu
 }
 
 function byRegistryEntry(entryId: DshOperationalEntityId): readonly DshOperationalSurfaceSummary[] {
-  return dshOperationalPreviewRecords
+  return dshOperationalSummaryRecords
     .filter((record) => record.registryEntryId === entryId)
     .map(toSummary);
 }
 
-function byWorkspace(workspace: DshOperationalPreviewRecord['controlPanelWorkspace']): readonly DshOperationalSurfaceSummary[] {
+function byWorkspace(workspace: DshOperationalSummaryRecord['controlPanelWorkspace']): readonly DshOperationalSurfaceSummary[] {
   const registryEntryIds = new Set(getDshOperationalEntriesByWorkspace(workspace).map((entry) => entry.id));
-  return dshOperationalPreviewRecords
+  return dshOperationalSummaryRecords
     .filter((record) => registryEntryIds.has(record.registryEntryId))
     .map(toSummary);
 }
 
 export function buildDshOperationalSummaryForSurface(surfaceId: DshSurfaceId): readonly DshOperationalSurfaceSummary[] {
   const entryIds = new Set(getDshOperationalEntriesBySurface(surfaceId).map((entry) => entry.id));
-  return dshOperationalPreviewRecords
+  return dshOperationalSummaryRecords
     .filter((record) => record.ownerSurface === surfaceId || record.visibleSurfaces.includes(surfaceId) || entryIds.has(record.registryEntryId))
     .map(toSummary);
 }
 
-export function buildDshControlPanelOperationsPreview(): readonly DshControlPanelOperationsPreview[] {
+export function buildDshControlPanelOperationsSummary(): readonly DshControlPanelOperationsSummary[] {
   return [
     { workspace: 'orders-queue', purpose: 'Order status, owner, SLA, exception, support, and settlement input visibility.', records: byWorkspace('orders-queue') },
     { workspace: 'trips-board', purpose: 'Trip status, assignment, pickup/dropoff, proof, failure, and return visibility.', records: byWorkspace('trips-board') },
@@ -98,28 +98,28 @@ export function buildDshControlPanelOperationsPreview(): readonly DshControlPane
   ] as const;
 }
 
-export function buildDshSettlementInputPreview(): readonly DshOperationalSurfaceSummary[] {
+export function buildDshSettlementInputSummary(): readonly DshOperationalSurfaceSummary[] {
   return byRegistryEntry('settlement-input-bridge');
 }
 
-export function buildDshTripPreviewForOrder(orderId: string): readonly DshOperationalSurfaceSummary[] {
-  return dshOperationalPreviewRecords
+export function buildDshTripSummaryForOrder(orderId: string): readonly DshOperationalSurfaceSummary[] {
+  return dshOperationalSummaryRecords
     .filter((record) => record.orderId === orderId && record.registryEntryId === 'delivery-trip')
     .map(toSummary);
 }
 
-export function buildDshExceptionQueuePreview(): readonly DshOperationalSurfaceSummary[] {
+export function buildDshExceptionQueueSummary(): readonly DshOperationalSurfaceSummary[] {
   return byRegistryEntry('operational-exception');
 }
 
-export function buildDshCodQueuePreview(): readonly DshOperationalSurfaceSummary[] {
+export function buildDshCodQueueSummary(): readonly DshOperationalSurfaceSummary[] {
   return byRegistryEntry('cod-collection');
 }
 
-export function buildDshPodReviewPreview(): readonly DshOperationalSurfaceSummary[] {
+export function buildDshPodReviewSummary(): readonly DshOperationalSurfaceSummary[] {
   return byRegistryEntry('proof-of-delivery');
 }
 
-export function getDshOperationalPreviewRegistryEntry(record: DshOperationalPreviewRecord) {
+export function getDshOperationalSummaryRegistryEntry(record: DshOperationalSummaryRecord) {
   return getDshOperationalEntryById(record.registryEntryId);
 }

@@ -5,23 +5,23 @@ import { Icon, Text,
   spacing,
 } from '@bthwani/ui-kit';
 
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
 import type { useStoreAppearanceChrome } from './store-appearance-chrome';
 import type { DshStoreGetScreenProps } from '../../contracts/dsh-store-screen-props';
 import { normalizeDisplayText } from '../../shared/store-formatting';
 import { resolveDshStoreMenuItemImageSource } from './StoreMenuItemCard';
 import { stylesTokens, styles as storeScreenStyles } from './store-screen.styles';
 
-type StoreImagePreviewSheetProps = {
-  previewItem: DshStoreGetMenuItem | null | undefined;
-  previewItems: DshStoreGetMenuItem[];
-  previewAnim: Animated.Value;
-  previewPanResponder: { panHandlers: object };
-  previewListRef: React.RefObject<Animated.FlatList<DshStoreGetMenuItem> | null>;
-  previewScrollY: Animated.Value;
+type StoreImageViewerSheetProps = {
+  viewerItem: DshStoreGetMenuItem | null | undefined;
+  viewerItems: DshStoreGetMenuItem[];
+  viewerAnim: Animated.Value;
+  panResponder: { panHandlers: object };
+  menuListRef: React.RefObject<Animated.FlatList<DshStoreGetMenuItem> | null>;
+  menuScrollY: Animated.Value;
   viewportHeight: number;
   viewportWidth: number;
-  previewActiveIndex: number;
+  viewerActiveIndex: number;
   setPreviewActiveIndex: (index: number) => void;
   setPreviewItem: (item: DshStoreGetMenuItem | null) => void;
   closeImagePreview: () => void;
@@ -41,16 +41,16 @@ const STORE_PREVIEW_MAX_TO_RENDER_PER_BATCH = 3;
 const STORE_PREVIEW_WINDOW_SIZE = 5;
 const STORE_PREVIEW_ITEM_GAP = 16;
 
-export function StoreImagePreviewSheet({
-  previewItem,
-  previewItems,
-  previewAnim,
-  previewPanResponder,
-  previewListRef,
-  previewScrollY,
+export function StoreImageViewerSheet({
+  viewerItem,
+  viewerItems,
+  viewerAnim,
+  panResponder,
+  menuListRef,
+  menuScrollY,
   viewportHeight,
   viewportWidth,
-  previewActiveIndex,
+  viewerActiveIndex,
   setPreviewActiveIndex,
   setPreviewItem,
   closeImagePreview,
@@ -63,10 +63,10 @@ export function StoreImagePreviewSheet({
   storeLogoImageSource,
   handleToggleFavorite,
   openMeasurementPicker,
-}: StoreImagePreviewSheetProps) {
-  const previewItemWidth = viewportWidth * 0.92;
-  const previewItemHeight = viewportHeight * 0.54;
-  const previewSnapInterval = previewItemHeight + STORE_PREVIEW_ITEM_GAP;
+}: StoreImageViewerSheetProps) {
+  const viewerItemWidth = viewportWidth * 0.92;
+  const viewerItemHeight = viewportHeight * 0.54;
+  const previewSnapInterval = viewerItemHeight + STORE_PREVIEW_ITEM_GAP;
 
   const renderPreviewItem = React.useCallback(({ item, index }: { item: DshStoreGetMenuItem; index: number }) => {
     const inputRange = [
@@ -74,16 +74,16 @@ export function StoreImagePreviewSheet({
       index * previewSnapInterval,
       (index + 1) * previewSnapInterval,
     ];
-    const scale = previewScrollY.interpolate({ inputRange, outputRange: [0.94, 1, 0.94], extrapolate: 'clamp' });
-    const opacity = previewScrollY.interpolate({ inputRange, outputRange: [0.7, 1, 0.7], extrapolate: 'clamp' });
+    const scale = menuScrollY.interpolate({ inputRange, outputRange: [0.94, 1, 0.94], extrapolate: 'clamp' });
+    const opacity = menuScrollY.interpolate({ inputRange, outputRange: [0.7, 1, 0.7], extrapolate: 'clamp' });
 
     return (
       <Animated.View
         style={[
           styles.previewCard,
           {
-            width: previewItemWidth,
-            height: previewItemHeight,
+            width: viewerItemWidth,
+            height: viewerItemHeight,
             marginVertical: STORE_PREVIEW_ITEM_GAP / 2,
             backgroundColor: appearanceChrome.modalSurface,
             borderColor: appearanceChrome.modalBorder,
@@ -172,9 +172,9 @@ export function StoreImagePreviewSheet({
     isRTL,
     normalizedStoreName,
     openMeasurementPicker,
-    previewItemHeight,
-    previewItemWidth,
-    previewScrollY,
+    viewerItemHeight,
+    viewerItemWidth,
+    menuScrollY,
     previewSnapInterval,
     store,
     storeLogoImageSource,
@@ -184,22 +184,22 @@ export function StoreImagePreviewSheet({
   ]);
 
   return (
-    <Modal visible={Boolean(previewItem)} transparent animationType="fade" onRequestClose={closeImagePreview}>
+    <Modal visible={Boolean(viewerItem)} transparent animationType="fade" onRequestClose={closeImagePreview}>
       <View style={[styles.previewOverlay, { backgroundColor: appearanceChrome.overlay }]}>
         <Pressable style={styles.previewBackdrop} onPress={closeImagePreview} />
         <Animated.View
           style={[
             styles.previewWrap,
             {
-              opacity: previewAnim,
-              transform: [{ scale: previewAnim.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1] }) }],
+              opacity: viewerAnim,
+              transform: [{ scale: viewerAnim.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1] }) }],
             },
           ]}
-          {...previewPanResponder.panHandlers}
+          {...panResponder.panHandlers}
         >
           <Animated.FlatList
-            ref={previewListRef}
-            data={previewItems}
+            ref={menuListRef}
+            data={viewerItems}
             renderItem={renderPreviewItem}
             keyExtractor={(item: DshStoreGetMenuItem) => `preview-${item.id}`}
             horizontal={false}
@@ -212,13 +212,13 @@ export function StoreImagePreviewSheet({
             snapToAlignment="center"
             decelerationRate="fast"
             onScroll={Animated.event(
-              [{ nativeEvent: { contentOffset: { y: previewScrollY } } }],
+              [{ nativeEvent: { contentOffset: { y: menuScrollY } } }],
               { useNativeDriver: true },
             )}
             contentContainerStyle={{
-              paddingVertical: (viewportHeight - previewItemHeight) / 2 - STORE_PREVIEW_ITEM_GAP / 2,
+              paddingVertical: (viewportHeight - viewerItemHeight) / 2 - STORE_PREVIEW_ITEM_GAP / 2,
             }}
-            initialScrollIndex={previewActiveIndex !== -1 ? previewActiveIndex : 0}
+            initialScrollIndex={viewerActiveIndex !== -1 ? viewerActiveIndex : 0}
             getItemLayout={(_, index) => ({
               length: previewSnapInterval,
               offset: previewSnapInterval * index,
@@ -226,9 +226,9 @@ export function StoreImagePreviewSheet({
             })}
             onMomentumScrollEnd={(event: { nativeEvent: { contentOffset: { y: number } } }) => {
               const index = Math.round(event.nativeEvent.contentOffset.y / previewSnapInterval);
-              if (index >= 0 && index < previewItems.length) {
+              if (index >= 0 && index < viewerItems.length) {
                 setPreviewActiveIndex(index);
-                setPreviewItem(previewItems[index]);
+                setPreviewItem(viewerItems[index]);
               }
             }}
           />

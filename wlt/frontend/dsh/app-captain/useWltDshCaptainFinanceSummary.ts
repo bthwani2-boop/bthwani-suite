@@ -2,12 +2,12 @@ import React from 'react';
 import {
   type WltCaptainFinanceSection,
   type WltCaptainFinanceSnapshot,
-  type WltDshFinancePreviewRecord,
+  type WltDshFinanceSummaryRecord,
 } from '../control-panel/financeContracts';
 import { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
 import * as WltCaptainAdapter from './wlt-dsh-captain.adapter';
 
-export function useWltDshCaptainFinancePreview(
+export function useWltDshCaptainFinanceSummary(
   initialSection: WltCaptainFinanceSection = 'eligibility',
   captainId?: string | null,
   dshAuthBearerToken?: string | null
@@ -27,7 +27,7 @@ export function useWltDshCaptainFinancePreview(
     hasEligibilityBlock: false, eligibilityBlockReason: '',
     contractState: 'CONTRACT_TBD', isPreview: false,
   });
-  const [allRecords, setAllRecords] = React.useState<readonly WltDshFinancePreviewRecord[]>([]);
+  const [allRecords, setAllRecords] = React.useState<readonly WltDshFinanceSummaryRecord[]>([]);
   const [lastError, setLastError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -104,4 +104,4 @@ export function useWltDshCaptainFinancePreview(
   } as const;
 }
 
-export default useWltDshCaptainFinancePreview;
+export default useWltDshCaptainFinanceSummary;

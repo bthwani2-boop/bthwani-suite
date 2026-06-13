@@ -1,8 +1,7 @@
 /**
  * WLT DSH Finance — pure type definitions + formatWltYer.
- * No preview data. No functions that touch PREVIEW_SEEDS.
+ * Runtime read-model types. No hardcoded entity objects. No offline static sources.
  * Imported by WLT selectors and models that need event kinds and record shapes.
- * PREVIEW_ONLY — not runtime, not accounting truth.
  */
 
 export type WltDshFinanceActor = 'client' | 'partner' | 'captain' | 'field' | 'control-panel';
@@ -49,7 +48,7 @@ export const WLT_DSH_FINANCE_OWNERSHIP = {
   deliveryContext: 'dsh',
 } as const satisfies WltDshFinanceOwnership;
 
-export interface WltDshFinancePreviewRecord {
+export interface WltDshFinanceSummaryRecord {
   id: string;
   actor: WltDshFinanceActor;
   kind: WltDshFinanceEventKind;
@@ -71,7 +70,7 @@ export interface WltDshFinancePreviewRecord {
   isPreview: boolean;
 }
 
-export type WltDshFinancePreviewMetadata = {
+export type WltDshFinanceReadModelMetadata = {
   readonly dataKind: 'preview';
   readonly runtimeTruth: 'none — runtime_unbound';
   readonly backendSource: 'none — preview_seeds_only';
@@ -84,7 +83,7 @@ export type WltDshFinancePreviewMetadata = {
   readonly isPreview: true;
 };
 
-export function getWltDshFinancePreviewMetadata(): WltDshFinancePreviewMetadata {
+export function getWltDshFinanceReadModelMetadata(): WltDshFinanceReadModelMetadata {
   return {
     dataKind: 'preview',
     runtimeTruth: 'none — runtime_unbound',
@@ -127,7 +126,7 @@ export type WltCaptainFinanceSnapshot = {
 };
 
 export type WltPartnerFinanceSnapshot = {
-  settlementRecords: WltDshFinancePreviewRecord[];
+  settlementRecords: WltDshFinanceSummaryRecord[];
   grossSalesMinorUnits: number;
   grossSalesLabel: string;
   platformCommissionMinorUnits: number;
@@ -155,11 +154,11 @@ export type WltPartnerFinanceSnapshot = {
 };
 
 export type WltFieldFinanceSnapshot = {
-  records: WltDshFinancePreviewRecord[];
-  commissionRecords: WltDshFinancePreviewRecord[];
-  pendingRecords: WltDshFinancePreviewRecord[];
-  rejectedRecords: WltDshFinancePreviewRecord[];
-  payoutRecords: WltDshFinancePreviewRecord[];
+  records: WltDshFinanceSummaryRecord[];
+  commissionRecords: WltDshFinanceSummaryRecord[];
+  pendingRecords: WltDshFinanceSummaryRecord[];
+  rejectedRecords: WltDshFinanceSummaryRecord[];
+  payoutRecords: WltDshFinanceSummaryRecord[];
   totalCommissionMinorUnits: number;
   totalCommissionLabel: string;
   pendingCommissionsMinorUnits: number;
@@ -179,7 +178,7 @@ export type WltFieldFinanceSnapshot = {
 
 export type WltDshPaymentMethod = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
 
-export type WltDshPaymentOptionPreview = {
+export type WltDshPaymentOption = {
   id: WltDshPaymentMethod;
   titleLabel: string;
   descriptionLabel: string;
@@ -189,7 +188,7 @@ export type WltDshPaymentOptionPreview = {
   isPreview: true;
 };
 
-export type WltDshPaymentPreviewState = {
+export type WltDshPaymentState = {
   method: WltDshPaymentMethod;
   orderTotalMinorUnits: number;
   walletBalanceMinorUnits: number;
@@ -225,7 +224,7 @@ export type WltDshOrderCommissionBreakdown = {
   isPreview: true;
 };
 
-export type WltDshPartnerModeRatePreview = {
+export type WltDshPartnerModeRate = {
   partnerId: string;
   storeLabel: string;
   rates: Readonly<Record<WltDshFulfillmentMode, string>>;

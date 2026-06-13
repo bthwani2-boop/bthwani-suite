@@ -3,14 +3,14 @@
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
-import { useDemoPlatformState } from '../useDemoPlatformState';
+import { usePlatformAuditState } from '../usePlatformAuditState';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AppearanceCustomization = Record<string, any>;
 const PREVIEW_APPEARANCE_ITEMS: AppearanceCustomization[] = [];
 import styles from '../../shared/control-panel-surface.module.css';
 
 export function DshPlatformAppearanceWorkspace() {
-  const { addAuditEvent } = useDemoPlatformState();
+  const { addAuditEvent } = usePlatformAuditState();
   const [selectedId, setSelectedId] = React.useState<string>('client-header');
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
 

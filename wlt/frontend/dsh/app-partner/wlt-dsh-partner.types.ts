@@ -1,5 +1,5 @@
 import type {
-  WltDshFinancePreviewRecord,
+  WltDshFinanceSummaryRecord,
   WltPartnerFinanceSnapshot,
 } from '../control-panel/financeContracts';
 
@@ -11,7 +11,7 @@ export type WltDshPartnerWalletPreview = {
 
 export type WltDshPartnerFinancePreviewState = {
   snapshot: WltPartnerFinanceSnapshot;
-  settlementRecords: readonly WltDshFinancePreviewRecord[];
+  settlementRecords: readonly WltDshFinanceSummaryRecord[];
 };
 
 export type WltDshPartnerBridgeState = {

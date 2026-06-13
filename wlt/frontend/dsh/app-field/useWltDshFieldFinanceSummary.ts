@@ -2,7 +2,7 @@ import React from 'react';
 import { wltDshFieldBridgeDataContract } from './wlt-dsh-field.contract';
 import * as WltFieldAdapter from './wlt-dsh-field.adapter';
 import {
-  type WltDshFinancePreviewRecord,
+  type WltDshFinanceSummaryRecord,
   type WltFieldFinanceSnapshot,
 } from '../control-panel/financeContracts';
 
@@ -10,7 +10,7 @@ function createStoreIdsKey(storeIds?: readonly string[]) {
   return storeIds?.join('|') ?? '';
 }
 
-export function useWltDshFieldFinancePreview(storeIds?: readonly string[]) {
+export function useWltDshFieldFinanceSummary(storeIds?: readonly string[]) {
   const storeIdsKey = createStoreIdsKey(storeIds);
   const [snapshot, setSnapshot] = React.useState<WltFieldFinanceSnapshot>({
     records: [], commissionRecords: [], pendingRecords: [], rejectedRecords: [], payoutRecords: [],
@@ -41,7 +41,7 @@ export function useWltDshFieldFinancePreview(storeIds?: readonly string[]) {
     };
   }, [storeIdsKey, storeIds]);
 
-  const records = React.useMemo<readonly WltDshFinancePreviewRecord[]>(() => snapshot.records, [snapshot]);
+  const records = React.useMemo<readonly WltDshFinanceSummaryRecord[]>(() => snapshot.records, [snapshot]);
   const commissionRecords = React.useMemo(() => snapshot.commissionRecords, [snapshot]);
   const pendingRecords = React.useMemo(() => snapshot.pendingRecords, [snapshot]);
   const rejectedRecords = React.useMemo(() => snapshot.rejectedRecords, [snapshot]);
@@ -59,4 +59,4 @@ export function useWltDshFieldFinancePreview(storeIds?: readonly string[]) {
   } as const;
 }
 
-export default useWltDshFieldFinancePreview;
+export default useWltDshFieldFinanceSummary;

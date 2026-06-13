@@ -49,17 +49,17 @@ export function useHomeFilterRail({
     return rawCategoryItems.filter((cat) => cat.id !== 'awnak');
   }, [rawCategoryItems, isAwnakEnabled]);
 
-  const selectedCategoryFixture = React.useMemo(
+  const selectedCategory = React.useMemo(
     () =>
       activeCategoryId && activeCategoryId !== 'all'
         ? categoryItems.find((category) => category.id === activeCategoryId) ?? null
         : null,
     [activeCategoryId, categoryItems],
   );
-  const selectedCategoryLabel = selectedCategoryFixture?.label ?? 'الفئات';
+  const selectedCategoryLabel = selectedCategory?.label ?? 'الفئات';
   const selectedSubcategories = React.useMemo(
-    () => selectedCategoryFixture?.subcategories ?? [],
-    [selectedCategoryFixture],
+    () => selectedCategory?.subcategories ?? [],
+    [selectedCategory],
   );
   const allCategoryRailItems = React.useMemo(
     () =>
@@ -86,17 +86,17 @@ export function useHomeFilterRail({
     [categoryItems],
   );
   const activeCategoryDialItem = React.useMemo(() => {
-    if (!selectedCategoryFixture) return null;
+    if (!selectedCategory) return null;
     return {
-      id: selectedCategoryFixture.id,
-      key: selectedCategoryFixture.id,
+      id: selectedCategory.id,
+      key: selectedCategory.id,
       title: selectedCategoryLabel,
-      subtitle: selectedCategoryFixture.subtitle,
-      mediaKey: selectedCategoryFixture.mediaKey,
-      iconUrl: getDshCategoryIconUrl(selectedCategoryFixture.id),
-      emojiFallback: selectedCategoryFixture.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂',
+      subtitle: selectedCategory.subtitle,
+      mediaKey: selectedCategory.mediaKey,
+      iconUrl: getDshCategoryIconUrl(selectedCategory.id),
+      emojiFallback: selectedCategory.emojiFallback ?? categoryIconMap[selectedCategory.id] ?? '📂',
     };
-  }, [selectedCategoryFixture, selectedCategoryLabel]);
+  }, [selectedCategory, selectedCategoryLabel]);
   const selectedSubcategoryCards = React.useMemo(
     () =>
       selectedSubcategories.map((subcategory) => ({
@@ -200,7 +200,7 @@ export function useHomeFilterRail({
 
   return {
     allCategoryRailItems,
-    selectedCategoryFixture,
+    selectedCategory,
     selectedCategoryLabel,
     categoriesDialItems,
     activeCategoryDialItem,

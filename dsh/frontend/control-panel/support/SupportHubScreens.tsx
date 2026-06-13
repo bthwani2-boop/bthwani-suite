@@ -39,13 +39,13 @@ import {
 
 type DshOperationsSupportFlowId = string;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DshControlPanelSupportRowSeed = Record<string, any>;
-function getOperationsSupportFlowPreview(_id: string) {
+type DshControlPanelSupportRow = Record<string, any>;
+function getOperationsSupportFlowSpec(_id: string) {
   return { title: '—', forbiddenActions: [] as string[], severity: 'warning' as const, ownerLabel: '—', description: '—', nextAction: '—' };
 }
-const DSH_CALL_INTAKE_PREVIEW: unknown[] = [];
-const DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS: DshControlPanelSupportRowSeed[] = [];
-const DSH_CUSTOMER_360_PREVIEW: unknown[] = [];
+const DSH_CALL_INTAKE_STUBS: unknown[] = [];
+const DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS: DshControlPanelSupportRow[] = [];
+const DSH_CUSTOMER_360_STUBS: unknown[] = [];
 
 type SupportFulfillmentMode = DshFulfillmentDeliveryMode;
 
@@ -161,8 +161,8 @@ function buildSupportHref(tab: SupportTab, context?: SupportRouteContext) {
   return `/support?${searchParams.toString()}`;
 }
 
-function buildSupportRow(rowData: DshControlPanelSupportRowSeed): SupportRow {
-  const flowEntry = getOperationsSupportFlowPreview(rowData.flowId);
+function buildSupportRow(rowData: DshControlPanelSupportRow): SupportRow {
+  const flowEntry = getOperationsSupportFlowSpec(rowData.flowId);
   const registryFlowId = SUPPORT_REGISTRY_FLOW_MAP[rowData.flowId];
   const flowSummary = registryFlowId ? getDshFlowPolicySummary(registryFlowId) : undefined;
   const governanceEntry = registryFlowId ? findDshControlPanelGovernanceSectionByFlowId(registryFlowId) : SUPPORT_GOVERNANCE;
@@ -249,13 +249,13 @@ export function ControlPanelDshSupportHubScreen() {
 
   const rows = filterRows(activeTab, activeSubTab);
   const selectedRow = rows.find((row) => row.id === selectedId) ?? rows[0] ?? SUPPORT_ROWS[0];
-  const selectedFlowPreview = selectedRow ? getOperationsSupportFlowPreview(selectedRow.flowId) : null;
+  const selectedFlowSpec = selectedRow ? getOperationsSupportFlowSpec(selectedRow.flowId) : null;
   const selectedRegistrySummary = selectedRow?.registryFlowId ? getDshFlowPolicySummary(selectedRow.registryFlowId) : undefined;
   const selectedFinanceReference = selectedRegistrySummary?.financialImpact ? FINANCE_GOVERNANCE?.financeReference ?? 'wlt-finance' : undefined;
   const primaryMetricValue = activeTab === 'customer-360'
-    ? DSH_CUSTOMER_360_PREVIEW.length
+    ? DSH_CUSTOMER_360_STUBS.length
     : activeTab === 'call-intake'
-      ? DSH_CALL_INTAKE_PREVIEW.length
+      ? DSH_CALL_INTAKE_STUBS.length
       : rows.length;
 
   return (
@@ -492,7 +492,7 @@ export function ControlPanelDshSupportHubScreen() {
                     <Text role="caption" tone="muted">السطح: {selectedRow?.surface}</Text>
                     <Text role="caption" tone="muted">المالك: {selectedRow?.owner}</Text>
                     <Text role="caption" tone="muted">قسم الحوكمة: {selectedRow?.governanceSectionLabel ?? 'الدعم'}</Text>
-                    <Text role="caption" tone="muted">مالك التصعيد: {selectedFlowPreview?.escalationOwnerLabel ?? '—'}</Text>
+                    <Text role="caption" tone="muted">مالك التصعيد: {selectedFlowSpec?.escalationOwnerLabel ?? '—'}</Text>
                     <Text role="caption" tone="muted">سياسة العرض: {selectedRow?.policyLabel ?? '—'}</Text>
                     <Text role="caption" tone="muted">وضع التنفيذ: {selectedRow?.fulfillmentLabel}</Text>
                     <Text role="caption" tone="muted">المسؤول الحالي: {selectedRow?.responsibleActor}</Text>
@@ -500,8 +500,8 @@ export function ControlPanelDshSupportHubScreen() {
                     <Text role="caption" tone="muted">الدليل: {selectedRow?.evidence}</Text>
                     <Text role="caption" tone="muted">الإجراء التالي: {selectedRow?.nextAction}</Text>
                     <Text role="caption" tone="muted">الممنوع: {selectedRow?.forbiddenPreview ?? 'غير محدد'}</Text>
-                    {selectedFlowPreview?.financialImpactPreview ? (
-                      <Text role="caption" tone="muted">WLT Preview: {selectedFlowPreview.financialImpactPreview}</Text>
+                    {selectedFlowSpec?.financialImpactRef ? (
+                      <Text role="caption" tone="muted">WLT Preview: {selectedFlowSpec.financialImpactRef}</Text>
                     ) : null}
                     {selectedFinanceReference ? (
                       <Text role="caption" tone="muted">مرجع ledger: {selectedFinanceReference}</Text>
@@ -511,7 +511,7 @@ export function ControlPanelDshSupportHubScreen() {
                     title="توصية الدعم"
                     reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما السياسة؟ ${selectedRow.policyLabel} · ما الدليل؟ ${selectedRow.evidence} · ما القرار التالي؟ ${selectedRegistrySummary?.nextPolicyActionPreview ?? selectedRow.nextAction}` : 'اختر صفًا.'}
                     confidence="high"
-                    auditTag={selectedRow?.registryFlowId ?? selectedFlowPreview?.flowId ?? selectedRow?.owner ?? 'support'}
+                    auditTag={selectedRow?.registryFlowId ?? selectedFlowSpec?.flowId ?? selectedRow?.owner ?? 'support'}
                     primaryAction={
                       selectedRow
                         ? {

@@ -32,6 +32,10 @@ func TestApplyMigrations(t *testing.T) {
 		t.Skipf("wlt postgres not available: %v", err)
 	}
 
+	if _, err := db.ExecContext(context.Background(), `SET search_path = public`); err != nil {
+		t.Fatalf("failed to set search_path: %v", err)
+	}
+
 	// Clean all WLT tables for idempotent re-run.
 	_, _ = db.ExecContext(context.Background(),
 		`DROP TABLE IF EXISTS wlt_ledger, wlt_refunds, wlt_settlements,

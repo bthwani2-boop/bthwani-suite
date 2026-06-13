@@ -97,7 +97,7 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
   closeInlineSearch,
   openServiceDial,
 }: HomeScreenShellProps) {
-  const fallbackCategoriesDialLayout = React.useMemo(() => ({
+  const defaultCategoriesDialLayout = React.useMemo(() => ({
     x: isRtl ? Math.max(spacing[3], viewportWidth - spacing[3] - 54) : spacing[3],
     y: spacing[14],
     width: 54,
@@ -106,7 +106,7 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
 
   const openCategoriesDial = React.useCallback(() => {
     const openSheet = (layout?: { x: number; y: number; width: number; height: number }) => {
-      homeState.setCategoriesDialLayout(layout ?? fallbackCategoriesDialLayout);
+      homeState.setCategoriesDialLayout(layout ?? defaultCategoriesDialLayout);
       homeState.setCategoriesSheetVisible(true);
     };
     if (!categoriesAnchorRef.current?.measureInWindow) {
@@ -115,9 +115,9 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
     }
     categoriesAnchorRef.current.measureInWindow((x: number, y: number, width: number, height: number) => {
       const hasValidLayout = [x, y, width, height].every((value) => Number.isFinite(value)) && width > 0 && height > 0;
-      openSheet(hasValidLayout ? { x, y, width, height } : fallbackCategoriesDialLayout);
+      openSheet(hasValidLayout ? { x, y, width, height } : defaultCategoriesDialLayout);
     });
-  }, [fallbackCategoriesDialLayout, homeState, categoriesAnchorRef]);
+  }, [defaultCategoriesDialLayout, homeState, categoriesAnchorRef]);
 
   const listData = React.useMemo(
     () => derivedStores.activeHomeStoreCards.length ? derivedStores.activeHomeStoreCards : (['empty'] as const),

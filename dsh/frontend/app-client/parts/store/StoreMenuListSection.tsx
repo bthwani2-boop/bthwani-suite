@@ -7,7 +7,7 @@ import {
   colorPalette,
   type BThwaniFilterRailItem,
 } from '@bthwani/ui-kit';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
 import type { DshStoreSearchCategory } from '../../shared/store-search-helpers';
 import type { DshFulfillmentDeliveryMode } from '../../contracts/dsh-client-binding.contracts';
 import { MenuItemCard } from './StoreMenuItemCard';
@@ -101,7 +101,7 @@ type StoreMenuListSectionProps = {
   storeLogoImageSource: import('react-native').ImageSourcePropType | string | null | undefined;
   favoriteIds: ReadonlySet<string>;
   openMeasurementPicker: (item: DshStoreGetMenuItem, anchor?: { x: number; y: number }) => void;
-  openImagePreview: (item: DshStoreGetMenuItem) => void;
+  openImageViewer: (item: DshStoreGetMenuItem) => void;
   handleToggleFavorite: (itemId: string) => void;
   isDarkGlass: boolean;
   stickyThreshold: number;
@@ -124,7 +124,7 @@ export const StoreMenuListSection = React.memo(function StoreMenuListSection({
   storeLogoImageSource,
   favoriteIds,
   openMeasurementPicker,
-  openImagePreview,
+  openImageViewer,
   handleToggleFavorite,
   isDarkGlass,
   stickyThreshold,
@@ -180,10 +180,10 @@ export const StoreMenuListSection = React.memo(function StoreMenuListSection({
       partnerImageSource={storeLogoImageSource}
       isFavorited={favoriteIds.has(item.id)}
       onOpenMeasurementPicker={openMeasurementPicker}
-      onOpenImagePreview={openImagePreview}
+      onOpenImagePreview={openImageViewer}
       onToggleFavorite={handleToggleFavorite}
     />
-  ), [favoriteIds, handleToggleFavorite, openImagePreview, openMeasurementPicker, scrollY, storeLogoImageSource]);
+  ), [favoriteIds, handleToggleFavorite, openImageViewer, openMeasurementPicker, scrollY, storeLogoImageSource]);
 
   const listEmptyComponent = React.useMemo(() => (
     <View style={styles.emptyFeed}>

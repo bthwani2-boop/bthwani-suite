@@ -10,7 +10,7 @@ import {
   radius,
 } from '@bthwani/ui-kit';
 
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
 import type { DshFulfillmentDeliveryMode } from '../../contracts/dsh-client-binding.contracts';
 import type { useStoreShellDerivedState } from '../../hooks/useStoreShellDerivedState';
 import type { useStoreAppearanceChrome } from './store-appearance-chrome';

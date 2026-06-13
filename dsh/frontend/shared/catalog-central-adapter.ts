@@ -131,7 +131,7 @@ export function buildCentralPartnerInventoryItems(
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type PartnerInventoryDetail = Record<string, any>;
 export const CENTRAL_PRODUCT_DETAIL_LOOKUP: Record<string, PartnerInventoryDetail> = {};
-const dshCategoryFixtures: { id: string; subcategories: { id: string }[] }[] = [];
+const dshCategoryData: { id: string; subcategories: { id: string }[] }[] = [];
 
 /**
  * Maps the category ID to a path containing main category and optional subcategory.
@@ -139,7 +139,7 @@ const dshCategoryFixtures: { id: string; subcategories: { id: string }[] }[] = [
  */
 export function getProductCategoryPath(categoryId: string): { main: string; sub?: string } {
   // Try to match the item categoryId to subcategories
-  for (const cat of dshCategoryFixtures) {
+  for (const cat of dshCategoryData) {
     if (cat.id === categoryId) {
       return { main: cat.id };
     }

@@ -33,11 +33,11 @@ import { DshCartDetails } from '../parts/CartDetails';
 import { formatDshPrice, formatDshPriceMinorUnits } from '../../shared/dsh-price-format';
 import { getDshClientStateMeta, type DshClientState } from '../../shared/client-state';
 // getPartnerOfferItems removed — offers come from API, not fixtures.
-import { isClientVisibleStatus, type CommercialLifecycleStatus } from '../../shared/commercial.preview-contract';
+import { isClientVisibleStatus, type CommercialLifecycleStatus } from '../../shared/commercial-contract';
 // getEntitlements removed — subscriptions/entitlements come from API, not fixtures.
 import {
   resolveWltDshFinanceEventKindForPaymentMethod,
-  useWltDshWalletPreview,
+  useWltDshWalletSession,
   type WltDshFinanceEventKind,
 } from '../../../../wlt/frontend/dsh/app-client';
 import { resolveDshRuntimeImageSource } from '../shared/resolve-runtime-image-source';
@@ -87,7 +87,7 @@ type QuickActionMeta = {
 };
 
 // Cart fixtures removed — recommended products and fallback items come from API, not fixtures.
-import type { RecommendationProduct, CartItem } from '../../shared/dsh-order-preview.contract';
+import type { RecommendationProduct, CartItem } from '../../shared/dsh-order.contract';
 
 type PaymentMethodKey = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
 
@@ -1064,7 +1064,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     requestPayment: requestWalletPayment,
     link: linkWallet,
     topUp: topUpWallet,
-  } = useWltDshWalletPreview(props.clientId, props.bearerToken);
+  } = useWltDshWalletSession(props.clientId, props.bearerToken);
 
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
   const { direction } = useDirection();
@@ -1160,7 +1160,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     () => (previewProduct ? findCartItemForProduct(items, previewProduct) : undefined),
     [items, previewProduct],
   );
-  const previewCartQty = activePreviewCartItem?.qty ?? 0;
+  const activeCartQty = activePreviewCartItem?.qty ?? 0;
 
   useEffect(() => {
     const nextMode = props.fulfillmentMode ?? 'bthwani_delivery';
@@ -2381,7 +2381,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
       <ProductPreviewModal
         visible={Boolean(previewProduct)}
         product={previewProduct}
-        cartQty={previewCartQty}
+        cartQty={activeCartQty}
         feedback={previewFeedback}
         bottomInset={androidSystemBottomInset}
         onClose={closeProductPreview}

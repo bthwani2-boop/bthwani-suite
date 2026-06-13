@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 // Authority: control-panel/marketing — banner live preview component.
 // Extracted from BannersCommandDeckScreen (inner component) as part of Giant Screen split.
@@ -9,22 +9,22 @@ import { Image, StyleSheet, View, type ImageStyle, type ViewStyle } from 'react-
 import { Box, Text, shadowPresets, useTheme,
   radius,
 } from '@bthwani/ui-kit';
-import { resolvePreviewColor } from '../../shared/dsh-preview-color';
+import { resolveColorToken } from '../../shared/dsh-color-resolver';
 import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
 import { BANNER_MOTION_OPTIONS } from './banner-types';
 import type { BannerDraft, BannerTemplate } from './banner-types';
 
-export type BannerPreviewProps = {
+export type BannerViewerProps = {
   draft: BannerDraft;
   templates: ReadonlyArray<Pick<BannerTemplate, 'id' | 'label'>>;
 };
 
-export function BannerPreview({ draft, templates }: BannerPreviewProps) {
+export function BannerViewer({ draft, templates }: BannerViewerProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-  const resolvedAccentColor = resolvePreviewColor(draft.accentColor || theme.brandHeaderBackground);
-  const resolvedBadgeColor = resolvePreviewColor(draft.offerBadgeColor || theme.brand);
+  const resolvedAccentColor = resolveColorToken(draft.accentColor || theme.brandHeaderBackground);
+  const resolvedBadgeColor = resolveColorToken(draft.offerBadgeColor || theme.brand);
   const previewMotionLabel = BANNER_MOTION_OPTIONS.find((o) => o.value === draft.motionStyle)?.label ?? 'انسياب';
 
   return (

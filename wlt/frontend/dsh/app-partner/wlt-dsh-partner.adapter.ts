@@ -1,7 +1,7 @@
 import type React from 'react';
 import type { Icon } from '@bthwani/ui-kit';
 import type {
-  WltDshFinancePreviewRecord,
+  WltDshFinanceSummaryRecord,
   WltDshFinanceEventKind,
   WltDshFinanceStatusTone,
   WltDshFinanceTone,
@@ -63,7 +63,7 @@ function mapStatusTone(tone: WltDshFinanceStatusTone): WltDshPartnerTransactionT
   return 'info';
 }
 
-function resolveTransactionIcon(record: WltDshFinancePreviewRecord): React.ComponentProps<typeof Icon>['name'] {
+function resolveTransactionIcon(record: WltDshFinanceSummaryRecord): React.ComponentProps<typeof Icon>['name'] {
   if (record.kind === 'partner-settlement') {
     return 'wallet-outline';
   }
@@ -161,7 +161,7 @@ function sanitizeLabel(text: string | undefined): string {
 }
 
 export function mapWltDshPartnerPreviewTransactions(
-  records: readonly WltDshFinancePreviewRecord[],
+  records: readonly WltDshFinanceSummaryRecord[],
 ): readonly WltDshPartnerWalletTransaction[] {
   return records.map((record) => ({
     id: record.id,

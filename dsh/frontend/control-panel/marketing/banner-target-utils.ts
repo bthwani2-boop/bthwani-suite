@@ -2,7 +2,7 @@
 // Extracted from BannersCommandDeckScreen as part of Giant Screen split.
 // No React dependency — all functions are pure or data-driven only.
 
-const dshCategoryFixtures: { id: string; label: string; subcategories: { id: string; label: string }[] }[] = [];
+const dshCategoryData: { id: string; label: string; subcategories: { id: string; label: string }[] }[] = [];
 const dshDiscoveryStores: { id: string; name: string }[] = [];
 const storeItemsByStoreId: Record<string, { id: string; name: string }[]> = {};
 import type { MarketingBannerRecord } from '../../shared/dsh-marketing-types';
@@ -14,7 +14,7 @@ export function normalizeSearchText(value: string): string {
 }
 
 export function getCategoryOptionLabel(categoryId: string): string {
-  return dshCategoryFixtures.find((c) => c.id === categoryId)?.label ?? categoryId;
+  return dshCategoryData.find((c) => c.id === categoryId)?.label ?? categoryId;
 }
 
 export function getStoreOptionLabel(storeId: string): string {
@@ -68,7 +68,7 @@ export function resolveSmartTargetSummary(
     };
   }
   if (targetType === 'category') {
-    const category = dshCategoryFixtures.find((entry) => entry.id === draft.actionTarget);
+    const category = dshCategoryData.find((entry) => entry.id === draft.actionTarget);
     return {
       label: 'فئة',
       finalRoute: `categories/${draft.actionTarget || '—'}`,
@@ -77,7 +77,7 @@ export function resolveSmartTargetSummary(
     };
   }
   if (targetType === 'subcategory') {
-    const category = dshCategoryFixtures.find((entry) => entry.id === draft.actionTarget);
+    const category = dshCategoryData.find((entry) => entry.id === draft.actionTarget);
     const subcategory = category?.subcategories.find((entry) => entry.id === draft.actionExtra);
     return {
       label: 'فئة فرعية',

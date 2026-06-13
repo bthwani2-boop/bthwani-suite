@@ -14,7 +14,7 @@ import { DshPlatformProvidersWorkspace } from './Providers';
 import { DshPlatformRolloutsWorkspace } from './Rollouts';
 import { DshPlatformHealthWorkspace } from './Health';
 import { DshPlatformAuditWorkspace } from './Audit';
-import { DemoPlatformProvider } from './useDemoPlatformState';
+import { PlatformAuditProvider } from './usePlatformAuditState';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
 
@@ -253,7 +253,7 @@ export function ControlPanelDshPlatformScreen() {
   const subTabsForActiveWorkspace = SUB_TABS[activeWorkspace] || [];
 
   return (
-    <DemoPlatformProvider>
+    <PlatformAuditProvider>
       <div className={styles.surfaceCockpit}>
         {/* Top bar */}
         <header className={styles.surfaceTopBar}>
@@ -343,7 +343,7 @@ export function ControlPanelDshPlatformScreen() {
           </div>
         </main>
       </div>
-    </DemoPlatformProvider>
+    </PlatformAuditProvider>
   );
 }
 

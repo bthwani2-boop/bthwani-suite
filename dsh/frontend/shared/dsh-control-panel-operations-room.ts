@@ -1,5 +1,5 @@
-import type { CanonicalOperationsGroupId } from '../control-panel/operations/operations.types';
 import type {
+  CanonicalOperationsGroupId,
   DshControlPanelOperationalWorkspace,
   DshControlPanelSideEffectClassification,
   DshOperationalEntityId,

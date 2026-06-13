@@ -9,7 +9,7 @@ import {
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
-import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order-preview.contract';
+import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order.contract';
 import {
   resolveDshOrderApiBaseUrl,
   createDshOrderLifecycleHttpClient,

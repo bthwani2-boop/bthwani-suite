@@ -13,11 +13,11 @@ export type PartnerModificationRequest = {
 export type PartnerDispute = {
   id: string; partnerId: string; status: string; type: string; date: string; sla: string;
 };
-type DshPartnerFulfillmentAgreementSeed = { partnerId: string; storeName: string };
+type DshPartnerFulfillmentAgreementEntry = { partnerId: string; storeName: string };
 const PARTNER_COMPLAINTS_DATA: PartnerComplaint[] = [];
 const PARTNER_MODIFICATION_REQUESTS: PartnerModificationRequest[] = [];
 const PARTNER_DISPUTES_DATA: PartnerDispute[] = [];
-const PARTNER_FULFILLMENT_AGREEMENTS_SEED: DshPartnerFulfillmentAgreementSeed[] = [];
+const PARTNER_FULFILLMENT_AGREEMENTS_BASE: DshPartnerFulfillmentAgreementEntry[] = [];
 
 
 export type DshPartnerIntakeSource = 'app-field' | 'app-partner';
@@ -949,7 +949,7 @@ let _globalPartnerComplaints = [...PARTNER_COMPLAINTS_DATA];
 let _globalPartnerModifications = [...PARTNER_MODIFICATION_REQUESTS];
 let _globalPartnerDisputes = [...PARTNER_DISPUTES_DATA];
 let _globalPromotionCandidates = [...dshPromotionCandidates];
-export let PARTNER_FULFILLMENT_AGREEMENTS = [...PARTNER_FULFILLMENT_AGREEMENTS_SEED];
+export let PARTNER_FULFILLMENT_AGREEMENTS = [...PARTNER_FULFILLMENT_AGREEMENTS_BASE];
 
 export function getPartnerComplaints(): PartnerComplaint[] {
   return _globalPartnerComplaints;

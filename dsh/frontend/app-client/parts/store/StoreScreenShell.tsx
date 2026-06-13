@@ -18,14 +18,14 @@ import {
 import { useStoreGestureHandlers } from '../../hooks/useStoreGestureHandlers';
 import { useStoreInlineSearch } from '../../hooks/useStoreInlineSearch';
 import { useStoreMeasurementState } from '../../hooks/useStoreMeasurementState';
-import { useStorePreviewState } from '../../hooks/useStorePreviewState';
+import { useStoreImageViewerState } from '../../hooks/useStoreImageViewerState';
 import { useStoreShellDerivedState } from '../../hooks/useStoreShellDerivedState';
 import { StoreMeasurementSheet } from '../../sheets/StoreMeasurementSheet';
 import type { DshStoreGetScreenShellProps } from '../../contracts/dsh-store-screen-props';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
 import { resolveMeasurementOptions } from '../../shared/store-formatting';
 import { StoreHeroSection } from './StoreHeroSection';
-import { StoreImagePreviewSheet } from './StoreImagePreviewSheet';
+import { StoreImageViewerSheet } from './StoreImageViewerSheet';
 import { StoreMenuListSection } from './StoreMenuListSection';
 import {
   StoreMissingState,
@@ -51,7 +51,7 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
   storeState,
   derivedItems,
   visibleItems,
-  previewItems,
+  viewerItems,
 }: DshStoreGetScreenShellProps) {
   const { tokens } = useBThwaniAppearance();
   const { mode: themeMode, theme } = useTheme();
@@ -61,12 +61,12 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
   const { width: viewportWidth, height: viewportHeight } = Dimensions.get('window');
   const { selectedMode, setSelectedMode, selectedCategory, setSelectedCategory, pickerItem, setPickerItem, pickerAnchor, setPickerAnchor } = storeState;
   const { selectedMeasureOption, setSelectedMeasureOption, selectedMeasureQty, setSelectedMeasureQty, headerSearchVisible, setHeaderSearchVisible, headerSearchQuery, setHeaderSearchQuery } = storeState;
-  const { addedItemLabel, setAddedItemLabel, previewItem, setPreviewItem, favoriteIds, setFavoriteIds, isAddedToCart, setIsAddedToCart } = storeState;
-  const { stickyThreshold, setStickyThreshold, previewActiveIndex, setPreviewActiveIndex } = storeState;
+  const { addedItemLabel, setAddedItemLabel, viewerItem, setPreviewItem, favoriteIds, setFavoriteIds, isAddedToCart, setIsAddedToCart } = storeState;
+  const { stickyThreshold, setStickyThreshold, viewerActiveIndex, setPreviewActiveIndex } = storeState;
   const { clientVisibleItems, categories, deliveryModes } = derivedItems;
   const appearanceChrome = useStoreAppearanceChrome({ isDarkGlass, tokens });
 
-  const { previewAnim, openImagePreview, closeImagePreview } = useStorePreviewState({ setPreviewItem, setPreviewActiveIndex, previewItems });
+  const { viewerAnim, openImageViewer, closeImageViewer } = useStoreImageViewerState({ setPreviewItem, setPreviewActiveIndex, viewerItems });
 
   // Derived store display values, operational/visibility state, and share/preview/toggle handlers owned by hook
   const {
@@ -83,7 +83,7 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
     handleStoreShare,
     openStoreItemPreview,
     handleToggleFavorite,
-  } = useStoreShellDerivedState(store, openImagePreview, setFavoriteIds);
+  } = useStoreShellDerivedState(store, openImageViewer, setFavoriteIds);
 
   React.useEffect(() => {
     if (deliveryModes.length && !deliveryModes.some((mode) => mode.id === selectedMode)) {
@@ -98,8 +98,8 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
 
   const listRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
   const scrollY = React.useRef(new Animated.Value(0)).current;
-  const previewListRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
-  const previewScrollY = React.useRef(new Animated.Value(0)).current;
+  const menuListRef = React.useRef<FlatList<DshStoreGetMenuItem> | null>(null);
+  const menuScrollY = React.useRef(new Animated.Value(0)).current;
 
   const { openInlineSearch, closeInlineSearch } = useStoreInlineSearch({ headerSearchVisible, setHeaderSearchVisible, headerSearchQuery, setHeaderSearchQuery });
   const {
@@ -130,13 +130,13 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
     if (Platform.OS !== 'web') Vibration.vibrate(8);
   }, [selectedCategory, setSelectedCategory]);
 
-  const { previewPanResponder } = useStoreGestureHandlers({
-    previewActiveIndex,
-    previewItems,
+  const { panResponder } = useStoreGestureHandlers({
+    viewerActiveIndex,
+    viewerItems,
     isRTL,
     setPreviewActiveIndex,
     setPreviewItem,
-    previewListRef,
+    menuListRef,
   });
 
   const activeMeasurementOptions = React.useMemo(() => (pickerItem ? resolveMeasurementOptions(pickerItem) : []), [pickerItem]);
@@ -232,7 +232,7 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
         storeLogoImageSource={storeLogoImageSource}
         favoriteIds={favoriteIds}
         openMeasurementPicker={openMeasurementPicker}
-        openImagePreview={openImagePreview}
+        openImageViewer={openImageViewer}
         handleToggleFavorite={handleToggleFavorite}
         isDarkGlass={isDarkGlass}
         stickyThreshold={stickyThreshold}
@@ -241,19 +241,19 @@ export const StoreScreenShell = React.memo(function StoreScreenShellComponent({
         styles={styles}
       />
 
-      <StoreImagePreviewSheet
-        previewItem={previewItem}
-        previewItems={previewItems}
-        previewAnim={previewAnim}
-        previewPanResponder={previewPanResponder}
-        previewListRef={previewListRef}
-        previewScrollY={previewScrollY}
+      <StoreImageViewerSheet
+        viewerItem={viewerItem}
+        viewerItems={viewerItems}
+        viewerAnim={viewerAnim}
+        panResponder={panResponder}
+        menuListRef={menuListRef}
+        menuScrollY={menuScrollY}
         viewportHeight={viewportHeight}
         viewportWidth={viewportWidth}
-        previewActiveIndex={previewActiveIndex}
+        viewerActiveIndex={viewerActiveIndex}
         setPreviewActiveIndex={setPreviewActiveIndex}
         setPreviewItem={setPreviewItem}
-        closeImagePreview={closeImagePreview}
+        closeImagePreview={closeImageViewer}
         appearanceChrome={appearanceChrome}
         styles={styles}
         isRTL={isRTL}

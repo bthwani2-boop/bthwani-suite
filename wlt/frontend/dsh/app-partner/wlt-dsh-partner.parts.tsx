@@ -20,7 +20,7 @@ import {
   typographyRoles,
 } from '@bthwani/ui-kit';
 import type { WltDshPartnerWalletTransaction } from './wlt-dsh-partner.adapter';
-import { useWltDshPartnerWalletPreview } from './useWltDshPartnerWalletPreview';
+import { useWltDshPartnerWalletSummary } from './useWltDshPartnerWalletSummary';
 import { getWltDshPartnerCommissionLabel, getWltDshPartnerOperationalModeCommission } from './wlt-dsh-partner.ui-copy';
 import {
   type WltDshFulfillmentMode,
@@ -287,11 +287,11 @@ function FinancialStreamCard({
 
 // ─── تبويب الملخص ─────────────────────────────────────────────────
 function SummaryTab({
-  partnerPreview,
+  partnerSummary,
   storeDeliveryPreview,
   openAction,
 }: {
-  partnerPreview: ReturnType<typeof useWltDshPartnerWalletPreview>['partnerPreview'];
+  partnerSummary: ReturnType<typeof useWltDshPartnerWalletSummary>['partnerSummary'];
   storeDeliveryPreview: StoreDeliveryState;
   openAction: (id: PartnerDshWalletActionId) => void;
 }) {
@@ -321,7 +321,7 @@ function SummaryTab({
               صافي التسوية
             </Text>
             <Text role="titleSm" weight="bold" style={{ color: theme.success, textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
-              {partnerPreview.netSettlementLabel}
+              {partnerSummary.netSettlementLabel}
             </Text>
           </View>
 
@@ -334,7 +334,7 @@ function SummaryTab({
               إجمالي المبيعات
             </Text>
             <Text role="titleSm" weight="bold" style={{ color: theme.info, textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
-              {partnerPreview.grossSalesLabel}
+              {partnerSummary.grossSalesLabel}
             </Text>
           </View>
 
@@ -347,7 +347,7 @@ function SummaryTab({
               التسوية القادمة
             </Text>
             <Text role="titleSm" weight="bold" style={{ color: theme.warning, textAlign: direction === 'rtl' ? 'right' : 'left' }} numberOfLines={1}>
-              {partnerPreview.nextSettlementLabel}
+              {partnerSummary.nextSettlementLabel}
             </Text>
           </View>
         </View>
@@ -395,10 +395,10 @@ function SummaryTab({
 
 // ─── تبويب التسوية ────────────────────────────────────────────────
 function CycleTab({
-  partnerPreview,
+  partnerSummary,
   storeDeliveryPreview,
 }: {
-  partnerPreview: ReturnType<typeof useWltDshPartnerWalletPreview>['partnerPreview'];
+  partnerSummary: ReturnType<typeof useWltDshPartnerWalletSummary>['partnerSummary'];
   storeDeliveryPreview: StoreDeliveryState;
 }) {
   return (
@@ -406,22 +406,22 @@ function CycleTab({
       <KeyValueList
         dense
         items={[
-          { label: 'إجمالي المبيعات', value: partnerPreview.grossSalesLabel, tone: 'info' },
-          { label: 'عمولة المنصة', value: `-${partnerPreview.platformCommissionLabel}`, tone: 'warning' },
-          { label: 'خصومات واستردادات', value: `-${partnerPreview.deductionsLabel}`, tone: 'warning' },
+          { label: 'إجمالي المبيعات', value: partnerSummary.grossSalesLabel, tone: 'info' },
+          { label: 'عمولة المنصة', value: `-${partnerSummary.platformCommissionLabel}`, tone: 'warning' },
+          { label: 'خصومات واستردادات', value: `-${partnerSummary.deductionsLabel}`, tone: 'warning' },
           { label: 'رسوم توصيل المتجر', value: `+${storeDeliveryPreview.totalFeeLabel}`, tone: 'success' },
           { label: 'تعويض موصل المتجر', value: `-${storeDeliveryPreview.totalCompensationLabel}`, tone: 'warning' },
-          { label: 'صافي التسوية', value: partnerPreview.netSettlementLabel, tone: 'success' },
+          { label: 'صافي التسوية', value: partnerSummary.netSettlementLabel, tone: 'success' },
         ]}
       />
       <Divider />
       <KeyValueList
         dense
         items={[
-          { label: 'حالة الدورة الحالية', value: partnerPreview.cycleStatus, tone: 'success' },
-          { label: 'تاريخ بدء الدورة', value: partnerPreview.cycleStartDate },
-          { label: 'تاريخ نهاية الدورة', value: partnerPreview.cycleEndDate },
-          { label: 'موعد الصرف القادم', value: partnerPreview.nextPayoutDate, tone: 'info' },
+          { label: 'حالة الدورة الحالية', value: partnerSummary.cycleStatus, tone: 'success' },
+          { label: 'تاريخ بدء الدورة', value: partnerSummary.cycleStartDate },
+          { label: 'تاريخ نهاية الدورة', value: partnerSummary.cycleEndDate },
+          { label: 'موعد الصرف القادم', value: partnerSummary.nextPayoutDate, tone: 'info' },
         ]}
       />
     </Box>
@@ -694,7 +694,7 @@ export function PartnerDshWalletBridgeView({
   dshClientId,
 }: PartnerDshWalletBridgeProps) {
   const { direction } = useDirection();
-  const { partnerPreview, previewTransactions } = useWltDshPartnerWalletPreview(dshClientId || undefined, dshAuthBearerToken);
+  const { partnerSummary, summaryTransactions } = useWltDshPartnerWalletSummary(dshClientId || undefined, dshAuthBearerToken);
   const [selectedTransactionId, setSelectedTransactionId] = React.useState<string | null>(null);
   const [expandedSection, setExpandedSection] = React.useState<WalletTabId | null>('summary');
 
@@ -704,7 +704,7 @@ export function PartnerDshWalletBridgeView({
   );
   const storeDeliveryPreview = EMPTY_STORE_DELIVERY;
 
-  const sourceTransactions = transactions ?? previewTransactions;
+  const sourceTransactions = transactions ?? summaryTransactions;
   const visibleTransactions = state === 'no-transactions' ? [] : sourceTransactions;
 
   function openAction(actionId: PartnerDshWalletActionId) {
@@ -791,7 +791,7 @@ export function PartnerDshWalletBridgeView({
           subtitle={
             <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
               <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                {`${partnerPreview.netSettlementLabel} • صافي التسوية • ريال يمني`}
+                {`${partnerSummary.netSettlementLabel} • صافي التسوية • ريال يمني`}
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
                 <Badge label="نشط" tone="success" />
@@ -807,7 +807,7 @@ export function PartnerDshWalletBridgeView({
           }
         >
           <SummaryTab
-            partnerPreview={partnerPreview}
+            partnerSummary={partnerSummary}
             storeDeliveryPreview={storeDeliveryPreview}
             openAction={openAction}
           />
@@ -820,10 +820,10 @@ export function PartnerDshWalletBridgeView({
           subtitle={
             <View style={{ alignItems: 'flex-end', gap: spacing[1], marginTop: 2 }}>
               <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                {`${partnerPreview.cycleStartDate} إلى ${partnerPreview.cycleEndDate}`}
+                {`${partnerSummary.cycleStartDate} إلى ${partnerSummary.cycleEndDate}`}
               </Text>
               <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
-                <Badge label={partnerPreview.cycleStatus} tone="success" />
+                <Badge label={partnerSummary.cycleStatus} tone="success" />
                 <Text role="bodySm" tone="muted" style={{ fontSize: typographyRoles.overline.fontSize }}>#التسوية</Text>
               </View>
             </View>
@@ -836,7 +836,7 @@ export function PartnerDshWalletBridgeView({
           }
         >
           <CycleTab
-            partnerPreview={partnerPreview}
+            partnerSummary={partnerSummary}
             storeDeliveryPreview={storeDeliveryPreview}
           />
         </ActionStrip>

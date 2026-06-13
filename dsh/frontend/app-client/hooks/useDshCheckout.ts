@@ -7,20 +7,13 @@ import {
   type DshOrderItemInput,
 } from '../../shared';
 import { resolveDshDiscoveryStoresRuntimeConfig } from '../shared/dsh-discovery-stores-runtime-config';
+import { parseCartItemPrice } from '../shared/store-formatting';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostCartItem, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import { hostClientStates } from '../dsh-client.navigation-bridge';
 import { isCodAllowedForMode } from '../dsh-client-wlt-payment-bridge';
 
-// Dev fallback: parse display label when backend returns no numeric price.
-// Used only when total_amount_minor_units === 0 (memory mode / legacy backend).
-function parsePriceFallback(priceLabel?: string): number {
-  if (!priceLabel) return 10.0;
-  const match = priceLabel.match(/\d+(\.\d+)?/);
-  return match ? parseFloat(match[0]) : 10.0;
-}
-
-export type WalletPreview = {
+export type WalletSessionContext = {
   balance: number | null;
   requestPayment: (amount: number, intentId?: string) => Promise<{ success: boolean; txId?: string; error?: string }>;
   refresh: () => Promise<void>;
@@ -33,7 +26,7 @@ type UseDshCheckoutOptions = {
   activeStore: ActiveStore;
   selectedFulfillmentMode: DshFulfillmentDeliveryMode;
   checkoutAuth: DshCheckoutAuthContext;
-  walletPreview: WalletPreview;
+  walletPreview: WalletSessionContext;
   createOrderValues: CreateOrderValues;
   /** Called when an order has been confirmed and paid — caller should persist the new order and navigate to tracking. */
   onOrderExecute: (payload: {
@@ -102,7 +95,7 @@ export function useDshCheckout({
         // Fall back to parsed display labels when backend returns 0 (in-memory dev mode).
         cartTotal = intentResp.total_amount_minor_units > 0
           ? intentResp.total_amount_minor_units
-          : cartItems.reduce((sum, item) => sum + parsePriceFallback(item.priceLabel) * item.qty, 0)
+          : cartItems.reduce((sum, item) => sum + parseCartItemPrice(item.priceLabel) * item.qty, 0)
             + (selectedFulfillmentMode === 'pickup' ? 0 : 1500);
       } catch {
         setCheckoutState('payment-failed');
@@ -111,7 +104,7 @@ export function useDshCheckout({
       }
     } else {
       // Intent already created in a previous attempt — use parsed fallback (no re-fetch).
-      cartTotal = cartItems.reduce((sum, item) => sum + parsePriceFallback(item.priceLabel) * item.qty, 0)
+      cartTotal = cartItems.reduce((sum, item) => sum + parseCartItemPrice(item.priceLabel) * item.qty, 0)
         + (selectedFulfillmentMode === 'pickup' ? 0 : 1500);
     }
 

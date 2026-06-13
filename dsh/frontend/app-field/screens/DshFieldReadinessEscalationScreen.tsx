@@ -18,7 +18,7 @@ import {
   radius,
   borders,
 } from '@bthwani/ui-kit';
-import { getOperationsSupportFlowPreview, getOperationsSupportFlowsForSurface } from '../../shared/support-flows';
+import { getOperationsSupportFlowSpec, getOperationsSupportFlowsForSurface } from '../../shared/support-flows';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 
@@ -55,7 +55,7 @@ export function DshFieldReadinessEscalationScreen({
 }: DshFieldReadinessEscalationScreenProps) {
   const { theme } = useTheme();
   const [reason, setReason] = React.useState('');
-  const readinessFlow = getOperationsSupportFlowPreview('branch-readiness-escalation');
+  const readinessFlow = getOperationsSupportFlowSpec('branch-readiness-escalation');
   const registryFlowSummary = getDshFlowPolicySummary('field-readiness-escalation');
   const registryEscalationOwner = resolveDshControlPanelSectionLabel('partners');
   const fieldFollowUpFlows = getOperationsSupportFlowsForSurface('app-field').filter(

@@ -11,10 +11,10 @@ import {
   type DshCanonicalProductCard,
   type DshCanonicalPreviewEvidence,
   type DshDiscoveryStore,
-  type DshStoreFixtureItem,
+  type DshStoreMenuItem,
   type StoreItemsByStoreId,
   mapCanonicalStoreToDiscoveryStore,
-  mapCanonicalProductToStoreFixtureItem,
+  mapCanonicalProductToStoreMenuItem,
 } from '../../shared/dshStoreProductCardModel';
 
 // ── Canonical IDs ────────────────────────────────────────────────────────────
@@ -135,10 +135,10 @@ export function buildCanonicalPreviewDiscoveryStores(): DshDiscoveryStore[] {
 }
 
 export function buildCanonicalPreviewStoreItemsByStoreId(): StoreItemsByStoreId {
-  return canonicalPreviewStores.reduce<Record<string, DshStoreFixtureItem[]>>((result, store) => {
+  return canonicalPreviewStores.reduce<Record<string, DshStoreMenuItem[]>>((result, store) => {
     const product = getCanonicalPreviewProductForStore(store.id);
     if (product) {
-      result[store.id] = [mapCanonicalProductToStoreFixtureItem(product)];
+      result[store.id] = [mapCanonicalProductToStoreMenuItem(product)];
     }
     return result;
   }, {});

@@ -4,8 +4,8 @@ import {
   type DshDiscoveryStoresBridgeResult,
 } from '../shared/dsh-discovery-stores-bridge';
 import {
-  clientVisibleDiscoveryPreviewStores,
-  clientVisibleHomePreviewStores,
+  clientVisibleDiscoveryStores as initialDiscoveryStores,
+  clientVisibleHomeStores as initialHomeStores,
 } from '../dsh-client.navigation-bridge';
 import { resolveDshDiscoveryStoresRuntimeConfig } from '../shared/dsh-discovery-stores-runtime-config';
 import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } from '../shared/dsh-discovery-stores-transport';
@@ -13,8 +13,8 @@ import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } from
 export function useDshClientRuntimeStores() {
   const [runtimeBridge, setRuntimeBridge] = React.useState<DshDiscoveryStoresBridgeResult>(() =>
     resolveDshDiscoveryStoresBridge({
-      previewHomeStores: clientVisibleHomePreviewStores,
-      previewDiscoveryStores: clientVisibleDiscoveryPreviewStores,
+      initialHomeStores: initialHomeStores,
+      initialDiscoveryStores: initialDiscoveryStores,
     }),
   );
 
@@ -35,8 +35,8 @@ export function useDshClientRuntimeStores() {
 
     setRuntimeBridge(
       resolveDshDiscoveryStoresBridge({
-        previewHomeStores: clientVisibleHomePreviewStores,
-        previewDiscoveryStores: clientVisibleDiscoveryPreviewStores,
+        initialHomeStores: initialHomeStores,
+        initialDiscoveryStores: initialDiscoveryStores,
         state: 'loading',
       }),
     );
@@ -48,8 +48,8 @@ export function useDshClientRuntimeStores() {
       setRuntimeBridge(
         resolveDshDiscoveryStoresBridge({
           response,
-          previewHomeStores: clientVisibleHomePreviewStores,
-          previewDiscoveryStores: clientVisibleDiscoveryPreviewStores,
+          initialHomeStores: initialHomeStores,
+          initialDiscoveryStores: initialDiscoveryStores,
         }),
       );
     }).catch((err: unknown) => {
@@ -58,8 +58,8 @@ export function useDshClientRuntimeStores() {
       const bridgeState = isDshDiscoveryStoresOfflineError(err) ? 'offline' : 'error';
       setRuntimeBridge(
         resolveDshDiscoveryStoresBridge({
-          previewHomeStores: clientVisibleHomePreviewStores,
-          previewDiscoveryStores: clientVisibleDiscoveryPreviewStores,
+          initialHomeStores: initialHomeStores,
+          initialDiscoveryStores: initialDiscoveryStores,
           state: bridgeState,
         }),
       );

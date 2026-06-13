@@ -1,13 +1,13 @@
 import { createWltDshTypedClient, type WltLedgerEntry } from '../contracts';
 import {
 	formatWltYer,
-	type WltDshFinancePreviewRecord,
+	type WltDshFinanceSummaryRecord,
 	type WltFieldFinanceSnapshot,
 } from '../control-panel/financeContracts';
 
 const DEFAULT_FIELD_AGENT_ID = 'field-demo';
 
-function commissionRecord(entry: WltLedgerEntry): WltDshFinancePreviewRecord {
+function commissionRecord(entry: WltLedgerEntry): WltDshFinanceSummaryRecord {
 	const amount = Math.round(entry.amount * 100);
 	const isCompleted = entry.status === 'COMPLETED';
 	return {
@@ -62,23 +62,23 @@ export async function getSnapshot(fieldAgentId = DEFAULT_FIELD_AGENT_ID): Promis
 	};
 }
 
-export async function getRecords(fieldAgentId?: string): Promise<WltDshFinancePreviewRecord[]> {
+export async function getRecords(fieldAgentId?: string): Promise<WltDshFinanceSummaryRecord[]> {
 	return (await getSnapshot(fieldAgentId)).records;
 }
 
-export async function getCommissionRecords(fieldAgentId?: string): Promise<WltDshFinancePreviewRecord[]> {
+export async function getCommissionRecords(fieldAgentId?: string): Promise<WltDshFinanceSummaryRecord[]> {
 	return (await getSnapshot(fieldAgentId)).commissionRecords;
 }
 
-export async function getPendingCommissionRecords(fieldAgentId?: string): Promise<WltDshFinancePreviewRecord[]> {
+export async function getPendingCommissionRecords(fieldAgentId?: string): Promise<WltDshFinanceSummaryRecord[]> {
 	return (await getSnapshot(fieldAgentId)).pendingRecords;
 }
 
-export async function getRejectedCommissionRecords(fieldAgentId?: string): Promise<WltDshFinancePreviewRecord[]> {
+export async function getRejectedCommissionRecords(fieldAgentId?: string): Promise<WltDshFinanceSummaryRecord[]> {
 	return (await getSnapshot(fieldAgentId)).rejectedRecords;
 }
 
-export async function getPayoutRecords(fieldAgentId?: string): Promise<WltDshFinancePreviewRecord[]> {
+export async function getPayoutRecords(fieldAgentId?: string): Promise<WltDshFinanceSummaryRecord[]> {
 	return (await getSnapshot(fieldAgentId)).payoutRecords;
 }
 

@@ -7,7 +7,7 @@ import {
   resolveStoreOperationalState,
 } from '../shared/store-formatting';
 import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
 
 type StoreShellStore = {
   name?: string;
@@ -24,7 +24,7 @@ type StoreShellStore = {
 
 export function useStoreShellDerivedState(
   store: StoreShellStore,
-  openImagePreview: (item: DshStoreGetMenuItem) => void,
+  openImageViewer: (item: DshStoreGetMenuItem) => void,
   setFavoriteIds: (updater: (prev: ReadonlySet<string>) => Set<string>) => void,
 ) {
   const storeCoverImageSource = React.useMemo(
@@ -88,9 +88,9 @@ export function useStoreShellDerivedState(
 
   const openStoreItemPreview = React.useCallback(
     (item?: DshStoreGetMenuItem | null) => {
-      if (item) openImagePreview(item);
+      if (item) openImageViewer(item);
     },
-    [openImagePreview],
+    [openImageViewer],
   );
 
   const handleToggleFavorite = React.useCallback(

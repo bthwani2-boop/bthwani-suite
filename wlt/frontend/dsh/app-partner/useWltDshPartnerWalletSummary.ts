@@ -2,7 +2,7 @@ import React from 'react';
 import { createWltDshTypedClient, type WltSettlement } from '../contracts';
 import {
   formatWltYer,
-  type WltDshFinancePreviewRecord,
+  type WltDshFinanceSummaryRecord,
   type WltPartnerFinanceSnapshot,
 } from '../control-panel/financeContracts';
 
@@ -23,7 +23,7 @@ const EMPTY_PARTNER_SNAPSHOT: WltPartnerFinanceSnapshot = {
 };
 import { mapWltDshPartnerPreviewTransactions } from './wlt-dsh-partner.adapter';
 
-function settlementRecord(s: WltSettlement): WltDshFinancePreviewRecord {
+function settlementRecord(s: WltSettlement): WltDshFinanceSummaryRecord {
   const amount = Math.round(s.partner_payout * 100);
   const isDone = s.status === 'COMPLETED';
   return {
@@ -46,7 +46,7 @@ function settlementRecord(s: WltSettlement): WltDshFinancePreviewRecord {
   };
 }
 
-export function useWltDshPartnerWalletPreview(partnerId?: string, dshAuthBearerToken?: string | null) {
+export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerToken?: string | null) {
   const [partnerPreview, setPartnerPreview] = React.useState<WltPartnerFinanceSnapshot>(EMPTY_PARTNER_SNAPSHOT);
   const [lastError, setLastError] = React.useState<string | null>(null);
 

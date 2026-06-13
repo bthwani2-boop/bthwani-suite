@@ -28,7 +28,7 @@ function getLoyaltyRewards(): LoyaltyReward[] { return []; }
 function getLoyaltyTiers(): LoyaltyTier[] { return []; }
 function getSubscriptionPlans(): SubscriptionPlan[] { return []; }
 import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import { CommercialParityPreview } from './commercial-parity-preview';
+import { CommercialParityPreview } from './commercial-parity-viewer';
 
 
 

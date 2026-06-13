@@ -14,7 +14,7 @@ import {
   successPalette,
 } from '@bthwani/ui-kit';
 
-export const dshPreviewColorContractMeta = {
+export const dshColorResolverMeta = {
   dataKind: 'SHARED_HELPER',
   purpose: 'Resolve semantic preview color tokens to ui-kit hex values at render or adapter boundaries',
 } as const;
@@ -49,6 +49,6 @@ const _TOKEN_MAP: Record<string, string | undefined> = {
  * If the input is already an unrecognized string (e.g. an actual hex from a live
  * API response), it passes through unchanged.
  */
-export function resolvePreviewColor(token: string): string {
+export function resolveColorToken(token: string): string {
   return _TOKEN_MAP[token] ?? token;
 }

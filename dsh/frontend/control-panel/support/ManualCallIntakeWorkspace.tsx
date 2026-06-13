@@ -12,7 +12,7 @@ function getDshCallIntakePreview(_id: string): DshCallIntakePreview | undefined 
 import type {
   DshGlobalControlLink,
   DshRouteHintedAction,
-} from '../../shared/dsh-order-preview.contract';
+} from '../../shared/dsh-order.contract';
 import styles from '../shared/control-panel-surface.module.css';
 import { SUPPORT_VERIFICATION_STATUS_META } from './support.types';
 

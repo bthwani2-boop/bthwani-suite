@@ -29,7 +29,7 @@ import type {
 	DshCaptainOrderServiceType,
 	DshCaptainOrderStage,
 	DshCaptainOrdersScreenState,
-} from '../../shared/dsh-order-preview.contract';
+} from '../../shared/dsh-order.contract';
 
 type ServiceBadge = { badgeLabel: string; badgeTone: 'warning' | 'info' | 'brand' };
 

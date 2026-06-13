@@ -12,13 +12,13 @@ import {
 } from '@bthwani/ui-kit/web';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
 import { resolveDshOrderApiBaseUrl } from '../../shared';
-import { EXCEPTION_TICKET_MAP } from '../../shared/dsh-order-preview.contract';
+import { EXCEPTION_TICKET_MAP } from '../../shared/dsh-order.contract';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
 import {
   getDshEscalationFlowsForSurface,
-  getDshFinancePreviewFlows,
+  getDshFinanceImpactFlows,
   getDshFlowPolicySummary,
   getDshRenderableFlowsForSurface,
   type DshFlowRegistryEntry,
@@ -345,7 +345,7 @@ type ExceptionsStateItem = {
     [],
   );
   const financePreviewFlowIds = React.useMemo(
-    () => new Set(getDshFinancePreviewFlows().map((flow) => flow.id)),
+    () => new Set(getDshFinanceImpactFlows().map((flow) => flow.id)),
     [],
   );
   const filteredFlows = React.useMemo(() => {

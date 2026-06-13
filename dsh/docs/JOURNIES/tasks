@@ -1,0 +1,489 @@
+ظيم استمر لاتتوقف وبمجرد انتهائك تحقق وقم بتنفيذ كل ماتبقى من التالي
+
+
+
+استخدم جرافي والادوات الاخرى في الوقت والسياق المناسب لضمان الدقة وسرعه التنفيذ وضمان استهلاك اقل للتوكن
+C:\bthwani-suite\dsh\docs\JOURNIES\command_additional
+C:\bthwani-suite\dsh\docs\JOURNIES\command
+
+لاتقم بالكتابة او التعديل هنا مطلقا C:\bthwani-suite\dsh\docs\JOURNIES
+
+المساران اللذان ذكرتَهما هما **ملفان** في GitHub، وليس مجلدين:
+
+```text
+dsh/docs/JOURNIES/command
+dsh/docs/JOURNIES/command_additional
+```
+
+وهذه هي **كل المهام المطلوبة لضمان إغلاق نهائي 100%** كما تظهر منهما على الفرع `feat/dsh-surface-refactor`.
+
+## 1) مهام الحوكمة العامة لكل شريحة
+
+1. تنفيذ العمل داخل `C:\bthwani-suite` فقط.
+2. اعتبار `JOURNIES` مرجع قراءة فقط، وليس هدف تعديل بدل الكود الحي.
+3. اعتماد الوضع: `Real End-to-End Live Code Implementation`.
+4. منع: UI Preview، Demo Runtime، Mock Runtime، Preview Data، Report-Only Output.
+5. العمل بمنهج واحد فقط: `CHECK → APPLY IMMEDIATELY → VERIFY`.
+6. إذا فشل `VERIFY`، الرجوع مباشرة إلى `APPLY` ثم إعادة `VERIFY`.
+7. منع إنهاء أي شريحة وفيها نقص قابل للإصلاح.
+8. منع التوصيات المستقبلية أو الاكتفاء بالتشخيص.
+9. كل شريحة يجب أن تُغلق بالكود الفعلي والأدلة قبل الانتقال.
+10. المخرج المقبول: `CLOSED_WITH_EVIDENCE`.
+11. المخرج البديل الوحيد: `HARD_BLOCKED_EXTERNAL_ONLY` بسبب خارجي مثبت فقط.
+12. منع `FIX_REQUIRED_WITH_EXACT_PATHS` كمخرج نهائي.
+
+## 2) مهام CHECK الإلزامية
+
+13. تحديد هدف الشريحة.
+14. تحديد actor.
+15. تحديد الأسطح والشاشات المتأثرة.
+16. فحص routes/navigation/screen registry.
+17. فحص API/OpenAPI/client binding/generated consumers.
+18. فحص backend/runtime/Go files.
+19. فحص Docker/local runtime عند الارتباط.
+20. فحص حدود DSH/WLT.
+21. تحديد مصادر البيانات الحقيقية.
+22. تحديد مصادر الوسائط الحقيقية.
+23. تحديد حالات UI المطلوبة.
+24. تحديد الملفات المرتبطة فعليًا.
+25. إدخال أي ملف تكشفه graph/import/runtime ضمن الشريحة.
+26. تحديد الملفات الميتة أو المتكررة.
+27. تحديد أوامر التحقق المطلوبة.
+28. استخدام `bthwani-evidence-gate-router-contract` لاختيار أصغر مجموعة أدوات مناسبة.
+29. استخدام `bthwani-graphify-query-first` عند وجود سؤال علاقات أو تأثير عابر للملفات، وليس كتشغيل عشوائي.
+
+## 3) مهام APPLY الفوري
+
+30. إضافة أي منطق ناقص.
+31. إصلاح أي flow ناقص أو مكسور.
+32. إضافة أو إصلاح شاشة ناقصة.
+33. إصلاح route/navigation/screen registry.
+34. إصلاح API/OpenAPI usage.
+35. إصلاح client binding/generated consumer.
+36. إصلاح backend/runtime/Go logic.
+37. إصلاح Docker/local runtime readiness.
+38. إصلاح integration.
+39. إزالة preview/demo/mock/fixture runtime usage.
+40. حذف dead code بعد إثبات انقطاعه.
+41. دمج duplicates بعد إثبات التكرار.
+42. تفكيك الملف الضخم المرتبط بالشريحة فقط.
+43. نقل ownership إلى مكانه الصحيح.
+44. إزالة orphan imports/adapters/hooks/types.
+45. إصلاح UI/RTL/states.
+
+## 4) مهام real data / media
+
+46. منع أي تدفق حي يعتمد على بيانات تجريبية.
+47. السماح فقط بـ:
+
+* إدخال يدوي حقيقي.
+* API حقيقي.
+* PostgreSQL عبر DSH API.
+* MinIO/S3 للوسائط.
+* `dsh_media_assets` للـ metadata والربط.
+* WLT للماليات.
+
+48. إنشاء أو إصلاح شاشة الإدخال أو endpoint إذا كان التدفق يحتاج إدخالًا يدويًا.
+49. منع تخزين الصور/الفيديو داخل PostgreSQL.
+50. منع استخدام `dsh/frontend/data` أو `dsh/frontend/media-fixtures` كمصدر runtime.
+51. إثبات media gate كامل قبل أي إدخال وسائط حقيقي:
+
+* PostgreSQL healthy.
+* `dsh_media_assets` migration applied.
+* MinIO healthy.
+* bucket موجود.
+* upload intent يعمل.
+* PUT إلى upload URL ينجح.
+* complete/read/list تعمل.
+* الواجهة تستخدم Media Runtime API.
+
+52. إصلاح Docker/env/media storage إذا كان MinIO أو bucket أو upload URL غير جاهز داخل النطاق.
+
+## 5) مهام إزالة preview/demo/mock/fixture
+
+53. إزالة أو عزل أي runtime usage من:
+
+* preview
+* demo
+* mock
+* fixture
+* sample
+* fake
+* fallback
+* dev data
+* test-only runtime data.
+
+54. منع flags مثل:
+
+* `DSH_ENABLE_DEV_FIXTURE_MEDIA`
+* `DSH_ENABLE_MEDIA_FIXTURES`
+* `USE_PREVIEW_DATA`
+* `TOLERATED_VIOLATIONS`.
+
+55. تحويل أي مستهلك لـ `dsh/frontend/data` أو `dsh/frontend/media-fixtures` إلى API/runtime/MinIO/S3/metadata حقيقي.
+56. حذف import/export/barrel يخفي مصدرًا ممنوعًا.
+57. تشغيل graph/import/delete probe قبل حذف المصدر.
+58. إثبات صفر runtime imports من data/media-fixtures.
+59. معالجة imports من `legacy-preview` فورًا.
+60. الهدف: صفر imports من `dsh/frontend/data` و`dsh/frontend/media-fixtures` داخل frontend surfaces.
+
+## 6) مهام DSH/WLT المالية
+
+61. إبقاء WLT المالك الحصري لـ:
+
+* payment
+* refund
+* settlement
+* ledger
+* reconciliation
+* balance
+* wallet transaction
+* financial state machine.
+
+62. منع أي money mutation داخل DSH.
+63. DSH يحفظ references فقط.
+64. أي مخالفة مالية داخل نطاق الشريحة تُصلح في الكود فورًا، لا توثق فقط.
+65. فحص `wlt/frontend/dsh` عند أي ارتباط بـ wallet/balance/payment/refund/settlement/ledger/earnings/WLT bridge.
+66. معالجة أي أسماء runtime داخل WLT/DSH تحمل Preview/Demo/Mock/Sample/Fallback.
+67. تنفيذ أول إصلاح عملي إن وجد:
+
+* `useWltDshWalletPreview.ts`
+* تحويله إلى `useWltDshWalletSession.ts` أو `useWltDshWalletSummary.ts`.
+
+## 7) مهام النطاق والمسارات
+
+68. فحص المسارات المرتبطة بالشريحة فقط، لكن دون تجاهل أي ملف يظهر عبر graph/import/runtime/API/Docker/Go/navigation/generated consumers.
+69. المسارات الأساسية:
+
+* `dsh/frontend/app-captain`
+* `dsh/frontend/app-client`
+* `dsh/frontend/app-field`
+* `dsh/frontend/app-partner`
+* `dsh/frontend/control-panel`
+* `dsh/frontend/shared`
+* `dsh/backend`
+* `dsh/openapi`
+* `dsh/api`
+* `wlt/frontend/dsh/**`
+* `docker-compose.local.yml`
+* `.env.local`
+
+## 8) مهام Surface Host
+
+70. جعل Surface host orchestration فقط:
+
+* providers/controllers
+* runtime context
+* route الحالي
+* screen registry
+* handlers من hooks/adapters.
+
+71. منع داخل Surface host:
+
+* route switch ضخم.
+* screen registry inline كبير.
+* API mapping متعدد.
+* WLT money logic.
+* business calculations.
+* hardcoded operational identities.
+* preview/demo/sample/fallback data.
+* storage direct access.
+* media fixture resolving.
+
+72. إذا كان Surface legacy ضخمًا: تثبيت ratchet baseline ومنع النمو والتسريبات بدل تفكيك عشوائي.
+
+## 9) مهام قرارات الملفات
+
+73. كل ملف/مجلد يتم لمسه يجب أن يحصل على قرار واحد:
+
+* `KEEP_ACTIVE`
+* `REFACTOR_SPLIT`
+* `MERGE_DUPLICATE`
+* `RETIRE_DEAD`
+* `MOVE_TO_OWNER`
+
+74. منع `FIX_REQUIRED` كقرار نهائي.
+75. قبل حذف/نقل/دمج أي ملف يجب إثبات عدم وجود اعتماد عبر imports/exports/routes/navigation/screen registry/runtime/API/OpenAPI/tests/guards/build/Docker/Go.
+
+## 10) مهام التصميم والتنظيم
+
+76. اعتماد `@bthwani/ui-kit` كسلطة التصميم.
+77. منع design system محلي أو components مكررة أو visual drift.
+78. كل شاشة متأثرة تغطي:
+
+* loading
+* empty
+* error
+* success
+* offline
+* disabled
+* RTL correctness
+* primary action clarity
+* no overflow
+* no clipping
+* no unrelated visual drift.
+
+79. منع runtime من الاعتماد على:
+
+* graphify-out
+* `.tamagui`
+* `tools/registry/runs`
+* evidence files
+* diagnostic outputs.
+
+## 11) مهام VERIFY
+
+80. بعد كل APPLY تشغيل:
+
+* `git status --short`
+* `git diff --stat`
+* `git diff --name-status`
+* `git diff --check`
+
+81. حسب النطاق:
+
+* `pnpm -w exec tsc --noEmit`
+* `go test ./...`
+* `docker compose -f .\docker-compose.local.yml config`
+
+82. إذا مسّت الشريحة data/media، تشغيل Delete Probe أو فحص مكافئ.
+83. إذا مسّت media flow، تشغيل media runtime gate كامل.
+84. أي guard في live closure يجب أن يكون failing guard، وليس report-only أو WARN.
+
+## 12) مهام الإغلاق النهائي للشريحة
+
+85. لا إعلان PASS/CLOSED/DONE/READY/FINAL/100% إلا بعد:
+
+* نجاح diff check.
+* نجاح الحراس.
+* نجاح TypeScript عند لمس frontend.
+* نجاح Go tests عند لمس backend.
+* نجاح Docker config عند لمس runtime.
+* عدم وجود تغييرات خارج النطاق.
+* عدم وجود imports ميتة.
+* عدم وجود orphan consumers.
+* عدم وجود preview/demo/mock/fixture runtime references.
+* عدم كسر UI/RTL/navigation.
+* عدم كسر WLT boundary.
+* وجود دليل حذف/نقل/دمج.
+* وجود API أو real input path لأي بيانات مطلوبة.
+
+86. لا إغلاق لأي real data/media إذا MinIO أو upload flow أو `dsh_media_assets` غير مثبت.
+87. إنتاج `slice-coverage-matrix.json` لكل شريحة عند الحاجة.
+88. Discovery قبل APPLY:
+
+* file inventory
+* import/export graph
+* route/navigation/screen registry scan
+* preview/data/media-fixtures scan
+* WLT boundary scan
+* control-panel input path scan
+* PostgreSQL/MinIO/media flow scan
+* duplicate/dead/small/giant scan
+* guard/config/docker/env scan.
+
+89. إذا كشف VERIFY ملفًا ناقصًا، تعاد الشريحة إلى APPLY ويضاف الملف إلى coverage matrix.
+90. كل Journey/Slice يجب أن يحتوي scope/linked paths/entrypoints/dependencies/runtime behavior/data source/media source/WLT boundary/control-panel relation/guards/verification/evidence/closure/rollback.
+91. الإغلاق النهائي يتطلب صفر uncovered files/directories/imports/unowned shared/control-panel/WLT bridge/unhandled preview/data/media/openapi/guard report-only/delete without proof.
+
+## 13) المهام الإضافية الصريحة من `command_additional`
+
+92. تحديث ملف `dsh/docs/JOURNIES/command` بدمج قواعد `command_additional`.
+93. إنشاء Evidence Session قبل أي refactor أو حذف أو نقل.
+94. بناء file inventory كامل للنطاق:
+
+* shared
+* control-panel
+* app-client
+* app-partner
+* app-captain
+* app-field
+* wlt/frontend/dsh.
+
+95. بناء import/export graph.
+96. بناء route/navigation/screen registry graph.
+97. بناء OpenAPI/client binding graph.
+98. بناء PostgreSQL/MinIO/media flow scan.
+99. بناء WLT/DSH boundary scan.
+100. بناء control-panel input path scan.
+101. بناء shared ownership scan.
+102. بناء preview/data/media-fixtures scan.
+103. بناء duplicate/dead/small/giant file scan.
+104. إنتاج `slice-coverage-matrix.json`.
+105. إنتاج `uncovered-files.md`.
+106. إدخال أي uncovered file فورًا في الشريحة أو sub-slice.
+107. إصلاح الحراس حتى تفشل على النطاق الكامل.
+108. جعل `guard:jscpd:live` failing لا report-only.
+109. جعل fixture/media/preview guard failing داخل scope.
+110. إضافة/تفعيل `guard:dsh-surface-structure`.
+111. إضافة/تفعيل `guard:real-media-runtime`.
+112. تثبيت PostgreSQL + MinIO + `dsh_media_assets` + Media Runtime Gate.
+113. إثبات upload-intent/PUT/complete/read/list.
+114. إغلاق كل runtime imports من data/media-fixtures.
+115. تنظيف `wlt/frontend/dsh` من Preview/preview-data/FinancePreview/PaymentPreview.
+116. ضمان أن WLT يملك الماليات وDSH لا يملك money mutation.
+117. تنظيم shared.
+118. تنظيم control-panel sections كمسار إدخال حقيقي.
+119. تفكيك app-client تدريجيًا.
+120. تفكيك app-partner تدريجيًا.
+121. تفكيك app-captain تدريجيًا.
+122. تفكيك app-field تدريجيًا.
+123. إعادة تشغيل coverage matrix بعد كل شريحة.
+124. تنظيف duplicate/dead/small/noise files مع graph proof.
+125. تحديث OpenAPI/client binding عند تغيير API.
+126. تشغيل visual/RTL evidence عند أي UI changes.
+127. إثبات صفر references إلى data/media-fixtures في كل الأسطح وWLT/DSH.
+128. حذف `dsh/frontend/data` و`dsh/frontend/media-fixtures` فقط بعد نجاح كل gates.
+129. تشغيل verify كامل بعد الحذف.
+130. إنتاج `final-decision.md`.
+131. إنتاج `_HANDOFF.zip`.
+
+## 14) مهام shared
+
+132. منع تحويل `dsh/frontend/shared` إلى مجلد رمي عشوائي.
+133. السماح فقط بـ contracts/types، pure helpers، view-model primitives، API client primitives، media resolver contracts، UI-neutral utilities، constants تشغيلية عامة.
+134. منع screen logic، routing، navigation state، app-specific state، control-panel forms، preview/demo/mock/sample/fallback، imports من apps/control-panel/data/media-fixtures، WLT money mutation.
+135. نقل أي منطق خاص بسطح واحد إلى السطح المالك.
+136. إنتاج `shared-ownership-report.json`.
+
+## 15) مهام control-panel
+
+137. تنظيم `dsh/frontend/control-panel` حسب الأقسام التشغيلية الواقعية فقط.
+138. إنشاء sections عند وجود وظيفة حقيقية فقط:
+
+* stores
+* products
+* categories
+* media
+* campaigns
+* orders
+* operations
+* field-readiness
+* support
+* finance-readonly
+* settings.
+
+139. جعل control-panel مسار إدخال حقيقي للبيانات والوسائط.
+140. رفع الصور والفيديو عبر Media Runtime API.
+141. ربط الوسائط بـ `dsh_media_assets`.
+142. عرض finance read-model فقط من WLT.
+143. تعويض أي fixture سابق بمسار إدخال حقيقي.
+144. منع runtime imports من data/media-fixtures.
+145. إنتاج `control-panel-input-path-report.json`.
+
+## 16) مهام تطبيقات DSH الأربعة
+
+146. فحص app-client/customer discovery/cart/checkout/tracking/my-space/WLT summary.
+147. فحص app-partner/inbox/catalog/store ops/support/store-courier/WLT settlement summary.
+148. فحص app-captain/availability/offers/trip lifecycle/map/pickup-dropoff/PoD/support/earnings summary.
+149. فحص app-field/store onboarding/visit/document upload/readiness escalation/history/profile/finance summary.
+150. جعل كل Surface host orchestration فقط.
+151. منع route switch ضخم، API mapping، WLT money logic، hardcoded identities، preview data، direct storage، media fixtures.
+152. عند التضخم: استخراج أصغر مسؤولية حقيقية فقط إلى state/routes/adapters/copy/parts/screens/contracts/storage.
+
+## 17) مهام Route Renderer
+
+153. أي route renderer يكون mapping واضحًا فقط.
+154. منع business calculations/cart totals/payment method building/hardcoded addresses/preview ids/props object ضخم/WLT state/media resolving.
+155. إذا تجاوز 25 prop أو 10 branches، يفكك إلى:
+
+* route-registry
+* route-renderer
+* feature-screen-presenters
+* feature adapters
+* contracts.
+
+156. البداية العملية: `dsh/frontend/app-client/DshClientRouteRenderer.tsx`.
+
+## 18) مهام الحذف النهائي
+
+157. حذف `dsh/frontend/data`.
+158. حذف `dsh/frontend/media-fixtures`.
+159. الحذف لا يتم إلا بعد:
+
+* صفر imports مباشرة/غير مباشرة.
+* صفر barrel يخفي الاعتماد.
+* كل مستهلك تحول إلى API/PostgreSQL/Control Panel/MinIO/S3/WLT.
+* `dsh_media_assets` migration مطبقة.
+* MinIO bucket جاهز.
+* media upload flow يعمل.
+* control-panel يملك مسارات الإدخال.
+* shared وWLT/DSH نظيفان.
+* tsc ناجح.
+* graph وguards ناجحة.
+* uncovered-files.md فارغ.
+
+160. بعد الحذف: TypeScript، import graph، depcruise، preview/data/media guard، jscpd، binding guard، media runtime gate، runtime smoke، visual/RTL عند UI changes.
+
+## 19) مهام OpenAPI/API/client binding
+
+161. بعد أي تغيير backend/media/data/endpoint/adapter:
+
+* مراجعة OpenAPI.
+* مراجعة generated consumers.
+* مراجعة client adapters.
+* تشغيل binding guard.
+
+162. أي endpoint جديد يحتاج:
+
+* handler
+* route registration
+* request validation
+* response shape
+* OpenAPI contract
+* frontend adapter
+* runtime smoke
+* evidence.
+
+## 20) مهام UI/RTL/Visual Evidence
+
+163. أي تغيير في screen/route/component/control-panel section يحتاج evidence بصري.
+164. المطلوب:
+
+* screenshot قبل/بعد إن أمكن.
+* RTL check.
+* empty/loading/error/success.
+* no preview labels.
+* no broken navigation.
+* no broken media rendering.
+
+## 21) شرط الإغلاق النهائي 100%
+
+لا يوجد إغلاق 100% إلا إذا ثبت:
+
+165. صفر uncovered files.
+166. صفر uncovered directories.
+167. صفر uncovered runtime imports.
+168. صفر unowned shared files.
+169. صفر unowned control-panel sections.
+170. صفر unowned WLT/DSH bridge files.
+171. صفر unhandled preview/data/media-fixtures usage.
+172. صفر unhandled route/screen/navigation dependency.
+173. صفر unhandled OpenAPI/client binding dependency.
+174. صفر guard report-only.
+175. صفر files deleted without reference proof.
+176. صفر runtime imports من data/media-fixtures.
+177. صفر preview/demo/mock/sample/fallback runtime.
+178. صفر Preview/preview-data runtime داخل WLT/DSH.
+179. PostgreSQL healthy.
+180. migrations applied.
+181. `dsh_media_assets` موجود.
+182. MinIO healthy.
+183. bucket موجود.
+184. media upload flow يعمل end-to-end.
+185. Control Panel يملك real input paths.
+186. shared لا يسرّب logic خاص.
+187. WLT يملك الماليات فقط.
+188. DSH لا يحتوي money mutation.
+189. Surface hosts orchestration فقط.
+190. Route renderers ليست business containers.
+191. لا duplication critical.
+192. لا dead code مرتبط بالنطاق.
+193. tsc ناجح.
+194. binding guard ناجح.
+195. diff check ناجح.
+196. runtime smoke موثق.
+197. visual/RTL evidence عند تغيير UI.
+198. كل ملفات evidence النهائية موجودة، ومنها `final-decision.md` و`_HANDOFF.zip`.
+
+**الخلاصة العملية:** هذه ليست مهمة واحدة؛ هي برنامج إغلاق كامل. أول تنفيذ صحيح يبدأ بـ: تحديث/اعتماد `command`، إنشاء Evidence Session، بناء inventory/graphs/coverage، إصلاح الحراس report-only، ثم إغلاق التسريبات من `data/media-fixtures` و`Preview` قبل حذف أي شيء أو إعلان 100%.

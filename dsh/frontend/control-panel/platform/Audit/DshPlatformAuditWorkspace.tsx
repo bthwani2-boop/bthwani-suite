@@ -3,11 +3,11 @@
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
-import { useDemoPlatformState } from '../useDemoPlatformState';
+import { usePlatformAuditState } from '../usePlatformAuditState';
 import styles from '../../shared/control-panel-surface.module.css';
 
 export function DshPlatformAuditWorkspace({ activeFilter }: { activeFilter: string }) {
-  const { auditEvents, rollbackEvent } = useDemoPlatformState();
+  const { auditEvents, rollbackEvent } = usePlatformAuditState();
   const [selectedEventId, setSelectedEventId] = React.useState<string | null>(null);
 
   const filteredEvents = auditEvents.filter((event) => {

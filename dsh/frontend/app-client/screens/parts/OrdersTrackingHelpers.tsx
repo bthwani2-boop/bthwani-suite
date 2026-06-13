@@ -7,11 +7,9 @@ import {
   Icon,
   Divider,
   KeyValueList,
-  ListItem,
   MobileScrollView,
   OrderLinkedChat,
   SectionHeader,
-  StatCard,
   TextField,
   Surface,
   Text,
@@ -153,7 +151,6 @@ export type DshFlowHubScreenProps = {
   onRetry?: () => void;
 };
 
-export type DshIntakeHubScreenProps = DshFlowHubScreenProps;
 
 export const defaultCreateOrderValues: CreateOrderValues = {
   fulfillmentMode: 'bthwani_delivery',
@@ -265,7 +262,7 @@ export const orderChatAttachmentOptions: Record<OrderChatAttachmentKind, OrderCh
   },
 };
 
-export const fallbackOrderListItems: DshOrderListItem[] = [
+export const defaultOrderListItems: DshOrderListItem[] = [
   {
     id: 'order-active',
     orderNumber: '3770281',
@@ -972,7 +969,7 @@ export function buildDefaultLifecycleStatus(clientState: DshClientState, phase: 
 }
 
 export function buildDefaultEventTimeline(clientState: DshClientState, timeline: DshTrackingTimelineItem[], phase: JourneyPhase = 'route'): DshClientEventTimelineItem[] {
-  const fallbackLifecycle = buildDefaultLifecycleStatus(clientState, phase);
+  const defaultLifecycle = buildDefaultLifecycleStatus(clientState, phase);
   const exceptionReason = getDefaultExceptionReason(clientState);
 
   if (!timeline.length) {
@@ -983,7 +980,7 @@ export function buildDefaultEventTimeline(clientState: DshClientState, timeline:
       actor_id: 'system',
       actor_role: 'system',
       from_status: null,
-      to_status: fallbackLifecycle,
+      to_status: defaultLifecycle,
       timestamp: '2026-05-01T20:20:00+03:00',
       source: 'system',
       reason_code: exceptionReason,
@@ -998,13 +995,13 @@ export function buildDefaultEventTimeline(clientState: DshClientState, timeline:
     received: 'delivered',
   };
 
-  const fallbackStatuses: DshClientDeliveryLifecycleStatus[] = ['enroute_to_dropoff', 'at_door', 'delivered'];
+  const defaultStatuses: DshClientDeliveryLifecycleStatus[] = ['enroute_to_dropoff', 'at_door', 'delivered'];
 
   return timeline.map((item, index) => {
-    const toStatus = statusByStepId[item.id] ?? fallbackStatuses[Math.min(index, fallbackStatuses.length - 1)] ?? fallbackLifecycle;
+    const toStatus = statusByStepId[item.id] ?? defaultStatuses[Math.min(index, defaultStatuses.length - 1)] ?? defaultLifecycle;
     const previousStatus = index === 0
       ? (clientState === 'tracking_active' || clientState === 'delivered' ? 'picked_up' : null)
-      : (statusByStepId[timeline[index - 1]?.id] ?? fallbackStatuses[Math.min(index - 1, fallbackStatuses.length - 1)] ?? null);
+      : (statusByStepId[timeline[index - 1]?.id] ?? defaultStatuses[Math.min(index - 1, defaultStatuses.length - 1)] ?? null);
 
     return {
       event_id: `event-${item.id}`,

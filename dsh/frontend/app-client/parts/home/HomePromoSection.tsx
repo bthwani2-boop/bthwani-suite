@@ -107,7 +107,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
               style={styles.heroPromoCard}
               onPress={() => {
                 const promo = activeHomePromo;
-                const mockPromo: DshHomeGetPromo = {
+                const promoRecord: DshHomeGetPromo = {
                   id: promo.id,
                   title: promo.title,
                   subtitle: promo.subtitle,
@@ -115,7 +115,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
                   actionType: normalizeHomePromoActionType(promo.targetType),
                   actionTarget: promo.targetId,
                 };
-                promoHandlers.resolveBannerPress(mockPromo)();
+                promoHandlers.resolveBannerPress(promoRecord)();
               }}
             >
               {activeHomePromo.imageUrl && (

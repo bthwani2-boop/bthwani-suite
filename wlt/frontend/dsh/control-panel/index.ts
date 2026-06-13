@@ -21,7 +21,7 @@ export { WltDshFieldCommissionStatement } from './components/WltDshFieldCommissi
 export { WltDshCaptainStatement } from './components/WltDshCaptainStatement';
 export { LedgerEntriesTable } from './components/LedgerEntriesTable';
 export { TrialBalancePanel } from './components/TrialBalancePanel';
-export { WltDshFinanceControlPanelContent, WltDshFinanceControlPanelPreview } from './components/WltDshFinanceControlPanelPreview';
+export { WltDshFinanceControlPanelContent, WltDshFinanceControlPanelSummary } from './components/WltDshFinanceControlPanelSummary';
 export { WltDshRealtimeLedger } from './components/WltDshRealtimeLedger';
 
 // finance routing (types + registry + api-matrix)
