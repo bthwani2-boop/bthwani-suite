@@ -1,4 +1,4 @@
-import type { DshClientState } from '../../shared/client-state';
+﻿import type { DshClientState } state-machines/client-state';
 
 export type DshClientId = string;
 
@@ -446,8 +446,8 @@ export type DshClientOperationsOrderDetail = {
 // --- Phase 2: DSH Flow Registry — client surface on-demand policy bridge ---
 // DSH_PHASE_2_CROSS_SURFACE_REGISTRY_CONSUMPTION-20260521
 // Registry is the SSoT for on-demand policy. Do not duplicate policy constants locally.
-import type { DshOnDemandPolicy } from '../../shared/dsh-flow-registry';
-import { getDshFlowById } from '../../shared/dsh-flow-registry';
+import type { DshOnDemandPolicy } policies/dsh-flow-registry';
+import { getDshFlowById } policies/dsh-flow-registry';
 
 /** Canonical registry flow IDs owned by the client surface. */
 export const DSH_CLIENT_REGISTRY_FLOW_IDS = [

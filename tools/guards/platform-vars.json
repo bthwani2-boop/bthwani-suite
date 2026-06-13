@@ -1,4 +1,4 @@
-{
+﻿{
   "guardId": "GUARD_PLATFORM_VARS_CONTROL",
   "status": "WARN",
   "failCount": 0,
@@ -728,7 +728,7 @@
     {
       "severity": "WARN",
       "rule": "mutable_policy_not_var_classified",
-      "file": "dsh/frontend/shared/catalog.ts",
+      "file": "dsh/frontend/shared/contracts/catalog.ts",
       "line": 182,
       "message": "Mutable service/provider policy signal is not clearly classified as VAR/provider policy for service \"dsh\".",
       "remediation": "Expose mutable behavior through a configured VAR/provider policy with owner and rollback."

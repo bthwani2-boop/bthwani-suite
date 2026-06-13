@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View } from 'react-native';
 import {
   Badge,
@@ -11,7 +11,7 @@ import {
   useTheme,
   ActionStrip,
 } from '@bthwani/ui-kit';
-import type { LoyaltyClientMetric, LoyaltyClientSection } from '../../shared/commercial-contract';
+import type { LoyaltyClientMetric, LoyaltyClientSection } contracts/commercial-contract';
 
 export type DshLoyaltyRewardsScreenProps = {
   title?: string;

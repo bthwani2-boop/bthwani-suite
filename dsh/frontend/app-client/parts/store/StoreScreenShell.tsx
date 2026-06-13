@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   Animated,
   Dimensions,
@@ -22,8 +22,8 @@ import { useStoreImageViewerState } from '../../hooks/useStoreImageViewerState';
 import { useStoreShellDerivedState } from '../../hooks/useStoreShellDerivedState';
 import { StoreMeasurementSheet } from '../../sheets/StoreMeasurementSheet';
 import type { DshStoreGetScreenShellProps } from '../../contracts/dsh-store-screen-props';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
-import { resolveMeasurementOptions } from '../../shared/store-formatting';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+import { resolveMeasurementOptions } store-formatting';
 import { StoreHeroSection } from './StoreHeroSection';
 import { StoreImageViewerSheet } from './StoreImageViewerSheet';
 import { StoreMenuListSection } from './StoreMenuListSection';

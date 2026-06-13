@@ -131,7 +131,7 @@ export function WltDshRealtimeLedger() {
     const simEntry: WltLedgerEntry = {
       id,
       wallet_id: 'WLT-WAL-0099',
-      subject: Math.random() > 0.5 ? 'captain-demo' : 'partner-demo',
+      subject: Math.random() > 0.5 ? 'captain-001' : 'partner-001',
       transaction_type: Math.random() > 0.4 ? 'CREDIT' : 'DEBIT',
       amount: Math.floor(Math.random() * 15000) + 1000,
       currency: 'YER',

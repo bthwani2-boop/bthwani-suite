@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -8,7 +8,7 @@ import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 // SSoT: rescue triggers are derived from the lifecycle handoffs table.
 // The control-panel sees rescue_required observations from partner_rejected and delivery_failed handoffs.
-import { getHandoffsForSurface } from '../../shared/dsh-order-lifecycle-handoffs';
+import { getHandoffsForSurface } from '../../shared/contracts/dsh-order-lifecycle-handoffs';
 
 export type OrderRescueScreenProps = {
   hubHref: string;

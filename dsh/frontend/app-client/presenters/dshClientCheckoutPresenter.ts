@@ -1,7 +1,7 @@
-import { buildPaymentMethodsList } from '../adapters/dshClientCheckoutAdapters';
+﻿import { buildPaymentMethodsList } from '../adapters/dshClientCheckoutAdapters';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostCartItem } from '../dsh-client.navigation-bridge';
-import { parseCartItemPrice } from '../shared/store-formatting';
+import { parseCartItemPrice } store-formatting';
 import type { WltDshWalletSessionState } from '../../../../wlt/frontend/dsh/app-client/wlt-dsh-client.types';
 
 const CONTRACT_REQUIRED_DELIVERY_FEE_YER = 1500;

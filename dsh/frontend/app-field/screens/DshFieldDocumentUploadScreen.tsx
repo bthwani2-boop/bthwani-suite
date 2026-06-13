@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import {
   Badge,
@@ -19,7 +19,7 @@ import {
   radius,
   spacing,
 } from '@bthwani/ui-kit';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary } from '../../shared/policies/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 import type { DshFieldDocumentKind } from '../../shared';
 

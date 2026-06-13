@@ -1,4 +1,4 @@
-import type { DshCanonicalPublishStage, DshCanonicalSource } from '../../shared/dshStoreProductCardModel';
+﻿import type { DshCanonicalPublishStage, DshCanonicalSource } from '../../shared/presentation-models/dshStoreProductCardModel';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
 
 export type DshPartnerIntakeSource = 'app-field' | 'app-partner';
@@ -67,7 +67,7 @@ export type {
   DshPartnerDocumentVerification,
   DshPartnerCatalogOverride,
   DshPromotionCandidate,
-} from '../../shared/workflow';
+} from '../../shared/state-machines/workflow';
 
 export {
   resolvePartnerIdForStore,
@@ -88,4 +88,4 @@ export {
   updatePartnerDisputeStatus,
   getPromotionCandidates,
   updatePromotionCandidateStatus,
-} from '../../shared/workflow';
+} from '../../shared/state-machines/workflow';

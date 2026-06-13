@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { View } from 'react-native';
@@ -18,7 +18,7 @@ import {
 import type {
   WltDshFinanceSummaryRecord,
   WltFieldFinanceSnapshot,
-} from '../control-panel/financeContracts';
+} from '../shared';
 import { useWltDshFieldFinanceSummary } from './useWltDshFieldFinanceSummary';
 
 function RecordRow({ record }: { record: WltDshFinanceSummaryRecord }) {

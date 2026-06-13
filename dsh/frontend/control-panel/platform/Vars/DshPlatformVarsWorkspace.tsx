@@ -280,12 +280,12 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
       [selectedVar.id]: { current: nextCurrent, proposed: nextProposed, status: nextStatus },
     }));
     addAuditEvent({
-      action: `تعديل معاينة (${selectedVar.label}): ${action}`,
-      operator: 'Ahmed.Sharif',
+      action: `تعديل متغير (${selectedVar.label}): ${action}`,
+      operator: 'platform-operator',
       status: action === 'rollback' ? 'danger' : 'success',
       oldValue: prev.current,
       newValue: nextCurrent,
-      reason: 'محاكاة مسار المعاينة المحلية',
+      reason: 'تعديل سياسة runtime',
       scope: selectedVar.scope,
       impact: selectedVar.effectSummary,
       rollbackAvailable: true,

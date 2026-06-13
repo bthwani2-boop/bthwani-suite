@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -13,9 +13,9 @@ import {
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
 import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
-import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/policies/dsh-flow-registry';
 // SSoT: delivery mode labels come from dsh-delivery-mode.model, not inline strings.
-import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';
+import { getDshDeliveryModeDefinition } from '../../shared/contracts/dsh-delivery-mode.model';
 import { buildOperationsHref } from '../operations/operations.registry';
 import { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
 import { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';

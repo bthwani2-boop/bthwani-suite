@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ScrollView, View, Pressable } from 'react-native';
 import {
   Badge,
@@ -37,10 +37,10 @@ import {
   type FieldOnboardingSectionId,
   type FieldStoreFile,
   type FieldDocumentPreviewStatus,
-} from '../../shared/field-store-model';
+} from '../../shared/contracts/field-store-model';
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
-import { getOperationsSupportFlowsForSurface } from '../../shared/support-flows';
-import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
+import { getOperationsSupportFlowsForSurface } from '../../shared/state-machines/support-flows';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/policies/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 const FIELD_ONBOARDING_OPERATION_FLOWS = getOperationsSupportFlowsForSurface('app-field');

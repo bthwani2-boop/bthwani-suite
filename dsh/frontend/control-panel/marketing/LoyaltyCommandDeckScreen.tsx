@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -27,7 +27,7 @@ function getLoyaltyPrograms(): LoyaltyProgram[] { return []; }
 function getLoyaltyRewards(): LoyaltyReward[] { return []; }
 function getLoyaltyTiers(): LoyaltyTier[] { return []; }
 function getSubscriptionPlans(): SubscriptionPlan[] { return []; }
-import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
+import { mapStoreCommercialFeatures } from '../../shared/adapters/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-viewer';
 
 

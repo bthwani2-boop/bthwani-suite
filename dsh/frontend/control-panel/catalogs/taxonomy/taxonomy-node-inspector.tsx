@@ -5,7 +5,7 @@ import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { DSH_COMMON_MEDIA_KEYS, type CatalogMainCategory, type CatalogProductMaster } from '../catalogs.data';
 import type { CatalogTaxonomyNodeRef } from '../catalogs.model';
 import { WatermarkedImage } from '../catalogs.parts';
-import { getActualPublicMediaPath } from '../../../shared/resolve-dsh-public-media-path';
+import { getActualPublicMediaPath } from '../../../shared/media/resolve-dsh-public-media-path';
 
 type TaxonomyNodeInspectorProps = {
   previewCategories: CatalogMainCategory[];

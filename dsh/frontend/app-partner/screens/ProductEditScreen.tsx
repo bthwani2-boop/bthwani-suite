@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ScrollView } from 'react-native';
 import {
   Box,
@@ -19,16 +19,16 @@ import {
   type DshProductIdentityApprovalStatus,
   getDshProductApprovalStatusLabel,
   getDshProductApprovalStatusTone,
-} from '../../shared/dsh-product-identity.model';
+} from '../../shared/contracts/dsh-product-identity.model';
 import {
   type DshProductRecord,
   type DshCreateProductRequest,
   type DshUpdateProductRequest,
-} from '../../shared/dsh-product-api.client';
+} from '../../shared/api/dsh-product-api.client';
 import {
   createDshProductApiHttpClient,
   resolveDshProductApiBaseUrl,
-} from '../../shared/dsh-product-api.transport';
+} from '../../shared/api/dsh-product-api.transport';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

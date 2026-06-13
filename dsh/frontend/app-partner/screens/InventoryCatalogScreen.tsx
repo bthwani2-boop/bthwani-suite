@@ -1,4 +1,4 @@
-/**
+﻿/**
  * InventoryCatalogScreen — Partner Surface
  *
  * Runtime truth: GET /stores/{store_id}/products via dsh-product-api.client.ts.
@@ -8,9 +8,9 @@
  * Catalog identity (name, category, publishStage) comes from the DSH backend — partners do not define it locally.
  */
 import React from 'react';
-import type { DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
-import { createDshMediaApiHttpClient } from '../../shared/dsh-media-api.client';
-import { resolveDshProductApiBaseUrl, createDshProductApiHttpClient } from '../../shared/dsh-product-api.transport';
+import type { DshCanonicalProductCard } from '../../shared/presentation-models/dshStoreProductCardModel';
+import { createDshMediaApiHttpClient } from '../../shared/api/dsh-media-api.client';
+import { resolveDshProductApiBaseUrl, createDshProductApiHttpClient } from '../../shared/api/dsh-product-api.transport';
 import {
   type DshCatalogDomainId,
   type DshCatalogMainCategoryId,
@@ -22,13 +22,13 @@ import {
   DSH_PRODUCT_FACET_LABELS as FACET_LABELS,
   DSH_OPERATIONAL_FACETS,
   isDshOperationalFacet,
-} from '../../shared/catalog';
+} from '../../shared/contracts/catalog';
 import {
   createDshStoreVisibilityHttpClient,
   resolveDshStoreVisibilityBaseUrl,
   type DshStoreVisibilityTransportError,
-} from '../../shared/dsh-store-visibility-transport';
-import type { PartnerReadinessStatus } from '../../shared/dsh-store-visibility-client';
+} from '../../shared/api/dsh-store-visibility-transport';
+import type { PartnerReadinessStatus } from '../../shared/api/dsh-store-visibility-client';
 
 import {
   BThwaniFilterRail,
@@ -63,7 +63,7 @@ import {
   translateStage,
   translateEntityType,
   canRenderInClientSurface,
-} from '../../shared/workflow';
+} from '../../shared/state-machines/workflow';
 
 
 // ── Light list model — only what is needed per row ────────────────────

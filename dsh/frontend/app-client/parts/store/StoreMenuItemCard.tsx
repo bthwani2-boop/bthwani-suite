@@ -1,11 +1,11 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import type { ImageSourcePropType } from 'react-native';
 import { ProductCard } from '@bthwani/ui-kit';
-import { type DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
-import { canRenderInClientSurface } from '../../../shared/workflow';
-import { mapMenuItemToProductCard } from '../../shared/map-menu-item-to-product-card';
-import { resolveDshRuntimeImageSource } from '../../shared/resolve-runtime-image-source';
-import { normalizeDisplayText } from '../../shared/store-formatting';
+import { type DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+import { canRenderInClientSurface } state-machines/workflow';
+import { mapMenuItemToProductCard } map-menu-item-to-product-card';
+import { resolveDshRuntimeImageSource } resolve-runtime-image-source';
+import { normalizeDisplayText } store-formatting';
 
 export function resolveDshStoreMenuItemImageSource(item: DshStoreGetMenuItem): ImageSourcePropType | undefined {
 	if (!canRenderInClientSurface(item.publishStage, 'product-media')) {

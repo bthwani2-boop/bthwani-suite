@@ -1,6 +1,6 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import type { DiscoveryFilter } from '../contracts/dsh-home-types';
-import { buildHomeCategoryFilterId } from '../shared/home-search-helpers';
+import { buildHomeCategoryFilterId } home-search-helpers';
 
 type HomeDialAnchorLayout = {
 	x: number;

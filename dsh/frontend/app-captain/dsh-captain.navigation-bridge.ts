@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DSH Captain Navigation Bridge
  * CONTRACT_SCAFFOLD — Not UI preview. This file is live runtime code.
  * contractState 'CONTRACT_SCAFFOLD_PREVIEW_ONLY' means the WLT/COD settlement binding is scaffolded (J-010).
@@ -14,10 +14,10 @@
  */
 
 import type { DshCaptainRoute } from './dsh-captain.types';
-import type { DshCaptainOrderStage } from '../shared/dsh-order.contract';
-import type { DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
-import type { DshSignalEventKind } from '../shared/dsh-signal-layer.model';
-import { getHandoffsForSurface, type DshOrderLifecycleHandoff } from '../shared/dsh-order-lifecycle-handoffs';
+import type { DshCaptainOrderStage } from '../shared/contracts/dsh-order.contract';
+import type { DshFulfillmentDeliveryMode } from '../shared/contracts/dsh-delivery-mode.model';
+import type { DshSignalEventKind } from '../shared/contracts/dsh-signal-layer.model';
+import { getHandoffsForSurface, type DshOrderLifecycleHandoff } from '../shared/contracts/dsh-order-lifecycle-handoffs';
 
 // ─── Captain lifecycle state ──────────────────────────────────────────────────
 

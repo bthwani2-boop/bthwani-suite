@@ -1,4 +1,4 @@
-// P0-05: Catalog publishing gate — control-panel/catalogs is the ONLY surface that can publish.
+﻿// P0-05: Catalog publishing gate — control-panel/catalogs is the ONLY surface that can publish.
 // All prerequisites must be satisfied before the publish CTA is enabled.
 // Prerequisites: partner active + all items approved + delivery modes ready + category mapped + no duplicates.
 // Audit note is shown when the gate record flags auditRequired = true.
@@ -6,7 +6,7 @@
 import React from 'react';
 import { Box, Button, Chip, KeyValueList, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
-import { resolveDshProductClientVisibility } from '../../shared/dsh-client-visibility.model';
+import { resolveDshProductClientVisibility } from '../../shared/contracts/dsh-client-visibility.model';
 import type {
   DshProductIdentityApprovalStatus,
   DshProductCategoryMappingStatus,

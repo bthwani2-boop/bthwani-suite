@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ScrollView } from 'react-native';
 import {
   Box,
@@ -18,11 +18,11 @@ import {
 import {
   type DshProductRecord,
   type DshCatalogOverrideInput,
-} from '../../shared/dsh-product-api.client';
+} from '../../shared/api/dsh-product-api.client';
 import {
   createDshProductApiHttpClient,
   resolveDshProductApiBaseUrl,
-} from '../../shared/dsh-product-api.transport';
+} from '../../shared/api/dsh-product-api.transport';
 
 export type ProductOverridesScreenProps = {
   productId: string;

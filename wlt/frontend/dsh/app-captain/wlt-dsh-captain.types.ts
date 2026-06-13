@@ -1,8 +1,8 @@
-import type {
+﻿import type {
   WltCaptainFinanceSection,
   WltCaptainFinanceSnapshot,
   WltDshFinanceSummaryRecord,
-} from '../control-panel/financeContracts';
+} from '../shared';
 
 export type WltDshCaptainBridgeSection = WltCaptainFinanceSection;
 

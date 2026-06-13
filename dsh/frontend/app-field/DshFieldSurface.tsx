@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
 import { useAppFieldAppearance } from '../../../app-field/shell/appearance';
 import { BottomNavBar, useTheme } from '@bthwani/ui-kit';
@@ -20,7 +20,7 @@ import {
   submitFieldStoreForReview,
   touchFieldStoreDraft,
   type FieldStoreFile,
-} from '../shared/field-store-model';
+} from '../shared/contracts/field-store-model';
 import {
   createDshFieldVisitHttpClient,
   createDshFieldStoreOnboardingHttpClient,

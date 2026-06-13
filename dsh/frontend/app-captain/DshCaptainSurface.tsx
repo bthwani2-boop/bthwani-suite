@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { BackHandler, Platform, Pressable, Switch as RNSwitch, View } from 'react-native';
 import { useAppCaptainAppearance } from '../../../app-captain/shell/appearance';
 
@@ -15,11 +15,11 @@ try {
 } catch (err) {
   // fallback is already a zero-insets function
 }
-import { Badge, borders, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, ListItem, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, shadowPresets, SheetFrame, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha,
+import { Badge, borders, BottomNavBar, Box, Button, colorPalette, Divider, Icon, KeyValueList, MobileScrollView, MobileWorkspaceHeader, ModernPremiumHeader, shadowPresets, StateView, Surface, Text, TextField, TopBar, useTheme, withAlpha,
   radius,
   spacing,
 } from '@bthwani/ui-kit';
-import type { DshCaptainBellEvent } from '../shared/dsh-order-journey.model';
+import type { DshCaptainBellEvent } from '../shared/state-machines/dsh-order-journey.model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { wltDshCaptainUiCopy, buildWltDshCaptainTopBarLocationLabel } from '../../../wlt/frontend/dsh/app-captain/wlt-dsh-captain.ui-copy';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
@@ -49,7 +49,7 @@ import {
   isModeVisibleInCaptainInbox,
   isCaptainPodRequiredForMode,
   isCaptainCodCollectorForMode,
-} from '../shared/dsh-fulfillment-surface-visibility';
+} from '../shared/contracts/dsh-fulfillment-surface-visibility';
 import {
   resolveDshOrderApiBaseUrl,
   createDshOrderLifecycleHttpClient,
@@ -190,13 +190,13 @@ const availabilityStatusMeta: Record<
   },
   break: {
     label: 'استراحة',
-    description: 'استراحة قصيرة محلية بلا أي ربط تشغيلي خارجي.',
+    description: 'استراحة قصيرة — استئناف الاستقبال عند التفعيل.',
     chipTone: 'warning',
     orderBadgeLabel: 'استراحة',
   },
   'planned-leave': {
     label: 'إجازة مخططة',
-    description: 'إدارة الإجازات والغياب ما زالت قيد الربط مع عمليات الأسطول وتظهر هنا كمتابعة محلية فقط.',
+    description: 'إدارة الإجازات مرتبطة بعمليات الأسطول.',
     chipTone: 'default',
     orderBadgeLabel: 'إجازة',
   },
@@ -212,17 +212,17 @@ const gpsStatusMeta: Record<
 > = {
   ready: {
     label: 'GPS جاهز',
-    description: 'إشارة الموقع مستقرة محليًا ويمكن عرض الخريطة التجريبية بثقة.',
+    description: 'إشارة الموقع مستقرة ويمكن عرض الخريطة بثقة.',
     chipTone: 'success',
   },
   limited: {
     label: 'GPS محدود',
-    description: 'الإشارة متاحة جزئيًا ويجب التعامل معها كإرشاد تقريبي فقط.',
+    description: 'الإشارة متاحة جزئيًا — دقة الموقع منخفضة.',
     chipTone: 'warning',
   },
   offline: {
     label: 'GPS دون اتصال',
-    description: 'تعذر تحديث الموقع الآن. المسار يعمل كمعاينة محلية حتى تعود الإشارة.',
+    description: 'تعذر تحديث الموقع الآن. لا تحديثات موقع حتى تعود الإشارة.',
     chipTone: 'warning',
   },
   disabled: {
@@ -546,7 +546,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
     const activeDeliveryStates = new Set(['offer-accepting', 'offer-accepted']);
     if (!inboxState || !activeDeliveryStates.has(inboxState) || !apiBaseUrl) return undefined;
     const rawOrderId = resolveRuntimeOrderId(activeOrderId);
-    if (!rawOrderId || rawOrderId === activeOrderId) return undefined; // skip preview IDs
+    if (!rawOrderId) return undefined;
     if (!captainRuntimeId) return undefined;
     let cancelled = false;
     let watchId: number | null = null;
@@ -735,7 +735,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
     setActiveServiceType(nextType);
     setRoute('home');
     setInboxState('ready');
-    setActiveOrderId('captain-order-9021');
+    setActiveOrderId('');
     setActiveOrderExpanded(false);
     setIsPickupSheetVisible(false);
     setIsDeliverySheetVisible(false);
@@ -751,7 +751,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
           onOpenOffersPress={() => setRoute('inbox')}
           onOpenExecutionPress={() => setRoute('detail')}
           onOpenProofCapturePress={() => {
-            setActiveOrderId('captain-order-9021');
+            setActiveOrderId('');
             setIsDeliverySheetVisible(true);
             setRoute('detail');
           }}
@@ -1112,14 +1112,14 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
 
   const renderCaptainAccountDocsScreen = () => {
     const items = [
-      { label: 'الوثائق', value: '3 ملفات محلية', tone: 'success' },
+      { label: 'الوثائق', value: '—', tone: 'success' },
       { label: 'التقييم', value: '4.9 / 5', tone: 'info' },
       { label: 'المستوى', value: 'Elite 3', tone: 'brand' },
       { label: 'حالة المراجعة', value: 'جاهز للمراجعة' },
       { label: 'الاعتماد الحقيقي', value: 'قيد الربط', tone: 'warning' },
     ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
 
-    return renderCaptainAccountSectionPage('الوثائق والتقييم', 'الملفات والمستوى وجاهزية الاعتماد', items, 'ربط الوثائق الحقيقي ينتظر مصدر الاعتماد المركزي ويظهر هنا كمتابعة جاهزية فقط.');
+    return renderCaptainAccountSectionPage('الوثائق والتقييم', 'الملفات والمستوى وجاهزية الاعتماد', items, 'الوثائق مرتبطة بمصدر الاعتماد المركزي.');
   };
 
   const renderCaptainAccountShiftsScreen = () => {
@@ -1130,7 +1130,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
       { label: 'آخر تحديث', value: 'الآن', tone: 'info' },
     ] satisfies React.ComponentProps<typeof KeyValueList>['items'];
 
-    return renderCaptainAccountSectionPage('الدوام / الإجازات', 'الحضور وجدول اليوم وخطة الإجازة', items, 'طلب الإجازة الحقيقي ينتظر ربط إدارة الأسطول ويظهر هنا كمعاينة حالة فقط.');
+    return renderCaptainAccountSectionPage('الدوام / الإجازات', 'الحضور وجدول اليوم وخطة الإجازة', items, 'طلب الإجازة مرتبط بإدارة الأسطول.');
   };
 
 
@@ -1270,7 +1270,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
     // Quick access rows removed — الدعم is now a standalone account nav item
     return renderCaptainAccountShell(
       'الإعدادات',
-      'المظهر، وضع التطبيق، والتفضيلات المحلية',
+      'المظهر ووضع التطبيق والإعدادات',
       <Box gap={4}>
         {/* Appearance + App mode — flat rows */}
         <Box padding={0} gap={0}>

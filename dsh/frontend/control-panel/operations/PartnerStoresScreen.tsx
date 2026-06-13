@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -14,7 +14,7 @@ import { buildOperationsHref } from './operations.registry';
 import {
   createDshStoreVisibilityHttpClient,
   resolveDshStoreVisibilityBaseUrl,
-} from '../../shared/dsh-store-visibility-transport';
+} from '../../shared/api/dsh-store-visibility-transport';
 
 export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
 

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
@@ -8,7 +8,7 @@ import {
   WebSectionCard,
   WebSignalCard,
 } from '@bthwani/ui-kit/web';
-import type { AdminRole, MockAdminUser, AdminUserStatus } from './administration.types';
+import type { AdminRole, DshAdminUser, AdminUserStatus } from './administration.types';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import {
   DSH_ROLE_PERMISSIONS,
@@ -16,14 +16,14 @@ import {
   DSH_REASON_EVIDENCE_POLICY,
   getDshRoleCanPerform,
   getDshRoleArabicName,
-} from '../../shared/dsh-role-permission.model';
-import type { DshRoleId } from '../../shared/dsh-role-permission.model';
+} from '../../shared/policies/dsh-role-permission.model';
+import type { DshRoleId } from '../../shared/policies/dsh-role-permission.model';
 import styles from '../shared/control-panel-surface.module.css';
 
 const ADMIN_ROLES: AdminRole[] = [];
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PLATFORM_PERMISSIONS: Record<string, any>[] = [];
-const MOCK_USERS: MockAdminUser[] = [];
+const MOCK_USERS: DshAdminUser[] = [];
 
 type AdminWorkspaceId = 'overview' | 'roles' | 'users' | 'approval-chain' | 'maker-checker' | 'sensitive-decisions';
 
@@ -156,7 +156,7 @@ function PermissionMatrix() {
 
 // ─── User card ───────────────────────────────────────────────────────────────
 
-function UserCard({ user }: { user: MockAdminUser }) {
+function UserCard({ user }: { user: DshAdminUser }) {
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = React.useState<AdminUserStatus>(user.status);
   const role = ADMIN_ROLES.find((r) => r.id === user.roleId);

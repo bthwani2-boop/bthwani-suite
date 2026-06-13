@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable, Switch as RNSwitch, View, Share, BackHandler } from 'react-native';
 import {
   AppearanceOptionCard,
@@ -34,21 +34,21 @@ import {
   wltDshPartnerUiCopy,
 } from '../../../../wlt/frontend/dsh/app-partner/wlt-dsh-partner.ui-copy';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
-import type { DshCanonicalStoreCard } from '../../shared/dshStoreProductCardModel';
-import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
-import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
+import type { DshCanonicalStoreCard } from '../../shared/presentation-models/dshStoreProductCardModel';
+import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/contracts/dsh-client-visibility.model';
+import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/state-machines/workflow';
 import { WltDshPartnerBridge } from '../../../../wlt/frontend/dsh/app-partner';
-import type { DshFulfillmentDeliveryMode } from '../../shared/dsh-delivery-mode.model';
+import type { DshFulfillmentDeliveryMode } from '../../shared/contracts/dsh-delivery-mode.model';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
 import {
   getDshPartnerJourneyStep,
   resolveDshPartnerLifecycleStageLabel,
   type DshPartnerLifecycleStage,
-} from '../../shared/dsh-partner-onboarding-journey.map';
-import { getDshPartnerActivationStatusLabel } from '../../shared/dsh-partner-activation.model';
-import { createDshMediaApiHttpClient, type DshMediaAsset } from '../../shared/dsh-media-api.client';
-import { resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
+} from '../../shared/state-machines/dsh-partner-onboarding-journey.map';
+import { getDshPartnerActivationStatusLabel } from '../../shared/contracts/dsh-partner-activation.model';
+import { createDshMediaApiHttpClient, type DshMediaAsset } from '../../shared/api/dsh-media-api.client';
+import { resolveDshProductApiBaseUrl } from '../../shared/api/dsh-product-api.transport';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';

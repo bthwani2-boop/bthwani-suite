@@ -1,4 +1,4 @@
-export type DshCaptainRoute =
+﻿export type DshCaptainRoute =
   | 'home'
   | 'account'
   | 'account-profile'
@@ -48,7 +48,7 @@ export type {
   DshCaptainState,
   DshCaptainStateGroup,
   DshCaptainStateMeta,
-} from '../shared/client-state';
+} from '../shared/state-machines/client-state';
 
 export type {
   DshCaptainFinanceSnapshot,

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { Dimensions, Image, Modal, Platform, Pressable, ScrollView, View } from 'react-native';
 import {
   Button,
@@ -30,17 +30,17 @@ import {
   typographyRoles,
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../parts/CartDetails';
-import { formatDshPrice, formatDshPriceMinorUnits } from '../../shared/dsh-price-format';
-import { getDshClientStateMeta, type DshClientState } from '../../shared/client-state';
+import { formatDshPrice, formatDshPriceMinorUnits } adapters/dsh-price-format';
+import { getDshClientStateMeta, type DshClientState } state-machines/client-state';
 // getPartnerOfferItems removed — offers come from API, not fixtures.
-import { isClientVisibleStatus, type CommercialLifecycleStatus } from '../../shared/commercial-contract';
+import { isClientVisibleStatus, type CommercialLifecycleStatus } contracts/commercial-contract';
 // getEntitlements removed — subscriptions/entitlements come from API, not fixtures.
 import {
   resolveWltDshFinanceEventKindForPaymentMethod,
   useWltDshWalletSession,
   type WltDshFinanceEventKind,
 } from '../../../../wlt/frontend/dsh/app-client';
-import { resolveDshRuntimeImageSource } from '../shared/resolve-runtime-image-source';
+import { resolveDshRuntimeImageSource } resolve-runtime-image-source';
 import {
   type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,
@@ -49,9 +49,9 @@ import {
 } from '../contracts/dsh-client-binding.contracts';
 // SSoT: COD availability per delivery mode — bthwani_delivery only.
 import { isCodAllowedForMode } from '../dsh-client-wlt-payment-bridge';
-import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } policies/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
-import type { DshCheckoutClient } from '../../shared/dsh-checkout-client';
+import type { DshCheckoutClient } api/dsh-checkout-client';
 
 const PAGE_BG = colorPalette.pageBackground;
 const SURFACE_SOFT = colorPalette.surfaceSecondary;
@@ -87,7 +87,7 @@ type QuickActionMeta = {
 };
 
 // Cart fixtures removed — recommended products and fallback items come from API, not fixtures.
-import type { RecommendationProduct, CartItem } from '../../shared/dsh-order.contract';
+import type { RecommendationProduct, CartItem } contracts/dsh-order.contract';
 
 type PaymentMethodKey = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
 

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Text, Surface, KeyValueList } from '@bthwani/ui-kit';
@@ -16,7 +16,7 @@ import {
   getDshPartnerVisibilityBadgeLabel,
   getDshPartnerVisibilityBadgeTone,
   getDshPartnerActivationStatusLabel,
-} from '../../shared/dsh-partner-activation.model';
+} from '../../shared/contracts/dsh-partner-activation.model';
 import {
   PARTNER_FULFILLMENT_AGREEMENTS,
   getPartnerActivationStatus,

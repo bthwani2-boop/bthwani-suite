@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
 import { BottomNavBar, Box, Button, ModernPremiumHeader, Surface, Text,
   spacing,
@@ -19,10 +19,10 @@ import {
 } from './dsh-partner.types';
 import {
   getSurfaceModeCapability,
-} from '../shared/dsh-fulfillment-surface-visibility';
+} from '../shared/contracts/dsh-fulfillment-surface-visibility';
 import {
   getActionableHandoffsForSurface,
-} from '../shared/dsh-order-lifecycle-handoffs';
+} from '../shared/contracts/dsh-order-lifecycle-handoffs';
 import {
   resolveDshOrderApiBaseUrl,
   createDshOrderLifecycleHttpClient,

@@ -7,15 +7,15 @@ import { FilterDropdown } from './catalogs.parts';
 import {
   type DshProductIdentityApprovalStatus,
   getDshProductApprovalStatusTone,
-} from '../../shared/dsh-product-identity.model';
+} from '../../shared/contracts/dsh-product-identity.model';
 import {
   getAllApprovalRecords,
   moveApprovalRecordToStage,
   upsertApprovalRecord,
   type ApprovalRecord,
   type ApprovalStage,
-} from '../../shared/workflow';
-import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
+} from '../../shared/state-machines/workflow';
+import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../shared/api/dsh-product-api.transport';
 
 type ItemApprovalStatus = 'pending' | 'approved' | 'rejected' | 'needs-revision';
 
@@ -117,7 +117,7 @@ export function ItemApprovalScreen({
             category: 'منتج كتالوج',
             submittedAt: p.created_at ? p.created_at.split('T')[0] : '',
             status,
-            approvalStatus: p.approval_status as import('../../shared/dsh-product-identity.model').DshProductIdentityApprovalStatus,
+            approvalStatus: p.approval_status as import('../../shared/contracts/dsh-product-identity.model').DshProductIdentityApprovalStatus,
             auditRequired: false,
           };
         });

@@ -1,16 +1,16 @@
-import React from 'react';
+﻿import React from 'react';
 import { Platform } from 'react-native';
 import {
   createDshOrderLifecycleHttpClient,
   type DshCheckoutAuthContext,
   type DshOrderDetailsResponse,
 } from '../../shared';
-import { resolveDshDiscoveryStoresRuntimeConfig } from '../shared/dsh-discovery-stores-runtime-config';
+import { resolveDshDiscoveryStoresRuntimeConfig } dsh-discovery-stores-runtime-config';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import { initialOrders, hostClientStates } from '../dsh-client.navigation-bridge';
 import { getClientWltIntentForState, type DshClientWltIntentEntry } from '../dsh-client-wlt-payment-bridge';
-import { getDshClientStateMeta, type DshClientState } from '../../shared/client-state';
+import { getDshClientStateMeta, type DshClientState } state-machines/client-state';
 import type { DshRoute } from '../dsh-client.types';
 
 const TERMINAL_STATUSES = new Set(['DELIVERED', 'CANCELLED', 'REFUNDED', 'FAILED_DELIVERY', 'RETURNED']);
@@ -26,7 +26,7 @@ function statusToLabel(status: string): string {
   return labels[status] ?? status;
 }
 
-function statusToClientState(status: string): import('../../shared/client-state').DshClientState {
+function statusToClientState(status: string): import('../../shared/state-machines/client-state').DshClientState {
   if (status === 'DELIVERED') return hostClientStates.delivered;
   if (status === 'CANCELLED') return hostClientStates.cancelled;
   if (TERMINAL_STATUSES.has(status)) return hostClientStates.delivered;

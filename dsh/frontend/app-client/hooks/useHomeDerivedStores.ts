@@ -1,23 +1,23 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import type {
   DshHomeCategory,
   DshHomeGetStore,
   DiscoveryFilter,
   StorePagerPage,
 } from '../contracts/dsh-home-types';
-import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
-import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
+import type { DshPartnerActivationStatus } contracts/dsh-partner-activation.model';
+import { resolveDshStoreClientVisibility } contracts/dsh-client-visibility.model';
 import {
   getHomePromoVisibilityRecord,
   isMarketingRenderable,
-} from '../../shared/marketing-visibility.contract';
-import type { HomePromoRecord } from '../../shared/dsh-marketing-types';
+} contracts/marketing-visibility.contract';
+import type { HomePromoRecord } contracts/dsh-marketing-types';
 import type { HomeStoreCardEntry } from '../parts/home/HomeStoreFeedSection';
-import { resolveHomePromoPublishStage } from '../shared/home-promo-mappers';
-import { resolveHomeStoresForCategory } from '../shared/home-search-helpers';
-import { resolveDshRuntimeImageSource } from '../shared/resolve-runtime-image-source';
+import { resolveHomePromoPublishStage } home-promo-mappers';
+import { resolveHomeStoresForCategory } home-search-helpers';
+import { resolveDshRuntimeImageSource } resolve-runtime-image-source';
 // getPublishedHomePromos removed — home promos come from API.
-import { canRenderInClientSurface } from '../../shared/workflow';
+import { canRenderInClientSurface } state-machines/workflow';
 
 type UseHomeDerivedStoresParams = {
   stores?: DshHomeGetStore[];

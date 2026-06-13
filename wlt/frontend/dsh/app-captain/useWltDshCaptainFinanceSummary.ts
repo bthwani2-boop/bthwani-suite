@@ -1,9 +1,9 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   type WltCaptainFinanceSection,
   type WltCaptainFinanceSnapshot,
   type WltDshFinanceSummaryRecord,
-} from '../control-panel/financeContracts';
+} from '../shared';
 import { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
 import * as WltCaptainAdapter from './wlt-dsh-captain.adapter';
 

@@ -1,7 +1,7 @@
-import type {
+﻿import type {
   WltDshFinanceSummaryRecord,
   WltPartnerFinanceSnapshot,
-} from '../control-panel/financeContracts';
+} from '../shared';
 
 export type WltDshPartnerWalletPreview = {
   balanceLabel: string;

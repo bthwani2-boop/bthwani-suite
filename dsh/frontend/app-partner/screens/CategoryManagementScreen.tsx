@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ScrollView, Alert } from 'react-native';
 import {
   Box,
@@ -19,11 +19,11 @@ import {
   type DshCategoryRecord,
   type DshCreateCategoryRequest,
   type DshUpdateCategoryRequest,
-} from '../../shared/dsh-product-api.client';
+} from '../../shared/api/dsh-product-api.client';
 import {
   createDshProductApiHttpClient,
   resolveDshProductApiBaseUrl,
-} from '../../shared/dsh-product-api.transport';
+} from '../../shared/api/dsh-product-api.transport';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

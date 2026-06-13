@@ -1,7 +1,7 @@
-import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
+﻿import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 
 import type { DshFulfillmentDeliveryMode } from './dsh-client-binding.contracts';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
 import type { useStoreState } from '../hooks/useStoreState';
 import type { useStoreDerivedItems } from '../hooks/useStoreDerivedItems';
 
@@ -24,7 +24,7 @@ export type DshStoreGetScreenProps = {
     subscriptionPackageChips?: string[];
     hasBthwaniPro?: boolean;
     publishStage?: string;
-    commercialSourceMap?: import('../../shared/store-card-commercial-map').CommercialSourceMap;
+    commercialSourceMap?: import('../../shared/adapters/store-card-commercial-map').CommercialSourceMap;
     tags?: string[];
     categories?: Array<{ id: string; label: string; itemCount: number; isPopular?: boolean }>;
     deliveryModes?: Array<{ id: DshFulfillmentDeliveryMode; name: string; isAvailable: boolean; estimatedTime?: string; fee?: number }>;

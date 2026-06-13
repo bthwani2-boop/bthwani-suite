@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { Animated, FlatList, Platform, View, type ImageSourcePropType } from 'react-native';
 import {
   BThwaniFilterSwipeBoundary,
@@ -7,12 +7,12 @@ import {
   colorPalette,
   type BThwaniFilterRailItem,
 } from '@bthwani/ui-kit';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
-import type { DshStoreSearchCategory } from '../../shared/store-search-helpers';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
+import type { DshStoreSearchCategory } store-search-helpers';
 import type { DshFulfillmentDeliveryMode } from '../../contracts/dsh-client-binding.contracts';
 import { MenuItemCard } from './StoreMenuItemCard';
-import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../../../shared/category-icons';
-import { normalizeDisplayText } from '../../shared/store-formatting';
+import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } contracts/category-icons';
+import { normalizeDisplayText } store-formatting';
 import { StoreFilterRailSection } from './StoreFilterRailSection';
 import type { styles as storeScreenStyles } from './store-screen.styles';
 

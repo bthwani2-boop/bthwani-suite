@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -74,7 +74,7 @@ const REQUIRED_CONTROL_PANEL_SECTIONS = [
 const tasks = read('dsh/docs/JOURNIES/tasks');
 const capabilityMap = read('dsh/frontend/shared/full-stack/bthwani-full-stack-capability.map.ts');
 const capabilitiesFile = read('dsh/frontend/shared/full-stack/bthwani-full-stack-capabilities.ts');
-const governanceMap = read('dsh/frontend/shared/dsh-governance.map.ts');
+const governanceMap = read('dsh/frontend/shared/control-panel/dsh-governance.map.ts');
 const coverageTypesFile = read('dsh/frontend/shared/full-stack/bthwani-full-stack-coverage.types.ts');
 
 if (!tasks) {
@@ -105,7 +105,7 @@ for (const capId of REQUIRED_CAPABILITIES) {
 
 for (const section of REQUIRED_CONTROL_PANEL_SECTIONS) {
   if (governanceMap && !new RegExp(`['"]${section}['"]`).test(governanceMap)) {
-    add('FAIL', 'control_panel_section_missing_from_governance_map', 'dsh/frontend/shared/dsh-governance.map.ts', section, 'Keep all 10 control-panel sections in the governance map.');
+    add('FAIL', 'control_panel_section_missing_from_governance_map', 'dsh/frontend/shared/control-panel/dsh-governance.map.ts', section, 'Keep all 10 control-panel sections in the governance map.');
   }
 }
 
@@ -113,14 +113,14 @@ if (governanceMap) {
   const forbiddenInMap = /\bpreview-only\b|financeReference:\s*['"]wlt-finance['"]/g;
   let m;
   while ((m = forbiddenInMap.exec(governanceMap))) {
-    add('FAIL', 'governance_map_preview_or_legacy_reference', 'dsh/frontend/shared/dsh-governance.map.ts', m[0], 'Replace preview-only or wlt-finance with wlt-read-model, wlt-reference-required, or blocked-by-policy.');
+    add('FAIL', 'governance_map_preview_or_legacy_reference', 'dsh/frontend/shared/control-panel/dsh-governance.map.ts', m[0], 'Replace preview-only or wlt-finance with wlt-read-model, wlt-reference-required, or blocked-by-policy.');
   }
 }
 
 const requiredFullStackFields = ['fullStackCapabilities', 'requiredSurfaces', 'inputOwnership', 'runtimeTruth'];
 for (const field of requiredFullStackFields) {
   if (governanceMap && !governanceMap.includes(field)) {
-    add('FAIL', 'governance_map_full_stack_field_missing', 'dsh/frontend/shared/dsh-governance.map.ts', field, 'All governance section entries must include full-stack fields.');
+    add('FAIL', 'governance_map_full_stack_field_missing', 'dsh/frontend/shared/control-panel/dsh-governance.map.ts', field, 'All governance section entries must include full-stack fields.');
   }
 }
 

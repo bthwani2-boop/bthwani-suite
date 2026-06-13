@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Text, Surface, KeyValueList } from '@bthwani/ui-kit';
@@ -9,7 +9,7 @@ import {
   WebControlPanelActionCluster,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import { type DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
+import { type DshPartnerActivationStatus } from '../../shared/contracts/dsh-partner-activation.model';
 import {
   PARTNER_FULFILLMENT_AGREEMENTS,
   type DshPartnerDocumentVerification,

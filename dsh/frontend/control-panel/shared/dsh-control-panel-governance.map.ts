@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DSH Control Panel Governance Map — compatibility re-export shim
  * SESSION: DSH_PHASE_5_FINAL_LOGIC_CLOSURE-20260521-071500
  *
@@ -14,7 +14,7 @@
 export type {
   DshControlPanelSectionId,
   DshControlPanelGovernanceEntry,
-} from '../../shared/dsh-governance.map';
+} from '../../shared/control-panel/dsh-governance.map';
 
 export {
   DSH_CONTROL_PANEL_SECTION_IDS,
@@ -25,4 +25,4 @@ export {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceSectionsForSurface,
   resolveDshControlPanelSectionLabel,
-} from '../../shared/dsh-governance.map';
+} from '../../shared/control-panel/dsh-governance.map';

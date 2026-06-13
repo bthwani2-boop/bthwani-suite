@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -12,7 +12,7 @@ import { Box } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
 import { getDynamicUiAudits, resolveAuditEntry } from '../../shared';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
-import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/adapters/dsh-operational-runtime-adapter';
 import styles from '../shared/control-panel-surface.module.css';
 import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 

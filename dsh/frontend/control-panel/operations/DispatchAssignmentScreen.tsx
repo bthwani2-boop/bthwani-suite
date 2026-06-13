@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -8,8 +8,8 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
-import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order.contract';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/adapters/dsh-operational-runtime-adapter';
+import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/contracts/dsh-order.contract';
 import {
   resolveDshOrderApiBaseUrl,
   createDshOrderLifecycleHttpClient,
@@ -17,7 +17,7 @@ import {
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
-import { getDshLifecycleStateMetadata } from '../../shared/dsh-order-journey.model';
+import { getDshLifecycleStateMetadata } from '../../shared/state-machines/dsh-order-journey.model';
 import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 // SSoT: dispatch queue visibility is owned by dsh-fulfillment-surface-visibility.
 // Do not duplicate delivery-mode dispatch logic inline — use these helpers.
@@ -25,7 +25,7 @@ import {
   shouldEnterDispatchQueueForMode,
   shouldShowCaptainAssignmentInCP,
   getSurfaceRoleSummaryForMode,
-} from '../../shared/dsh-fulfillment-surface-visibility';
+} from '../../shared/contracts/dsh-fulfillment-surface-visibility';
 
 export type DispatchAssignmentScreenProps = { hubHref: string; subGroup?: string };
 

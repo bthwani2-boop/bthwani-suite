@@ -74,7 +74,7 @@ const tasks = requireFile('dsh/docs/JOURNIES/tasks');
 const operatingModel = requireFile('governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md');
 const goldenSlice = requireFile('governance/22_DSH_GOLDEN_SLICE.md');
 const serviceClosure = requireFile('governance/10_SERVICE_CLOSURE.md');
-const governanceMap = requireFile('dsh/frontend/shared/dsh-governance.map.ts');
+const governanceMap = requireFile('dsh/frontend/shared/control-panel/dsh-governance.map.ts');
 const capabilities = requireFile('dsh/frontend/shared/full-stack/bthwani-full-stack-capabilities.ts');
 const capabilityMap = requireFile('dsh/frontend/shared/full-stack/bthwani-full-stack-capability.map.ts');
 const packageJson = requireFile('package.json');
@@ -99,7 +99,7 @@ for (const [rule, text, file, regex] of requiredDocs) {
 const requiredSections = ['dashboard', 'operations', 'support', 'finance', 'catalogs', 'partners', 'marketing', 'platform', 'administration', 'hr'];
 for (const section of requiredSections) {
   if (!new RegExp(`['"]${section}['"]`).test(governanceMap)) {
-    add('FAIL', 'governance_section_missing', 'dsh/frontend/shared/dsh-governance.map.ts', section, 'Keep current control-panel sections in the shared governance map.');
+    add('FAIL', 'governance_section_missing', 'dsh/frontend/shared/control-panel/dsh-governance.map.ts', section, 'Keep current control-panel sections in the shared governance map.');
   }
   if (!new RegExp(`section === ['"]${section}['"]`).test(host) && section !== 'operations') {
     add('FAIL', 'host_section_missing', 'dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx', section, 'Host must route every current control-panel section.');
@@ -108,14 +108,14 @@ for (const section of requiredSections) {
 
 for (const token of ['fullStackCapabilities', 'requiredSurfaces', 'inputOwnership', 'runtimeTruth']) {
   if (!governanceMap.includes(token)) {
-    add('FAIL', 'governance_full_stack_field_missing', 'dsh/frontend/shared/dsh-governance.map.ts', token, 'Add full-stack governance fields to every section entry.');
+    add('FAIL', 'governance_full_stack_field_missing', 'dsh/frontend/shared/control-panel/dsh-governance.map.ts', token, 'Add full-stack governance fields to every section entry.');
   }
 }
 
 const forbiddenGovernance = /\bpreview-only\b|financeReference:\s*['"]wlt-finance['"]/g;
 let match;
 while ((match = forbiddenGovernance.exec(governanceMap))) {
-  add('FAIL', 'governance_preview_or_legacy_finance_reference', 'dsh/frontend/shared/dsh-governance.map.ts', match[0], 'Use wlt-read-model, wlt-reference-required, or blocked-by-policy.', governanceMap, match.index);
+  add('FAIL', 'governance_preview_or_legacy_finance_reference', 'dsh/frontend/shared/control-panel/dsh-governance.map.ts', match[0], 'Use wlt-read-model, wlt-reference-required, or blocked-by-policy.', governanceMap, match.index);
 }
 
 const requiredCapabilities = [

@@ -1,4 +1,4 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import { Platform, SectionList, View } from 'react-native';
 import { BThwaniFilterSwipeBoundary, StateView, spacing } from '@bthwani/ui-kit';
 
@@ -18,7 +18,7 @@ import type { useHomeFilterRail } from '../../hooks/useHomeFilterRail';
 import type { useHomeVideoHandlers } from '../../hooks/useHomeVideoHandlers';
 import type { useHomeTickerState } from '../../hooks/useHomeTickerState';
 import type { buildHomeScreenStyles } from './home-screen.styles';
-import type { HomePromoRecord } from '../../../shared/dsh-marketing-types';
+import type { HomePromoRecord } contracts/dsh-marketing-types';
 
 export interface HomeScreenShellProps {
   props: DshHomeGetScreenProps;

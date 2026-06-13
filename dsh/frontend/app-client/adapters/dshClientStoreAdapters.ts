@@ -1,8 +1,8 @@
-import { buildStoreTags, buildStoreDeliveryModes } from '../../shared/dsh-store-builders';
-import { formatDshStoreFollowerCount } from '../shared/store-profile';
-import type { DshGetDiscoveryStoreResponse } from '../shared/dsh-discovery-stores-client';
-import type { DshDiscoveryStore } from '../../shared/dshStoreProductCardModel';
-import type { DshProductRecord } from '../../shared/dsh-product-api.client';
+﻿import { buildStoreTags, buildStoreDeliveryModes } adapters/dsh-store-builders';
+import { formatDshStoreFollowerCount } store-profile';
+import type { DshGetDiscoveryStoreResponse } dsh-discovery-stores-client';
+import type { DshDiscoveryStore } presentation-models/dshStoreProductCardModel';
+import type { DshProductRecord } api/dsh-product-api.client';
 
 export function mapProductRecordToItem(p: DshProductRecord) {
   const isAvailable = p.available_override !== false;

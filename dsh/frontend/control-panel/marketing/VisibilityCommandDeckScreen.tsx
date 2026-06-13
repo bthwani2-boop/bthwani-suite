@@ -1,21 +1,21 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Text } from '@bthwani/ui-kit';
 import marketingStyles from './control-panel-marketing.module.css';
 import styles from '../shared/control-panel-surface.module.css';
-import { dshPromotionCandidates } from '../../shared/workflow';
+import { dshPromotionCandidates } from '../../shared/state-machines/workflow';
 import type {
   CampaignAudience,
   CampaignPlacement,
   CampaignRecord,
   CampaignStatus,
   CampaignTargetType,
-} from '../../shared/dsh-marketing-types';
+} from '../../shared/contracts/dsh-marketing-types';
 import type {
   PartnerOfferRecord,
   PartnerOfferStatus,
-} from '../../shared/dsh-partner-offer-types';
+} from '../../shared/contracts/dsh-partner-offer-types';
 import {
   buildCommercialProjection,
   evaluateCommercialConflicts,
@@ -23,30 +23,30 @@ import {
   type CommercialConflict,
   type CommercialLifecycleStatus,
   type PartnerOffer,
-} from '../../shared/commercial-contract';
+} from '../../shared/contracts/commercial-contract';
 import {
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,
-} from '../../shared/marketing-visibility.contract';
+} from '../../shared/contracts/marketing-visibility.contract';
 import {
   getDshPartnerActivationStateMetadata,
   type DshPartnerActivationStatus,
-} from '../../shared/dsh-partner-activation.model';
+} from '../../shared/contracts/dsh-partner-activation.model';
 import {
   getDshProductApprovalStateMetadata,
   type DshProductCategoryMappingStatus,
   type DshProductDuplicateStatus,
   type DshProductIdentityApprovalStatus,
-} from '../../shared/dsh-product-identity.model';
+} from '../../shared/contracts/dsh-product-identity.model';
 import {
   resolveDshProductClientVisibility,
   resolveDshStoreClientVisibility,
-} from '../../shared/dsh-client-visibility.model';
+} from '../../shared/contracts/dsh-client-visibility.model';
 import {
   getDshSignalEventLabel,
   getDshSignalEventTone,
   getDshSignalSummaries,
-} from '../../shared/dsh-signal-layer.model';
+} from '../../shared/contracts/dsh-signal-layer.model';
 import type { MarketingControlView } from './types';
 
 

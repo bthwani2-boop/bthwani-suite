@@ -1,8 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable } from 'react-native';
 import { Box, Button, Chip, SectionHeader, Surface, Text, TextField } from '@bthwani/ui-kit';
 import type { DshPartnerOperationalFlowId, DshPartnerSupportIssueCategoryId } from '../dsh-partner.types';
-import { getOperationsSupportFlowSpec } from '../../shared/support-flows';
+import { getOperationsSupportFlowSpec } from '../../shared/state-machines/support-flows';
 
 export type PartnerOrderIssueFlowId = 'order-issue-queue' | 'order-reject';
 

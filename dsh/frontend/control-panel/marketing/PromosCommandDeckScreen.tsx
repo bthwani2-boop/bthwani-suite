@@ -18,7 +18,7 @@ function toggleHomePromoStatus(_id: string): void {}
 const dshCategoryFixtures: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
 const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
 const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
-import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
+import { resolveDshImageSource } from '../../shared/media/resolve-dsh-image-source';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';

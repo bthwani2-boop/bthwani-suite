@@ -1,6 +1,6 @@
-import React from 'react';
-import { resolveDshDiscoveryStoresRuntimeConfig } from '../shared/dsh-discovery-stores-runtime-config';
-import { parseCartItemPrice } from '../shared/store-formatting';
+﻿import React from 'react';
+import { resolveDshDiscoveryStoresRuntimeConfig } dsh-discovery-stores-runtime-config';
+import { parseCartItemPrice } store-formatting';
 import {
   createDshOrderLifecycleHttpClient,
   type DshOrderItemInput,
@@ -12,7 +12,7 @@ import { hostClientStates } from '../dsh-client.navigation-bridge';
 import { mapLiveOrderToSummary } from '../adapters/dshClientOrderAdapters';
 import { useDshCheckout, type WalletSessionContext, type ActiveStore } from './useDshCheckout';
 import type { DshRoute } from '../dsh-client.types';
-import type { DshClientState } from '../../shared/client-state';
+import type { DshClientState } state-machines/client-state';
 
 type UseDshClientOrderExecutionOptions = {
   cartItems: HostCartItem[];

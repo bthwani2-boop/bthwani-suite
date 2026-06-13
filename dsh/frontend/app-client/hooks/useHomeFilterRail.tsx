@@ -1,19 +1,19 @@
-import * as React from 'react';
+﻿import * as React from 'react';
 import type { StyleProp, ImageStyle, TextStyle } from 'react-native';
 import { Icon, type BThwaniFilterRailItem } from '@bthwani/ui-kit';
 import { CategoryIconImage } from '../parts/home/HomeCategoryCarousel';
 import {
   DSH_CATEGORY_ICONS as categoryIconMap,
   DSH_SUBCATEGORY_ICONS as subcategoryIconMap,
-} from '../../shared/category-icons';
-import { DSH_HOME_DISCOVERY_FILTERS as discoveryFilters } from '../../shared/home-service-config';
-import { getDshCategoryIconUrl } from '../shared/get-dsh-category-icon-url';
+} contracts/category-icons';
+import { DSH_HOME_DISCOVERY_FILTERS as discoveryFilters } adapters/home-service-config';
+import { getDshCategoryIconUrl } get-dsh-category-icon-url';
 import {
   buildHomeCategoryFilterId,
   buildHomeModeFilterId,
   HOME_CATEGORY_FILTER_PREFIX,
   HOME_MODE_FILTER_PREFIX,
-} from '../shared/home-search-helpers';
+} home-search-helpers';
 import type { DiscoveryFilter, DshHomeCategory } from '../contracts/dsh-home-types';
 import { useFeatureFlag } from '../../shared';
 

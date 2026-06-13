@@ -48,7 +48,7 @@ const checks = [
   },
   {
     id: 'frontend_media_api_client',
-    file: 'dsh/frontend/shared/dsh-media-api.client.ts',
+    file: 'dsh/frontend/shared/api/dsh-media-api.client.ts',
     patterns: ['/media/upload-intents', '/complete', 'media_id'],
   },
 ];

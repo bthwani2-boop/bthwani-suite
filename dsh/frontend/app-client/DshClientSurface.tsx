@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Platform, View } from 'react-native';
 import { usePlatformVars, FeatureFlagProvider, PlatformVarsProvider, useFeatureFlag, listNotifications, resolveDshAuthBaseUrl } from '../shared';
 import type { DshSignalSummary, DshSignalEventKind, DshSignalEntityType } from '../shared';
@@ -501,4 +501,4 @@ import {
   buildStoreCategories,
   buildStoreDeliveryModes,
   buildStoreTags,
-} from '../shared/dsh-store-builders';
+} adapters/dsh-store-builders';

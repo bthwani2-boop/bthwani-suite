@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Text, useTheme, Surface, KeyValueList, TextField } from '@bthwani/ui-kit';
@@ -9,7 +9,7 @@ import {
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerDisputes, updatePartnerDisputeStatus } from './workflow';
-import type { PartnerDispute } from '../../shared/workflow';
+import type { PartnerDispute } from '../../shared/state-machines/workflow';
 const PARTNER_PERFORMANCE_METRICS: { id: string; capacity: string; compliance: string; kpis: { onTime: string; cancelRate: string; rating: string }; disputes: number }[] = [];
 const PARTNER_VISIBILITY_TIMELINE_DATA: unknown[] = [];
 import styles from '../shared/control-panel-surface.module.css';

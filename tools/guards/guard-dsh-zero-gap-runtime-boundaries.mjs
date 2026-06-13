@@ -42,6 +42,17 @@ const forbiddenText = [
   { id: 'runtime_require_data_or_media_fixture', regex: /\brequire\(['"][^'"]*(?:dsh\/frontend\/data|dsh\/frontend\/media-fixtures|(?:\.\.\/){1,4}(?:data|media-fixtures))[^'"]*['"]\)/i },
   { id: 'runtime_preview_identity_token', regex: /\b(?:proof\.delivery\.preview|cart-preview|DSH_CAPTAIN_FALLBACK_ID|PLACEHOLDER_URI)\b/i },
   { id: 'standalone_surface_split_wording', regex: /standalone surface|فول ستاك منفصل/i },
+  // WLT demo runtime IDs — hardcoded IDs that replace real subject/actor identifiers
+  { id: 'wlt_demo_captain_id', regex: /['"`]captain-demo['"`]|DEFAULT_CAPTAIN_ID\s*=\s*['"`]captain/i },
+  { id: 'wlt_demo_field_id', regex: /['"`]field-demo['"`]|DEFAULT_FIELD_AGENT_ID\s*=\s*['"`]field/i },
+  { id: 'wlt_demo_client_id_runtime', regex: /DEFAULT_CLIENT_ID\s*=\s*['"`]client-demo['"`]/i },
+  // WLT app imports from WLT control-panel financeContracts (must use ../shared instead)
+  { id: 'wlt_app_imports_finance_contracts', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*control-panel[\\/]+financeContracts['"]/im },
+  // Arabic preview/local wording in runtime app surfaces (not control-panel informational labels)
+  { id: 'arabic_preview_local_wording', regex: /['"`][^'"`]*(?:معاينة محلية|محاكاة محلية|تعديل معاينة|مسار المعاينة المحلية)[^'"`]*['"`]/u, onlyIn: /^(?:dsh\/frontend\/(?:app-|shared)|wlt\/frontend\/dsh\/app-)/ },
+  { id: 'skip_preview_ids_comment', regex: /\/\/\s*skip preview IDs/i },
+  // MockAdminUser export from shared root (renamed to DshAdminUser — catches regression)
+  { id: 'mock_admin_user_in_shared', regex: /MockAdminUser/i },
 ];
 
 const forbiddenWltRuntimeNames = /\b(?:Preview|preview-data|FinancePreview|PaymentPreview|Demo|Mock|Sample|Fallback)\b/;
@@ -53,6 +64,12 @@ const forbiddenWltAppToControlPanel = [
     onlyIn: /^wlt\/frontend\/dsh\/(app-client|app-partner|app-captain|app-field)\//,
     remediation: 'WLT app-* must not import from WLT control-panel. Use WLT shared read-models/adapters instead.',
   },
+  {
+    id: 'wlt_app_imports_finance_contracts',
+    regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*control-panel[\\/]+financeContracts['"]/im,
+    onlyIn: /^wlt\/frontend\/dsh\/(app-client|app-partner|app-captain|app-field)\//,
+    remediation: 'WLT app-* must not import from financeContracts. Use ../shared types instead.',
+  },
 ];
 
 const forbiddenDshSharedImportsSurfaces = [
@@ -61,6 +78,36 @@ const forbiddenDshSharedImportsSurfaces = [
     regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*dsh[\\/]+frontend[\\/]+(?:app-client|app-partner|app-captain|app-field|control-panel)[^'"]*['"]/im,
     onlyIn: /^dsh\/frontend\/shared\//,
     remediation: 'dsh/frontend/shared must not import from any DSH surface (app-* or control-panel).',
+  },
+  {
+    id: 'ui_kit_in_dsh_shared',
+    regex: /^\s*(?:import|export)\s+.*from\s+['"]@bthwani\/ui-kit['"]/im,
+    onlyIn: /^dsh\/frontend\/shared\/(?!platform\/)/,
+    remediation: 'dsh/frontend/shared must not import @bthwani/ui-kit. Move design components to ui-kit package or app-* surfaces.',
+  },
+  {
+    id: 'cross_surface_import_captain_from_other',
+    regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*dsh[\\/]+frontend[\\/]+app-(?:client|partner|field)[^'"]*['"]/im,
+    onlyIn: /^dsh\/frontend\/app-captain\//,
+    remediation: 'app-captain must not import from other DSH app surfaces. Use dsh/frontend/shared instead.',
+  },
+  {
+    id: 'cross_surface_import_client_from_other',
+    regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*dsh[\\/]+frontend[\\/]+app-(?:captain|partner|field)[^'"]*['"]/im,
+    onlyIn: /^dsh\/frontend\/app-client\//,
+    remediation: 'app-client must not import from other DSH app surfaces. Use dsh/frontend/shared instead.',
+  },
+  {
+    id: 'cross_surface_import_partner_from_other',
+    regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*dsh[\\/]+frontend[\\/]+app-(?:captain|client|field)[^'"]*['"]/im,
+    onlyIn: /^dsh\/frontend\/app-partner\//,
+    remediation: 'app-partner must not import from other DSH app surfaces. Use dsh/frontend/shared instead.',
+  },
+  {
+    id: 'cross_surface_import_field_from_other',
+    regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*dsh[\\/]+frontend[\\/]+app-(?:captain|client|partner)[^'"]*['"]/im,
+    onlyIn: /^dsh\/frontend\/app-field\//,
+    remediation: 'app-field must not import from other DSH app surfaces. Use dsh/frontend/shared instead.',
   },
 ];
 
@@ -94,6 +141,7 @@ for (const abs of files) {
   const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
 
   for (const rule of forbiddenText) {
+    if (rule.onlyIn && !rule.onlyIn.test(rel)) continue;
     const match = rule.regex.exec(text);
     if (match) {
       findings.push({
@@ -146,6 +194,22 @@ for (const abs of files) {
         remediation: rule.remediation,
       });
     }
+  }
+
+  // Guard: dsh/frontend/shared must not contain JSX (exception: platform/ context providers)
+  if (
+    rel.startsWith('dsh/frontend/shared/') &&
+    (rel.endsWith('.tsx') || rel.endsWith('.jsx')) &&
+    !rel.startsWith('dsh/frontend/shared/platform/')
+  ) {
+    findings.push({
+      severity: 'FAIL',
+      rule: 'jsx_in_dsh_shared',
+      file: rel,
+      line: 1,
+      evidence: path.basename(rel),
+      remediation: 'Move JSX components to @bthwani/ui-kit (reusable) or dsh/frontend/app-* (surface-specific). dsh/frontend/shared must be JSX-free.',
+    });
   }
 }
 

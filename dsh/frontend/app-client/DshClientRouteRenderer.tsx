@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Platform } from 'react-native';
 import { Text, colorPalette, spacing } from '@bthwani/ui-kit';
 
@@ -28,7 +28,7 @@ import { DshAppearanceHubScreen } from './screens/DshAppearanceHubScreen';
 import { WltHomeGetScreen } from '../../../wlt/frontend/app-client-wlt';
 import { hostClientStates } from './dsh-client.navigation-bridge';
 import { buildDshClientCheckoutPresenterModel } from './presenters/dshClientCheckoutPresenter';
-import { getDshClientStateMeta } from '../shared/client-state';
+import { getDshClientStateMeta } state-machines/client-state';
 import type { DshClientRouteRendererProps } from './contracts/dsh-client-renderer.contracts';
 
 export function DshClientRouteRenderer({

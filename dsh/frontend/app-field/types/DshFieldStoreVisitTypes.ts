@@ -1,6 +1,6 @@
-export type {
+﻿export type {
   DshFieldStoreVisitErrors,
   DshFieldStoreVisitState,
   DshFieldStoreVisitValues,
   DshFieldVisitEvidenceItem,
-} from '../../shared/dsh-field-visit.contract';
+} from '../../shared/contracts/dsh-field-visit.contract';

@@ -1,4 +1,4 @@
-// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
+﻿// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Client visibility policy gateway — shows why a product is visible/hidden
 //   and lists all prerequisites that must be satisfied.
@@ -11,13 +11,13 @@ import { Box, Button, Text, TextField, useTheme,
 } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster } from '../catalogs.data';
-import type { DshPartnerActivationStatus } from '../../../shared/dsh-partner-activation.model';
+import type { DshPartnerActivationStatus } from '../../../shared/contracts/dsh-partner-activation.model';
 import {
   resolveDshProductClientVisibility,
   resolveDshStoreClientVisibility,
   type DshClientVisibilityBlockedCode,
-} from '../../../shared/dsh-client-visibility.model';
-import type { DshProductCategoryMappingStatus, DshProductDuplicateStatus } from '../../../shared/dsh-product-identity.model';
+} from '../../../shared/contracts/dsh-client-visibility.model';
+import type { DshProductCategoryMappingStatus, DshProductDuplicateStatus } from '../../../shared/contracts/dsh-product-identity.model';
 import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

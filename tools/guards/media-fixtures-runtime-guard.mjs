@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 // MEDIA_CANONICAL_CONSISTENCY_CHECK
 // Enforces DEV_ONLY_MEDIA_FIXTURES and DEV_ONLY_PREVIEW_DATA isolation.
 // Scans frontend source for runtime imports from banned paths.
@@ -55,7 +55,7 @@ const TOLERATED_VIOLATIONS = new Map([
   ['dsh/frontend/app-field/contracts/dsh-field-binding.contracts.ts', 'RUNTIME_VIOLATION: Pending field contracts migration'],
   ['dsh/frontend/app-field/screens/DshFieldStoresScreen.tsx', 'RUNTIME_VIOLATION: Pending field stores screen API'],
   ['dsh/frontend/app-field/screens/DshFieldStoresHistoryScreen.tsx', 'RUNTIME_VIOLATION: Pending field history API'],
-  ['dsh/frontend/shared/catalog-central-adapter.ts', 'RUNTIME_VIOLATION: Pending catalog API adapter'],
+  ['dsh/frontend/shared/adapters/catalog-central-adapter.ts', 'RUNTIME_VIOLATION: Pending catalog API adapter'],
   ['dsh/frontend/shared/workflow.ts', 'RUNTIME_VIOLATION: Pending workflow API'],
   ['dsh/frontend/shared/dsh-operational-preview-adapter.ts', 'RUNTIME_VIOLATION: Pending operational API'],
   ['dsh/frontend/shared/dsh-signal-layer.model.ts', 'RUNTIME_VIOLATION: Pending signal API'],

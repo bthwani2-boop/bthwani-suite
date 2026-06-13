@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { View } from 'react-native';
@@ -20,7 +20,7 @@ import {
   type WltDshPaymentOption,
   type WltDshPaymentState,
   resolveWltDshFinanceEventKindForPaymentMethod,
-} from '../control-panel/financeContracts';
+} from '../shared';
 
 const PAYMENT_OPTIONS: readonly WltDshPaymentOption[] = [
   { id: 'cod', titleLabel: 'الدفع عند الاستلام', descriptionLabel: 'ادفع كامل المبلغ عند استلام الطلب.', availabilityLabel: 'متاح دائمًا', availabilityTone: 'success', isAvailable: true, isPreview: true },

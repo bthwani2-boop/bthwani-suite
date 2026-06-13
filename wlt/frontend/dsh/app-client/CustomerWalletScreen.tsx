@@ -20,7 +20,7 @@ import {
 } from '@bthwani/ui-kit';
 import { useWltDshWalletSession } from './useWltDshWalletSession';
 import { listLedgerEntries } from './wlt-dsh-client.adapter';
-import { formatWltYer } from '../control-panel/financeContracts';
+import { formatWltYer } from '../shared';
 
 export type CustomerWalletScreenProps = {
 	clientId?: string;

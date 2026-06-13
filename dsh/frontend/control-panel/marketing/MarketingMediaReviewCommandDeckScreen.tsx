@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Button, Surface, Text, SearchField, Chip, KeyValueList, ListItem, useTheme,
@@ -20,7 +20,7 @@ import {
   translateStage,
   translateEntityType,
   translateOwner,
-} from '../../shared/workflow';
+} from '../../shared/state-machines/workflow';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
 

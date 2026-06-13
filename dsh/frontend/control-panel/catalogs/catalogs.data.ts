@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DSH Catalog Control-Panel View Models
  * Owner: control-panel/catalogs (governance/approval/mapping consumer)
  *
@@ -155,8 +155,8 @@ import {
   deriveProductSku,
   deriveProductGtin,
   getSubcategoryClassifications,
-} from '../../shared/catalog-central-adapter';
-import type { StoreItemsByStoreId } from '../../shared/dshStoreProductCardModel';
+} from '../../shared/adapters/catalog-central-adapter';
+import type { StoreItemsByStoreId } from '../../shared/presentation-models/dshStoreProductCardModel';
 
 type DshCategorySubcategory = { id: string; label: string; subtitle: string; mediaKey?: string; imageUri?: string };
 type DshCategoryData = { id: string; label: string; subtitle: string; emojiFallback?: string; mediaKey?: string; imageUri?: string; renderMode?: 'stores' | 'manual-order'; isManualLike?: boolean; subcategories: DshCategorySubcategory[] };

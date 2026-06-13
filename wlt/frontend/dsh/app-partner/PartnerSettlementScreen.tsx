@@ -18,7 +18,7 @@ import {
   typographyRoles,
 } from '@bthwani/ui-kit';
 import { useWltDshPartnerWalletSummary } from './useWltDshPartnerWalletSummary';
-import { formatWltYer } from '../control-panel/financeContracts';
+import { formatWltYer } from '../shared';
 
 export type PartnerSettlementScreenProps = {
 	partnerId?: string;

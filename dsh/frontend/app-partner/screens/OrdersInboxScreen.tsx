@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View } from 'react-native';
 import {
   Badge,
@@ -19,16 +19,16 @@ import {
   useDirection,
   spacing,
 } from '@bthwani/ui-kit';
-import type { DshPartnerOrderConversationMode } from '../../shared/dsh-order.contract';
+import type { DshPartnerOrderConversationMode } from '../../shared/contracts/dsh-order.contract';
 import { AcceptanceTimerSheet } from '../sheets';
 // SSoT: delivery mode labels from dsh-delivery-mode.model.
-import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';
+import { getDshDeliveryModeDefinition } from '../../shared/contracts/dsh-delivery-mode.model';
 import {
   getHandoffsForSurface,
   getActionableHandoffsForSurface,
   getSurfaceObservation,
-} from '../../shared/dsh-order-lifecycle-handoffs';
-import { getSurfaceModeCapability } from '../../shared/dsh-fulfillment-surface-visibility';
+} from '../../shared/contracts/dsh-order-lifecycle-handoffs';
+import { getSurfaceModeCapability } from '../../shared/contracts/dsh-fulfillment-surface-visibility';
 
 // ML-018: added preparation_started; ML-019: preparing + items_ready distinguish in-progress vs done
 // ML-021: added captain_assigned / captain_arriving so partner can track handoff event

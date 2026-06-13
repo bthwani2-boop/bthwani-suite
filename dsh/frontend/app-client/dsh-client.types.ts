@@ -1,4 +1,4 @@
-import type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
+﻿import type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
 
 export type DshRoute =
   | 'home'
@@ -44,7 +44,7 @@ export type DshClientSurfaceProps = {
 };
 
 
-export type { DshClientState } from '../shared/client-state';
+export type { DshClientState } state-machines/client-state';
 export type {
 	DshClientBindingError,
 	DshClientCartLine,

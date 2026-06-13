@@ -1,8 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { Box, Button, ListItem, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
-import type { DshPartnerPreparationStage } from '../../shared/dsh-order-journey.model';
-import type { DshFulfillmentDeliveryMode } from '../../shared/dsh-delivery-mode.model';
-import { getSurfaceModeCapability } from '../../shared/dsh-fulfillment-surface-visibility';
+import type { DshPartnerPreparationStage } from '../../shared/state-machines/dsh-order-journey.model';
+import type { DshFulfillmentDeliveryMode } from '../../shared/contracts/dsh-delivery-mode.model';
+import { getSurfaceModeCapability } from '../../shared/contracts/dsh-fulfillment-surface-visibility';
 
 type PartnerFulfillmentMode = DshFulfillmentDeliveryMode;
 

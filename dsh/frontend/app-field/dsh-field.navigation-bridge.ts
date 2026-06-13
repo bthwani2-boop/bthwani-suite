@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DSH Field Navigation Bridge
  * CONTRACT_SCAFFOLD — Not UI preview. This file is live runtime code.
  * contractState 'CONTRACT_SCAFFOLD_PREVIEW_ONLY' means the WLT field-visit settlement binding is scaffolded (J-010).
@@ -14,9 +14,9 @@
  */
 
 import type { DshFieldRoute } from './dsh-field.types';
-import type { DshSignalEventKind } from '../shared/dsh-signal-layer.model';
-import type { DshPartnerIntakeStage } from '../shared/workflow';
-import { getHandoffsForSurface, type DshOrderLifecycleHandoff } from '../shared/dsh-order-lifecycle-handoffs';
+import type { DshSignalEventKind } from '../shared/contracts/dsh-signal-layer.model';
+import type { DshPartnerIntakeStage } from '../shared/state-machines/workflow';
+import { getHandoffsForSurface, type DshOrderLifecycleHandoff } from '../shared/contracts/dsh-order-lifecycle-handoffs';
 
 // ─── Field agent lifecycle state ──────────────────────────────────────────────
 

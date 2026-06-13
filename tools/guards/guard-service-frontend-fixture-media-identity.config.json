@@ -2,46 +2,6 @@
   "version": "1.0.0",
   "serviceFixtureOwnershipMap": [
     {
-      "serviceId": "dsh",
-      "serviceRoot": "dsh",
-      "frontendScanRoots": [
-        "dsh/frontend"
-      ],
-      "canonicalDataRoot": "dsh/frontend/data",
-      "canonicalMediaRoot": "dsh/frontend/media-fixtures",
-      "canonicalDataStatus": "VERIFIED",
-      "canonicalMediaStatus": "TBD_UNVERIFIED_PATH",
-      "allowedFixtureFilePatterns": [
-        "^dsh/frontend/data/",
-        "^dsh/frontend/.*/(adapter|adapters|view-model|viewModels|view-models)/",
-        "^dsh/frontend/shared/catalog-central-adapter\\.ts$",
-        "^dsh/frontend/shared/resolve-dsh-image-source\\.ts$"
-      ],
-      "allowedMediaReferencePatterns": [
-        "dsh/frontend/media-fixtures",
-        "dsh/frontend/data",
-        "media-fixtures/",
-        "@bthwani/ui-kit"
-      ],
-      "forbiddenLocalMockPatterns": [
-        "\\b(mock|mocks|fixture|fixtures|demo|sample|seed)\\b",
-        "\\b(product|products|category|categories|store|stores|branch|branches|service|services)\\b"
-      ],
-      "identityKeys": [
-        "id",
-        "slug",
-        "barcode",
-        "sku",
-        "name",
-        "nameAr",
-        "nameEn",
-        "title",
-        "titleAr",
-        "titleEn"
-      ],
-      "remediationTemplate": "Move or unify demo identities under dsh/frontend/data, reference media from dsh/frontend/media-fixtures, and expose only ids/references/lean summaries through adapters or view models."
-    },
-    {
       "serviceId": "esf",
       "serviceRoot": "esf",
       "frontendScanRoots": [
@@ -355,7 +315,7 @@
   "skipPathPrefixes": [
     "tools/registry/runs",
     "dsh/frontend/data/legacy-preview",
-    "dsh/frontend/shared/dsh-operational-summary-adapter.ts",
+    "dsh/frontend/shared/adapters/dsh-operational-summary-adapter.ts",
     "dsh/frontend/shared/store-card-commercial-map.ts",
     "dsh/frontend/control-panel/partners/ReadinessApprovalsWorkspace.tsx",
     "dsh/frontend/control-panel/partners/ReadinessEscalationsWorkspace.tsx",
@@ -364,9 +324,9 @@
     "dsh/frontend/app-partner/screens/ProductMediaScreen.tsx",
     "dsh/frontend/app-partner/screens/ProductEditScreen.tsx",
     "dsh/frontend/app-partner/screens/CategoryManagementScreen.tsx",
-    "dsh/frontend/shared/dsh-product-api.client.ts",
-    "dsh/frontend/shared/dsh-product-api.transport.ts",
-    "dsh/frontend/shared/dsh-media-api.client.ts",
+    "dsh/frontend/shared/api/dsh-product-api.client.ts",
+    "dsh/frontend/shared/api/dsh-product-api.transport.ts",
+    "dsh/frontend/shared/api/dsh-media-api.client.ts",
     "dsh/frontend/shared/dev-fixtures-isolation-guard.ts",
     "dsh/frontend/media-fixtures",
     "wlt/frontend/media-fixtures",
@@ -406,9 +366,9 @@
     "dsh/frontend/app-client/screens/parts/OperationScreenView.tsx",
     "dsh/frontend/app-client/screens/parts/OrdersTrackingHelpers.tsx",
     "dsh/frontend/shared/index.ts",
-    "dsh/frontend/shared/catalog.ts",
-    "dsh/frontend/shared/dsh-operational.contract.ts",
-    "dsh/frontend/shared/dsh-operational-registry.ts",
+    "dsh/frontend/shared/contracts/catalog.ts",
+    "dsh/frontend/shared/contracts/dsh-operational.contract.ts",
+    "dsh/frontend/shared/contracts/dsh-operational-registry.ts",
     "dsh/frontend/control-panel/catalogs",
     "dsh/frontend/data/partner.preview-data.ts",
     "dsh/frontend/data/stores.preview-data.ts",
@@ -419,7 +379,7 @@
     "dsh/frontend/app-client/contracts/dsh-home-types.ts",
     "dsh/frontend/app-client/hooks/useHomeFilterRail.tsx",
     "dsh/frontend/app-client/parts/home/HomeOrbitSections.tsx",
-    "dsh/frontend/shared/resolve-dsh-public-media-path.ts",
+    "dsh/frontend/shared/media/resolve-dsh-public-media-path.ts",
     "dsh/frontend/shared/workflow.ts",
     "dsh/frontend/shared/dsh-signal-layer.model.ts",
     "dsh/frontend/control-panel/shared/ControlPanelDshDecisionBoard.tsx",

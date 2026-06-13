@@ -1,11 +1,11 @@
-import React from 'react';
+﻿import React from 'react';
 import { publishedPromoCategoryIds } from '../dsh-client.navigation-bridge';
 import type { DshHomeGetPromo } from '../contracts/dsh-home-types';
 import type {
   HomePromoRecord,
   MarketingGrowthRecord,
   MarketingVideoRecord,
-} from '../../shared/dsh-marketing-types';
+} contracts/dsh-marketing-types';
 
 const bannerPalette = {
   white: 'white',

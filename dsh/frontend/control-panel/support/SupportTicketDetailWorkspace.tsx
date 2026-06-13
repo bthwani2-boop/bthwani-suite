@@ -1,4 +1,4 @@
-// P0-06: Support ticket detail workspace — control-panel/support owns resolution decisions.
+﻿// P0-06: Support ticket detail workspace — control-panel/support owns resolution decisions.
 // Evidence note is displayed for each escalation transition. Audit log surfaced when auditRequired=true.
 // Message timeline uses DSH_DEMO_SUPPORT_TICKETS for preview; real data replaces via prop injection.
 // No money mutation — WLT-linked tickets render read-only preview tags only.
@@ -8,7 +8,7 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary } from '../../shared/policies/dsh-flow-registry';
 import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,

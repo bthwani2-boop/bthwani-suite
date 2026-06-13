@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Surface, Text, TextField } from '@bthwani/ui-kit';
@@ -7,7 +7,7 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
-import { getDshRolePermission } from '../../shared/dsh-role-permission.model';
+import { getDshRolePermission } from '../../shared/policies/dsh-role-permission.model';
 import styles from '../shared/control-panel-surface.module.css';
 
 const DEACTIVATION_POLICY = getDshRolePermission('partner-deactivation');

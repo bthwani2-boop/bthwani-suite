@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Text, Surface, TextField, KeyValueList } from '@bthwani/ui-kit';
@@ -15,7 +15,7 @@ import {
   CENTRAL_PRODUCT_DETAIL_LOOKUP,
   deriveProductSku,
   deriveProductGtin,
-} from '../../shared/catalog-central-adapter';
+} from '../../shared/adapters/catalog-central-adapter';
 import {
   PARTNER_FULFILLMENT_AGREEMENTS,
   getPartnerCatalogOverrides,

@@ -1,11 +1,11 @@
-import type {
+﻿import type {
   DshHomeCategory,
   DshHomeGetPromo,
   DshHomeGetStore,
   DshHomeRecentOrder,
   DshServiceId,
 } from './dsh-home-types';
-import type { HomePromoRecord, MarketingVideoRecord } from '../../shared/dsh-marketing-types';
+import type { HomePromoRecord, MarketingVideoRecord } contracts/dsh-marketing-types';
 
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';

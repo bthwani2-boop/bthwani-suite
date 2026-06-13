@@ -1,4 +1,4 @@
-/**
+﻿/**
  * DSH Client ↔ WLT Payment Bridge
  * LIVE — WLT backend binding is active (J-003).
  *
@@ -15,9 +15,9 @@
  * Consumers: DshClientSurface (checkout/tracking), dsh-client.navigation-bridge.ts
  */
 
-import type { DshClientState } from '../shared/client-state';
-import type { DshFulfillmentDeliveryMode } from '../shared/dsh-delivery-mode.model';
-import type { DshSignalEventKind } from '../shared/dsh-signal-layer.model';
+import type { DshClientState } state-machines/client-state';
+import type { DshFulfillmentDeliveryMode } contracts/dsh-delivery-mode.model';
+import type { DshSignalEventKind } contracts/dsh-signal-layer.model';
 
 // ─── WLT intent types ─────────────────────────────────────────────────────────
 

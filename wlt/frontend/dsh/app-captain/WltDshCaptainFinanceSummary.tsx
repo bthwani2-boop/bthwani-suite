@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { View, Pressable } from 'react-native';
@@ -25,7 +25,7 @@ import type {
   WltCaptainFinanceSection,
   WltCaptainFinanceSnapshot,
   WltDshFinanceSummaryRecord,
-} from '../control-panel/financeContracts';
+} from '../shared';
 import { useWltDshCaptainFinanceSummary } from './useWltDshCaptainFinanceSummary';
 
 function RecordRow({ record }: { record: WltDshFinanceSummaryRecord }) {

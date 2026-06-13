@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Platform, ScrollView, Image, ActivityIndicator } from 'react-native';
 import {
 	Box,
@@ -18,8 +18,8 @@ import {
 	createDshMediaApiHttpClient,
 	type DshMediaAsset,
 	type DshMediaApiError,
-} from '../../shared/dsh-media-api.client';
-import { resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
+} from '../../shared/api/dsh-media-api.client';
+import { resolveDshProductApiBaseUrl } from '../../shared/api/dsh-product-api.transport';
 
 // DEV_ALLOWED: resolveDshProductApiBaseUrl is the shared DSH API base — same base URL for media.
 // RUNTIME_VIOLATION_FIXED: removed DSH_PRODUCT_MEDIA_FIXTURE_KEYS, resolveDshImageSource, Manifest selector.

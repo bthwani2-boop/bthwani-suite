@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import Image from 'next/image';
-import { getActualPublicMediaPath, getMediaKeyFromPublicPath } from '../../shared/resolve-dsh-public-media-path';
-import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
+import { getActualPublicMediaPath, getMediaKeyFromPublicPath } from '../../shared/media/resolve-dsh-public-media-path';
+import { resolveDshImageSource } from '../../shared/media/resolve-dsh-image-source';
 import type { CatalogProductMaster, CatalogMainCategory } from './catalogs.data';
 
 // --- FilterDropdown.tsx ---

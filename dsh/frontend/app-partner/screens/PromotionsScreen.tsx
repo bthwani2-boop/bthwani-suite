@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   Badge,
   Box,
@@ -12,10 +12,10 @@ import {
   useTheme,
   spacing,
 } from '@bthwani/ui-kit';
-import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType } from '../../shared/dsh-partner-offer-types';
+import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType } from '../../shared/contracts/dsh-partner-offer-types';
 import {
   getPartnerOfferVisibilityRecord,
-} from '../../shared/marketing-visibility.contract';
+} from '../../shared/contracts/marketing-visibility.contract';
 import { getDshControlPanelGovernanceEntry } from '../../shared';
 
 type AnalyticsWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-analytics' | 'no-campaigns';

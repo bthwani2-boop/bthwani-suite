@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import {
   Badge,
@@ -25,7 +25,7 @@ import { getWltDshPartnerCommissionLabel, getWltDshPartnerOperationalModeCommiss
 import {
   type WltDshFulfillmentMode,
   type WltDshOrderLineItemApplicability,
-} from '../control-panel/financeContracts';
+} from '../shared';
 
 type StoreDeliveryState = {
   totalFeeLabel: string;

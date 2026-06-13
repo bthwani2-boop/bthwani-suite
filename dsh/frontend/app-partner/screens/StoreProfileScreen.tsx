@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View } from 'react-native';
 import {
   Box,
@@ -19,8 +19,8 @@ import {
 import {
   type DshPartnerActivationStatus,
   getDshPartnerActivationStatusLabel,
-} from '../../shared/dsh-partner-activation.model';
-import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
+} from '../../shared/contracts/dsh-partner-activation.model';
+import { resolveDshStoreClientVisibility } from '../../shared/contracts/dsh-client-visibility.model';
 
 export type StoreProfileScreenProps = {
   storeName: string;

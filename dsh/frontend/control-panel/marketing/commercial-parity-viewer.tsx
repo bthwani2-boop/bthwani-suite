@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 /**
  * CommercialParityPreview — control-panel preview card only.
@@ -32,8 +32,8 @@
  */
 import React from 'react';
 import { colorPalette } from '@bthwani/ui-kit';
-import type { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import type { CommercialBadge } from '../../shared/commercial-contract';
+import type { mapStoreCommercialFeatures } from '../../shared/adapters/store-card-commercial-map';
+import type { CommercialBadge } from '../../shared/contracts/commercial-contract';
 
 type CommercialParityPreviewProps = {
   features: ReturnType<typeof mapStoreCommercialFeatures>;

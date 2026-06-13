@@ -1,10 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 import { wltDshFieldBridgeDataContract } from './wlt-dsh-field.contract';
 import * as WltFieldAdapter from './wlt-dsh-field.adapter';
 import {
   type WltDshFinanceSummaryRecord,
   type WltFieldFinanceSnapshot,
-} from '../control-panel/financeContracts';
+} from '../shared';
 
 function createStoreIdsKey(storeIds?: readonly string[]) {
   return storeIds?.join('|') ?? '';

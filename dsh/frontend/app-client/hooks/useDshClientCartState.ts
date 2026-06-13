@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import type {
   HostCartItem,
   CreateOrderValues,
@@ -15,7 +15,7 @@ import {
 } from '../contracts/dsh-client-binding.contracts';
 import { performReorderMapping } from '../adapters/dshClientOrderAdapters';
 import type { DshRoute } from '../dsh-client.types';
-import type { DshDiscoveryStore } from '../../shared/dshStoreProductCardModel';
+import type { DshDiscoveryStore } presentation-models/dshStoreProductCardModel';
 
 type UseDshClientCartStateOptions = {
   activeStore: DshDiscoveryStore;

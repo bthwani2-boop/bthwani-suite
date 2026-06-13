@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Pressable } from 'react-native';
 import {
   Box,
@@ -23,7 +23,7 @@ import type {
   StoreDeliveryPolicy,
   StoreDeliveryPricingSource,
 } from '../contracts/dsh-partner-binding.contracts';
-import { getSurfaceModeCapability, getSurfaceRoleSummaryForMode } from '../../shared/dsh-fulfillment-surface-visibility';
+import { getSurfaceModeCapability, getSurfaceRoleSummaryForMode } from '../../shared/contracts/dsh-fulfillment-surface-visibility';
 
 type PolicyOption = { id: StoreDeliveryPolicy; label: string; description: string };
 type PricingOption = { id: StoreDeliveryPricingSource; label: string; description: string };

@@ -1,4 +1,4 @@
-export { WltDshFieldBridge } from './WltDshFieldBridge';
+﻿export { WltDshFieldBridge } from './WltDshFieldBridge';
 export type { WltDshFieldBridgeProps } from './WltDshFieldBridge';
 export { WltDshFieldFinanceSummary } from './WltDshFieldFinanceSummary';
 export { wltDshFieldBridgeDataContract } from './wlt-dsh-field.contract';
@@ -20,4 +20,4 @@ export {
 export type {
   WltDshFinanceSummaryRecord,
   WltFieldFinanceSnapshot,
-} from '../control-panel/financeContracts';
+} from '../shared';

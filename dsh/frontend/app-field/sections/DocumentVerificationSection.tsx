@@ -9,7 +9,7 @@ import {
   useTheme,
   useDirection,
 } from '@bthwani/ui-kit';
-import type { FieldDocumentPreviewStatus } from '../../shared/field-store-model';
+import type { FieldDocumentPreviewStatus } from '../../shared/contracts/field-store-model';
 
 type DocumentKind = 'commercial_registration' | 'id_card' | 'trade_license' | 'other';
 

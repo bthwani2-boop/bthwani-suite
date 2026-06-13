@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Box, Button, Chip, ListItem, Surface, Text, TextField,
   spacing,
 } from '@bthwani/ui-kit';
@@ -10,7 +10,7 @@ import {
 import {
   DSH_ORDER_LIFECYCLE_HANDOFFS,
   getSurfaceObservation,
-} from '../../shared/dsh-order-lifecycle-handoffs';
+} from '../../shared/contracts/dsh-order-lifecycle-handoffs';
 import { DshPartnerInventoryActionPanel, type PartnerInventoryFlowId } from '../parts/PartnerInventoryActionPanel';
 import { DshPartnerOnboardingActionPanel, type PartnerOnboardingFlowId } from '../parts/PartnerOnboardingActionPanel';
 import { DshPartnerOrderActionPanel, type PartnerOrderActionFlowId } from '../parts/PartnerOrderActionPanel';

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 // Authority: control-panel/marketing — banner live preview component.
 // Extracted from BannersCommandDeckScreen (inner component) as part of Giant Screen split.
@@ -9,8 +9,8 @@ import { Image, StyleSheet, View, type ImageStyle, type ViewStyle } from 'react-
 import { Box, Text, shadowPresets, useTheme,
   radius,
 } from '@bthwani/ui-kit';
-import { resolveColorToken } from '../../shared/dsh-color-resolver';
-import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
+import { resolveColorToken } from '../../shared/adapters/dsh-color-resolver';
+import { resolveDshImageSource } from '../../shared/media/resolve-dsh-image-source';
 import { BANNER_MOTION_OPTIONS } from './banner-types';
 import type { BannerDraft, BannerTemplate } from './banner-types';
 

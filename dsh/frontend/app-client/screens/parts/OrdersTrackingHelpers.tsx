@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable, View } from 'react-native';
 import {
   Badge,
@@ -27,7 +27,7 @@ import {
   typographyRoles,
 } from '@bthwani/ui-kit';
 import { DshOperationScreenState } from '../../parts/OperationScreen';
-import { getDshClientStateMeta, type DshClientState } from '../../../shared/client-state';
+import { getDshClientStateMeta, type DshClientState } state-machines/client-state';
 import type {
   DshClientAddressSnapshot,
   DshClientCreateOrderRequest,
@@ -42,9 +42,9 @@ import type {
   DshFulfillmentDeliveryMode,
 } from '../../contracts/dsh-client-binding.contracts';
 import { getDshClientFlowPolicy } from '../../contracts/dsh-client-binding.contracts';
-import type { DshSmartProximityState, DshSmartTrackingSnapshot } from '../../../shared/dsh-order-journey.model';
-import { DSH_ORDER_JOURNEY_STEPS } from '../../../shared/dsh-order-journey.model';
-import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../../shared/dsh-flow-registry';
+import type { DshSmartProximityState, DshSmartTrackingSnapshot } state-machines/dsh-order-journey.model';
+import { DSH_ORDER_JOURNEY_STEPS } state-machines/dsh-order-journey.model';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } policies/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../../shared';
 
 export function resolveEscalationOwnerLabel(ownerSurface?: string): string {

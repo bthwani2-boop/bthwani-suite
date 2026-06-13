@@ -909,8 +909,6 @@
       "selectionTier": "service",
       "triggerAnyChange": false,
       "triggerPaths": [
-        "dsh/frontend/data/**",
-        "dsh/frontend/media-fixtures/**",
         "dsh/frontend/shared/**",
         "governance/14_GUARDS_CATALOG.md",
         "governance/22_DSH_GOLDEN_SLICE.md"
@@ -944,8 +942,6 @@
       "selectionTier": "service",
       "triggerAnyChange": false,
       "triggerPaths": [
-        "dsh/frontend/data/**",
-        "dsh/frontend/media-fixtures/**",
         "dsh/frontend/shared/**",
         "governance/14_GUARDS_CATALOG.md",
         "governance/22_DSH_GOLDEN_SLICE.md"
@@ -1098,7 +1094,7 @@
         "dsh/backend/internal/store/postgres_media_assets_repository.go",
         "dsh/backend/migrations/030_dsh_media_assets.sql",
         "dsh/backend/docker-compose.local.yml",
-        "dsh/frontend/shared/dsh-media-api.client.ts",
+        "dsh/frontend/shared/api/dsh-media-api.client.ts",
         "tools/guards/guard-real-media-runtime.mjs"
       ],
       "triggerExtensions": [
@@ -1222,7 +1218,7 @@
       "selectionTier": "service",
       "triggerAnyChange": false,
       "triggerPaths": [
-        "dsh/frontend/shared/dsh-governance.map.ts",
+        "dsh/frontend/shared/control-panel/dsh-governance.map.ts",
         "dsh/frontend/control-panel/**",
         "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md"
       ],
@@ -1282,7 +1278,7 @@
       "triggerAnyChange": false,
       "triggerPaths": [
         "dsh/frontend/shared/full-stack/**",
-        "dsh/frontend/shared/dsh-governance.map.ts",
+        "dsh/frontend/shared/control-panel/dsh-governance.map.ts",
         "dsh/docs/JOURNIES/tasks",
         "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
         "governance/22_DSH_GOLDEN_SLICE.md"

@@ -5,7 +5,7 @@ import { Badge, Box, Button, Divider, colorPalette, Icon, MobileScrollView, Mode
 } from '@bthwani/ui-kit';
 import { FieldStoreCard } from '../parts/FieldStoreCard';
 import { DSH_FIELD_BINDING_CONTRACTS } from '../contracts/dsh-field-binding.contracts';
-import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from '../../shared/field-store-model';
+import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from '../../shared/contracts/field-store-model';
 
 function resolveStoresBindingLabel() {
   return 'جسر قائمة المتاجر';
@@ -112,8 +112,8 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
               </Text>
               <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
                 {storesBinding
-                  ? `حالة الربط: ${resolveStoresBindingLabel()} · معاينة محلية لقائمة المتاجر والمفاضلة بينها.`
-                  : 'حالة الربط: معاينة محلية لقائمة المتاجر.'}
+                  ? `حالة الربط: ${resolveStoresBindingLabel()} · قائمة المتاجر والمفاضلة بينها.`
+                  : 'حالة الربط: قائمة المتاجر.'}
               </Text>
               {priorityStore ? (
                 <Button label="فتح المتجر التالي" onPress={() => onOpenStore(priorityStore.id)} />

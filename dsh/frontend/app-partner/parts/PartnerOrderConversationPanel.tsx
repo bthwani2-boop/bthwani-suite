@@ -1,11 +1,11 @@
-import React from 'react';
+﻿import React from 'react';
 import { Box, Button, ListItem, SectionHeader, StateView, Surface, Text, TextField } from '@bthwani/ui-kit';
 import type { DshPartnerOperationalFlowId } from '../dsh-partner.types';
 import {
   shouldShowDshPartnerOrderConversation,
   type DshPartnerOrderConversationMessage,
   type DshPartnerOrderConversationMode,
-} from '../../shared/dsh-order.contract';
+} from '../../shared/contracts/dsh-order.contract';
 
 export type DshPartnerOrderConversationPanelProps = {
   enabledForOrderMode?: DshPartnerOrderConversationMode;

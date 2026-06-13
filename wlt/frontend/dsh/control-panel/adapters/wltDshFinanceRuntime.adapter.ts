@@ -102,7 +102,7 @@ function accountTypeByCode(code: string): WltFinancialCenterSection['sectionType
 }
 
 function partyLabel(entry: RuntimeLedgerEntry): string {
-	// subject encodes actor identity (e.g. "client-001", "captain-demo")
+	// subject encodes actor identity (e.g. "client-001", "captain-abc")
 	if (entry.subject.startsWith('captain')) return `كابتن · ${entry.subject}`;
 	if (entry.subject.startsWith('partner')) return `شريك · ${entry.subject}`;
 	if (entry.subject.startsWith('field')) return `ميداني · ${entry.subject}`;

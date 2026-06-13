@@ -1,4 +1,4 @@
-import type { DshCaptainOrderAction, DshCaptainOrderId, DshCaptainOrderMode, DshCaptainOrderProofStatus, DshCaptainOrderStage } from '../../shared/dsh-order.contract';
+﻿import type { DshCaptainOrderAction, DshCaptainOrderId, DshCaptainOrderMode, DshCaptainOrderProofStatus, DshCaptainOrderStage } from '../../shared/contracts/dsh-order.contract';
 
 export type DshCaptainOrderSnapshot = {
 	id: DshCaptainOrderId;
@@ -42,8 +42,8 @@ export type DshCaptainOperationsSnapshot = {
 // --- Phase 2: DSH Flow Registry — captain surface on-demand policy bridge ---
 // DSH_PHASE_2_CROSS_SURFACE_REGISTRY_CONSUMPTION-20260521
 // Registry is the SSoT for on-demand policy. Do not duplicate policy constants locally.
-import type { DshOnDemandPolicy } from '../../shared/dsh-flow-registry';
-import { getDshFlowById } from '../../shared/dsh-flow-registry';
+import type { DshOnDemandPolicy } from '../../shared/policies/dsh-flow-registry';
+import { getDshFlowById } from '../../shared/policies/dsh-flow-registry';
 
 /** Canonical registry flow IDs owned by the captain surface. */
 export const DSH_CAPTAIN_REGISTRY_FLOW_IDS = [

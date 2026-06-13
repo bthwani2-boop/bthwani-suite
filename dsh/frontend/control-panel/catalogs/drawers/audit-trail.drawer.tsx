@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 /**
  * CatalogAuditTrailWorkspace — SCAFFOLD: ربط API قيد التنفيذ
@@ -21,8 +21,8 @@ import { Box, Button, Surface, Text, useTheme,
 } from '@bthwani/ui-kit';
 import { WorkspacePreviewNotice } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
-import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../../shared/dsh-product-api.transport';
-import type { DshCatalogConflict } from '../../../shared/dsh-product-api.client';
+import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../../shared/api/dsh-product-api.transport';
+import type { DshCatalogConflict } from '../../../shared/api/dsh-product-api.client';
 
 export type CatalogAuditTrailWorkspaceProps = {
   productId?: string;

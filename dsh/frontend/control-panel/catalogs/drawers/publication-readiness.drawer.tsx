@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 /**
  * CatalogPublicationReadinessMatrix — SCAFFOLD: ربط API قيد التنفيذ
@@ -11,7 +11,7 @@ import { Box, Button, Surface, Text, useTheme,
   radius,
 } from '@bthwani/ui-kit';
 import type { CatalogProductMaster } from '../catalogs.data';
-import { mapApprovalStageToPartnerActivationStatus } from '../../../shared/dsh-client-visibility.model';
+import { mapApprovalStageToPartnerActivationStatus } from '../../../shared/contracts/dsh-client-visibility.model';
 
 export type CatalogPublicationReadinessMatrixProps = {
   products: readonly CatalogProductMaster[];

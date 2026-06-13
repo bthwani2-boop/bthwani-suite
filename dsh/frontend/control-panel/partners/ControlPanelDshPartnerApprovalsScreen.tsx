@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Text, Surface } from '@bthwani/ui-kit';
@@ -10,17 +10,17 @@ import {
   WebControlPanelRecommendation,
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
-import { getPartnerIntakeItems } from '../../shared/workflow';
+import { getPartnerIntakeItems } from '../../shared/state-machines/workflow';
 import {
   ApprovalRecord,
   moveApprovalRecordToStage,
   translateStage,
   translateEntityType,
-} from '../../shared/workflow';
+} from '../../shared/state-machines/workflow';
 import {
   mapApprovalStageToPartnerActivationStatus,
   resolveDshStoreClientVisibility,
-} from '../../shared/dsh-client-visibility.model';
+} from '../../shared/contracts/dsh-client-visibility.model';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import styles from '../shared/control-panel-surface.module.css';
 const PartnerDeactivationWorkspace = React.lazy(() => import('./PartnerDeactivationWorkspace'));
@@ -54,7 +54,7 @@ import {
   PARTNER_SUB_TAB_DEFINITIONS,
   type PartnerWorkspaceTabId,
 } from './partners.types';
-import type { DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
+import type { DshPartnerActivationStatus } from '../../shared/contracts/dsh-partner-activation.model';
 const partnerCoveragePreviewZones: { status: string }[] = [];
 
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {

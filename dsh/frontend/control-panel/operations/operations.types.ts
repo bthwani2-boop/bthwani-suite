@@ -1,5 +1,5 @@
-import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
-export type { CanonicalOperationsGroupId } from '../../shared/dsh-operational.contract';
+﻿import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+export type { CanonicalOperationsGroupId } from '../../shared/contracts/dsh-operational.contract';
 
 export type OperationsPanelId = 'detail' | 'chat' | 'batches';
 

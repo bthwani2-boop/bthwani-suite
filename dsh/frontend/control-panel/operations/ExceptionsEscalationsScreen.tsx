@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -10,9 +10,9 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
-import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/adapters/dsh-operational-runtime-adapter';
 import { resolveDshOrderApiBaseUrl } from '../../shared';
-import { EXCEPTION_TICKET_MAP } from '../../shared/dsh-order.contract';
+import { EXCEPTION_TICKET_MAP } from '../../shared/contracts/dsh-order.contract';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
@@ -22,7 +22,7 @@ import {
   getDshFlowPolicySummary,
   getDshRenderableFlowsForSurface,
   type DshFlowRegistryEntry,
-} from '../../shared/dsh-flow-registry';
+} from '../../shared/policies/dsh-flow-registry';
 import { findDshControlPanelGovernanceSectionByFlowId } from '../shared/dsh-control-panel-governance.map';
 import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 

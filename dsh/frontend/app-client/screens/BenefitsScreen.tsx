@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View } from 'react-native';
 import {
   Badge,
@@ -26,16 +26,16 @@ import {
   type LoyaltyReward,
   type CommercialEntitlement,
   type SubscriptionClientCard,
-} from '../../shared/commercial-contract';
+} contracts/commercial-contract';
 import {
   DSH_LOYALTY_UI_BOUNDARY_NOTE,
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,
   isMarketingRenderable,
-} from '../../shared/marketing-visibility.contract';
+} contracts/marketing-visibility.contract';
 import type { DshNotificationItem } from './NotificationsScreen';
-import type { CampaignRecord } from '../../shared/dsh-marketing-types';
-import type { PartnerOfferRecord } from '../../shared/dsh-partner-offer-types';
+import type { CampaignRecord } contracts/dsh-marketing-types';
+import type { PartnerOfferRecord } contracts/dsh-partner-offer-types';
 
 type DshBenefitsSection = 'now' | 'loyalty' | 'subscription' | 'offers' | 'history';
 

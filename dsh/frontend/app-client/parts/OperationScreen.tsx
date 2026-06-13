@@ -1,1 +1,1 @@
-export { DshOperationScreen, type DshOperationScreenProps, type DshOperationScreenState } from '../../shared/dsh-operation-screen';
+export { DshOperationScreen, type DshOperationScreenProps, type DshOperationScreenState } from '../components/DshOperationScreen';

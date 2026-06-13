@@ -1,12 +1,12 @@
-import React from 'react';
-import { resolveDshDiscoveryStoresRuntimeConfig } from '../shared/dsh-discovery-stores-runtime-config';
-import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } from '../shared/dsh-discovery-stores-transport';
-import { createDshProductApiHttpClient } from '../../shared/dsh-product-api.transport';
+﻿import React from 'react';
+import { resolveDshDiscoveryStoresRuntimeConfig } dsh-discovery-stores-runtime-config';
+import { createDshDiscoveryStoresClient, isDshDiscoveryStoresOfflineError } dsh-discovery-stores-transport';
+import { createDshProductApiHttpClient } api/dsh-product-api.transport';
 import { mapProductRecordToItem } from '../adapters/dshClientStoreAdapters';
 import type { DshRoute } from '../dsh-client.types';
-import type { DshDiscoveryStore } from '../../shared/dshStoreProductCardModel';
-import type { DshGetDiscoveryStoreResponse } from '../shared/dsh-discovery-stores-client';
-import type { DshStoreMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshDiscoveryStore } presentation-models/dshStoreProductCardModel';
+import type { DshGetDiscoveryStoreResponse } dsh-discovery-stores-client';
+import type { DshStoreMenuItem } presentation-models/dshStoreProductCardModel';
 
 type UseDshClientStoreStateOptions = {
   route: DshRoute;

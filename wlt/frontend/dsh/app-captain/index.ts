@@ -1,4 +1,4 @@
-export { WltDshCaptainBridge } from './WltDshCaptainBridge';
+﻿export { WltDshCaptainBridge } from './WltDshCaptainBridge';
 export type { WltDshCaptainBridgeProps } from './WltDshCaptainBridge';
 export { WltDshCaptainFinanceSummary } from './WltDshCaptainFinanceSummary';
 export { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
@@ -26,4 +26,4 @@ export type {
   WltCaptainFinanceSection,
   WltCaptainFinanceSnapshot,
   WltDshFinanceSummaryRecord,
-} from '../control-panel/financeContracts';
+} from '../shared';

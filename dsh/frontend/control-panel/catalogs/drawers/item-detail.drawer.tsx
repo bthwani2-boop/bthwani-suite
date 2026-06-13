@@ -1,4 +1,4 @@
-// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
+﻿// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Detail view for a single catalog product — identity, approval stage,
 //   client visibility gate, linked surfaces summary, and action result banner.
@@ -13,10 +13,10 @@ import type { CatalogProductMaster } from '../catalogs.data';
 import {
   resolveDshProductClientVisibility,
   type DshClientVisibilityBlockedCode,
-} from '../../../shared/dsh-client-visibility.model';
+} from '../../../shared/contracts/dsh-client-visibility.model';
 import {
   mapApprovalStageToPartnerActivationStatus,
-} from '../../../shared/dsh-client-visibility.model';
+} from '../../../shared/contracts/dsh-client-visibility.model';
 import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

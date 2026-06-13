@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   createDshCheckoutHttpClient,
   createDshOrderLifecycleHttpClient,
@@ -6,8 +6,8 @@ import {
   type DshCheckoutClient,
   type DshOrderItemInput,
 } from '../../shared';
-import { resolveDshDiscoveryStoresRuntimeConfig } from '../shared/dsh-discovery-stores-runtime-config';
-import { parseCartItemPrice } from '../shared/store-formatting';
+import { resolveDshDiscoveryStoresRuntimeConfig } dsh-discovery-stores-runtime-config';
+import { parseCartItemPrice } store-formatting';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostCartItem, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import { hostClientStates } from '../dsh-client.navigation-bridge';

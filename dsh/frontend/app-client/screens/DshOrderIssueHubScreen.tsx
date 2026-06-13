@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   Box,
   Button,
@@ -18,9 +18,9 @@ import {
   getOperationsSupportFlowsForSurface,
   getOperationsSupportSurfaceEntry,
   type DshOperationsSupportFlowId,
-} from '../../shared/support-flows';
+} state-machines/support-flows';
 import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
-import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } policies/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 function resolveClientIssueOwnerLabel(ownerSurface?: string): string {

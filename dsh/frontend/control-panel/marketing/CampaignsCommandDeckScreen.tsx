@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { StyleSheet, View, Pressable } from 'react-native';
@@ -6,7 +6,7 @@ import { Box, Button, Surface, Tabs, Text, TextField, useTheme,
   radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import type { CampaignAudience, CampaignTargetType } from '../../shared/dsh-marketing-types';
+import type { CampaignAudience, CampaignTargetType } from '../../shared/contracts/dsh-marketing-types';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CampaignRecord = Record<string, any>;
 type CampaignStatus = 'draft' | 'pending' | 'published' | 'paused' | 'archived';
@@ -25,7 +25,7 @@ function removeCampaignItem(_id: string): void {}
 const dshCategoryData: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
 const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
 const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
-import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
+import { mapStoreCommercialFeatures } from '../../shared/adapters/store-card-commercial-map';
 import { CommercialParityPreview } from './commercial-parity-viewer';
 type Entitlement = { id: string; type: string; referenceId: string; status: string; source: string };
 import { useMarketingPermissions } from './marketing-permissions.contract';

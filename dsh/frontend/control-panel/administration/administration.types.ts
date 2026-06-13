@@ -28,7 +28,7 @@ export type AdminRole = {
   tone: 'brand' | 'warning' | 'danger' | 'success' | 'default';
 };
 
-export type MockAdminUser = {
+export type DshAdminUser = {
   id: string;
   name: string;
   email: string;

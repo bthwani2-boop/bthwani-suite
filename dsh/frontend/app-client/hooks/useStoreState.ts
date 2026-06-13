@@ -1,5 +1,5 @@
 ﻿import * as React from 'react';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } presentation-models/dshStoreProductCardModel';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 
 export function useStoreState() {

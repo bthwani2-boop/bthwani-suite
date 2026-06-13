@@ -1,10 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 import { createWltDshTypedClient, type WltSettlement } from '../contracts';
 import {
   formatWltYer,
   type WltDshFinanceSummaryRecord,
   type WltPartnerFinanceSnapshot,
-} from '../control-panel/financeContracts';
+} from '../shared';
 
 const EMPTY_PARTNER_SNAPSHOT: WltPartnerFinanceSnapshot = {
   settlementRecords: [],
