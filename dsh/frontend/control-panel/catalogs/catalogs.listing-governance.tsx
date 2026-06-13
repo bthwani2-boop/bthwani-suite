@@ -7,6 +7,13 @@ import React from 'react';
 import { Box, Button, Chip, KeyValueList, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import { resolveDshProductClientVisibility } from '../../shared/dsh-client-visibility.model';
+import type {
+  DshProductIdentityApprovalStatus,
+  DshProductCategoryMappingStatus,
+  DshProductDuplicateStatus,
+  DshPartnerActivationStatus,
+} from '../../shared';
+
 type PublishGateStatus = 'not-started' | 'in-review' | 'approved' | 'rejected' | 'published';
 type CatalogPublishGateRecord = {
   id: string;
@@ -16,13 +23,13 @@ type CatalogPublishGateRecord = {
   itemCount: number;
   approvedItemCount: number;
   auditRequired: boolean;
-  approvalStatus?: string;
-  partnerActivationStatus?: string;
+  approvalStatus?: DshProductIdentityApprovalStatus;
+  partnerActivationStatus?: DshPartnerActivationStatus;
   deliveryModesReady?: boolean;
   serviceabilityAvailable?: boolean;
   catalogPublished?: boolean;
-  categoryMappingStatus?: string;
-  duplicateStatus?: string;
+  categoryMappingStatus?: DshProductCategoryMappingStatus;
+  duplicateStatus?: DshProductDuplicateStatus;
   mediaPolicySatisfied?: boolean;
 };
 
