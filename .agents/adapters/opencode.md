@@ -22,4 +22,5 @@ Rules:
 - Do not claim completion without evidence.
 - Use PowerShell and `pnpm` conventions for `C:\bthwani-suite`.
 - If a tool's generic skill conflicts with BThwani rules, BThwani rules win.
-- Use `.agents/GRAPHIFY.md` for Graphify before broad repository-structure search.
+- Use `bthwani-evidence-gate-router-contract` to select the minimum gate tier and tools before any analysis.
+- Use `.agents/GRAPHIFY.md` only when cross-file scope discovery or relationship questions are present -- not before every search.

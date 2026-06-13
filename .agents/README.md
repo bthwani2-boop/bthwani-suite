@@ -19,7 +19,8 @@ Read order:
 1. `AGENTS.md`
 2. `.agents/README.md`
 3. `.agents/AUTHORITY_BOUNDARY.md`
-4. `.agents/GRAPHIFY.md` when the task is about repository structure, relationships, ownership, routing, imports, or cross-surface impact
+4. `.agents/EVIDENCE_GATE_ROUTER.md` to select the minimum gate tier and tool set
+5. `.agents/GRAPHIFY.md` only when cross-file scope discovery, relationship questions, or impact analysis is needed — not for every task
 5. `.agents/INDEX.md`
 6. relevant `SKILL.md`
 7. relevant adapter

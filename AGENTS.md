@@ -59,7 +59,8 @@ Core laws:
 - Any reusable design belongs in approved design system / `@bthwani/ui-kit`.
 - No new UI-kit files unless the need is non-negotiable, proven by evidence, and human-approved.
 - Service/application/domain specialization belongs in `governance/`; `.agents` skills remain general.
-- Adhere strictly to the [bthwani-graphify-query-first](file:///c:/bthwani-suite/.agents/skills/bthwani-graphify-query-first/SKILL.md) skill as much as possible for every task to maximize token utility and query precision.
+- Use [bthwani-evidence-gate-router-contract](file:///c:/bthwani-suite/.agents/skills/bthwani-evidence-gate-router-contract/SKILL.md) to select the minimum correct tools and guards for every task.
+- Use [bthwani-graphify-query-first](file:///c:/bthwani-suite/.agents/skills/bthwani-graphify-query-first/SKILL.md) only when cross-file scope is unknown or a relationship/impact question is present. Graphify is a context and navigation layer — not a toolchain leader.
 - Do not claim `PASS`, `CLOSED`, `FINAL`, `READY`, or `100%` without Git diff, verification, and evidence.
 
 Smart Execution Budget:
@@ -105,6 +106,7 @@ Use these project-owned skills when relevant:
 - `.agents/skills/bthwani-finance-ledger-contract/SKILL.md`
 - `.agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md`
 - `.agents/skills/bthwani-go-backend-target-boundary/SKILL.md`
+- `.agents/skills/bthwani-evidence-gate-router-contract/SKILL.md`
 - `.agents/skills/bthwani-graphify-query-first/SKILL.md`
 - `.agents/skills/bthwani-integrated-system-umbrella-contract/SKILL.md`
 - `.agents/skills/bthwani-local-evidence-pack/SKILL.md`
@@ -132,23 +134,37 @@ Use these project-owned skills when relevant:
 
 <!-- BTHWANI_CURRENT_AGENT_CONTRACT_END -->
 
-## graphify
+## Evidence Gate Router
+
+Tool and guard selection is driven by task classification and the minimum gate tier. There is no single tool leader.
+
+See `.agents/EVIDENCE_GATE_ROUTER.md` and `.agents/skills/bthwani-evidence-gate-router-contract/SKILL.md` for the full routing contract.
+
+### Tool Selection Rule
+
+Use `bthwani-evidence-gate-router-contract` to select the minimum correct tools and guards before running any analysis.
+Do NOT run tools comprehensively without a gate-tier justification.
+
+### Graphify (Optional Context / Navigation)
 
 This project has a knowledge graph at `graphify-out/` with god nodes, community structure, and cross-file relationships.
 
-### Mandatory Adherence & Optimization (Every Task)
+Graphify is a **context and navigation layer only** — not a toolchain leader.
 
-All agents must strictly adhere to the [bthwani-graphify-query-first](file:///c:/bthwani-suite/.agents/skills/bthwani-graphify-query-first/SKILL.md) skill in **every task**. This is a highly critical and practical rule designed to minimize token usage, prevent reading unrelated files, and maintain strict codebase boundaries.
+Use Graphify when:
+- Cross-file scope is unknown and requires discovery.
+- The task involves dependency paths, import/export chains, or cross-surface impact.
+- The task asks "where does X live?" or "what is connected to Y?"
 
-To achieve maximum utility:
-- **Query First**: Never run raw directory-wide `grep`, `rg`, or grep-search tools as a starting point. Always run `graphify query` or `graphify explain` first to locate the exact subgraph and target files.
-- **Explain and Path**: If looking for cross-file impacts, dependencies, or structural relationships, use `graphify path "<A>" "<B>"` or `graphify explain "<concept>"` to get a scoped view.
-- **Maintain Graph Freshness**: Run `graphify update .` immediately after modifying code to ensure successive agent steps have access to an accurate knowledge graph.
+Do NOT use Graphify when:
+- File scope is already known.
+- The task is text-only, docs-only, agents-only, or governance-only.
+- A dedicated tool (tsc, Spectral, Playwright, Semgrep, etc.) is the correct proof source.
 
-### Usage Rules:
+### Graphify Usage Rules
 - When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"` before doing anything else.
-- For codebase questions, first run `graphify query "<question>"` when `graphify-out/graph.json` exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than `GRAPH_REPORT.md` or raw grep output.
-- Dirty `graphify-out/` files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- Run `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` only when scope discovery is needed.
+- Do NOT run `graphify update .` by default after code changes. Run it only when code structure or imports changed AND subsequent steps in the same session need accurate graph navigation.
 - If `graphify-out/wiki/index.md` exists, use it for broad navigation instead of raw source browsing.
-- Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review or when query/path/explain do not surface enough context.
-- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+- Read `graphify-out/GRAPH_REPORT.md` only for broad architecture review when query/path/explain do not surface enough context.
+- Graphify output alone cannot justify `PASS`, `CLOSED`, `FINAL`, `READY`, `SAFE`, or `100%`.

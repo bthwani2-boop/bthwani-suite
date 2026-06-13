@@ -2,7 +2,8 @@
 
 | Skill | Purpose | Governance dependency | Output |
 |---|---|---|---|
-| `bthwani-graphify-query-first` | Start journeys/slices with Graphify to reduce context, identify scope, and lead targeted sub-tool runs. | local `graphify-out/graph.json` cache + exact owner files | scoped files/relationships + orchestrated next action |
+| `bthwani-evidence-gate-router-contract` | **Primary tool and guard selector.** Classify the task, select the minimum gate tier (Fast / Scoped / Heavy), choose the minimum tool set, and produce normalized evidence. Use before any guard or analysis tool selection. | `guard-manifest.json`, `package.json` scripts, task classification | gate-tier decision + tool-selection.json + evidence path |
+| `bthwani-graphify-query-first` | **Optional context / navigation only.** Use when cross-file scope is unknown or a relationship/impact question is present. Not a toolchain leader. Not required for every task. Do not run `graphify update .` by default. | local `graphify-out/graph.json` cache + exact owner files | scoped files/relationships → route to evidence-gate-router-contract |
 | `bthwani-logic-graph-guard-tooling-contract` | Route feature, journey, screen, API, state, Cucumber/Spectral/Playwright, and cross-surface logic gap diagnostics. | feature/journey manifests + OpenAPI + existing guards | logic gap matrix + evidence-aware next action |
 | `bthwani-design-guard-tooling-contract` | Route installed design tooling, generated-output safety, UI-kit ownership, Tamagui boundary, design-token drift, and visual evidence checks. | `ui-kit`, `tools/guards`, generated/cache outputs | design tooling decision + guard/evidence requirements |
 | `bthwani-structure-organization-guard-tooling-contract` | Use structure, duplication, monorepo, file-size, performance-bloat, and security-hygiene tooling to diagnose organization gaps. | `package.json`, `tools/guards` | organization decision + next action |
