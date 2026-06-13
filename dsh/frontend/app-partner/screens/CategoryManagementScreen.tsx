@@ -20,7 +20,7 @@ import {
   type DshCreateCategoryRequest,
   type DshUpdateCategoryRequest,
 } from '../../shared/api/dsh-product-api.client';
-import { getDshProductRuntimeClient } from '../../shared';
+import { useDshPartnerCategories } from '../../shared/adapters/catalog/useDshPartnerCategories';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

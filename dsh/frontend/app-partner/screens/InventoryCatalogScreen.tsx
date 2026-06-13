@@ -9,7 +9,8 @@
  */
 import React from 'react';
 import type { DshCanonicalProductCard } from '../../shared/presentation-models/dshStoreProductCardModel';
-import { getDshMediaRuntimeClient, getDshProductRuntimeClient, getDshStoreVisibilityRuntimeClient } from '../../shared';
+import { getDshProductRuntimeClient, getDshStoreVisibilityRuntimeClient } from '../../shared';
+import { useDshEntityMedia } from '../../shared/adapters/media/useDshEntityMedia';
 import {
   type DshCatalogDomainId,
   type DshCatalogMainCategoryId,
@@ -988,23 +989,12 @@ function InventoryCatalogCardPanel({
 }) {
   const { direction } = useDirection();
 
-  const _mediaClient = React.useMemo(() => getDshMediaRuntimeClient(), []);
-  const [thumbnailUrl, setThumbnailUrl] = React.useState<string | undefined>(undefined);
-  React.useEffect(() => {
-    if (!_mediaClient) return;
-    let cancelled = false;
-    _mediaClient
-      .listMedia({ owner_type: 'product', owner_id: item.id })
-      .then((resp) => {
-        if (cancelled) return;
-        const asset =
-          resp.items.find((a) => a.status === 'uploaded' && a.purpose === 'primary') ??
-          resp.items.find((a) => a.status === 'uploaded');
-        setThumbnailUrl(asset?.public_url ?? undefined);
-      })
-      .catch(() => undefined);
-    return () => { cancelled = true; };
-  }, [_mediaClient, item.id]);
+  const { assets: _productMedia } = useDshEntityMedia('product', item.id);
+  const thumbnailUrl = React.useMemo(() => {
+    const asset = _productMedia.find((a) => a.status === 'uploaded' && a.purpose === 'primary')
+      ?? _productMedia.find((a) => a.status === 'uploaded');
+    return asset?.public_url ?? undefined;
+  }, [_productMedia]);
 
   const isRejected = item.publishStage === 'rejected';
   const isNeedsFix = item.publishStage === 'needs-fix';

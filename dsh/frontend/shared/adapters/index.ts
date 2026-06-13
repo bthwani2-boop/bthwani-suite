@@ -1,4 +1,6 @@
 // DSH Adapters — data mappers, operational adapters, commercial feature mapping
+export * from './media/useDshEntityMedia';
+export * from './catalog/useDshPartnerCategories';
 export * from './dsh-operational-summary-adapter';
 export * from './dsh-operational-runtime-adapter';
 export * from './dsh-store-builders';

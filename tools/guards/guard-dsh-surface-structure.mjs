@@ -71,11 +71,25 @@ function countJsxProps(text, tagName) {
 
 const findings = [];
 
+// Strip import/export-from lines so that shared-path imports of type names
+// do not trigger the state-machine or mapping-table rules.
+// Importing from shared is allowed; defining or using locally is not.
+function stripImportLines(text) {
+  return text.replace(/^[ \t]*(?:import|export)\s[\s\S]*?from\s+['"][^'"]*['"][^\n]*/gm, '');
+}
+
+// Rules that should only scan code (not import declarations)
+const importSensitiveRuleIds = new Set([
+  'surface_state_machine_or_lifecycle',
+  'surface_mapping_table',
+]);
+
 for (const item of surfaceFiles) {
   const relative = item.file;
   const abs = path.join(root, relative);
   if (!fs.existsSync(abs)) continue;
   const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
+  const textWithoutImports = stripImportLines(text);
   const lines = text.split(/\r?\n/).length;
   const stateCount = countMatches(text, /\b(?:React\.)?useState\s*</g) + countMatches(text, /\b(?:React\.)?useState\s*\(/g);
   const effectCount = countMatches(text, /\b(?:React\.)?useEffect\s*\(/g);
@@ -112,7 +126,8 @@ for (const item of surfaceFiles) {
   }
 
   for (const rule of forbiddenPatterns) {
-    const match = rule.regex.exec(text);
+    const scanText = importSensitiveRuleIds.has(rule.id) ? textWithoutImports : text;
+    const match = rule.regex.exec(scanText);
     if (match) {
       findings.push({
         severity: 'FAIL',

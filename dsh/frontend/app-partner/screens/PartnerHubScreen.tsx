@@ -47,8 +47,7 @@ import {
   type DshPartnerLifecycleStage,
 } from '../../shared/state-machines/dsh-partner-onboarding-journey.map';
 import { getDshPartnerActivationStatusLabel } from '../../shared/contracts/dsh-partner-activation.model';
-import type { DshMediaAsset } from '../../shared/api/dsh-media-api.client';
-import { getDshMediaRuntimeClient } from '../../shared';
+import { useDshEntityMedia } from '../../shared/adapters/media/useDshEntityMedia';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';
@@ -1568,8 +1567,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
   const [isAvailable, setIsAvailable] = React.useState<boolean>(storeOpen);
 
-  const _mediaClient = React.useMemo(() => getDshMediaRuntimeClient(), []);
-  const [storeMediaAssets, setStoreMediaAssets] = React.useState<DshMediaAsset[]>([]);
+  const _storeMediaId = activeCanonicalStore?.id ?? canonicalStoreId;
 
   const { direction } = useDirection();
   const { theme } = useTheme();
@@ -1594,19 +1592,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   }, []);
   const resolvedActiveZoneLabel = activeCanonicalStore?.zoneLabel ?? activeZoneLabel;
 
-  React.useEffect(() => {
-    const storeId = activeCanonicalStore?.id ?? canonicalStoreId;
-    if (!_mediaClient || !storeId) return;
-    let cancelled = false;
-    _mediaClient
-      .listMedia({ owner_type: 'store', owner_id: storeId })
-      .then((resp) => {
-        if (!cancelled) setStoreMediaAssets(resp.items.filter((a) => a.status === 'uploaded'));
-      })
-      .catch(() => undefined);
-    return () => { cancelled = true; };
-  }, [_mediaClient, activeCanonicalStore?.id, canonicalStoreId]);
-
+  const { assets: storeMediaAssets } = useDshEntityMedia('store', _storeMediaId);
   const storeCoverUrl = storeMediaAssets.find((a) => a.purpose === 'cover')?.public_url;
   const storeLogoUrl = storeMediaAssets.find((a) => a.purpose === 'logo')?.public_url;
 

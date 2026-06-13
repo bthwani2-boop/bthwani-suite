@@ -10,25 +10,13 @@ import type { CreateOrderValues, HostOrderSummary } from '../dsh-client.navigati
 import { initialOrders, hostClientStates } from '../dsh-client.navigation-bridge';
 import { getClientWltIntentForState, type DshClientWltIntentEntry } from '../../shared/finance-boundary';
 import { getDshClientStateMeta, type DshClientState } from 'state-machines/client-state';
+import { getClientOrderStatusLabel, CLIENT_ORDER_TERMINAL_STATUSES } from '../../shared/view-models/client';
 import type { DshRoute } from '../dsh-client.types';
-
-const TERMINAL_STATUSES = new Set(['DELIVERED', 'CANCELLED', 'REFUNDED', 'FAILED_DELIVERY', 'RETURNED']);
-
-function statusToLabel(status: string): string {
-  const labels: Record<string, string> = {
-    CREATED: 'قيد المراجعة', ACCEPTED: 'تم القبول', READY_FOR_PICKUP: 'جاهز للاستلام',
-    ACCEPTED_BY_CAPTAIN: 'الكابتن قبل المهمة', PICKED_UP: 'تم الاستلام', EN_ROUTE: 'في الطريق',
-    ARRIVED: 'وصل الكابتن', DELIVERED: 'تم التوصيل', CANCELLED: 'تم الإلغاء',
-    REFUNDED: 'تم الاسترداد', FAILED_DELIVERY: 'فشل التوصيل', RETURNING_TO_STORE: 'عائد للمتجر',
-    RETURNED: 'تم الإرجاع',
-  };
-  return labels[status] ?? status;
-}
 
 function statusToClientState(status: string): import('../../shared/state-machines/client-state').DshClientState {
   if (status === 'DELIVERED') return hostClientStates.delivered;
   if (status === 'CANCELLED') return hostClientStates.cancelled;
-  if (TERMINAL_STATUSES.has(status)) return hostClientStates.delivered;
+  if (CLIENT_ORDER_TERMINAL_STATUSES.has(status)) return hostClientStates.delivered;
   return hostClientStates.trackingActive;
 }
 
@@ -156,7 +144,7 @@ export function useDshOrderTracking({
           id: o.id,
           title: o.store_id,
           subtitle: '',
-          statusLabel: statusToLabel(o.status),
+          statusLabel: getClientOrderStatusLabel(o.status),
           clientState: statusToClientState(o.status),
           fulfillmentMode: 'bthwani_delivery' as DshFulfillmentDeliveryMode,
           pickupAddress: '',
