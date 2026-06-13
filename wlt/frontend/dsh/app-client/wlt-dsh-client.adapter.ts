@@ -1,16 +1,15 @@
 // WLT DSH Client Adapter — runtime-bound HTTP bridge.
 // DSH stores WLT references/status only; WLT owns wallet balance and payment outcome.
+// topUp is a WLT-side operation — DSH must deep-link into WLT UI; never call confirmPaymentSession directly.
 
 import { createWltDshTypedClient } from '../contracts';
 
 export type WalletAccount = { id: string; name: string };
 
-const DEFAULT_CLIENT_ID = 'client-demo';
-const DEFAULT_ORDER_ID = 'dsh-client-runtime-payment';
 const DEFAULT_CURRENCY = 'YER';
 
-function getClient(bearerToken?: string, devClientId?: string) {
-	return createWltDshTypedClient({ bearerToken, devClientId });
+function getClient(bearerToken?: string) {
+	return createWltDshTypedClient({ bearerToken });
 }
 
 function paymentIdempotencyKey(clientId: string, orderId: string, amountYer: number): string {
@@ -22,33 +21,30 @@ function normalizeError(error: unknown): string {
 	return 'wlt_runtime_unavailable';
 }
 
-export const isLinked = async (clientId?: string, bearerToken?: string): Promise<boolean> => {
+export const isLinked = async (clientId: string, bearerToken?: string): Promise<boolean> => {
 	try {
-		const cid = clientId || DEFAULT_CLIENT_ID;
-		await getClient(bearerToken, cid).getClientWalletSummary(cid);
+		await getClient(bearerToken).getClientWalletSummary(clientId);
 		return true;
 	} catch {
 		return false;
 	}
 };
 
-export const getBalance = async (clientId?: string, bearerToken?: string): Promise<number> => {
-	const cid = clientId || DEFAULT_CLIENT_ID;
-	const summary = await getClient(bearerToken, cid).getClientWalletSummary(cid);
+export const getBalance = async (clientId: string, bearerToken?: string): Promise<number> => {
+	const summary = await getClient(bearerToken).getClientWalletSummary(clientId);
 	// YER has no sub-units (ISO 4217 exponent 0). Return balance as integer YER units.
 	const rawBalance = typeof summary.balance === 'number' && !isNaN(summary.balance)
 		? summary.balance
-		: ((summary as any).balanceMinorUnits ?? 0) / 100;
+		: ((summary as Record<string, unknown>)['balanceMinorUnits'] as number ?? 0) / 100;
 	return Math.round(rawBalance);
 };
 
-export const link = async (clientId?: string, bearerToken?: string): Promise<{ success: boolean; account?: WalletAccount; error?: string }> => {
+export const link = async (clientId: string, bearerToken?: string): Promise<{ success: boolean; account?: WalletAccount; error?: string }> => {
 	try {
-		const cid = clientId || DEFAULT_CLIENT_ID;
-		await getClient(bearerToken, cid).getClientWalletSummary(cid);
+		await getClient(bearerToken).getClientWalletSummary(clientId);
 		return {
 			success: true,
-			account: { id: cid, name: 'محفظة WLT' },
+			account: { id: clientId, name: 'محفظة WLT' },
 		};
 	} catch (error) {
 		return { success: false, error: normalizeError(error) };
@@ -61,21 +57,19 @@ export const unlink = async (): Promise<void> => {
 
 export const requestPayment = async (
 	amountYer: number,
-	clientId?: string,
+	clientId: string,
+	orderId: string,
 	bearerToken?: string,
-	orderId?: string,
 ): Promise<{ success: boolean; txId?: string; error?: string }> => {
 	try {
-		const cid = clientId || DEFAULT_CLIENT_ID;
-		const oid = orderId || DEFAULT_ORDER_ID;
 		// YER has no sub-units — amount is passed directly as integer YER to WLT.
-		const session = await getClient(bearerToken, cid).createClientPaymentSession({
-			checkout_intent_id: oid,
-			client_id: cid,
+		const session = await getClient(bearerToken).createClientPaymentSession({
+			checkout_intent_id: orderId,
+			client_id: clientId,
 			amount: amountYer,
 			currency: DEFAULT_CURRENCY,
 			payment_method: 'wallet',
-			idempotency_key: paymentIdempotencyKey(cid, oid, amountYer),
+			idempotency_key: paymentIdempotencyKey(clientId, orderId, amountYer),
 		});
 
 		if (session.status !== 'CONFIRMED') {
@@ -89,38 +83,17 @@ export const requestPayment = async (
 };
 
 export const listLedgerEntries = async (
-	clientId?: string,
+	clientId: string,
 	bearerToken?: string,
 	limit = 50,
 	offset = 0,
 ) => {
-	const cid = clientId || DEFAULT_CLIENT_ID;
-	return getClient(bearerToken, cid).listLedgerEntries(cid, limit, offset);
+	return getClient(bearerToken).listLedgerEntries(clientId, limit, offset);
 };
 
-export const topUp = async (
-	amountYer: number,
-	clientId?: string,
-	bearerToken?: string,
-): Promise<{ success: boolean; balance?: number; error?: string }> => {
-	try {
-		const cid = clientId || DEFAULT_CLIENT_ID;
-		// YER has no sub-units — amount is passed directly as integer YER.
-		const session = await getClient(bearerToken, cid).createClientPaymentSession({
-			checkout_intent_id: `topup-${Date.now()}`,
-			client_id: cid,
-			amount: amountYer,
-			currency: DEFAULT_CURRENCY,
-			payment_method: 'wallet',
-			idempotency_key: `topup-idemp-${cid}-${Date.now()}`,
-		});
-		// In a real flow this redirects, here we simulate confirmed
-		await getClient(bearerToken, cid).confirmPaymentSession(session.id, 'mock-topup-ref');
-		const newBalance = await getBalance(cid, bearerToken);
-		return { success: true, balance: newBalance };
-	} catch (error) {
-		return { success: false, error: normalizeError(error) };
-	}
+// topUp is WLT-owned. DSH must use createDeepLink to redirect — never confirm sessions directly.
+export const topUp = async (): Promise<never> => {
+	throw new Error('wlt_topup_must_be_initiated_via_wlt_ui: use createDeepLink and redirect');
 };
 
 export const createDeepLink = (orderId: string, amountYer: number): string => {

@@ -499,7 +499,11 @@
     "dsh/frontend/app-client/contracts/dsh-client-binding.contracts.ts",
     "dsh/frontend/shared/dsh-marketing-types.ts",
     "dsh/frontend/shared/dsh-partner-offer-types.ts",
-    "dsh/frontend/shared/field-store-model.ts"
+    "dsh/frontend/shared/field-store-model.ts",
+    "dsh/frontend/shared/dsh-operation-screen.tsx",
+    "dsh/frontend/shared/presentation-models",
+    "wlt/frontend/dsh/app-client/wlt-dsh-client.adapter.ts",
+    "wlt/frontend/dsh/shared"
   ],
   "lockfileNames": [
     "pnpm-lock.yaml",

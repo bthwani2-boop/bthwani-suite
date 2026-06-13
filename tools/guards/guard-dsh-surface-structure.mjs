@@ -26,11 +26,27 @@ const surfaceFiles = [
   { file: 'dsh/frontend/app-captain/DshCaptainSurface.tsx', maxLines: 2221 },
   { file: 'dsh/frontend/app-field/DshFieldSurface.tsx', maxLines: 535 },
 ];
+const routeRendererFiles = [
+  { file: 'dsh/frontend/app-client/DshClientRouteRenderer.tsx' },
+];
+const runtimeScreenFiles = [
+  { file: 'dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx' },
+];
 const forbiddenPatterns = [
   { id: 'runtime_data_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:\.\.\/){1,4}data(?:\/|['"])/im },
   { id: 'runtime_media_fixtures_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:\.\.\/){1,4}media-fixtures(?:\/|['"])/im },
   { id: 'runtime_media_fixture_require', regex: /\brequire\(['"][^'"]*(?:media-fixtures|(?:\.\.\/){1,4}data)[^'"]*['"]\)/i },
   { id: 'storage_direct_access', regex: /\b(?:localStorage|AsyncStorage|sessionStorage|indexedDB)\b/ },
+  { id: 'captain_pod_preview_runtime_truth', regex: /\b(?:CAPTAIN_POD_PLACEHOLDER_URI|CAPTAIN_POD_MEDIA_KEY)\b|proof\.delivery\.preview|data:image\/png;base64/i },
+  { id: 'captain_fallback_identity', regex: /\bDSH_CAPTAIN_FALLBACK_ID\b|CAP-0041|captain_id:\s*captainId\b|captainId\s*\?\?\s*['"]unknown['"]/ },
+  { id: 'field_local_store_runtime_truth', regex: /\b(?:readFieldStoresLocal|writeFieldStoresLocal|FIELD_VISIT_EVIDENCE_ITEMS)\b/ },
+  { id: 'partner_hardcoded_runtime_profile', regex: /جرين بول|store-1001|managerLabel:\s*['"]خالد['"]|locationLabel=\{`الرياض/ },
+];
+const forbiddenRouteRendererPatterns = [
+  { id: 'route_renderer_cart_total_calculation', regex: /\b(?:parseCartItemPrice|cartSubtotal|deliveryFeeNum|cartTotal)\b/ },
+  { id: 'route_renderer_payment_method_building', regex: /\bbuildPaymentMethodsList\b/ },
+  { id: 'route_renderer_preview_identity', regex: /\bcart-preview\b|proof\.delivery\.preview/i },
+  { id: 'route_renderer_hardcoded_address', regex: /مسقط، الخوير|جوار الجبل الجديد|العليا، طريق الملك فهد/ },
 ];
 
 function toPosix(value) {
@@ -76,10 +92,56 @@ for (const item of surfaceFiles) {
   }
 }
 
+for (const item of runtimeScreenFiles) {
+  const relative = item.file;
+  const abs = path.join(root, relative);
+  if (!fs.existsSync(abs)) continue;
+  const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
+
+  const screenRules = [
+    { id: 'field_visit_demo_evidence_default', regex: /\bdemoEvidenceItems\b|front-signage-photo|owner-availability-note/ },
+  ];
+
+  for (const rule of screenRules) {
+    const match = rule.regex.exec(text);
+    if (match) {
+      findings.push({
+        severity: 'FAIL',
+        rule: rule.id,
+        file: toPosix(relative),
+        line: lineNumber(text, match.index),
+        evidence: match[0].slice(0, 180),
+        remediation: 'Do not default runtime field visits to demo evidence. Pass evidence only from runtime media/read-model adapters.',
+      });
+    }
+  }
+}
+
+for (const item of routeRendererFiles) {
+  const relative = item.file;
+  const abs = path.join(root, relative);
+  if (!fs.existsSync(abs)) continue;
+  const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
+
+  for (const rule of forbiddenRouteRendererPatterns) {
+    const match = rule.regex.exec(text);
+    if (match) {
+      findings.push({
+        severity: 'FAIL',
+        rule: rule.id,
+        file: toPosix(relative),
+        line: lineNumber(text, match.index),
+        evidence: match[0].slice(0, 180),
+        remediation: 'Keep route renderers as route-to-screen mapping only. Move pricing, payment, address, and identity logic into controllers or presenters.',
+      });
+    }
+  }
+}
+
 const output = {
   guardId: 'GUARD_DSH_SURFACE_STRUCTURE',
   status: findings.length > 0 ? 'FAIL' : 'PASS',
-  filesScanned: surfaceFiles.length,
+  filesScanned: surfaceFiles.length + routeRendererFiles.length + runtimeScreenFiles.length,
   mode: 'RATCHET_BASELINE',
   baselinePolicy: 'Existing oversized Surface hosts are not closed by this guard. The guard blocks growth and direct runtime data/media/storage leaks until scoped extraction slices reduce the baselines.',
   findings,

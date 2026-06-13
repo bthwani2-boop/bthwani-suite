@@ -994,6 +994,49 @@
       ]
     },
     {
+      "id": "GUARD_BTHWANI_FULL_STACK_OPERATING_SYSTEM",
+      "file": "tools/guards/guard-bthwani-full-stack-operating-system.mjs",
+      "ownerPolicy": [
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md",
+        "governance/10_SERVICE_CLOSURE.md"
+      ],
+      "purpose": "enforce BThwani Full-Stack closure coverage across backend, OpenAPI, shared, current control-panel sections, mobile role surfaces, WLT boundary, media runtime, and evidence",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/**",
+        "wlt/frontend/dsh/**",
+        "control-panel/runtime/**",
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md",
+        "governance/10_SERVICE_CLOSURE.md",
+        "tools/guards/guard-bthwani-full-stack-operating-system.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".go",
+        ".sql",
+        ".yaml",
+        ".yml",
+        ".json",
+        ".md"
+      ]
+    },
+    {
       "id": "GUARD_DSH_ZERO_GAP_RUNTIME_BOUNDARIES",
       "file": "tools/guards/guard-dsh-zero-gap-runtime-boundaries.mjs",
       "ownerPolicy": [
@@ -1157,6 +1200,98 @@
         ".css",
         ".scss",
         ".ps1"
+      ]
+    },
+    {
+      "id": "GUARD_DSH_CONTROL_PANEL_SECTIONS",
+      "file": "tools/guards/guard-dsh-control-panel-sections.mjs",
+      "ownerPolicy": [
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "enforce that all 10 current control-panel sections are present in the governance map and the surface host; delegates to GUARD_BTHWANI_FULL_STACK_OPERATING_SYSTEM",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/dsh-governance.map.ts",
+        "dsh/frontend/control-panel/**",
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_DSH_SHARED_OWNERSHIP",
+      "file": "tools/guards/guard-dsh-shared-ownership.mjs",
+      "ownerPolicy": [
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md"
+      ],
+      "purpose": "enforce shared ownership rules: shared must not import surfaces, no preview/design in shared, WLT boundary enforced; delegates to GUARD_BTHWANI_FULL_STACK_OPERATING_SYSTEM",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/**",
+        "wlt/frontend/dsh/shared/**",
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_FULL_STACK_CAPABILITY_COVERAGE",
+      "file": "tools/guards/guard-full-stack-capability-coverage.mjs",
+      "ownerPolicy": [
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "verify all 13 BThwani full-stack capabilities are registered in capability map, tasks backlog, and governance map with correct full-stack fields and no preview references",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/full-stack/**",
+        "dsh/frontend/shared/dsh-governance.map.ts",
+        "dsh/docs/JOURNIES/tasks",
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".mjs",
+        ".md"
       ]
     }
   ]

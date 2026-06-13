@@ -45,23 +45,6 @@ export type DshFieldStoreVisitScreenProps = {
   onRetry?: () => void;
 };
 
-const demoEvidenceItems: DshFieldVisitEvidenceItem[] = [
-  {
-    id: 'front-signage-photo',
-    title: 'صورة الواجهة',
-    subtitle: 'إثبات الزيارة من مدخل المتجر الرئيسي.',
-    statusLabel: 'محتفظ به',
-    capturedAtLabel: '10:14 ص',
-  },
-  {
-    id: 'owner-availability-note',
-    title: 'ملاحظة توافر المالك',
-    subtitle: 'تأكيد ساعات العمل والجاهزية للخطوة التالية.',
-    statusLabel: 'مسجل',
-    capturedAtLabel: '10:19 ص',
-  },
-];
-
 function renderState(state: Exclude<DshFieldStoreVisitState, 'ready' | 'disabled'>, onRetry?: () => void) {
   if (state === 'loading') {
     return <StateView stateId="loading" />;
@@ -116,7 +99,7 @@ export function DshFieldStoreVisitScreen({
   state = 'ready',
   values,
   errors,
-  evidenceItems = demoEvidenceItems,
+  evidenceItems = [],
   onChange,
   onSubmit,
   onOpenEvidence,

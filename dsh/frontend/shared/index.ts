@@ -1,4 +1,13 @@
-// --- Commercial Preview Contract (SCAFFOLD — WLT binding pending J-010) ---
+// --- Full-Stack Capability Coverage ---
+export * from './full-stack';
+
+// --- WLT Finance Boundary (DSH read-only) ---
+export * from './finance-boundary';
+
+// --- Presentation Models (data-only, no JSX, no ui-kit) ---
+export * from './presentation-models';
+
+// --- Commercial Contract (SCAFFOLD — WLT binding pending J-010) ---
 export type {
   CommercialLifecycleStatus,
   CommercialAudience,
@@ -594,7 +603,7 @@ export type {
   DshPlatformVarRecord,
   DshPlatformProviderControlRecord,
   DshPlatformScopeLayer,
-  DshPlatformSimulationScenario,
+  DshPlatformPolicyScenario,
   DshPlatformAuditEntry,
 } from './dsh-cp-platform.contract';
 export { dshCpPlatformContractMeta } from './dsh-cp-platform.contract';
@@ -626,6 +635,19 @@ export {
   resolveColorToken,
   dshColorResolverMeta,
 } from './dsh-color-resolver';
+
+export type {
+  DshSurfaceActor,
+  DshSurfaceRuntimeStatus,
+  DshSurfaceCapabilityId,
+  DshSurfaceCapability,
+  DshSurfaceRuntimeContract,
+} from './dsh-surface-runtime.contract';
+export {
+  DSH_SURFACE_RUNTIME_CONTRACTS,
+  getDshSurfaceCapability,
+  getDshSurfaceRuntimeContract,
+} from './dsh-surface-runtime.contract';
 
 // --- Catalog Central Adapter (DEV_ONLY offline fallback) ---
 // Maps archived seed catalog data to surface view models.

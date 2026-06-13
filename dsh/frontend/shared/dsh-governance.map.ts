@@ -15,6 +15,7 @@
  */
 
 import type { DshOnDemandPolicy, DshSurfaceId } from './dsh-flow-registry';
+import type { BthwaniFullStackCapabilityId } from './full-stack/bthwani-full-stack-capabilities';
 
 export const DSH_CONTROL_PANEL_SECTION_IDS = [
   'dashboard',
@@ -39,8 +40,12 @@ export type DshControlPanelGovernanceEntry = {
   readonly relatedMobileSurfaces: readonly DshSurfaceId[];
   readonly policyOwner: DshSurfaceId;
   readonly escalationOwner: DshSurfaceId;
-  readonly financeReference: 'none' | 'wlt-finance' | 'preview-only';
+  readonly financeReference: 'none' | 'wlt-read-model' | 'wlt-reference-required' | 'blocked-by-policy';
   readonly varsReference: 'none' | 'platform' | 'wlt-bridge';
+  readonly fullStackCapabilities: readonly BthwaniFullStackCapabilityId[];
+  readonly requiredSurfaces: readonly DshSurfaceId[];
+  readonly inputOwnership: 'none' | 'control-panel' | 'shared-api' | 'wlt' | 'media-runtime';
+  readonly runtimeTruth: 'backend-api' | 'wlt-read-model' | 'media-runtime' | 'policy-only';
   readonly allowedActions: readonly string[];
   readonly forbiddenActions: readonly string[];
   readonly onDemandPolicySummary: readonly DshOnDemandPolicy[];
@@ -64,8 +69,12 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     relatedMobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'wlt-finance'],
     policyOwner: 'control-panel',
     escalationOwner: 'control-panel',
-    financeReference: 'preview-only',
+    financeReference: 'wlt-read-model',
     varsReference: 'platform',
+    fullStackCapabilities: ['foundation', 'control-panel-governance', 'wlt-finance-read-model'],
+    requiredSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'wlt-finance'],
+    inputOwnership: 'none',
+    runtimeTruth: 'policy-only',
     allowedActions: ['عرض ملخص الإغلاق', 'فتح الأدلة عند الطلب', 'توجيه المستخدم إلى القسم المالك'],
     forbiddenActions: ['اعتماد إغلاق نهائي', 'تنفيذ mutation', 'استبدال أدلة الأقسام المالكة'],
     onDemandPolicySummary: ['summary-only', 'detail-on-open', 'evidence-on-open'],
@@ -96,6 +105,10 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     escalationOwner: 'control-panel',
     financeReference: 'none',
     varsReference: 'platform',
+    fullStackCapabilities: ['order-lifecycle', 'captain-delivery', 'partner-operations', 'notifications'],
+    requiredSurfaces: ['app-client', 'app-partner', 'app-captain', 'control-panel'],
+    inputOwnership: 'control-panel',
+    runtimeTruth: 'backend-api',
     allowedActions: ['تشغيل التنفيذ الحي', 'إعادة الإسناد', 'متابعة الضغط والسعة', 'فتح المالك الصحيح للحالة'],
     forbiddenActions: ['اعتماد مالي', 'اعتماد شريك نهائي', 'نشر كتالوج', 'إغلاق تذكرة دعم خارج مالكها'],
     onDemandPolicySummary: ['summary-only', 'detail-on-open', 'evidence-on-open'],
@@ -124,8 +137,12 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     relatedMobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel'],
     policyOwner: 'control-panel',
     escalationOwner: 'control-panel',
-    financeReference: 'preview-only',
+    financeReference: 'wlt-reference-required',
     varsReference: 'platform',
+    fullStackCapabilities: ['support-escalation', 'captain-delivery', 'field-readiness'],
+    requiredSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel'],
+    inputOwnership: 'control-panel',
+    runtimeTruth: 'backend-api',
     allowedActions: ['إدارة التذاكر', 'متابعة الرسائل', 'تصعيد المتابعة', 'فتح الأدلة عند الطلب'],
     forbiddenActions: ['نسخ واجهات الموبايل كما هي', 'بدء استرداد مالي', 'تغيير policy من داخل التذكرة'],
     onDemandPolicySummary: ['summary-only', 'chat-on-open', 'evidence-on-open', 'detail-on-open'],
@@ -136,7 +153,7 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
   finance: {
     sectionId: 'finance',
     sectionLabel: 'المالية',
-    ownerRole: 'Finance Preview Owner with WLT Ledger Reference',
+    ownerRole: 'Finance Read-Only Owner with WLT Ledger Reference',
     relatedRegistryFlowIds: [
       'partner-finance-bridge',
       'partner-settlement-summary',
@@ -146,11 +163,15 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     relatedMobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'wlt-finance'],
     policyOwner: 'control-panel',
     escalationOwner: 'wlt-finance',
-    financeReference: 'wlt-finance',
+    financeReference: 'wlt-read-model',
     varsReference: 'wlt-bridge',
-    allowedActions: ['عرض preview مالي', 'فتح مرجع WLT', 'توضيح owner المالي', 'إظهار أثر الحالة فقط'],
+    fullStackCapabilities: ['wlt-finance-read-model', 'cart-checkout', 'order-lifecycle'],
+    requiredSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'wlt-finance'],
+    inputOwnership: 'wlt',
+    runtimeTruth: 'wlt-read-model',
+    allowedActions: ['عرض قراءة مالية', 'فتح مرجع WLT', 'توضيح owner المالي', 'إظهار أثر الحالة فقط'],
     forbiddenActions: ['refund mutation', 'settlement mutation', 'commission mutation', 'ledger mutation'],
-    onDemandPolicySummary: ['finance-preview-only', 'summary-only', 'detail-on-open'],
+    onDemandPolicySummary: ['summary-only', 'detail-on-open'],
     evidenceRequired: true,
     screenshotRequired: true,
     notes: 'WLT هو ledger owner. DSH finance surfaces للقراءة والحوكمة فقط ولا تنفذ أي تعديل مالي.',
@@ -173,6 +194,10 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     escalationOwner: 'control-panel',
     financeReference: 'none',
     varsReference: 'platform',
+    fullStackCapabilities: ['catalog-store', 'media-runtime', 'field-readiness'],
+    requiredSurfaces: ['app-client', 'app-partner', 'app-field', 'control-panel'],
+    inputOwnership: 'control-panel',
+    runtimeTruth: 'backend-api',
     allowedActions: ['مراجعة barcode وSKU وGTIN', 'حل التعارضات', 'اعتماد النشر', 'فتح التفاصيل عند الطلب'],
     forbiddenActions: ['تحميل payload ثقيل دائمًا', 'تكرار publication logic داخل التسويق أو العمليات'],
     onDemandPolicySummary: ['summary-only', 'detail-on-open', 'evidence-on-open'],
@@ -194,8 +219,12 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     relatedMobileSurfaces: ['app-partner', 'app-field', 'control-panel'],
     policyOwner: 'control-panel',
     escalationOwner: 'control-panel',
-    financeReference: 'preview-only',
+    financeReference: 'blocked-by-policy',
     varsReference: 'platform',
+    fullStackCapabilities: ['field-readiness', 'partner-operations', 'catalog-store'],
+    requiredSurfaces: ['app-partner', 'app-field', 'control-panel'],
+    inputOwnership: 'control-panel',
+    runtimeTruth: 'backend-api',
     allowedActions: ['اعتماد الشريك', 'مراجعة الوثائق', 'إدارة readiness وtopology وdeactivation', 'فتح handoff للكتالوج والتسويق'],
     forbiddenActions: ['منح final approval من app-partner', 'نسخ منطق الشركاء داخل العمليات أو التسويق'],
     onDemandPolicySummary: ['summary-only', 'detail-on-open', 'evidence-on-open'],
@@ -215,8 +244,12 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     relatedMobileSurfaces: ['app-client', 'app-partner', 'control-panel'],
     policyOwner: 'control-panel',
     escalationOwner: 'control-panel',
-    financeReference: 'preview-only',
+    financeReference: 'wlt-reference-required',
     varsReference: 'platform',
+    fullStackCapabilities: ['catalog-store', 'media-runtime'],
+    requiredSurfaces: ['app-client', 'app-partner', 'control-panel'],
+    inputOwnership: 'control-panel',
+    runtimeTruth: 'backend-api',
     allowedActions: ['إدارة الحملات والعروض والميديا', 'إظهار publication bridge', 'إحالة incidents إلى support أو operations'],
     forbiddenActions: ['اعتماد partner activation النهائي', 'اعتماد catalog publication النهائي بدون owner catalogs'],
     onDemandPolicySummary: ['summary-only', 'detail-on-open', 'evidence-on-open'],
@@ -227,7 +260,7 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
   platform: {
     sectionId: 'platform',
     sectionLabel: 'المنصة',
-    ownerRole: 'Platform Policy and Vars Preview Owner',
+    ownerRole: 'Platform Policy and Vars Owner',
     relatedRegistryFlowIds: [
       'control-sla-policy',
       'control-escalation-queue',
@@ -237,14 +270,18 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     relatedMobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'wlt-finance'],
     policyOwner: 'control-panel',
     escalationOwner: 'control-panel',
-    financeReference: 'wlt-finance',
+    financeReference: 'wlt-read-model',
     varsReference: 'platform',
+    fullStackCapabilities: ['foundation', 'actor-auth-permissions', 'control-panel-governance', 'notifications'],
+    requiredSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'wlt-finance'],
+    inputOwnership: 'control-panel',
+    runtimeTruth: 'policy-only',
     allowedActions: ['عرض vars/providers/rollouts/services/health/audit', 'إظهار scope وprecedence', 'فتح WLT bridge reference عند الحاجة'],
     forbiddenActions: ['backend/env mutation', 'provider switching الفعلي', 'finance mutation'],
-    onDemandPolicySummary: ['summary-only', 'detail-on-open', 'finance-preview-only'],
+    onDemandPolicySummary: ['summary-only', 'detail-on-open'],
     evidenceRequired: true,
     screenshotRequired: true,
-    notes: 'platform هو owner للسياسات القابلة للضبط والـ preview references فقط. لا يملك catalog/partner day-to-day decisions.',
+    notes: 'platform هو owner للسياسات القابلة للضبط والـ runtime/read-only references فقط. لا يملك catalog/partner day-to-day decisions.',
   },
   administration: {
     sectionId: 'administration',
@@ -259,6 +296,10 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     escalationOwner: 'control-panel',
     financeReference: 'none',
     varsReference: 'platform',
+    fullStackCapabilities: ['actor-auth-permissions', 'control-panel-governance'],
+    requiredSurfaces: ['control-panel'],
+    inputOwnership: 'control-panel',
+    runtimeTruth: 'policy-only',
     allowedActions: ['إدارة الأدوار', 'إظهار approval chain', 'ربط permissions بالحوكمة'],
     forbiddenActions: ['تخزين منطق تشغيلي يومي', 'تكرار sections الأخرى'],
     onDemandPolicySummary: ['summary-only', 'detail-on-open'],
@@ -269,7 +310,7 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
   hr: {
     sectionId: 'hr',
     sectionLabel: 'الموارد البشرية',
-    ownerRole: 'Control Panel HR Preview Owner',
+    ownerRole: 'Control Panel HR Blocked Reference Owner',
     relatedRegistryFlowIds: [
       'control-sla-policy',
       'control-escalation-queue',
@@ -279,12 +320,16 @@ export const DSH_CONTROL_PANEL_GOVERNANCE_MAP: Readonly<Record<DshControlPanelSe
     escalationOwner: 'control-panel',
     financeReference: 'none',
     varsReference: 'platform',
+    fullStackCapabilities: ['control-panel-governance'],
+    requiredSurfaces: ['control-panel'],
+    inputOwnership: 'none',
+    runtimeTruth: 'policy-only',
     allowedActions: ['عرض حالة HR المحجوبة', 'توضيح سبب تعطيل الأفعال', 'توجيه الربط إلى backend HR لاحقًا'],
     forbiddenActions: ['إنشاء بيانات موظفين محلية', 'تفعيل إجراء HR بدون API', 'خلط HR مع administration أو operations'],
     onDemandPolicySummary: ['summary-only', 'detail-on-open'],
     evidenceRequired: false,
     screenshotRequired: true,
-    notes: 'HR route موجود في الشل لكنه يبقى preview/blocked حتى يثبت backend HR. لا يملك بيانات موظفين محلية ولا صلاحية تشغيلية حالية.',
+    notes: 'HR route موجود في الشل لكنه يبقى blocked/read-only حتى يثبت backend HR. لا يملك بيانات موظفين محلية ولا صلاحية تشغيلية حالية.',
   },
 } as const;
 

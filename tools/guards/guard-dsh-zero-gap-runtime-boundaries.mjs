@@ -40,9 +40,29 @@ const forbiddenText = [
   { id: 'legacy_preview_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*legacy-preview/i },
   { id: 'preview_data_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:preview-data|operational-statuses\.preview-data)/im },
   { id: 'runtime_require_data_or_media_fixture', regex: /\brequire\(['"][^'"]*(?:dsh\/frontend\/data|dsh\/frontend\/media-fixtures|(?:\.\.\/){1,4}(?:data|media-fixtures))[^'"]*['"]\)/i },
+  { id: 'runtime_preview_identity_token', regex: /\b(?:proof\.delivery\.preview|cart-preview|DSH_CAPTAIN_FALLBACK_ID|PLACEHOLDER_URI)\b/i },
+  { id: 'standalone_surface_split_wording', regex: /standalone surface|فول ستاك منفصل/i },
 ];
 
 const forbiddenWltRuntimeNames = /\b(?:Preview|preview-data|FinancePreview|PaymentPreview|Demo|Mock|Sample|Fallback)\b/;
+
+const forbiddenWltAppToControlPanel = [
+  {
+    id: 'wlt_app_imports_wlt_control_panel',
+    regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*wlt[\\/]+frontend[\\/]+dsh[\\/]+control-panel[^'"]*['"]/im,
+    onlyIn: /^wlt\/frontend\/dsh\/(app-client|app-partner|app-captain|app-field)\//,
+    remediation: 'WLT app-* must not import from WLT control-panel. Use WLT shared read-models/adapters instead.',
+  },
+];
+
+const forbiddenDshSharedImportsSurfaces = [
+  {
+    id: 'shared_imports_surface',
+    regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*dsh[\\/]+frontend[\\/]+(?:app-client|app-partner|app-captain|app-field|control-panel)[^'"]*['"]/im,
+    onlyIn: /^dsh\/frontend\/shared\//,
+    remediation: 'dsh/frontend/shared must not import from any DSH surface (app-* or control-panel).',
+  },
+];
 
 function toPosix(value) {
   return String(value).replace(/\\/g, '/');
@@ -96,6 +116,36 @@ for (const abs of files) {
       evidence: path.basename(rel),
       remediation: 'Rename runtime files to Summary, Session, or ReadModel, or isolate non-runtime files under test/story/dev-only.',
     });
+  }
+
+  for (const rule of forbiddenWltAppToControlPanel) {
+    if (!rule.onlyIn.test(rel)) continue;
+    const match = rule.regex.exec(text);
+    if (match) {
+      findings.push({
+        severity: 'FAIL',
+        rule: rule.id,
+        file: rel,
+        line: lineNumber(text, match.index),
+        evidence: match[0].slice(0, 180),
+        remediation: rule.remediation,
+      });
+    }
+  }
+
+  for (const rule of forbiddenDshSharedImportsSurfaces) {
+    if (!rule.onlyIn.test(rel)) continue;
+    const match = rule.regex.exec(text);
+    if (match) {
+      findings.push({
+        severity: 'FAIL',
+        rule: rule.id,
+        file: rel,
+        line: lineNumber(text, match.index),
+        evidence: match[0].slice(0, 180),
+        remediation: rule.remediation,
+      });
+    }
   }
 }
 

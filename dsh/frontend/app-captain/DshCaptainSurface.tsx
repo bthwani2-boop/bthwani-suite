@@ -6,7 +6,6 @@ import { useAppCaptainAppearance } from '../../../app-captain/shell/appearance';
 // `react-native-safe-area-context` isn't installed in some environments.
 let useSafeAreaInsets: () => { top: number; bottom: number; left: number; right: number } = () => ({ top: 0, bottom: 0, left: 0, right: 0 });
 try {
-  // hide from static analysis so bundlers that can't resolve the package won't fail
   // eslint-disable-next-line no-eval
   const r: any = eval('require');
   const safe = r('react-native-safe-area-context');
@@ -88,10 +87,6 @@ type CaptainAppMode = 'bthwani_captain_mode' | 'store_courier_mode';
 type StoreCourierStage = 'ready_for_pickup' | 'picked_up' | 'out_for_delivery' | 'delivery_failed' | 'delivered';
 type DshCaptainPodState = NonNullable<React.ComponentProps<typeof DshCaptainPoDSubmissionScreen>['state']>;
 
-const CAPTAIN_POD_MEDIA_KEY = 'proof.delivery.preview.v1';
-const CAPTAIN_POD_PLACEHOLDER_URI = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+kG7wAAAAASUVORK5CYII=';
-const DSH_CAPTAIN_FALLBACK_ID = 'CAP-0041';
-
 const CAPTAIN_BOTTOM_NAV_ROUTES = new Set<DshCaptainRoute>([
   'home', 'map', 'inbox', 'account', 'account-finance', 'account-orders',
   'account-profile', 'account-docs', 'account-shifts', 'account-support',
@@ -146,50 +141,14 @@ type CompactOrderChatMessage = {
   side: 'start' | 'end';
 };
 
-const defaultDetailByOrderId: Record<string, CaptainOrderDetailSummary> = {
-  'captain-order-9021': {
-    orderId: 'captain-order-9021',
-    pickupLabel: 'Burger Lab - فرع حطين',
-    dropoffLabel: 'حي العليا، طريق الملك فهد',
-    etaLabel: 'مدة الوصول إلى الاستلام: 8 دقائق',
-    currentStageLabel: 'في الطريق إلى الاستلام',
-    nextActionLabel: 'أكد الاستلام بعد التقاط الطلب',
-  },
-  'captain-order-9024': {
-    orderId: 'captain-order-9024',
-    pickupLabel: 'Green Bowl - فرع الياسمين',
-    dropoffLabel: 'طريق الملك فهد، الحي الشمالي',
-    etaLabel: 'مدة الوصول إلى الاستلام: 15 دقيقة',
-    currentStageLabel: 'في قائمة الإرسال',
-    nextActionLabel: 'ابدأ المسار وأكد الاستلام عند الوصول',
-  },
+const EMPTY_ORDER_SUMMARY: CaptainOrderDetailSummary = {
+  orderId: '',
+  pickupLabel: '',
+  dropoffLabel: '',
+  etaLabel: '',
+  currentStageLabel: '',
+  nextActionLabel: '',
 };
-
-const compactOrderChatSeed: CompactOrderChatMessage[] = [
-  {
-    id: 'compact-msg-1',
-    sender: 'العميل',
-    text: 'أبقي التحديثات قصيرة لو سمحت، وأنا جاهز عند الوصول.',
-    time: '09:12',
-    side: 'start',
-  },
-  {
-    id: 'compact-msg-2',
-    sender: 'الكابتن',
-    text: 'تم. أنا الآن في الطريق إلى الاستلام.',
-    time: '09:13',
-    side: 'end',
-  },
-  {
-    id: 'compact-msg-3',
-    sender: 'العميل',
-    text: 'أخبرني قبل دقيقة من الوصول.',
-    time: '09:14',
-    side: 'start',
-  },
-];
-
-const captainDisplayName = 'الكابتن عبدالله السبيعي';
 
 const captainAppearanceOptions: ReadonlyArray<{
   mode: BThwaniAppearanceMode;
@@ -405,9 +364,10 @@ export function DshCaptainSurface(props: DshCaptainSurfaceProps) {
   );
 }
 
-function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, walletBalanceLabel }: DshCaptainSurfaceProps) {
+function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshCaptainSurfaceProps) {
   const { theme } = useTheme();
   const { dshAuthBearerToken, dshClientId } = usePlatformVars();
+  const captainRuntimeId = React.useMemo(() => (captainId ?? dshClientId ?? '').trim(), [captainId, dshClientId]);
   const {
     hydrated: appearanceHydrated,
     mode: appearanceMode,
@@ -417,7 +377,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
   const [activeServiceType, setActiveServiceType] = React.useState<CaptainServiceType>('dsh');
   const [route, setRoute] = React.useState<DshCaptainRoute>(() => getRouteForCommandTarget(command.target));
   const [inboxState, setInboxState] = React.useState<CaptainOrdersInboxScreenState>('ready');
-  const [activeOrderId, setActiveOrderId] = React.useState<string>('captain-order-9021');
+  const [activeOrderId, setActiveOrderId] = React.useState<string>('');
   const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<CaptainSupportRoute>('orders-list');
   const [isPickupSheetVisible, setIsPickupSheetVisible] = React.useState(false);
   const [isDeliverySheetVisible, setIsDeliverySheetVisible] = React.useState(false);
@@ -427,17 +387,15 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
   const [activeOrderPhase, setActiveOrderPhase] = React.useState<ActiveOrderPhase>('pickup');
   const [captainAppMode, setCaptainAppMode] = React.useState<CaptainAppMode>('bthwani_captain_mode');
   const isStoreCourierMode = captainAppMode === 'store_courier_mode';
-  // SSoT: bthwani_delivery orders are visible in captain inbox; partner_delivery and pickup are not.
   // SSoT: bthwani_delivery is the only mode visible in captain inbox
   const bthwaniDeliveryVisibleInInbox = isModeVisibleInCaptainInbox('bthwani_delivery') && isCaptainInboxVisibleForMode('bthwani_delivery');
-  // PoD required only in bthwani_delivery mode; store_courier_mode skips it
   const captainPodRequired = !isStoreCourierMode && isCaptainPodRequiredForMode('bthwani_delivery');
   const captainCollectsCod = !isStoreCourierMode && isCaptainCodCollectorForMode('bthwani_delivery');
   const showCaptainBottomNav = isStoreCourierMode
     ? route === 'home' || route === 'account'
     : CAPTAIN_BOTTOM_NAV_ROUTES.has(route);
   const [activeOrderDraft, setActiveOrderDraft] = React.useState('');
-  const [activeOrderMessages, setActiveOrderMessages] = React.useState<CompactOrderChatMessage[]>(compactOrderChatSeed);
+  const [activeOrderMessages, setActiveOrderMessages] = React.useState<CompactOrderChatMessage[]>([]);
   const [storeCourierStage, setStoreCourierStage] = React.useState<StoreCourierStage>('ready_for_pickup');
   const [captainPodState, setCaptainPodState] = React.useState<DshCaptainPodState>('ready');
   const [captainPodPhotoUri, setCaptainPodPhotoUri] = React.useState<string | undefined>();
@@ -451,10 +409,12 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
   const orderLifecycleClient = React.useMemo(() => createDshOrderLifecycleHttpClient(apiBaseUrl), [apiBaseUrl]);
 
   const handleAcceptTask = React.useCallback(async (orderId: string) => {
+    if (!captainRuntimeId) return void setInboxState('error');
+
     const rawOrderId = resolveRuntimeOrderId(orderId);
     try {
       setInboxState('offer-accepting');
-      await orderLifecycleClient.acceptTask(rawOrderId, { captain_id: captainId });
+      await orderLifecycleClient.acceptTask(rawOrderId, { captain_id: captainRuntimeId });
       setInboxState('offer-accepted');
       setActiveOrderId(orderId);
       setRoute('detail');
@@ -463,13 +423,15 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
       console.error("Failed to accept task", err);
       setInboxState('error');
     }
-  }, [captainId, orderLifecycleClient]);
+  }, [captainRuntimeId, orderLifecycleClient]);
 
   const handleDeclineConfirm = React.useCallback(async (orderId: string, reason: string) => {
+    if (!captainRuntimeId) return void setDeclineSheetState('error');
+
     const rawOrderId = resolveRuntimeOrderId(orderId);
     try {
       setDeclineSheetState('loading');
-      await orderLifecycleClient.declineTask(rawOrderId, { captain_id: captainId, reason });
+      await orderLifecycleClient.declineTask(rawOrderId, { captain_id: captainRuntimeId, reason });
       setDeclineSheetState('success');
       setTimeout(() => {
         setIsDeclineSheetVisible(false);
@@ -480,24 +442,23 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
       console.error("Failed to decline task", err);
       setDeclineSheetState('error');
     }
-  }, [captainId, orderLifecycleClient]);
+  }, [captainRuntimeId, orderLifecycleClient]);
   const routeHistoryRef = React.useRef<DshCaptainRoute[]>(['home']);
   const routeTransitionFromBackRef = React.useRef(false);
 
-  const activeSummary = defaultDetailByOrderId[activeOrderId] ?? defaultDetailByOrderId['captain-order-9021']!;
-  const activeOrderDisplayId = resolveRuntimeOrderId(activeSummary.orderId);
+  const activeSummary: CaptainOrderDetailSummary = EMPTY_ORDER_SUMMARY;
+  const activeOrderDisplayId = activeOrderId ? resolveRuntimeOrderId(activeOrderId) : '';
+  const captainDisplayName = '';
   const orderChatState = inboxState === 'delivered' ? 'readOnly' : 'active';
   const isCaptainAvailable = captainAvailabilityStatus === 'available';
   const isGpsEnabled = gpsStatus !== 'disabled';
   const currentAvailabilityMeta = availabilityStatusMeta[captainAvailabilityStatus];
   const currentGpsMeta = gpsStatusMeta[gpsStatus];
 
-  // Binary toggle: available <-> unavailable (owner decision)
   const cycleAvailabilityStatus = React.useCallback(() => {
     setCaptainAvailabilityStatus((current) => (current === 'available' ? 'unavailable' : 'available'));
   }, []);
 
-  // Simple GPS toggle: ready <-> disabled. No sheet/screen opened by toggle.
   const cycleGpsStatus = React.useCallback(() => {
     setGpsStatus((current) => (current === 'ready' ? 'disabled' : 'ready'));
   }, []);
@@ -562,7 +523,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
     setActiveOrderExpanded(false);
     setActiveOrderPhase('pickup');
     setActiveOrderDraft('');
-    setActiveOrderMessages(compactOrderChatSeed);
+    setActiveOrderMessages([]);
   }, [activeOrderId, inboxState]);
 
   React.useEffect(() => {
@@ -586,13 +547,14 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
     if (!inboxState || !activeDeliveryStates.has(inboxState) || !apiBaseUrl) return undefined;
     const rawOrderId = resolveRuntimeOrderId(activeOrderId);
     if (!rawOrderId || rawOrderId === activeOrderId) return undefined; // skip preview IDs
+    if (!captainRuntimeId) return undefined;
     let cancelled = false;
     let watchId: number | null = null;
 
     const postLocation = (lat: number, lng: number) => {
       if (cancelled) return;
       orderLifecycleClient.pushLocation(rawOrderId, {
-        captain_id: captainId ?? 'unknown',
+        captain_id: captainRuntimeId,
         latitude: lat,
         longitude: lng,
         lifecycle_status: inboxState ?? 'active',
@@ -615,7 +577,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
         navigator.geolocation.clearWatch(watchId);
       }
     };
-  }, [activeOrderId, apiBaseUrl, captainId, inboxState, orderLifecycleClient]);
+  }, [activeOrderId, apiBaseUrl, captainRuntimeId, inboxState, orderLifecycleClient]);
 
   const openOrderDetail = React.useCallback((orderId: string) => {
     setActiveOrderId(orderId);
@@ -634,14 +596,12 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
     setRoute('support-directory');
   }, []);
 
-  const capturePodPhotoPreview = React.useCallback(() => {
-    setCaptainPodPhotoUri(CAPTAIN_POD_PLACEHOLDER_URI);
-    setCaptainPodMediaKey(CAPTAIN_POD_MEDIA_KEY);
-    setCaptainPodState('ready');
+  const requestPodMediaCapture = React.useCallback(() => {
+    setCaptainPodPhotoUri(undefined); setCaptainPodMediaKey(undefined); setCaptainPodState('retry-required');
   }, []);
 
   const confirmPodSubmission = React.useCallback(async () => {
-    if (!captainPodPhotoUri || !captainPodMediaKey) {
+    if (!captainRuntimeId || !captainPodPhotoUri || !captainPodMediaKey) {
       return;
     }
 
@@ -650,10 +610,9 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
     try {
       const rawOrderId = resolveRuntimeOrderId(activeOrderId);
 
-      // DSH-SLICE-005E: submit proof-of-delivery. Transitions ARRIVED → DELIVERED.
       // WLT BOUNDARY: no payout mutation here. Payout is WLT responsibility post-DELIVERED.
       await orderLifecycleClient.deliverOrder(rawOrderId, {
-        captain_id: captainId,
+        captain_id: captainRuntimeId,
         pod_media_key: captainPodMediaKey,
       });
 
@@ -667,16 +626,18 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
       console.error("Failed to confirm delivery API call:", err);
       setCaptainPodState('error');
     }
-  }, [activeOrderId, captainAppMode, captainId, captainPodMediaKey, captainPodPhotoUri, orderLifecycleClient]);
+  }, [activeOrderId, captainAppMode, captainRuntimeId, captainPodMediaKey, captainPodPhotoUri, orderLifecycleClient]);
 
   const reportPodFailure = React.useCallback(async () => {
+    if (!captainRuntimeId) return void setCaptainPodState('error');
+
     const rawOrderId = resolveRuntimeOrderId(activeOrderId);
 
     try {
       // DSH-SLICE-005F: report delivery failure. Transitions ARRIVED → RETURNING_TO_STORE.
       // WLT BOUNDARY: no financial mutation. wlt_refund_trigger_ref (if any) is bridge ref only.
       await orderLifecycleClient.failDelivery(rawOrderId, {
-        captain_id: captainId,
+        captain_id: captainRuntimeId,
         failure_reason: 'CLIENT_UNREACHABLE',
         return_required: true,
       });
@@ -690,7 +651,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
       console.error("Failed to report delivery failure API call:", err);
       setCaptainPodState('error');
     }
-  }, [activeOrderId, captainAppMode, captainId, orderLifecycleClient]);
+  }, [activeOrderId, captainAppMode, captainRuntimeId, orderLifecycleClient]);
 
   const openCaptainSupportScreen = React.useCallback((screenId: CaptainSupportRoute) => {
     setSelectedSupportScreen(screenId);
@@ -706,10 +667,12 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
   }, []);
 
   const confirmPickup = React.useCallback(async () => {
+    if (!captainRuntimeId) return void setPickupSheetState('error');
+
     const rawOrderId = resolveRuntimeOrderId(activeOrderId);
     try {
       setPickupSheetState('loading');
-      await orderLifecycleClient.confirmPickup(rawOrderId, { captain_id: captainId });
+      await orderLifecycleClient.confirmPickup(rawOrderId, { captain_id: captainRuntimeId });
       setPickupSheetState('success');
       setTimeout(() => {
         setIsPickupSheetVisible(false);
@@ -730,20 +693,22 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
       console.error("Failed to confirm pickup", err);
       setPickupSheetState('error');
     }
-  }, [activeOrderId, captainId, orderLifecycleClient]);
+  }, [activeOrderId, captainRuntimeId, orderLifecycleClient]);
 
   const confirmDelivery = React.useCallback(async () => {
+    if (!captainRuntimeId) return void setCaptainPodState('error');
+
     const rawOrderId = resolveRuntimeOrderId(activeOrderId);
 
     try {
-      await orderLifecycleClient.deliverOrder(rawOrderId, { captain_id: captainId });
+      await orderLifecycleClient.deliverOrder(rawOrderId, { captain_id: captainRuntimeId });
       setInboxState('delivered');
       setActiveOrderExpanded(false);
     } catch (err) {
       console.error("Failed to confirm delivery", err);
       setCaptainPodState('error');
     }
-  }, [activeOrderId, captainId, orderLifecycleClient]);
+  }, [activeOrderId, captainRuntimeId, orderLifecycleClient]);
 
   const sendQuickMessage = React.useCallback(() => {
     const text = activeOrderDraft.trim();
@@ -882,7 +847,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
       return (
         <DshCaptainMapScreen
           orderId={activeOrderId}
-          captainId={captainId}
+          captainId={captainRuntimeId || undefined}
           onBack={() => setRoute('detail')}
           orderLifecycleClient={orderLifecycleClient}
         />
@@ -903,7 +868,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
           onBack={goBack}
           onRingBell={() => {
             // SCAFFOLD: bell event stub — no runtime dispatch, value is not used
-            void ({ orderId: activeOrderId, captainId, timestamp: new Date().toISOString(), proximityState: 'bell_rang' } satisfies DshCaptainBellEvent);
+            if (captainRuntimeId) void ({ orderId: activeOrderId, captainId: captainRuntimeId, timestamp: new Date().toISOString(), proximityState: 'bell_rang' } satisfies DshCaptainBellEvent);
           }}
         />
       );
@@ -914,7 +879,7 @@ function DshCaptainSurfaceInner({ command, captainId = DSH_CAPTAIN_FALLBACK_ID, 
         <DshCaptainPoDSubmissionScreen
           state={captainPodState}
           orderId={activeOrderId}
-          onCapturePhoto={capturePodPhotoPreview}
+          onCapturePhoto={requestPodMediaCapture}
           onConfirm={confirmPodSubmission}
           onReportFailure={reportPodFailure}
           onRetry={() => {

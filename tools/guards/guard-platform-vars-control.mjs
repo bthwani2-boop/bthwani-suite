@@ -133,6 +133,37 @@ for (const [serviceId, service] of serviceEntries) {
         );
       }
     }
+
+    if (relativePath.startsWith('dsh/frontend/control-panel/platform/Vars/')) {
+      const forbiddenRuntimeVarsTerms = /\b(?:preview-only|currentPreviewValue|proposedPreviewValue|DSH_PLATFORM_AUDIT_PREVIEW|DSH_PLATFORM_SIMULATION_PREVIEW|local-only)\b|معاينة محلية|تغيير محلي فقط|تعديل محلي فقط/g;
+      let forbiddenVarsMatch;
+      while ((forbiddenVarsMatch = forbiddenRuntimeVarsTerms.exec(text))) {
+        result.add(
+          'FAIL',
+          'platform_vars_preview_runtime_term',
+          file,
+          `Platform Vars runtime UI still contains preview/local-only terminology: "${forbiddenVarsMatch[0]}".`,
+          lineOf(text, forbiddenVarsMatch.index),
+          'Use runtime-bound, contract-required, read-only-reference, or disabled-by-policy language instead.'
+        );
+      }
+
+      const platformStatusRegex = /\bstatus:\s*['"]([^'"]+)['"]/g;
+      const allowedPlatformStatuses = new Set(['runtime-bound', 'contract-required', 'read-only-reference', 'disabled-by-policy']);
+      let statusMatch;
+      while ((statusMatch = platformStatusRegex.exec(text))) {
+        if (!allowedPlatformStatuses.has(statusMatch[1])) {
+          result.add(
+            'FAIL',
+            'platform_vars_forbidden_status',
+            file,
+            `Platform Vars status must be runtime-bound, contract-required, read-only-reference, or disabled-by-policy. Found "${statusMatch[1]}".`,
+            lineOf(text, statusMatch.index),
+            'Replace preview/local-only status vocabulary with the approved runtime policy states.'
+          );
+        }
+      }
+    }
   }
 
   for (const expectedPath of service.expectedVarsPaths ?? []) {

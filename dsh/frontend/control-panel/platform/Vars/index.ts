@@ -1,9 +1,9 @@
 export { DshPlatformVarsWorkspace } from './DshPlatformVarsWorkspace';
 export type {
   DshPlatformAuditEntry,
+  DshPlatformPolicyScenario,
   DshPlatformProviderControlRecord,
   DshPlatformScopeLayer,
-  DshPlatformSimulationScenario,
   DshPlatformVarOwner,
   DshPlatformVarRecord,
   DshPlatformVarRisk,

@@ -11,12 +11,10 @@ import {
   DshFieldStoreVisitScreen,
   type DshFieldStoreVisitErrors,
   type DshFieldStoreVisitValues,
-  type DshFieldVisitEvidenceItem,
 } from './screens/DshFieldStoreVisitScreen';
 import { DshFieldStoresHistoryScreen } from './screens/DshFieldStoresHistoryScreen';
 import { DshFieldStoresScreen } from './screens/DshFieldStoresScreen';
 import { DshFieldDocumentUploadScreen } from './screens/DshFieldDocumentUploadScreen';
-import { readFieldStoresLocal, writeFieldStoresLocal } from './storage/field-onboarding.storage';
 import {
   createManualFieldStore,
   submitFieldStoreForReview,
@@ -41,22 +39,6 @@ import {
 type DshFieldReadinessEscalationState = NonNullable<React.ComponentProps<typeof DshFieldReadinessEscalationScreen>['state']>;
 
 const DEFAULT_FIELD_ESCALATION_TARGET_ID = 'partner-management';
-const FIELD_VISIT_EVIDENCE_ITEMS: readonly DshFieldVisitEvidenceItem[] = [
-  {
-    id: 'field.visit.front-signage.v1',
-    title: 'صورة الواجهة',
-    subtitle: 'إثبات الزيارة من مدخل المتجر الرئيسي.',
-    statusLabel: 'محتفظ به',
-    capturedAtLabel: '10:14 ص',
-  },
-  {
-    id: 'field.visit.owner-availability.v1',
-    title: 'ملاحظة توافر المالك',
-    subtitle: 'تأكيد ساعات العمل والجاهزية للخطوة التالية.',
-    statusLabel: 'مسجل',
-    capturedAtLabel: '10:19 ص',
-  },
-];
 
 function isSameRoute(left: DshFieldRouteState, right: DshFieldRouteState) {
   if (left.kind !== right.kind) {
@@ -104,7 +86,7 @@ function DshFieldSurfaceInner({ command, onExit }: DshFieldSurfaceProps = {}) {
     mode: appearanceMode,
     setMode: setAppearanceMode,
   } = useAppFieldAppearance();
-  const [stores, setStores] = React.useState<FieldStoreFile[]>(() => readFieldStoresLocal());
+  const [stores, setStores] = React.useState<FieldStoreFile[]>([]);
   const [routeStack, setRouteStack] = React.useState<DshFieldRouteState[]>([{ kind: 'stores' }]);
   const [visitValues, setVisitValues] = React.useState<Record<string, DshFieldStoreVisitValues>>({});
   const [visitErrors, setVisitErrors] = React.useState<Record<string, DshFieldStoreVisitErrors>>({});
@@ -127,10 +109,6 @@ function DshFieldSurfaceInner({ command, onExit }: DshFieldSurfaceProps = {}) {
   const activeStore = route.kind === 'onboarding' || route.kind === 'visit'
     ? stores.find((store) => store.id === route.storeId) ?? null
     : null;
-
-  React.useEffect(() => {
-    writeFieldStoresLocal(stores);
-  }, [stores]);
 
   React.useEffect(() => {
     if (typeof command?.token !== 'number') {
@@ -282,7 +260,6 @@ function DshFieldSurfaceInner({ command, onExit }: DshFieldSurfaceProps = {}) {
       <DshFieldStoreVisitScreen
         values={values}
         errors={visitErrors[activeStore.id]}
-        evidenceItems={FIELD_VISIT_EVIDENCE_ITEMS}
         onRetry={popRoute}
         onChange={(field, value) => {
           setVisitValues((current) => ({
@@ -319,10 +296,10 @@ function DshFieldSurfaceInner({ command, onExit }: DshFieldSurfaceProps = {}) {
           void fieldVisitClient.createFieldVisit(activeStore.id, {
             visit_summary: nextValues.visitSummary.trim(),
             follow_up_action: nextValues.followUpAction.trim(),
-            evidence_media_keys: FIELD_VISIT_EVIDENCE_ITEMS.map((item) => item.id),
+            evidence_media_keys: [],
             location_confidence: 'manual_confirmed',
           }).catch(() => {
-            // Keep the field visit workflow usable offline; runtime evidence validates the API path.
+            // Runtime failure leaves the draft in-memory only; no local runtime truth is persisted.
           });
 
           updateStore(activeStore.id, (store) => ({

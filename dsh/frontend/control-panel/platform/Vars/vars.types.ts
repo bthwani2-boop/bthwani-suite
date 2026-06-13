@@ -1,6 +1,10 @@
 export type DshPlatformVarOwner = 'DSH' | 'WLT' | 'Provider';
 
-export type DshPlatformVarStatus = 'preview-only' | 'contract-needed' | 'ready-for-binding';
+export type DshPlatformVarStatus =
+  | 'runtime-bound'
+  | 'contract-required'
+  | 'read-only-reference'
+  | 'disabled-by-policy';
 
 export type DshPlatformVarScope =
   | 'Global'
@@ -22,8 +26,8 @@ export type DshPlatformVarRecord = {
   status: DshPlatformVarStatus;
   scope: DshPlatformVarScope;
   risk: DshPlatformVarRisk;
-  currentPreviewValue: string;
-  proposedPreviewValue?: string | null;
+  currentValue: string;
+  proposedValue?: string | null;
   effectSummary: string;
   auditRollbackHint: string;
   precedenceNote: string;
@@ -52,7 +56,7 @@ export type DshPlatformScopeLayer = {
   note: string;
 };
 
-export type DshPlatformSimulationScenario = {
+export type DshPlatformPolicyScenario = {
   id: string;
   title: string;
   owner: DshPlatformVarOwner;

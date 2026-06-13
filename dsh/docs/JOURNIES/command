@@ -18,6 +18,57 @@ No Preview Data
 No Report-Only Output
 ```
 
+## 0) تعريف فول ستاك بثواني
+
+الاسم التشغيلي الرسمي لهذا الإغلاق هو:
+
+```text
+فول ستاك بثواني
+```
+
+فول ستاك بثواني = منظومة واحدة تضم:
+
+```text
+DSH Backend + PostgreSQL + OpenAPI + generated clients + dsh/frontend/shared + Control Panel + app-client + app-partner + app-captain + app-field + WLT finance bridge + Media Runtime + MinIO/S3 + dsh_media_assets + guards + runtime/visual evidence.
+```
+
+ممنوع تفسير أي شريحة كإغلاق سطح منفصل.
+ممنوع إغلاق app-client أو app-partner أو app-captain أو app-field أو Control Panel منفردًا إذا كان الـ Capability مرتبطًا ببقية الأسطح.
+الإغلاق يكون بالـ Capability عبر كل الطبقات، وليس بالتطبيق.
+
+كل شريحة يجب أن تحدد Capability فول ستاك بثواني، ثم تفحص أثرها على:
+
+```text
+backend
+OpenAPI
+shared
+control-panel section الحالية
+app-client
+app-partner
+app-captain
+app-field
+wlt/frontend/dsh
+media/runtime
+guards/evidence
+```
+
+يجب أن يحتوي CHECK لكل شريحة على:
+
+```text
+Full-Stack Capability ID
+Control Panel current section
+Mobile surfaces affected
+Backend endpoints
+OpenAPI/generated client impact
+Shared contracts/adapters impact
+WLT read-model/boundary impact
+Media runtime impact
+Evidence required
+```
+
+ممنوع `CLOSED_WITH_EVIDENCE` إذا كان الإغلاق مثبتًا في سطح واحد فقط.
+يجب أن يثبت `slice-coverage-matrix.json` أو بديله التنفيذي كل الأسطح والأقسام المرتبطة بنفس Capability.
+
 ## 1) قاعدة العمل الوحيدة
 
 اعمل بمنهج واحد فقط:

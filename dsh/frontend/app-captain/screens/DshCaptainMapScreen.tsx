@@ -7,7 +7,7 @@ import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contract
 import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
 
 import { DshOrderLifecycleClient } from '../../shared/dsh-order-lifecycle-client';
-import { type DshOperationScreenState } from '../../app-client/parts/OperationScreen';
+import { type DshOperationScreenState } from '../parts/OperationScreen';
 
 type CaptainFieldStage = 'to-store' | 'to-customer' | 'near-customer' | 'at-door' | 'bell-rang' | 'proof';
 type CaptainHeartbeatState = { lastUpdateMinutesAgo: number; etaMinutes: number | null };

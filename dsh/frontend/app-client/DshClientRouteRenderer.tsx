@@ -27,9 +27,8 @@ import { DshPreferencesHubScreen } from './screens/DshPreferencesHubScreen';
 import { DshAppearanceHubScreen } from './screens/DshAppearanceHubScreen';
 import { WltHomeGetScreen } from '../../../wlt/frontend/app-client-wlt';
 import { hostClientStates } from './dsh-client.navigation-bridge';
-import { buildPaymentMethodsList } from './adapters/dshClientCheckoutAdapters';
+import { buildDshClientCheckoutPresenterModel } from './presenters/dshClientCheckoutPresenter';
 import { getDshClientStateMeta } from '../shared/client-state';
-import { parseCartItemPrice } from './shared/store-formatting';
 import type { DshClientRouteRendererProps } from './contracts/dsh-client-renderer.contracts';
 
 export function DshClientRouteRenderer({
@@ -168,25 +167,23 @@ export function DshClientRouteRenderer({
   }
 
   if (route === 'checkout-intent') {
-    const cartSubtotal = cartItems.reduce(
-      (sum, item) => sum + parseCartItemPrice(item.priceLabel) * item.qty,
-      0
-    );
-    const deliveryFeeNum = selectedFulfillmentMode === 'pickup' ? 0 : 1500;
-    const cartTotal = cartSubtotal + deliveryFeeNum;
-
-    const formattedBalance = walletSession.balance !== null ? `${walletSession.balance} ر.ي` : '...';
-    const paymentMethods = buildPaymentMethodsList(formattedBalance, selectedPaymentMethod);
+    const checkoutPresenter = buildDshClientCheckoutPresenterModel({
+      cartItems,
+      createOrderValues,
+      selectedFulfillmentMode,
+      selectedPaymentMethod,
+      walletSession,
+    });
 
     return (
       <DshCheckoutIntentScreen
         state={checkoutState}
-        address={createOrderValues.dropoffAddress || 'مسقط، الخوير، شارع المها، بناية رقم 123'}
-        subtotal={`${cartSubtotal} ر.ي`}
-        deliveryFee={`${deliveryFeeNum} ر.ي`}
-        total={`${cartTotal} ر.ي`}
-        eta={selectedFulfillmentMode === 'pickup' ? '15 - 20 دقيقة' : '30 - 45 دقيقة'}
-        paymentMethods={paymentMethods}
+        address={checkoutPresenter.addressLabel}
+        subtotal={checkoutPresenter.subtotalLabel}
+        deliveryFee={checkoutPresenter.deliveryFeeLabel}
+        total={checkoutPresenter.totalLabel}
+        eta={checkoutPresenter.etaLabel}
+        paymentMethods={checkoutPresenter.paymentMethods}
         paymentErrorMessage={paymentErrorMessage}
         onBack={() => setRoute('cart-get')}
         onConfirm={handleConfirmCheckout}
@@ -346,7 +343,7 @@ export function DshClientRouteRenderer({
         }}
         items={cartItems}
         activeOrder={{
-          id: cartItems[0]?.id ?? 'cart-preview',
+          id: cartItems[0]?.id ?? activeStore.id ?? 'cart-empty',
           title: cartItems[0] ? `تتضمن السلة ${cartItems[0].title}` : 'السلة جاهزة للدفع',
           subtitle: cartItems[0]
             ? `عناصر من ${cartItems[0].storeName}`

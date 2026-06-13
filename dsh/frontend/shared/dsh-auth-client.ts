@@ -2,6 +2,8 @@
 // Wraps GET /auth/session and GET /auth/permissions from auth.openapi.yaml.
 // Contract port: 18082 (DSH_AUTH_SERVICE_PORT env var).
 
+import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+
 export type DshAuthActorRole = 'client' | 'partner' | 'captain' | 'field' | 'operator' | 'system';
 
 export type DshAuthState = 'authenticated' | 'guest' | 'unauthenticated';
@@ -67,17 +69,15 @@ export async function getAuthPermissions(config: DshAuthClientConfig): Promise<D
 export function resolveDshAuthBaseUrl(): string | null {
   // Auth service runs on port 18082 by default.
   // Falls back to DSH API base URL host with auth port.
-  if (typeof process !== 'undefined' && process.env) {
-    const explicit = process.env.EXPO_PUBLIC_AUTH_BASE_URL ?? process.env.NEXT_PUBLIC_AUTH_BASE_URL ?? null;
-    if (explicit?.trim()) return explicit.trim();
-    const dshBase = process.env.EXPO_PUBLIC_DSH_API_BASE_URL ?? process.env.NEXT_PUBLIC_DSH_API_BASE_URL ?? null;
-    if (dshBase?.trim()) {
-      try {
-        const url = new URL(dshBase.trim());
-        return `${url.protocol}//${url.hostname}:18082`;
-      } catch {
-        // malformed base URL — return null
-      }
+  const explicit = PlatformVarsRegistry.get('authBaseUrl');
+  if (explicit?.trim()) return explicit.trim();
+  const dshBase = PlatformVarsRegistry.get('dshApiBaseUrl');
+  if (dshBase?.trim()) {
+    try {
+      const url = new URL(dshBase.trim());
+      return `${url.protocol}//${url.hostname}:18082`;
+    } catch {
+      // malformed base URL — return null
     }
   }
   return null;

@@ -58,10 +58,7 @@ import { ProductOverridesScreen } from './screens/ProductOverridesScreen';
 
 import {
   type PartnerStoreScopeOption,
-  type PartnerStoreHoursDay,
-  defaultStoreHours,
   defaultServiceModes,
-  defaultZone,
   storeScopeOptions,
   defaultSupportCommandContext,
   resolveSupportFilterFromOperationalFlow,
@@ -167,7 +164,7 @@ export function DshPartnerSurface(props: DshPartnerSurfaceProps) {
 
 function DshPartnerSurfaceInner({
   initialRoute = 'inbox',
-  initialOrderId = 'partner-order-1042',
+  initialOrderId = '',
 }: DshPartnerSurfaceProps = {}) {
   const { dshAuthBearerToken, dshClientId } = usePlatformVars();
   // walletHubVisible state removed in favor of self-contained WltDshPartnerBridge cockpit tabs.
@@ -243,29 +240,18 @@ function DshPartnerSurfaceInner({
     () => storeScopeOptions.find((option) => option.id === selectedStoreScopeId) ?? storeScopeOptions[0],
     [selectedStoreScopeId],
   );
+  const activeStoreRuntimeId = selectedStoreScope.id === 'all' ? '' : selectedStoreScope.id;
 
-  // activeOrderSummary deprecated in favor of inline details in OrdersInboxScreen.
-
-  const todayHoursLabel = React.useMemo(() => {
-    const today = defaultStoreHours[0];
-
-    if (!today.isOpen) {
-      return 'Closed today';
-    }
-
-    return `${today.openTime} - ${today.closeTime}`;
-  }, []);
-
-  const maintenanceProfile = React.useMemo(
+  const runtimePartnerProfile = React.useMemo(
     () => ({
-      storeName: 'جرين بول',
+      storeName: selectedStoreScope.label,
       branchLabel: selectedStoreScope.label,
-      cityLabel: 'الرياض',
-      managerLabel: 'خالد',
-      todayHoursLabel,
-      activeZoneLabel: defaultZone.title,
+      cityLabel: selectedStoreScope.description,
+      managerLabel: 'غير محدد',
+      todayHoursLabel: 'يتطلب ربط ساعات التشغيل',
+      activeZoneLabel: selectedStoreScope.label,
     }),
-    [selectedStoreScope.label, todayHoursLabel],
+    [selectedStoreScope.description, selectedStoreScope.label],
   );
 
   const partnerActionableHandoffs = React.useMemo(
@@ -274,13 +260,27 @@ function DshPartnerSurfaceInner({
   );
 
   const deliveryOpsSummary = React.useMemo(
-    () => ({
-      outForDelivery: 8,
-      handoffReady: (getSurfaceModeCapability('bthwani_delivery').partner.receivesOrder || getSurfaceModeCapability('partner_delivery').partner.receivesOrder) ? 5 : 1,
-      deliveredToday: 24,
-      delayedRisk: partnerActionableHandoffs.filter((h) => h.wltImpact.eventKind !== 'none').length,
-    }),
-    [partnerActionableHandoffs],
+    () => {
+      const partnerReceivesOrders =
+        getSurfaceModeCapability('bthwani_delivery').partner.receivesOrder ||
+        getSurfaceModeCapability('partner_delivery').partner.receivesOrder;
+      const outForDelivery = partnerOrders.filter((item) => item.status === 'captain_assigned' || item.status === 'captain_arriving' || item.status === 'delivering').length;
+      const handoffReady = partnerReceivesOrders
+        ? partnerOrders.filter((item) => item.status === 'ready' || item.status === 'items_ready' || item.status === 'handoff').length
+        : 0;
+      const deliveredToday = partnerOrders.filter((item) => item.status === 'completed').length;
+      const delayedRisk =
+        partnerOrders.filter((item) => item.priority === 'high' || item.slaRisk || item.issueRequired).length +
+        partnerActionableHandoffs.filter((h) => h.wltImpact.eventKind !== 'none').length;
+
+      return {
+        outForDelivery,
+        handoffReady,
+        deliveredToday,
+        delayedRisk,
+      };
+    },
+    [partnerActionableHandoffs, partnerOrders],
   );
 
   const partnerEntryState = 'ready' as const;
@@ -433,8 +433,8 @@ function DshPartnerSurfaceInner({
 
   const topBar = (
     <ModernPremiumHeader
-      title={maintenanceProfile.storeName}
-      locationLabel={`الرياض · ${selectedStoreScope.label} · ${maintenanceProfile.activeZoneLabel}`}
+      title={runtimePartnerProfile.storeName}
+      locationLabel={`${selectedStoreScope.label} · ${runtimePartnerProfile.activeZoneLabel}`}
       onProfilePress={() => openAccountHub('profile')}
       onNotificationsPress={() => {
         setActiveOrderId(initialOrderId);
@@ -558,12 +558,12 @@ function DshPartnerSurfaceInner({
       <DshPartnerHubSurface
         section={accountHubSection}
         onSectionChange={setAccountHubSection}
-        storeName={maintenanceProfile.storeName}
+        storeName={runtimePartnerProfile.storeName}
         branchLabel={selectedStoreScope.label}
-        cityLabel={maintenanceProfile.cityLabel}
-        managerLabel={maintenanceProfile.managerLabel}
-        todayHoursLabel={maintenanceProfile.todayHoursLabel}
-        activeZoneLabel={maintenanceProfile.activeZoneLabel}
+        cityLabel={runtimePartnerProfile.cityLabel}
+        managerLabel={runtimePartnerProfile.managerLabel}
+        todayHoursLabel={runtimePartnerProfile.todayHoursLabel}
+        activeZoneLabel={runtimePartnerProfile.activeZoneLabel}
         storeOpen
         listingEnabled
         serviceModes={defaultServiceModes}
@@ -649,10 +649,10 @@ function DshPartnerSurfaceInner({
           setEditingProductId(prodId);
           setRoute('product-overrides');
         }}
-        storeName={maintenanceProfile.storeName}
+        storeName={runtimePartnerProfile.storeName}
         branchLabel={selectedStoreScope.label}
-        activeZoneLabel={maintenanceProfile.activeZoneLabel}
-        todayHoursLabel={maintenanceProfile.todayHoursLabel}
+        activeZoneLabel={runtimePartnerProfile.activeZoneLabel}
+        todayHoursLabel={runtimePartnerProfile.todayHoursLabel}
       />,
     );
   }
@@ -660,7 +660,7 @@ function DshPartnerSurfaceInner({
   if (route === 'product-edit') {
     return renderSurfaceShell(
       <ProductEditScreen
-        storeId="store-1001"
+        storeId={activeStoreRuntimeId}
         productId={editingProductId}
         onBack={() => setRoute('inventory-management')}
         onSaved={() => {
@@ -674,7 +674,7 @@ function DshPartnerSurfaceInner({
   if (route === 'category-management') {
     return renderSurfaceShell(
       <CategoryManagementScreen
-        storeId="store-1001"
+        storeId={activeStoreRuntimeId}
         onBack={() => setRoute('inventory-management')}
       />,
     );
@@ -761,12 +761,12 @@ function DshPartnerSurfaceInner({
 
   return renderMainShell(
     <DshPartnerHubSurface
-      storeName={maintenanceProfile.storeName}
+      storeName={runtimePartnerProfile.storeName}
       branchLabel={selectedStoreScope.label}
-      cityLabel={maintenanceProfile.cityLabel}
-      managerLabel={maintenanceProfile.managerLabel}
-      todayHoursLabel={maintenanceProfile.todayHoursLabel}
-      activeZoneLabel={maintenanceProfile.activeZoneLabel}
+      cityLabel={runtimePartnerProfile.cityLabel}
+      managerLabel={runtimePartnerProfile.managerLabel}
+      todayHoursLabel={runtimePartnerProfile.todayHoursLabel}
+      activeZoneLabel={runtimePartnerProfile.activeZoneLabel}
       onOpenOrdersBoard={openOrdersBoard}
       onOpenInventoryManagement={openInventoryManagement}
       onOpenStoreScope={openStoreScope}

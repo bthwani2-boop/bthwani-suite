@@ -1,5 +1,77 @@
 ابدأ فورًا داخل C:\bthwani-suite فقط، وعلى أحدث حالة فعلية للفرع الحالي، ولا تعتمد على الذاكرة أو الافتراضات. هذا أمر تنفيذ وإغلاق حقيقي على الكود الحي، وليس تقريرًا، وليس تحليلًا فقط، وليس تصنيفًا، وليس توثيقًا، وليس اقتراحات مؤجلة. المطلوب تنفيذ معالجة فعلية متدرجة وصارمة لكل ما يتعلق بإغلاق DSH/WLT frontend وreal data/media flow وPostgreSQL/MinIO وWLT boundary وSurface structure وControl Panel وShared وSlice coverage، مع أدلة تشغيلية قابلة للمراجعة، وبدون أي تسويف أو تأجيل أو هروب.
 
+## فول ستاك بثواني — Execution Order
+
+ترتيب التنفيذ الرسمي يكون حسب Capability عبر كل الطبقات، وليس حسب سطح منفصل:
+
+```text
+1) Full-Stack Foundation
+2) Actor/Auth/Permission Model
+3) Store & Catalog Capability
+4) Media Runtime Capability
+5) Cart & Checkout Capability
+6) Order Lifecycle Capability
+7) Captain Delivery Lifecycle Capability
+8) Partner Operations Capability
+9) Field Readiness Capability
+10) Support & Escalation Capability
+11) WLT Finance Read-Model Capability
+12) Control Panel Governance Capability
+13) Notifications Capability
+14) Final Full-Stack Regression
+```
+
+كل Capability يجب أن يغطي:
+
+```text
+backend/API إن وجد
+OpenAPI/client binding
+shared contracts/adapters/view-models
+control-panel section الحالية
+app-client إن تأثر
+app-partner إن تأثر
+app-captain إن تأثر
+app-field إن تأثر
+wlt/frontend/dsh إن وُجد أثر مالي
+Media Runtime إن وُجدت وسائط
+visual/runtime evidence
+```
+
+هذه ليست تطبيقات مستقلة. هذه Role Surfaces فوق فول ستاك بثواني.
+ممنوع أن يمتلك أي سطح نسخة مستقلة من lifecycle أو status model أو API adapter أو media flow أو finance bridge إذا كان يوجد contract مشترك.
+كل سطح يملك presentation/controller الخاص بدوره فقط.
+
+استخدم تقسيم Control Panel الحالي كما هو:
+
+```text
+dashboard
+operations
+support
+finance
+catalogs
+partners
+marketing
+platform
+administration
+hr
+```
+
+لا تنشئ sections جديدة مثل stores/products/categories/media/orders/settings إلا إذا تم اعتمادها كـ migration حقيقي في routing/governance/host.
+إذا احتاجت Capability إلى stores/products/categories/media، فتوضع تحت القسم الحالي المالك:
+
+```text
+catalogs = products/categories/catalog/media publication
+partners = store onboarding/readiness/partner lifecycle
+operations = orders/live dispatch/intervention
+support = tickets/escalations/conversations
+finance = WLT read-only finance
+platform = vars/providers/policies
+administration = RBAC/approval chain
+marketing = campaigns/offers/content
+dashboard = summary/evidence navigation فقط
+hr = blocked/read-only unless backend HR exists
+```
+
 الهدف النهائي:
 تحويل DSH/WLT من أي بقايا preview/demo/mock/fake/sample/fallback/data/media-fixtures إلى runtime حقيقي يعتمد على:
 - PostgreSQL للبيانات التشغيلية والـ metadata.

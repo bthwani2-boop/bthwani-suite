@@ -107,7 +107,11 @@ export interface ServiceRecord {
 // ─── Platform Vars ───────────────────────────────────────────────────────────
 
 export type DshPlatformVarOwner = 'DSH' | 'WLT' | 'Provider';
-export type DshPlatformVarStatus = 'preview-only' | 'contract-needed' | 'ready-for-binding';
+export type DshPlatformVarStatus =
+  | 'runtime-bound'
+  | 'contract-required'
+  | 'read-only-reference'
+  | 'disabled-by-policy';
 export type DshPlatformVarScope =
   | 'Global'
   | 'Service'
@@ -127,8 +131,8 @@ export type DshPlatformVarRecord = {
   status: DshPlatformVarStatus;
   scope: DshPlatformVarScope;
   risk: DshPlatformVarRisk;
-  currentPreviewValue: string;
-  proposedPreviewValue?: string;
+  currentValue: string;
+  proposedValue?: string;
   effectSummary: string;
   auditRollbackHint: string;
   precedenceNote: string;
@@ -157,7 +161,7 @@ export type DshPlatformScopeLayer = {
   note: string;
 };
 
-export type DshPlatformSimulationScenario = {
+export type DshPlatformPolicyScenario = {
   id: string;
   title: string;
   owner: DshPlatformVarOwner;

@@ -38,7 +38,7 @@ export function DshClientSurface(props: DshClientSurfaceProps) {
 }
 
 function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devClientId, renderApprovedVideoReelsViewer }: DshClientSurfaceProps) {
-  const { dshAuthBearerToken, dshClientId } = usePlatformVars();
+  const { dshApiBaseUrl, dshAuthBearerToken, dshClientId } = usePlatformVars();
   const isAwnakEnabled = useFeatureFlag('DSH:capability:awnak');
   const { hydrated: appearanceHydrated, mode: appearanceMode, setMode: setAppearanceMode } = useAppClientAppearance();
 
@@ -228,9 +228,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
   React.useEffect(() => {
     if (route !== 'bell') return undefined;
     const authBaseUrl = resolveDshAuthBaseUrl();
-    const dshBase = checkoutAuth.bearerToken
-      ? (typeof process !== 'undefined' ? process.env?.EXPO_PUBLIC_DSH_API_BASE_URL ?? process.env?.NEXT_PUBLIC_DSH_API_BASE_URL ?? null : null)
-      : null;
+    const dshBase = checkoutAuth.bearerToken ? dshApiBaseUrl : null;
     const baseUrl = dshBase?.trim() || authBaseUrl?.replace(':18082', ':8080') || null;
     if (!baseUrl) return undefined;
     let cancelled = false;
@@ -253,7 +251,7 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
       setBellSignalEvents(summaries);
     }).catch(() => { /* non-fatal — bell shows empty state */ });
     return () => { cancelled = true; };
-  }, [route, checkoutAuth]);
+  }, [route, checkoutAuth, dshApiBaseUrl]);
 
   // Command routing reset to tracking default
   React.useEffect(() => {
@@ -280,10 +278,14 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     );
   }, [activeStoreDetail, activeStore, activeStoreTags, activeStoreDeliveryModes, activeStoreCategories]);
 
-  const homeRecentOrders = React.useMemo(() => [
-    { id: 'home-recent-order-1', storeId: clientVisibleHomeStores[0]?.id ?? 'store-1001', title: 'الطلب النشط', subtitle: clientVisibleHomeStores[0]?.name ?? 'مطعم القلعة', meta: `${clientVisibleHomeStores[0]?.distanceLabel ?? '2.1 كم'} · ${clientVisibleHomeStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`, statusLabel: clientVisibleHomeStores[0]?.statusTone === 'open' ? 'مباشر' : 'مغلق' },
-    { id: 'home-recent-order-2', storeId: clientVisibleHomeStores[1]?.id ?? 'store-1002', title: 'آخر طلب', subtitle: clientVisibleHomeStores[1]?.name ?? 'مطاعم الأرض الخضراء', meta: `${clientVisibleHomeStores[1]?.distanceLabel ?? '1.8 كم'} · ${clientVisibleHomeStores[1]?.serviceLabel ?? 'توصيل برو'}`, statusLabel: clientVisibleHomeStores[1]?.statusTone === 'open' ? 'مباشر' : 'مغلق' }
-  ], [clientVisibleHomeStores]);
+  const homeRecentOrders = React.useMemo(() => clientVisibleHomeStores.slice(0, 2).map((store, index) => ({
+    id: `home-recent-order-${store.id}`,
+    storeId: store.id,
+    title: index === 0 ? 'الطلب النشط' : 'آخر طلب',
+    subtitle: store.name,
+    meta: `${store.distanceLabel ?? 'غير محدد'} · ${store.deliveryLabel ?? store.serviceLabel ?? 'غير محدد'}`,
+    statusLabel: store.statusTone === 'open' ? 'مباشر' : 'مغلق',
+  })), [clientVisibleHomeStores]);
 
   const handleOpenActiveStoreItems = React.useCallback(() => {
     setStoreItemsEntryOrigin('store-get');

@@ -52,6 +52,21 @@ const checks = [
     patterns: ['/media/upload-intents', '/complete', 'media_id'],
   },
 ];
+const runtimeMediaScopes = [
+  'dsh/frontend/app-client',
+  'dsh/frontend/app-partner',
+  'dsh/frontend/app-captain',
+  'dsh/frontend/app-field',
+  'dsh/frontend/control-panel',
+  'dsh/frontend/shared',
+];
+const runtimeMediaExtensions = new Set(['.ts', '.tsx', '.js', '.jsx']);
+const forbiddenRuntimeMediaTruth = [
+  { id: 'base64_placeholder_media', regex: /data:image\/[^;]+;base64|base64 placeholder/i },
+  { id: 'fixture_media_key_runtime_truth', regex: /fixture media key|proof\.delivery\.preview|field\.visit\.(?:front-signage|owner-availability)\.v1/i },
+  { id: 'fake_media_storage_reference', regex: /fake (?:public_url|storage_key)|public_url:\s*['"]fake|storage_key:\s*['"]fake/i },
+  { id: 'local_file_uri_persisted_media_truth', regex: /file:\/\/|local file uri as persisted runtime truth/i },
+];
 
 const findings = [];
 
@@ -77,6 +92,41 @@ for (const check of checks) {
         evidence: `${check.id}: ${pattern}`,
         remediation: 'Wire PostgreSQL metadata, MinIO/S3 storage, and Media Runtime API consistently before closure.',
       });
+    }
+  }
+}
+
+function walk(absDir, files = []) {
+  if (!fs.existsSync(absDir)) return files;
+  for (const entry of fs.readdirSync(absDir, { withFileTypes: true })) {
+    if (['node_modules', '.git', 'dist', 'build', 'coverage'].includes(entry.name)) continue;
+    const abs = path.join(absDir, entry.name);
+    if (entry.isDirectory()) walk(abs, files);
+    else if (entry.isFile() && runtimeMediaExtensions.has(path.extname(entry.name))) files.push(abs);
+  }
+  return files;
+}
+
+function lineNumber(text, index) {
+  return text.slice(0, index).split(/\r?\n/).length;
+}
+
+for (const scope of runtimeMediaScopes) {
+  for (const abs of walk(path.join(root, scope))) {
+    const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
+    const relative = path.relative(root, abs).replace(/\\/g, '/');
+    for (const rule of forbiddenRuntimeMediaTruth) {
+      const match = rule.regex.exec(text);
+      if (match) {
+        findings.push({
+          severity: 'FAIL',
+          rule: rule.id,
+          file: relative,
+          line: lineNumber(text, match.index),
+          evidence: match[0].slice(0, 180),
+          remediation: 'Use Media Runtime upload intent, object storage PUT, complete, dsh_media_assets, and read/list/link APIs instead of local or fake media truth.',
+        });
+      }
     }
   }
 }

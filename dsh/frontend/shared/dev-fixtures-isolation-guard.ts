@@ -127,6 +127,12 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
     classification: 'DEV_ALLOWED',
     reason: 'Re-exports operational status types from archived operational status seed. Type-only export — no runtime fixture values. Exit: move type definitions to a pure types file.',
   },
+  // ─── Captain surface: RUNTIME_VIOLATION_FIXED (2026-06-13) ─────────────────
+  {
+    file: 'dsh/frontend/app-captain/DshCaptainSurface.tsx',
+    classification: 'RUNTIME_VIOLATION_FIXED',
+    reason: 'FIXED 2026-06-13. Removed defaultDetailByOrderId (hardcoded order seeds), compactOrderChatSeed (hardcoded chat messages), captainDisplayName hardcoded string. activeOrderId now starts empty; activeSummary uses EMPTY_ORDER_SUMMARY; chat messages start as []; captainDisplayName is empty pending profile API.',
+  },
   // ─── Finance sub-domain: RUNTIME_VIOLATION_FIXED (2026-06-12) ─────────────
   {
     file: 'archived-seed/dsh-finance',

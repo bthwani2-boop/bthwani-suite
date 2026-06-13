@@ -38,7 +38,7 @@ import type { DshCanonicalStoreCard } from '../../shared/dshStoreProductCardMode
 import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
 import { WltDshPartnerBridge } from '../../../../wlt/frontend/dsh/app-partner';
-import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+import type { DshFulfillmentDeliveryMode } from '../../shared/dsh-delivery-mode.model';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
 import {
