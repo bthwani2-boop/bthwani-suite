@@ -22,11 +22,13 @@ import {
   type FieldStoreFile,
 } from '../shared/contracts/field-store-model';
 import {
-  PlatformVarsProvider,
-  FeatureFlagProvider,
   applyFieldDocumentUploadToStore,
   useFieldRuntimeActions,
 } from '../shared';
+import {
+  PlatformVarsProvider,
+  FeatureFlagProvider,
+} from '../platform';
 import type { DshFieldNavigationCommand, DshFieldRouteState, DshFieldSurfaceProps } from './dsh-field.types';
 import {
   getFieldRouteForLifecycle,

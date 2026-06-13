@@ -15,7 +15,7 @@ import {
   spacing,
 } from '@bthwani/ui-kit';
 import {
-  formatWltYer,
+  formatWltDshAmountLabel,
   type WltDshPaymentMethod,
   type WltDshPaymentOption,
   type WltDshPaymentState,
@@ -30,7 +30,7 @@ const PAYMENT_OPTIONS: readonly WltDshPaymentOption[] = [
 ];
 
 function resolvePaymentState(method: WltDshPaymentMethod, orderTotalMinorUnits: number, walletBalanceMinorUnits: number, walletLinked: boolean): WltDshPaymentState {
-  const fmt = (n: number) => formatWltYer(n);
+  const fmt = (n: number) => formatWltDshAmountLabel(n);
   const base = { method, orderTotalMinorUnits, walletBalanceMinorUnits, walletLinked, contractState: 'LIVE' as const, financeEventKind: resolveWltDshFinanceEventKindForPaymentMethod(method), isPreview: true as const };
   if (method === 'cod') return { ...base, walletAmountMinorUnits: 0, amountDueOnDeliveryMinorUnits: orderTotalMinorUnits, valid: true, summaryLabel: `ستدفع ${fmt(orderTotalMinorUnits)} عند الاستلام.`, feedbackTone: 'info' };
   if (method === 'wallet') {
@@ -116,9 +116,9 @@ function WalletBalancePanel({
 }) {
   const items: KeyValueItem[] = walletLinked
     ? [
-        { label: 'الرصيد المتاح', value: formatWltYer(walletBalanceMinorUnits), tone: walletBalanceMinorUnits > 0 ? 'success' : 'warning' },
-        { label: 'محجوز', value: heldMinorUnits > 0 ? formatWltYer(heldMinorUnits) : 'لا يوجد', tone: heldMinorUnits > 0 ? 'warning' : 'default' },
-        { label: 'معلق', value: pendingMinorUnits > 0 ? formatWltYer(pendingMinorUnits) : 'لا يوجد', tone: 'default' },
+        { label: 'الرصيد المتاح', value: formatWltDshAmountLabel(walletBalanceMinorUnits), tone: walletBalanceMinorUnits > 0 ? 'success' : 'warning' },
+        { label: 'محجوز', value: heldMinorUnits > 0 ? formatWltDshAmountLabel(heldMinorUnits) : 'لا يوجد', tone: heldMinorUnits > 0 ? 'warning' : 'default' },
+        { label: 'معلق', value: pendingMinorUnits > 0 ? formatWltDshAmountLabel(pendingMinorUnits) : 'لا يوجد', tone: 'default' },
         { label: 'حالة المحفظة', value: 'مرتبطة', tone: 'success' },
       ]
     : [
@@ -167,11 +167,11 @@ function CheckoutSummaryPanel({
   walletBalanceAfterMinorUnits: number;
 }) {
   const items: KeyValueItem[] = [
-    { label: 'إجمالي الطلب', value: formatWltYer(orderTotalMinorUnits), tone: 'info' },
-    ...(walletAmountMinorUnits > 0 ? [{ label: 'من المحفظة', value: formatWltYer(walletAmountMinorUnits), tone: 'success' as const }] : []),
-    ...(codAmountMinorUnits > 0 ? [{ label: 'نقداً عند الاستلام', value: formatWltYer(codAmountMinorUnits), tone: 'brand' as const }] : []),
+    { label: 'إجمالي الطلب', value: formatWltDshAmountLabel(orderTotalMinorUnits), tone: 'info' },
+    ...(walletAmountMinorUnits > 0 ? [{ label: 'من المحفظة', value: formatWltDshAmountLabel(walletAmountMinorUnits), tone: 'success' as const }] : []),
+    ...(codAmountMinorUnits > 0 ? [{ label: 'نقداً عند الاستلام', value: formatWltDshAmountLabel(codAmountMinorUnits), tone: 'brand' as const }] : []),
     ...(isSplitPayment ? [{ label: 'نوع الدفع', value: 'مختلط (محفظة + كاش)', tone: 'info' as const }] : []),
-    ...(walletAmountMinorUnits > 0 ? [{ label: 'رصيد المحفظة بعد الدفع', value: formatWltYer(walletBalanceAfterMinorUnits), tone: (walletBalanceAfterMinorUnits >= 0 ? 'success' : 'danger') as KeyValueItem['tone'] }] : []),
+    ...(walletAmountMinorUnits > 0 ? [{ label: 'رصيد المحفظة بعد الدفع', value: formatWltDshAmountLabel(walletBalanceAfterMinorUnits), tone: (walletBalanceAfterMinorUnits >= 0 ? 'success' : 'danger') as KeyValueItem['tone'] }] : []),
   ];
 
   return (

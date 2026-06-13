@@ -32,7 +32,7 @@ import { WltDshFieldCommissionStatement } from '../components/WltDshFieldCommiss
 import { WltDshCaptainStatement } from '../components/WltDshCaptainStatement';
 import { WltDshWalletControlCenter } from '../components/WltDshWalletControlCenter';
 
-import styles from '../../../../../dsh/frontend/control-panel/shared/control-panel-surface.module.css';
+import styles from '../shared/control-panel-surface.module.css';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 export type WltDshFinanceHubHostProps = {

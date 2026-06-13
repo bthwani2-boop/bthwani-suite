@@ -20,7 +20,7 @@ import { ControlPanelDshAdministrationScreen } from './administration/ControlPan
 import { ControlPanelHrScreen } from './hr/ControlPanelHrScreen';
 import type { DshControlPanelSectionId } from './shared/dsh-control-panel-governance.map';
 
-import { PlatformVarsProvider, FeatureFlagProvider } from '../shared';
+import { PlatformVarsProvider, FeatureFlagProvider } from '../platform';
 
 export type DshControlPanelSurfaceHostProps = {
   section?: DshControlPanelSectionId;

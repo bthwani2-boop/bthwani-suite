@@ -1,5 +1,3 @@
-import React from 'react';
-
 declare const process: any;
 
 export interface PlatformVarsConfig {
@@ -16,7 +14,7 @@ export interface PlatformVarsConfig {
   partnerSettlementSchedule: string;
 }
 
-const DEFAULT_VARS: PlatformVarsConfig = {
+export const DEFAULT_PLATFORM_VARS: PlatformVarsConfig = {
   dshApiBaseUrl: null,
   authBaseUrl: null,
   dshAuthBearerToken: null,
@@ -30,9 +28,9 @@ const DEFAULT_VARS: PlatformVarsConfig = {
   partnerSettlementSchedule: 'كل أحد 10:00 ص',
 };
 
-// Static registry to allow non-React contexts to read values synchronously without context
+// Static registry lets non-React runtime adapters read values synchronously.
 export class PlatformVarsRegistry {
-  private static config: PlatformVarsConfig = { ...DEFAULT_VARS };
+  private static config: PlatformVarsConfig = { ...DEFAULT_PLATFORM_VARS };
   private static initialized = false;
 
   public static initialize(): void {
@@ -92,27 +90,4 @@ export class PlatformVarsRegistry {
   public static override(newConfig: Partial<PlatformVarsConfig>): void {
     this.config = { ...this.config, ...newConfig };
   }
-}
-
-const PlatformVarsContext = React.createContext<PlatformVarsConfig>(DEFAULT_VARS);
-
-export interface PlatformVarsProviderProps {
-  children: React.ReactNode;
-}
-
-export function PlatformVarsProvider({ children }: PlatformVarsProviderProps) {
-  const [config] = React.useState<PlatformVarsConfig>(() => {
-    PlatformVarsRegistry.initialize();
-    return PlatformVarsRegistry.getAll();
-  });
-
-  return (
-    <PlatformVarsContext.Provider value={config}>
-      {children}
-    </PlatformVarsContext.Provider>
-  );
-}
-
-export function usePlatformVars(): PlatformVarsConfig {
-  return React.useContext(PlatformVarsContext);
 }

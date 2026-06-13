@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { wltDshFieldBridgeDataContract } from './wlt-dsh-field.contract';
-import * as WltFieldAdapter from './wlt-dsh-field.adapter';
+import { getSnapshot } from '../shared/adapters/field-finance-runtime.adapter';
 import {
   type WltDshFinanceSummaryRecord,
   type WltFieldFinanceSnapshot,
@@ -26,7 +26,7 @@ export function useWltDshFieldFinanceSummary(storeIds?: readonly string[]) {
 
   React.useEffect(() => {
     let cancelled = false;
-    void WltFieldAdapter.getSnapshot(storeIds?.[0] ?? undefined)
+    void getSnapshot(storeIds?.[0] ?? undefined)
       .then((nextSnapshot) => {
         if (cancelled) return;
         setSnapshot(nextSnapshot);

@@ -1,4 +1,4 @@
-import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+import { PlatformVarsRegistry } from '../platform/platform-vars';
 
 export type CreateFieldReadinessEscalationRequest = {
   readonly field_agent_id?: string;

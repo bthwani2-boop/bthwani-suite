@@ -21,13 +21,13 @@ function parseArgs(argv = process.argv.slice(2)) {
 const args = parseArgs();
 const root = args.root;
 const surfaceFiles = [
-  { file: 'dsh/frontend/app-client/DshClientSurface.tsx', maxLines: 509 },
-  { file: 'dsh/frontend/app-partner/DshPartnerSurface.tsx', maxLines: 783 },
-  { file: 'dsh/frontend/app-captain/DshCaptainSurface.tsx', maxLines: 2221 },
-  { file: 'dsh/frontend/app-field/DshFieldSurface.tsx', maxLines: 535 },
+  { file: 'dsh/frontend/app-client/DshClientSurface.tsx', maxLines: 360, maxState: 8, maxEffect: 2 },
+  { file: 'dsh/frontend/app-partner/DshPartnerSurface.tsx', maxLines: 520, maxState: 8, maxEffect: 2 },
+  { file: 'dsh/frontend/app-captain/DshCaptainSurface.tsx', maxLines: 950, maxState: 8, maxEffect: 2 },
+  { file: 'dsh/frontend/app-field/DshFieldSurface.tsx', maxLines: 340, maxState: 8, maxEffect: 2 },
 ];
 const routeRendererFiles = [
-  { file: 'dsh/frontend/app-client/DshClientRouteRenderer.tsx' },
+  { file: 'dsh/frontend/app-client/DshClientRouteRenderer.tsx', maxProps: 25 },
 ];
 const runtimeScreenFiles = [
   { file: 'dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx' },
@@ -41,6 +41,9 @@ const forbiddenPatterns = [
   { id: 'captain_fallback_identity', regex: /\bDSH_CAPTAIN_FALLBACK_ID\b|CAP-0041|captain_id:\s*captainId\b|captainId\s*\?\?\s*['"]unknown['"]/ },
   { id: 'field_local_store_runtime_truth', regex: /\b(?:readFieldStoresLocal|writeFieldStoresLocal|FIELD_VISIT_EVIDENCE_ITEMS)\b/ },
   { id: 'partner_hardcoded_runtime_profile', regex: /جرين بول|store-1001|managerLabel:\s*['"]خالد['"]|locationLabel=\{`الرياض/ },
+  { id: 'surface_api_side_effect', regex: /\b(?:fetch\s*\(|create[A-Za-z0-9]+(?:Http|Typed)?Client\b|list[A-Z][A-Za-z0-9]*\s*\(|update[A-Z][A-Za-z0-9]*\s*\(|delete[A-Z][A-Za-z0-9]*\s*\(|submit[A-Z][A-Za-z0-9]*\s*\(|upload[A-Z][A-Za-z0-9]*\s*\()/ },
+  { id: 'surface_state_machine_or_lifecycle', regex: /\b(?:StateMachine|Lifecycle|lifecycle|statusMap|nextActionMap|ActiveOrderPhase|CaptainAvailabilityStatus|CaptainGpsStatus|CaptainAppMode|StoreCourierStage|DshCaptainPodState)\b/ },
+  { id: 'surface_mapping_table', regex: /\b(?:Record<[^>]+>|statusMeta|availabilityStatusMeta|gpsStatusMeta|demandHeatZones|captainHeatZones|mapRuntime[A-Za-z0-9]*)\b/ },
 ];
 const forbiddenRouteRendererPatterns = [
   { id: 'route_renderer_cart_total_calculation', regex: /\b(?:parseCartItemPrice|cartSubtotal|deliveryFeeNum|cartTotal)\b/ },
@@ -57,6 +60,15 @@ function lineNumber(text, index) {
   return text.slice(0, index).split(/\r?\n/).length;
 }
 
+function countMatches(text, regex) {
+  return Array.from(text.matchAll(regex)).length;
+}
+
+function countJsxProps(text, tagName) {
+  const matches = Array.from(text.matchAll(new RegExp(`<${tagName}\\b([\\s\\S]*?)(?:/>|>)`, 'gm')));
+  return matches.reduce((max, match) => Math.max(max, countMatches(match[1], /^\s+[A-Za-z_$][A-Za-z0-9_$]*=/gm)), 0);
+}
+
 const findings = [];
 
 for (const item of surfaceFiles) {
@@ -65,6 +77,8 @@ for (const item of surfaceFiles) {
   if (!fs.existsSync(abs)) continue;
   const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
   const lines = text.split(/\r?\n/).length;
+  const stateCount = countMatches(text, /\b(?:React\.)?useState\s*</g) + countMatches(text, /\b(?:React\.)?useState\s*\(/g);
+  const effectCount = countMatches(text, /\b(?:React\.)?useEffect\s*\(/g);
 
   if (lines > item.maxLines) {
     findings.push({
@@ -74,6 +88,26 @@ for (const item of surfaceFiles) {
       line: 1,
       evidence: `${lines} lines > baseline ${item.maxLines}`,
       remediation: 'Do not add more logic to Surface host. Extract the new responsibility into state, routes, adapters, parts, screens, or contracts.',
+    });
+  }
+  if (stateCount > item.maxState) {
+    findings.push({
+      severity: 'FAIL',
+      rule: 'surface_too_many_local_states',
+      file: toPosix(relative),
+      line: 1,
+      evidence: `${stateCount} useState calls > max ${item.maxState}`,
+      remediation: 'Move runtime/business state into shared controllers or view-model bindings; keep only visual modal/tab/sheet state in surfaces.',
+    });
+  }
+  if (effectCount > item.maxEffect) {
+    findings.push({
+      severity: 'FAIL',
+      rule: 'surface_too_many_runtime_effects',
+      file: toPosix(relative),
+      line: 1,
+      evidence: `${effectCount} useEffect calls > max ${item.maxEffect}`,
+      remediation: 'Move effects and runtime loading into shared binding hooks/controllers.',
     });
   }
 
@@ -122,6 +156,19 @@ for (const item of routeRendererFiles) {
   const abs = path.join(root, relative);
   if (!fs.existsSync(abs)) continue;
   const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
+  const componentName = path.basename(relative, path.extname(relative));
+  const propCount = countJsxProps(text, componentName);
+
+  if (propCount > item.maxProps) {
+    findings.push({
+      severity: 'FAIL',
+      rule: 'route_renderer_prop_fanout',
+      file: toPosix(relative),
+      line: 1,
+      evidence: `${propCount} props > max ${item.maxProps}`,
+      remediation: 'Pass grouped model/actions/context objects from shared bindings instead of flat prop fanout.',
+    });
+  }
 
   for (const rule of forbiddenRouteRendererPatterns) {
     const match = rule.regex.exec(text);
@@ -142,8 +189,8 @@ const output = {
   guardId: 'GUARD_DSH_SURFACE_STRUCTURE',
   status: findings.length > 0 ? 'FAIL' : 'PASS',
   filesScanned: surfaceFiles.length + routeRendererFiles.length + runtimeScreenFiles.length,
-  mode: 'RATCHET_BASELINE',
-  baselinePolicy: 'Existing oversized Surface hosts are not closed by this guard. The guard blocks growth and direct runtime data/media/storage leaks until scoped extraction slices reduce the baselines.',
+  mode: 'STRICT_UI_ONLY_SURFACE_STRUCTURE',
+  baselinePolicy: 'Surface hosts must be lightweight route/screen composition shells. Runtime, lifecycle, mapping, and business state belong in shared owners.',
   findings,
   failCount: findings.filter((f) => f.severity === 'FAIL').length,
   warnCount: findings.filter((f) => f.severity === 'WARN').length,

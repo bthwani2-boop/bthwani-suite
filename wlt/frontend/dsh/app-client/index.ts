@@ -22,10 +22,9 @@ export {
 	isLinked,
 	link,
 	requestPayment,
-	topUp,
 	unlink,
 	listLedgerEntries,
-} from './wlt-dsh-client.adapter';
-export type { WalletAccount } from './wlt-dsh-client.adapter';
+} from '../shared/adapters/client-wallet-runtime.adapter';
+export type { WltDshWalletAccount as WalletAccount } from '../shared/adapters/client-wallet-runtime.adapter';
 export { resolveWltDshFinanceEventKindForPaymentMethod } from '../shared';
 export type { WltDshFinanceEventKind } from '../shared';

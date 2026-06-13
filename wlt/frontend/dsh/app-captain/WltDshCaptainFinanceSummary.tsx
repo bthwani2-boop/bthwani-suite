@@ -75,18 +75,18 @@ function RecordRow({ record }: { record: WltDshFinanceSummaryRecord }) {
 function EligibilitySection({
   snapshot,
   records = [],
-  onTopUp,
+  onEligibilityFundingSubmit,
 }: {
   snapshot: WltCaptainFinanceSnapshot;
   records?: readonly WltDshFinanceSummaryRecord[];
-  onTopUp: (amountMinorUnits: number) => Promise<any>;
+  onEligibilityFundingSubmit: (amountMinorUnits: number) => Promise<any>;
 }) {
   const { direction } = useDirection();
   const { theme } = useTheme();
   const isRtl = direction === 'rtl';
 
-  const [showTopUpForm, setShowTopUpForm] = React.useState(false);
-  const [topUpAmountText, setTopUpAmountText] = React.useState(
+  const [showFundingForm, setShowFundingForm] = React.useState(false);
+  const [fundingAmountText, setFundingAmountText] = React.useState(
     snapshot.eligibilityShortfallMinorUnits > 0
       ? String(snapshot.eligibilityShortfallMinorUnits / 100)
       : '2000'
@@ -102,8 +102,8 @@ function EligibilitySection({
     { id: 'saba' as const, label: 'سباكاش' },
   ];
 
-  const handleConfirmTopUp = async () => {
-    const amountVal = parseFloat(topUpAmountText);
+  const handleConfirmFunding = async () => {
+    const amountVal = parseFloat(fundingAmountText);
     if (isNaN(amountVal) || amountVal <= 0) return;
 
     setLoading(true);
@@ -111,9 +111,9 @@ function EligibilitySection({
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     try {
-      await onTopUp(amountVal * 100);
+      await onEligibilityFundingSubmit(amountVal * 100);
       setSuccess(true);
-      setShowTopUpForm(false);
+      setShowFundingForm(false);
     } catch (err) {
       // ignore
     } finally {
@@ -143,7 +143,7 @@ function EligibilitySection({
         ]}
       />
 
-      {snapshot.eligibilityShortfallMinorUnits > 0 && !showTopUpForm && !success ? (
+      {snapshot.eligibilityShortfallMinorUnits > 0 && !showFundingForm && !success ? (
         <Box
           gap={1}
           style={{
@@ -170,14 +170,14 @@ function EligibilitySection({
         />
       )}
 
-      {showTopUpForm ? (
+      {showFundingForm ? (
         <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: radius.sm2, borderWidth: 1, borderColor: theme.line }}>
           <Text role="bodyStrong" style={{ textAlign: 'right' }}>إجراء شحن رصيد الضامن</Text>
 
           <TextField
             label="مبلغ الشحن (ر.ي)"
-            value={topUpAmountText}
-            onChangeText={setTopUpAmountText}
+              value={fundingAmountText}
+              onChangeText={setFundingAmountText}
             placeholder="أدخل مبلغ الشحن..."
             keyboardType="numeric"
             style={{ textAlign: 'right' }}
@@ -212,10 +212,10 @@ function EligibilitySection({
               label="تأكيد عملية الشحن"
               tone="primary"
               loading={loading}
-              disabled={loading || !topUpAmountText}
+              disabled={loading || !fundingAmountText}
               fullWidth={false}
               style={{ flex: 1 }}
-              onPress={handleConfirmTopUp}
+              onPress={handleConfirmFunding}
             />
             <Button
               label="إلغاء"
@@ -223,7 +223,7 @@ function EligibilitySection({
               disabled={loading}
               fullWidth={false}
               style={{ flex: 1 }}
-              onPress={() => setShowTopUpForm(false)}
+              onPress={() => setShowFundingForm(false)}
             />
           </Box>
         </Surface>
@@ -237,12 +237,12 @@ function EligibilitySection({
               tone={snapshot.eligibilityShortfallMinorUnits > 0 ? 'primary' : 'ghost'}
               fullWidth
               onPress={() => {
-                setTopUpAmountText(
+                setFundingAmountText(
                   snapshot.eligibilityShortfallMinorUnits > 0
                     ? String(snapshot.eligibilityShortfallMinorUnits / 100)
                     : '2000'
                 );
-                setShowTopUpForm(true);
+                setShowFundingForm(true);
               }}
             />
           </Box>
@@ -332,10 +332,10 @@ function EarningsSection({ snapshot, records }: { snapshot: WltCaptainFinanceSna
 
 function SettlementSection({
   snapshot,
-  onRequestSettlement,
+  onSettlementRequestSubmit,
 }: {
   snapshot: WltCaptainFinanceSnapshot;
-  onRequestSettlement: () => Promise<any>;
+  onSettlementRequestSubmit: () => Promise<any>;
 }) {
   const { direction } = useDirection();
   const { theme } = useTheme();
@@ -349,7 +349,7 @@ function SettlementSection({
     // Simulate approval processing delay
     await new Promise((resolve) => setTimeout(resolve, 1500));
     try {
-      await onRequestSettlement();
+      await onSettlementRequestSubmit();
       setSuccess(true);
     } catch (err) {
       // ignore
@@ -464,9 +464,8 @@ export function WltDshCaptainFinanceSummary({
   const {
     snapshot,
     allRecords,
-    topUp,
-    requestSettlement,
-    resetFinance,
+    submitEligibilityFunding,
+    submitSettlementRequest,
   } = useWltDshCaptainFinanceSummary(section, dshClientId, dshAuthBearerToken);
 
   const [expandedSection, setExpandedSection] = React.useState<WltCaptainFinanceSection | null>('eligibility');
@@ -494,7 +493,7 @@ export function WltDshCaptainFinanceSummary({
             <EligibilitySection
               snapshot={snapshot}
               records={allRecords.filter((r) => r.kind === 'captain-eligibility-topup')}
-              onTopUp={topUp}
+              onEligibilityFundingSubmit={submitEligibilityFunding}
             />
           </ActionStrip>
 
@@ -542,21 +541,9 @@ export function WltDshCaptainFinanceSummary({
           >
             <SettlementSection
               snapshot={snapshot}
-              onRequestSettlement={requestSettlement}
+              onSettlementRequestSubmit={submitSettlementRequest}
             />
           </ActionStrip>
-
-          {/* Developer Reset Section */}
-          <Box padding={4} style={{ marginTop: spacing[6], paddingHorizontal: spacing[4] }}>
-            <Button
-              label="إعادة تعيين بيانات المعاينة"
-              tone="ghost"
-              size="sm"
-              onPress={async () => {
-                await resetFinance();
-              }}
-            />
-          </Box>
         </Box>
       </MobileScrollView>
     </View>

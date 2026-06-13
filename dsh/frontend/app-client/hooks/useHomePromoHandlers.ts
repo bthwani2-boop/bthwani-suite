@@ -4,7 +4,7 @@ import type {
   DshHomeGetPromo,
   DiscoveryFilter,
 } from '../contracts/dsh-home-types';
-import { resolveColorToken } from 'adapters/dsh-color-resolver';
+import { resolveDshColorToken } from '../../platform';
 import { resolveHomeCategoryContext } from 'home-promo-mappers';
 
 type UseHomePromoHandlersParams = {
@@ -240,7 +240,7 @@ export function useHomePromoHandlers({
       badge: promo.offerBadgeText,
       cta: promo.ctaLabel,
       image: resolveBannerImageSource?.(promo.imageUrl ?? promo.mediaKey),
-      accentColor: promo.accentColor ? resolveColorToken(promo.accentColor) : undefined,
+      accentColor: promo.accentColor ? resolveDshColorToken(promo.accentColor) : undefined,
       onPress: () => resolveBannerPress(promo)(),
     }))
   ), [promos, resolveBannerImageSource, resolveBannerPress]);

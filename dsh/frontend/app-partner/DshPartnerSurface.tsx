@@ -24,11 +24,13 @@ import {
   getActionableHandoffsForSurface,
 } from '../shared/contracts/dsh-order-lifecycle-handoffs';
 import {
+  usePartnerOrdersRuntime,
+} from '../shared';
+import {
   PlatformVarsProvider,
   FeatureFlagProvider,
   usePlatformVars,
-  usePartnerOrdersRuntime,
-} from '../shared';
+} from '../platform';
 import type { PartnerOrderItem } from './screens/OrdersInboxScreen';
 import { DshPartnerHubSurface } from './screens/PartnerHubScreen';
 import { InventoryCatalogScreen } from './screens/InventoryCatalogScreen';

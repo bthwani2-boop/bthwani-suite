@@ -5,7 +5,7 @@ import type { DshFulfillmentDeliveryMode } from './dsh-client-binding.contracts'
 import type { CreateOrderValues, HostCartItem, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import type { DshRoute } from '../dsh-client.types';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
-import type { DshClientWltIntentEntry } from '../dsh-client-wlt-payment-bridge';
+import type { DshClientWltIntentEntry } from '../../shared/finance-boundary';
 import type { DshTrackingTimelineItem } from '../hooks/useDshOrderTracking';
 import type { DshDiscoveryStoresBridgeResult } from 'dsh-discovery-stores-bridge';
 import type { DshClientState } from '../dsh-client.types';

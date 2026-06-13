@@ -10,7 +10,7 @@ import styles from '../../shared/control-panel-surface.module.css';
 type RolloutRecord = Record<string, any>;
 type RolloutLevel = 'service' | 'capability';
 const PREVIEW_ROLLOUT_RECORDS: RolloutRecord[] = [];
-import { FeatureFlagsRegistry } from '../../../shared';
+import { FeatureFlagsRegistry } from '../../../shared/platform/feature-flags';
 
 function RolloutLevelBadge({ level }: { level: RolloutLevel }) {
   return (

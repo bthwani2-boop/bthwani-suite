@@ -1,7 +1,14 @@
 import React from 'react';
-import * as WltAdapter from './wlt-dsh-client.adapter';
+import {
+	createDeepLink,
+	getBalance as getRuntimeBalance,
+	isLinked as getRuntimeLinkedState,
+	link as linkRuntimeWallet,
+	requestPayment as requestRuntimePayment,
+} from '../shared/adapters/client-wallet-runtime.adapter';
 
 export function useWltDshWalletSession(clientId?: string, bearerToken?: string) {
+	const runtimeClientId = clientId?.trim() || 'client-dev-001';
 	const [linked, setLinked] = React.useState<boolean>(false);
 	const [balance, setBalance] = React.useState<number | null>(null);
 	const [hydrated, setHydrated] = React.useState<boolean>(false);
@@ -11,11 +18,11 @@ export function useWltDshWalletSession(clientId?: string, bearerToken?: string) 
 	const refresh = React.useCallback(async () => {
 		setRefreshing(true);
 		try {
-			const isLinked = await WltAdapter.isLinked(clientId, bearerToken);
+			const isLinked = await getRuntimeLinkedState(runtimeClientId, bearerToken);
 			setLinked(Boolean(isLinked));
 
 			if (isLinked) {
-				const walletBalance = await WltAdapter.getBalance(clientId, bearerToken);
+				const walletBalance = await getRuntimeBalance(runtimeClientId, bearerToken);
 				setBalance(walletBalance);
 			} else {
 				setBalance(null);
@@ -30,31 +37,29 @@ export function useWltDshWalletSession(clientId?: string, bearerToken?: string) 
 			setHydrated(true);
 			setRefreshing(false);
 		}
-	}, [clientId, bearerToken]);
+	}, [runtimeClientId, bearerToken]);
 
 	React.useEffect(() => {
 		void refresh();
 	}, [refresh]);
 
 	const requestPayment = React.useCallback(async (amountMinorUnits: number, orderId?: string) => {
-		return WltAdapter.requestPayment(amountMinorUnits, clientId, bearerToken, orderId);
-	}, [clientId, bearerToken]);
+		return requestRuntimePayment(amountMinorUnits, runtimeClientId, orderId ?? 'dsh-checkout', bearerToken);
+	}, [runtimeClientId, bearerToken]);
 
 	const getBalance = React.useCallback(async () => {
-		return WltAdapter.getBalance(clientId, bearerToken);
-	}, [clientId, bearerToken]);
+		return getRuntimeBalance(runtimeClientId, bearerToken);
+	}, [runtimeClientId, bearerToken]);
 
 	const link = React.useCallback(async () => {
-		const result = await WltAdapter.link(clientId, bearerToken);
+		const result = await linkRuntimeWallet(runtimeClientId, bearerToken);
 		await refresh();
 		return result;
-	}, [clientId, bearerToken, refresh]);
+	}, [runtimeClientId, bearerToken, refresh]);
 
-	const topUp = React.useCallback(async (amountMinorUnits: number) => {
-		const result = await WltAdapter.topUp(amountMinorUnits, clientId, bearerToken);
-		await refresh();
-		return result;
-	}, [clientId, bearerToken, refresh]);
+	const createWalletFundingLink = React.useCallback((amountMinorUnits: number) => {
+		return createDeepLink('wallet-funding', amountMinorUnits);
+	}, []);
 
 	return {
 		linked,
@@ -66,8 +71,8 @@ export function useWltDshWalletSession(clientId?: string, bearerToken?: string) 
 		requestPayment,
 		getBalance,
 		link,
-		topUp,
-		createDeepLink: WltAdapter.createDeepLink,
+		createWalletFundingLink,
+		createDeepLink,
 	} as const;
 }
 

@@ -10,7 +10,7 @@ import { parseCartItemPrice } from '../adapters/store-formatting';
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostCartItem, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import { hostClientStates } from '../dsh-client.navigation-bridge';
-import { isCodAllowedForMode } from '../dsh-client-wlt-payment-bridge';
+import { isCodAllowedForMode } from '../../shared/finance-boundary';
 
 export type WalletSessionContext = {
   balance: number | null;

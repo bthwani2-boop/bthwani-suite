@@ -93,6 +93,26 @@ export async function requestSettlement(): Promise<{ success: boolean; error: st
   return { success: false, error: 'wlt_payout_decision_requires_control_panel_wlt_operation' };
 }
 
+export async function submitCaptainEligibilityFunding(
+  amountMinorUnits: number,
+  captainId?: string,
+  bearerToken?: string | null,
+): Promise<{ success: boolean; error: string }> {
+  void amountMinorUnits;
+  void captainId;
+  void bearerToken;
+  return topUp();
+}
+
+export async function submitCaptainSettlementRequest(
+  captainId?: string,
+  bearerToken?: string | null,
+): Promise<{ success: boolean; error: string }> {
+  void captainId;
+  void bearerToken;
+  return requestSettlement();
+}
+
 const WltDshCaptainFinanceRuntimeAdapter = {
   getSnapshot,
   getRecords,
@@ -100,6 +120,8 @@ const WltDshCaptainFinanceRuntimeAdapter = {
   getRecordsForSection,
   topUp,
   requestSettlement,
+  submitCaptainEligibilityFunding,
+  submitCaptainSettlementRequest,
 };
 
 export default WltDshCaptainFinanceRuntimeAdapter;

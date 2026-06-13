@@ -18,7 +18,7 @@ import {
   typographyRoles,
 } from '@bthwani/ui-kit';
 import { useWltDshPartnerWalletSummary } from './useWltDshPartnerWalletSummary';
-import { formatWltYer } from '../shared';
+import { formatWltDshAmountLabel } from '../shared';
 
 export type PartnerSettlementScreenProps = {
 	partnerId?: string;
@@ -68,7 +68,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 							إجمالي المبيعات
 						</Text>
 						<Text role="bodyStrong" weight="black" style={[styles.metricValue, { color: theme.brand }]}>
-							{formatWltYer(partnerSummary.grossSalesMinorUnits)}
+							{formatWltDshAmountLabel(partnerSummary.grossSalesMinorUnits)}
 						</Text>
 					</Surface>
 
@@ -77,7 +77,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 							صافي مستحقات التسوية
 						</Text>
 						<Text role="bodyStrong" weight="black" style={[styles.metricValue, { color: theme.success }]}>
-							{formatWltYer(partnerSummary.netSettlementMinorUnits)}
+							{formatWltDshAmountLabel(partnerSummary.netSettlementMinorUnits)}
 						</Text>
 					</Surface>
 				</View>

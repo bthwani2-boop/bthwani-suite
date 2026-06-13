@@ -8,7 +8,7 @@ import { resolveDshDiscoveryStoresRuntimeConfig } from 'dsh-discovery-stores-run
 import type { DshFulfillmentDeliveryMode } from '../contracts/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import { initialOrders, hostClientStates } from '../dsh-client.navigation-bridge';
-import { getClientWltIntentForState, type DshClientWltIntentEntry } from '../dsh-client-wlt-payment-bridge';
+import { getClientWltIntentForState, type DshClientWltIntentEntry } from '../../shared/finance-boundary';
 import { getDshClientStateMeta, type DshClientState } from 'state-machines/client-state';
 import type { DshRoute } from '../dsh-client.types';
 

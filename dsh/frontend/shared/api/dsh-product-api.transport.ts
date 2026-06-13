@@ -10,7 +10,7 @@ import {
   type DshProductRecord,
 } from './dsh-product-api.client';
 
-import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+import { PlatformVarsRegistry } from '../platform/platform-vars';
 
 export type DshProductFetchFn = (input: string, init?: RequestInit) => Promise<Response>;
 

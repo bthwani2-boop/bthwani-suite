@@ -2,7 +2,7 @@
 // Wraps GET /auth/session and GET /auth/permissions from auth.openapi.yaml.
 // Contract port: 18082 (DSH_AUTH_SERVICE_PORT env var).
 
-import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+import { PlatformVarsRegistry } from '../platform/platform-vars';
 
 export type DshAuthActorRole = 'client' | 'partner' | 'captain' | 'field' | 'operator' | 'system';
 

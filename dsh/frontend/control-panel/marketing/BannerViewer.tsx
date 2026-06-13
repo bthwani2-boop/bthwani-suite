@@ -9,7 +9,7 @@ import { Image, StyleSheet, View, type ImageStyle, type ViewStyle } from 'react-
 import { Box, Text, shadowPresets, useTheme,
   radius,
 } from '@bthwani/ui-kit';
-import { resolveColorToken } from '../../shared/adapters/dsh-color-resolver';
+import { resolveDshColorToken } from '../../platform';
 import { resolveDshImageSource } from '../../shared/media/resolve-dsh-image-source';
 import { BANNER_MOTION_OPTIONS } from './banner-types';
 import type { BannerDraft, BannerTemplate } from './banner-types';
@@ -23,8 +23,8 @@ export function BannerViewer({ draft, templates }: BannerViewerProps) {
   const { theme } = useTheme();
   const styles = React.useMemo(() => createStyles(theme), [theme]);
 
-  const resolvedAccentColor = resolveColorToken(draft.accentColor || theme.brandHeaderBackground);
-  const resolvedBadgeColor = resolveColorToken(draft.offerBadgeColor || theme.brand);
+  const resolvedAccentColor = resolveDshColorToken(draft.accentColor || theme.brandHeaderBackground);
+  const resolvedBadgeColor = resolveDshColorToken(draft.offerBadgeColor || theme.brand);
   const previewMotionLabel = BANNER_MOTION_OPTIONS.find((o) => o.value === draft.motionStyle)?.label ?? 'انسياب';
 
   return (

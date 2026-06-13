@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { Box, Text, useTheme } from '@bthwani/ui-kit';
-import styles from '../../../../../dsh/frontend/control-panel/shared/control-panel-surface.module.css';
+import styles from '../shared/control-panel-surface.module.css';
 import type { WltDshFulfillmentMode } from '../financeContracts';
 
 type LineItemShape = { applies: true; label: string } | { applies: false; reason: string };

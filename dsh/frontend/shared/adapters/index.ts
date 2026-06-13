@@ -2,7 +2,6 @@
 export * from './dsh-operational-summary-adapter';
 export * from './dsh-operational-runtime-adapter';
 export * from './dsh-store-builders';
-export * from './dsh-color-resolver';
 export * from './catalog-central-adapter';
 export type {
   CommercialSource,

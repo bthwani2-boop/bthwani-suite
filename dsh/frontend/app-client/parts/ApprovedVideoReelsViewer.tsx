@@ -6,7 +6,7 @@ import { Box, Icon, Text, colorPalette, shadowPresets,
 } from '@bthwani/ui-kit';
 import type { MarketingVideoRecord } from 'contracts/dsh-marketing-types';
 
-import { usePlatformVars } from '../../shared';
+import { usePlatformVars } from '../../platform';
 
 export type DshHomeApprovedVideoReelsViewerProps = {
 	visible: boolean;

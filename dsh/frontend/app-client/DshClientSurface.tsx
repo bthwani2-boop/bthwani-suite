@@ -1,16 +1,18 @@
 ﻿import React from 'react';
 import { Platform, View } from 'react-native';
 import {
-  usePlatformVars,
-  FeatureFlagProvider,
-  PlatformVarsProvider,
-  useFeatureFlag,
   listNotifications,
   getDshAuthRuntimeBaseUrl,
   buildStoreCategories,
   buildStoreDeliveryModes,
   buildStoreTags,
 } from '../shared';
+import {
+  usePlatformVars,
+  FeatureFlagProvider,
+  PlatformVarsProvider,
+  useFeatureFlag,
+} from '../platform';
 import type { DshSignalSummary, DshSignalEventKind, DshSignalEntityType } from '../shared';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
 import type { DshClientSurfaceProps, DshRoute } from './dsh-client.types';

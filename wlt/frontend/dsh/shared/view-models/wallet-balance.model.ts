@@ -18,3 +18,7 @@ export function buildWalletBalanceViewModel(
     errorMessage: opts.error,
   };
 }
+
+export function formatWltDshAmountLabel(amountMinorUnits: number): string {
+  return `${(amountMinorUnits / 100).toLocaleString('ar-YE')} ر.ي`;
+}

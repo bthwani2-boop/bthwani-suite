@@ -16,7 +16,7 @@ export {
   getPayoutRecords,
   getRecords,
   getSnapshot,
-} from './wlt-dsh-field.adapter';
+} from '../shared/adapters/field-finance-runtime.adapter';
 export type {
   WltDshFinanceSummaryRecord,
   WltFieldFinanceSnapshot,

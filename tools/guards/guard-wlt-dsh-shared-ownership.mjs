@@ -8,6 +8,7 @@ const appRoots = [
   'wlt/frontend/dsh/app-partner',
   'wlt/frontend/dsh/app-captain',
   'wlt/frontend/dsh/app-field',
+  'wlt/frontend/dsh/control-panel',
 ];
 const extensions = new Set(['.ts', '.tsx', '.js', '.jsx']);
 
@@ -37,7 +38,7 @@ const rules = [
   },
   {
     id: 'wlt_app_maps_ledger_entries',
-    regex: /\bWltLedgerEntry\b|\bentries\.map\(|\btransaction_type\b|\breference_type\b/g,
+    regex: /\bWltLedgerEntry\b|\bentries\.map\(|\btransaction_type\b|\breference_type\b|\bledger[A-Z][A-Za-z0-9]*\b/g,
     remediation: 'Move ledger entry mapping into wlt/frontend/dsh/shared/read-models or shared/adapters.',
   },
   {
@@ -47,13 +48,18 @@ const rules = [
   },
   {
     id: 'wlt_app_exposes_finance_mutation',
-    regex: /\bconfirmPaymentSession\b|\bcreateClientPaymentSession\b|\bcreateRefundCase\b|\bcreateSettlement\b/g,
+    regex: /\bconfirmPaymentSession\b|\bcreateClientPaymentSession\b|\bcreateRefundCase\b|\bcreateSettlement\b|\btopUp\b|\brequestSettlement\b/g,
     remediation: 'Payment, refund, and settlement runtime decisions belong to WLT shared clients/policies.',
   },
   {
+    id: 'wlt_app_owns_money_format_or_policy',
+    regex: /\bformatWltYer\b|\bmoneyPolicy\b|\bfinance[A-Za-z0-9]*(?:Label|Policy|Contract)\b|\bpostingRules\b|\bsubledger\b|\bmakerChecker\b/g,
+    remediation: 'Move money formatting, finance labels, posting rules, subledger, and maker-checker policy to WLT shared.',
+  },
+  {
     id: 'wlt_app_imports_control_panel',
-    regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*control-panel[^'"]*['"]/gm,
-    remediation: 'WLT app-* must not import WLT control-panel.',
+    regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:dsh\/frontend\/control-panel|wlt\/frontend\/dsh\/control-panel|\/control-panel\/|\.\.\/control-panel)[^'"]*['"]/gm,
+    remediation: 'WLT app-* must not import DSH control-panel or depend on WLT control-panel internals.',
   },
   {
     id: 'wlt_app_imports_contracts_directly_for_runtime',
@@ -85,7 +91,7 @@ for (const abs of files) {
 }
 
 const output = {
-  guardId: 'GUARD_WLT_DSH_SHARED_OWNERSHIP',
+  guardId: 'GUARD_WLT_DSH_UI_ONLY_BINDINGS',
   status: findings.length > 0 ? 'FAIL' : 'PASS',
   appRoots,
   filesScanned: files.length,

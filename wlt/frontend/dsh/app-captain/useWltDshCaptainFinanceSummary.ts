@@ -5,7 +5,13 @@ import {
   type WltDshFinanceSummaryRecord,
 } from '../shared';
 import { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
-import * as WltCaptainAdapter from './wlt-dsh-captain.adapter';
+import {
+  getRecords,
+  getSections,
+  getSnapshot,
+  submitCaptainEligibilityFunding,
+  submitCaptainSettlementRequest,
+} from '../shared/adapters/captain-finance-runtime.adapter';
 
 export function useWltDshCaptainFinanceSummary(
   initialSection: WltCaptainFinanceSection = 'eligibility',
@@ -41,8 +47,8 @@ export function useWltDshCaptainFinanceSummary(
   React.useEffect(() => {
     let cancelled = false;
     void Promise.all([
-      WltCaptainAdapter.getSnapshot(captainId, dshAuthBearerToken),
-      WltCaptainAdapter.getRecords(captainId, dshAuthBearerToken)
+      getSnapshot(captainId, dshAuthBearerToken),
+      getRecords(captainId, dshAuthBearerToken)
     ])
       .then(([nextSnapshot, nextRecords]) => {
         if (cancelled) return;
@@ -59,7 +65,7 @@ export function useWltDshCaptainFinanceSummary(
     };
   }, [trigger, captainId, dshAuthBearerToken]);
 
-  const availableSections = React.useMemo(() => WltCaptainAdapter.getSections(), []);
+  const availableSections = React.useMemo(() => getSections(), []);
   const records = React.useMemo(
     () => allRecords.filter((record) => {
       if (activeSection === 'cod-liability') return record.kind === 'captain-cod-liability';
@@ -70,20 +76,14 @@ export function useWltDshCaptainFinanceSummary(
     [activeSection, allRecords],
   );
 
-  const topUp = React.useCallback(async (amountMinorUnits: number) => {
-    const res = await WltCaptainAdapter.topUp(amountMinorUnits, captainId || undefined, dshAuthBearerToken);
+  const submitEligibilityFunding = React.useCallback(async (amountMinorUnits: number) => {
+    const res = await submitCaptainEligibilityFunding(amountMinorUnits, captainId || undefined, dshAuthBearerToken);
     refresh();
     return res;
   }, [refresh, captainId, dshAuthBearerToken]);
 
-  const requestSettlement = React.useCallback(async () => {
-    const res = await WltCaptainAdapter.requestSettlement(captainId || undefined, dshAuthBearerToken);
-    refresh();
-    return res;
-  }, [refresh, captainId, dshAuthBearerToken]);
-
-  const resetFinance = React.useCallback(async () => {
-    const res = await WltCaptainAdapter.resetFinance(captainId || undefined, dshAuthBearerToken);
+  const submitSettlementRequest = React.useCallback(async () => {
+    const res = await submitCaptainSettlementRequest(captainId || undefined, dshAuthBearerToken);
     refresh();
     return res;
   }, [refresh, captainId, dshAuthBearerToken]);
@@ -97,9 +97,8 @@ export function useWltDshCaptainFinanceSummary(
     setActiveSection,
     availableSections,
     lastError,
-    topUp,
-    requestSettlement,
-    resetFinance,
+    submitEligibilityFunding,
+    submitSettlementRequest,
     refresh,
   } as const;
 }

@@ -2,8 +2,8 @@ import React from 'react';
 import {
   EMPTY_PARTNER_FINANCE_SNAPSHOT,
   getPartnerSnapshot,
+  mapWltDshPartnerTransactions,
 } from '../shared';
-import { mapWltDshPartnerPreviewTransactions } from './wlt-dsh-partner.adapter';
 
 export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerToken?: string | null) {
   const [partnerPreview, setPartnerPreview] = React.useState(EMPTY_PARTNER_FINANCE_SNAPSHOT);
@@ -29,7 +29,7 @@ export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerT
   }, [activePartnerId, dshAuthBearerToken]);
 
   const previewTransactions = React.useMemo(
-    () => mapWltDshPartnerPreviewTransactions(partnerPreview.settlementRecords),
+    () => mapWltDshPartnerTransactions(partnerPreview.settlementRecords),
     [partnerPreview],
   );
 

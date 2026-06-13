@@ -21,7 +21,7 @@ export {
   getRecordsForSection,
   getSections,
   getSnapshot,
-} from './wlt-dsh-captain.adapter';
+} from '../shared/adapters/captain-finance-runtime.adapter';
 export type {
   WltCaptainFinanceSection,
   WltCaptainFinanceSnapshot,

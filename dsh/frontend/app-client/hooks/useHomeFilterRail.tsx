@@ -15,7 +15,7 @@ import {
   HOME_MODE_FILTER_PREFIX,
 } from 'home-search-helpers';
 import type { DiscoveryFilter, DshHomeCategory } from '../contracts/dsh-home-types';
-import { useFeatureFlag } from '../../shared';
+import { useFeatureFlag } from '../../platform';
 
 export function useHomeFilterRail({
   theme,

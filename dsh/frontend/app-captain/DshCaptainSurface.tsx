@@ -52,13 +52,15 @@ import {
   isCaptainCodCollectorForMode,
 } from '../shared/contracts/dsh-fulfillment-surface-visibility';
 import {
-  PlatformVarsProvider,
-  FeatureFlagProvider,
-  usePlatformVars,
   resolveDshRuntimeOrderId,
   useCaptainActiveLocationPush,
   useCaptainOrderRuntime,
 } from '../shared';
+import {
+  PlatformVarsProvider,
+  FeatureFlagProvider,
+  usePlatformVars,
+} from '../platform';
 import { OfferDeclineSheet } from './sheets';
 import { CaptainSupportScreenRouter } from './CaptainSupportScreenRouter';
 

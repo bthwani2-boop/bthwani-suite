@@ -1229,6 +1229,37 @@
       ]
     },
     {
+      "id": "GUARD_DSH_SHARED_NO_UI",
+      "file": "tools/guards/guard-dsh-shared-no-ui.mjs",
+      "ownerPolicy": [
+        "governance/14_GUARDS_CATALOG.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "enforce that DSH shared remains non-visual, has no React creation or ui-kit or Tamagui imports",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/**",
+        "tools/guards/guard-dsh-shared-no-ui.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs"
+      ]
+    },
+    {
       "id": "GUARD_DSH_SHARED_OWNERSHIP",
       "file": "tools/guards/guard-dsh-shared-ownership.mjs",
       "ownerPolicy": [

@@ -19,8 +19,8 @@ import {
 	spacing,
 } from '@bthwani/ui-kit';
 import { useWltDshWalletSession } from './useWltDshWalletSession';
-import { listLedgerEntries } from './wlt-dsh-client.adapter';
-import { adaptClientLedgerEntries, formatWltYer } from '../shared';
+import { listLedgerEntries } from '../shared/adapters/client-wallet-runtime.adapter';
+import { adaptClientLedgerEntries, formatWltDshAmountLabel } from '../shared';
 import type { WltDshClientWalletLedgerRow } from '../shared';
 
 export type CustomerWalletScreenProps = {
@@ -77,15 +77,9 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 		}
 
 		try {
-			// Convert YER to minor units (multiply by 100)
-			const res = await wallet.topUp(amount * 100);
-			if (res.success) {
-				setRechargeSuccess(true);
-				setRechargeAmount('');
-				await handleRefresh();
-			} else {
-				setRechargeError(res.error || 'فشلت عملية الشحن، يرجى المحاولة مرة أخرى');
-			}
+			wallet.createWalletFundingLink(amount * 100);
+			setRechargeSuccess(true);
+			setRechargeAmount('');
 		} catch (err) {
 			setRechargeError('حدث خطأ غير متوقع أثناء الشحن');
 		}
@@ -149,7 +143,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 								الرصيد المتاح
 							</Text>
 							<Text role="hero" weight="black" style={[styles.balanceText, { color: theme.brand }]}>
-								{formatWltYer(wallet.balance ?? 0)}
+								{formatWltDshAmountLabel(wallet.balance ?? 0)}
 							</Text>
 							<View style={styles.badgeRow}>
 								<Badge label="محفظة نشطة" tone="success" />
@@ -184,7 +178,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 							)}
 							{rechargeSuccess && (
 								<Text role="bodySm" style={{ color: colorPalette.success, textAlign: 'right' }}>
-									تم شحن الرصيد بنجاح!
+									تم تجهيز رابط الشحن عبر WLT.
 								</Text>
 							)}
 						</Surface>

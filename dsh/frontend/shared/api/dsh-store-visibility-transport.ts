@@ -10,7 +10,7 @@ import {
   type StoreVisibilityGateResponse,
 } from './dsh-store-visibility-client';
 
-import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+import { PlatformVarsRegistry } from '../platform/platform-vars';
 
 export type DshVisibilityFetchFn = (input: string, init?: RequestInit) => Promise<Response>;
 

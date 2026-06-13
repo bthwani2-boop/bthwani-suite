@@ -48,7 +48,7 @@ import {
   getDshClientFlowPolicy,
 } from '../contracts/dsh-client-binding.contracts';
 // SSoT: COD availability per delivery mode — bthwani_delivery only.
-import { isCodAllowedForMode } from '../dsh-client-wlt-payment-bridge';
+import { isCodAllowedForMode } from '../../shared/finance-boundary';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from 'policies/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 import type { DshCheckoutClient } from 'api/dsh-checkout-client';
