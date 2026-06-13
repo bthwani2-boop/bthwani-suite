@@ -36,7 +36,7 @@
     "guard:secret-scan": "node tools/guards/guard-secret-scan.mjs",
     "guard:runtime-smoke": "pwsh -NoProfile -Command \"Write-Host 'NOT_RUN_REASON: no dedicated guard:runtime-smoke script is defined; run a project-specific smoke only on explicit request.'\"",
     "precommit:fast": "git --no-pager diff --cached --check",
-    "guard:protected-tokens": "node tools/guards/guard-design-token-drift.mjs",
+    "guard:protected-tokens": "node tools/guards/guard-bthwani-protected-tokens.mjs",
     "guard:design-token-drift": "node tools/guards/guard-design-token-drift.mjs",
     "guard:ui-kit-central-design-ownership": "node tools/guards/guard-ui-kit-central-design-ownership.mjs",
     "guard:tamagui-law": "pwsh -NoProfile -Command \"Write-Host 'NOT_RUN_REASON: no dedicated guard:tamagui-law script is defined; use pnpm run guard:tamagui-import-boundary for the active Tamagui boundary check.'\"",
