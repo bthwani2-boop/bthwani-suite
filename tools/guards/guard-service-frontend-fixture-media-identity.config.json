@@ -464,6 +464,7 @@
     "dsh/frontend/app-client/hooks/useDshClientOrderExecution.ts",
     "dsh/frontend/app-client/hooks/useDshClientRuntimeStores.ts",
     "dsh/frontend/app-client/hooks/useDshClientStoreState.ts",
+    "dsh/frontend/app-client/hooks/useDshClientHomeCategories.ts",
     "dsh/frontend/app-client/DshClientRouteRenderer.tsx",
     "dsh/frontend/app-client/DshClientBottomNav.tsx",
     "dsh/frontend/app-client/adapters/dshClientOrderAdapters.ts",

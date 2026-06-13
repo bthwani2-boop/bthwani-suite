@@ -6,3 +6,6 @@ export type { UseDshOrderTrackingResult, DshTrackingTimelineItem } from './useDs
 
 export { useDshCheckout } from './useDshCheckout';
 export type { UseDshCheckoutResult } from './useDshCheckout';
+
+export { useDshClientHomeCategories } from './useDshClientHomeCategories';
+export type { CategoriesBridgeResult } from './useDshClientHomeCategories';

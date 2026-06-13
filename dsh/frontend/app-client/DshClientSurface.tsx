@@ -4,7 +4,7 @@ import { usePlatformVars, FeatureFlagProvider, PlatformVarsProvider, useFeatureF
 import type { DshSignalSummary, DshSignalEventKind, DshSignalEntityType } from '../shared';
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
 import type { DshClientSurfaceProps, DshRoute } from './dsh-client.types';
-import { useDshNavigation, useDshOrderTracking } from './hooks';
+import { useDshNavigation, useDshOrderTracking, useDshClientHomeCategories } from './hooks';
 
 // Custom Hooks
 import { useDshClientRuntimeStores } from './hooks/useDshClientRuntimeStores';
@@ -52,6 +52,12 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     clientVisibleDiscoveryStores,
     clientVisibleHomeStores,
   } = useDshClientRuntimeStores();
+
+  // 1b. Runtime home categories fetch and consolidated state
+  const {
+    state: homeScreenState,
+    categories: homeCategories,
+  } = useDshClientHomeCategories(clientVisibleHomeStores, clientDiscoveryStoresBridge.state, homeRetryToken);
 
   // 2. Navigation
   const {
@@ -275,22 +281,8 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
   }, [activeStoreDetail, activeStore, activeStoreTags, activeStoreDeliveryModes, activeStoreCategories]);
 
   const homeRecentOrders = React.useMemo(() => [
-    {
-      id: 'home-recent-order-1',
-      storeId: clientVisibleHomeStores[0]?.id ?? 'store-1001',
-      title: 'الطلب النشط',
-      subtitle: clientVisibleHomeStores[0]?.name ?? 'مطعم القلعة',
-      meta: `${clientVisibleHomeStores[0]?.distanceLabel ?? '2.1 كم'} · ${clientVisibleHomeStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`,
-      statusLabel: clientVisibleHomeStores[0]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
-    },
-    {
-      id: 'home-recent-order-2',
-      storeId: clientVisibleHomeStores[1]?.id ?? 'store-1002',
-      title: 'آخر طلب',
-      subtitle: clientVisibleHomeStores[1]?.name ?? 'مطاعم الأرض الخضراء',
-      meta: `${clientVisibleHomeStores[1]?.distanceLabel ?? '1.8 كم'} · ${clientVisibleHomeStores[1]?.serviceLabel ?? 'توصيل برو'}`,
-      statusLabel: clientVisibleHomeStores[1]?.statusTone === 'open' ? 'مباشر' : 'مغلق',
-    },
+    { id: 'home-recent-order-1', storeId: clientVisibleHomeStores[0]?.id ?? 'store-1001', title: 'الطلب النشط', subtitle: clientVisibleHomeStores[0]?.name ?? 'مطعم القلعة', meta: `${clientVisibleHomeStores[0]?.distanceLabel ?? '2.1 كم'} · ${clientVisibleHomeStores[0]?.deliveryLabel ?? 'توصيل مجاني'}`, statusLabel: clientVisibleHomeStores[0]?.statusTone === 'open' ? 'مباشر' : 'مغلق' },
+    { id: 'home-recent-order-2', storeId: clientVisibleHomeStores[1]?.id ?? 'store-1002', title: 'آخر طلب', subtitle: clientVisibleHomeStores[1]?.name ?? 'مطاعم الأرض الخضراء', meta: `${clientVisibleHomeStores[1]?.distanceLabel ?? '1.8 كم'} · ${clientVisibleHomeStores[1]?.serviceLabel ?? 'توصيل برو'}`, statusLabel: clientVisibleHomeStores[1]?.statusTone === 'open' ? 'مباشر' : 'مغلق' }
   ], [clientVisibleHomeStores]);
 
   const handleOpenActiveStoreItems = React.useCallback(() => {
@@ -400,6 +392,8 @@ function DshClientSurfaceInner({ command, onExit, onOpenService, authToken, devC
     <View style={{ flex: 1, position: 'relative' }}>
       <View style={{ flex: 1, paddingBottom: Platform.OS === 'android' ? 112 : 80 }}>
         <DshClientRouteRenderer
+          categories={homeCategories}
+          homeScreenState={homeScreenState}
           route={route}
           setRoute={setRoute}
           dshAuthBearerToken={dshAuthBearerToken}

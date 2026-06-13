@@ -58,6 +58,8 @@ function parsePrice(priceLabel?: string): number {
 }
 
 type DshClientRouteRendererProps = {
+  categories: DshHomeCategory[];
+  homeScreenState: 'ready' | 'loading' | 'empty' | 'error' | 'offline';
   route: DshRoute;
   setRoute: React.Dispatch<React.SetStateAction<DshRoute>>;
   dshAuthBearerToken: string | null | undefined;
@@ -148,6 +150,8 @@ type DshClientRouteRendererProps = {
 };
 
 export function DshClientRouteRenderer({
+  categories,
+  homeScreenState,
   route,
   setRoute,
   dshAuthBearerToken,
@@ -660,11 +664,11 @@ export function DshClientRouteRenderer({
   // Fallback / default DshHomeGetScreen
   return (
     <DshHomeGetScreen
-      state={clientDiscoveryStoresBridge.state}
+      state={homeScreenState}
       serviceDialTrigger={serviceDialTrigger}
       favoriteOverrides={favoriteOverrides}
       onToggleFavorite={handleToggleFavorite}
-      categories={[] as DshHomeCategory[]}
+      categories={categories}
       promos={homeMarketingPromos}
       homePromos={homePromos}
       approvedVideoShorts={liveMarketingShorts}
