@@ -1,4 +1,4 @@
-﻿// ML-002: Field document verification section skeleton — used within DshFieldStoreOnboardingScreen
+// ML-002: Field document verification section skeleton — used within DshFieldStoreOnboardingScreen
 // BLOCKED_BY_CONTRACT: implement document capture and upload when upload API contract is proven
 import React from 'react';
 import {
@@ -9,7 +9,7 @@ import {
   useTheme,
   useDirection,
 } from '@bthwani/ui-kit';
-import type { FieldDocumentPreviewStatus } from '../../shared/contracts/field-store-model';
+import type { FieldDocumentStatus } from '../../shared/contracts/field-store-model';
 
 type DocumentKind = 'commercial_registration' | 'id_card' | 'trade_license' | 'other';
 
@@ -17,7 +17,7 @@ type DocumentItem = {
   id: DocumentKind;
   label: string;
   required: boolean;
-  status: FieldDocumentPreviewStatus;
+  status: FieldDocumentStatus;
   referenceLabel?: string;
 };
 
@@ -64,7 +64,7 @@ export function DocumentVerificationSection({
     .filter((d) => d.required)
     .every((d) => d.status === 'uploaded' || d.status === 'approved');
 
-  const resolveStatusTone = (status: FieldDocumentPreviewStatus) => {
+  const resolveStatusTone = (status: FieldDocumentStatus) => {
     if (status === 'approved') return 'success' as const;
     if (status === 'uploaded') return 'brand' as const;
     if (status === 'needs_reupload') return 'warning' as const;
@@ -72,7 +72,7 @@ export function DocumentVerificationSection({
     return 'muted' as const;
   };
 
-  const resolveStatusLabel = (status: FieldDocumentPreviewStatus) => {
+  const resolveStatusLabel = (status: FieldDocumentStatus) => {
     if (status === 'approved') return 'معتمد';
     if (status === 'uploaded') return 'مرفوع';
     if (status === 'needs_reupload') return 'يحتاج إعادة رفع';
@@ -83,7 +83,7 @@ export function DocumentVerificationSection({
   return (
     <Box gap={4}>
       <Text role="titleSm" style={{ textAlign: isRtl ? 'right' : 'left' }}>التحقق من المستندات</Text>
-      <Text role="caption" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>المراجع والحالات هنا preview-only؛ قرار الاعتماد النهائي يبقى لدى control-panel/partners.</Text>
+      <Text role="caption" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>المراجع والحالات هنا read-only؛ قرار الاعتماد النهائي يبقى لدى control-panel/partners.</Text>
       <Box gap={0}>
         {documents.map((doc) => (
           <Box

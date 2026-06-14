@@ -25,14 +25,14 @@ export { WltDshFinanceControlPanelContent, WltDshFinanceControlPanelSummary } fr
 export { WltDshRealtimeLedger } from './components/WltDshRealtimeLedger';
 
 // finance routing (types + registry + api-matrix)
-export type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState, FinanceGroupMeta, FinanceNormalizationResult } from './models/financeRouting.types';
-export { FINANCE_CANONICAL_GROUPS, FINANCE_NAV_GROUPS, FINANCE_CANONICAL_GROUP_IDS, normalizeFinanceLocation, buildFinanceHref, getFinanceGroupMeta } from './constants/finance.registry';
-export { FINANCE_API_MATRIX, getFinanceApiBinding } from './adapters/finance.api-matrix';
-export type { DshFinanceApiBinding } from './adapters/finance.api-matrix';
+export type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState, FinanceGroupMeta, FinanceNormalizationResult } from '../shared';
+export { FINANCE_CANONICAL_GROUPS, FINANCE_NAV_GROUPS, FINANCE_CANONICAL_GROUP_IDS, normalizeFinanceLocation, buildFinanceHref, getFinanceGroupMeta } from '../shared';
+export { FINANCE_API_MATRIX, getFinanceApiBinding } from '../shared';
+export type { DshFinanceApiBinding } from '../shared';
 
 // hub host screen
 export { WltDshFinanceHubHost, ControlPanelDshFinanceHubScreen, WltDshFinanceHubHost as ControlPanelFinanceHubHost } from './screens/WltDshFinanceHubHost';
 export type { WltDshFinanceHubHostProps, ControlPanelDshFinanceScreenProps } from './screens/WltDshFinanceHubHost';
 
 // public contracts barrel
-export * as wltDshFinanceContracts from './financeContracts';
+export * as wltDshFinanceContracts from '../shared/contracts/financeContracts';

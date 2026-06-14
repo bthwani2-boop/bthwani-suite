@@ -12,7 +12,7 @@ export type {
   FinanceViewState,
   FinanceGroupMeta,
   FinanceNormalizationResult,
-} from '../../../../wlt/frontend/dsh/control-panel/models/financeRouting.types';
+} from '../../../../wlt/frontend/dsh/shared';
 
 // Finance routing helpers
 export {
@@ -22,4 +22,4 @@ export {
   buildFinanceHref,
   getFinanceGroupMeta,
   normalizeFinanceLocation,
-} from '../../../../wlt/frontend/dsh/control-panel/constants/finance.registry';
+} from '../../../../wlt/frontend/dsh/shared';

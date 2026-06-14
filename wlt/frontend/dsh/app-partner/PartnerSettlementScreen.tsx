@@ -17,8 +17,7 @@ import {
 	spacing,
   typographyRoles,
 } from '@bthwani/ui-kit';
-import { useWltDshPartnerWalletSummary } from './useWltDshPartnerWalletSummary';
-import { formatWltDshAmountLabel } from '../shared';
+import { useWltDshPartnerWalletSummary, formatWltDshAmountLabel } from '../shared';
 
 export type PartnerSettlementScreenProps = {
 	partnerId?: string;

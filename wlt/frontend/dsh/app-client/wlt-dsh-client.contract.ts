@@ -1,14 +1,2 @@
-export const wltDshClientBridgeDataContract = {
-  dataKind: 'RUNTIME_BOUND',
-  runtimeTruth: true,
-  backendSource: true,
-  bindingSource: true,
-  moneySemantics: 'WLT-owned runtime wallet/payment session references only',
-  ownerKind: 'integration',
-  ownerId: 'wlt.dsh',
-  serviceId: 'wlt',
-  linkedServiceId: 'dsh',
-  surfaceId: 'app-client',
-} as const;
-
-export type WltDshClientBridgeContract = typeof wltDshClientBridgeDataContract;
+export { wltDshClientBridgeDataContract } from '../shared/contracts/wlt-dsh-client-bridge.contract';
+export type { WltDshClientBridgeContract } from '../shared/contracts/wlt-dsh-client-bridge.contract';

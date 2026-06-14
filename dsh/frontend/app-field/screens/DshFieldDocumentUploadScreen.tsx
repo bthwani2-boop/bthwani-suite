@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { View, Pressable, StyleSheet } from 'react-native';
 import {
   Badge,
@@ -20,13 +20,14 @@ import {
   spacing,
 } from '@bthwani/ui-kit';
 import { getDshFlowPolicySummary } from '../../shared/policies/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
-import type { DshFieldDocumentKind } from '../../shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/dsh-governance.map';
+import { resolveFieldDocumentDraftMediaKey } from '../../shared/view-models/field';
+import type { DshFieldDocumentKind } from '../../shared/api/dsh-field-document-client';
 
 export type DshFieldDocumentUploadScreenProps = {
   storeId: string;
   onBack: () => void;
-  onSubmit: (documentKind: DshFieldDocumentKind, mediaKey: string) => Promise<void>;
+  onSubmit: (documentKind: DshFieldDocumentKind, documentRef: string) => Promise<void>;
   state?: 'ready' | 'loading' | 'success' | 'error' | 'offline' | 'disabled';
   onRetry?: () => void;
 };
@@ -76,26 +77,25 @@ export function DshFieldDocumentUploadScreen({
   const isRtl = direction === 'rtl';
 
   const [selectedKind, setSelectedKind] = React.useState<DshFieldDocumentKind>('commercial_registration');
-  const [mediaKey, setMediaKey] = React.useState('');
+  const [documentRef, setDocumentRef] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [successDocId, setSuccessDocId] = React.useState<string | null>(null);
 
   const documentFlowSummary = getDshFlowPolicySummary('field-proof-required');
 
   React.useEffect(() => {
-    // Generate default media key based on selected type for ease of use/simulation
-    setMediaKey(`field.doc.${selectedKind}.${Date.now().toString().slice(-4)}`);
+    setDocumentRef(resolveFieldDocumentDraftMediaKey(selectedKind));
   }, [selectedKind]);
 
   const handleFormSubmit = async () => {
-    if (!mediaKey.trim()) {
+    if (!documentRef.trim()) {
       setErrorMessage('يرجى تحديد أو إدخال رمز الوسائط (media key).');
       return;
     }
     setErrorMessage(null);
     try {
-      await onSubmit(selectedKind, mediaKey.trim());
-      setSuccessDocId(mediaKey);
+      await onSubmit(selectedKind, documentRef.trim());
+      setSuccessDocId(documentRef);
     } catch (err: any) {
       if (err && err.kind === 'offline') {
         setErrorMessage('تعذر الاتصال بالخادم. أنت غير متصل بالإنترنت حاليًا.');
@@ -139,7 +139,7 @@ export function DshFieldDocumentUploadScreen({
     );
   }
 
-  const isSubmitDisabled = state === 'disabled' || !mediaKey.trim();
+  const isSubmitDisabled = state === 'disabled' || !documentRef.trim();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.surface }]}>
@@ -218,8 +218,8 @@ export function DshFieldDocumentUploadScreen({
             />
             <TextField
               label="رمز إثبات الوسائط (Media Key)"
-              value={mediaKey}
-              onChangeText={setMediaKey}
+              value={documentRef}
+              onChangeText={setDocumentRef}
               editable={state !== 'disabled'}
               error={errorMessage ?? undefined}
               hint="سيتم إنشاء هذا الرمز تلقائيًا لغرض المحاكاة."
@@ -234,7 +234,7 @@ export function DshFieldDocumentUploadScreen({
               dense
               items={[
                 { label: 'النوع المحدد', value: documentKinds.find((d) => d.id === selectedKind)?.label ?? '' },
-                { label: 'رمز الملف المعين', value: mediaKey || '—', tone: 'brand' },
+                { label: 'رمز الملف المعين', value: documentRef || '—', tone: 'brand' },
                 { label: 'حالة الاعتماد الأولية', value: 'قيد الانتظار (Pending)' },
               ]}
             />

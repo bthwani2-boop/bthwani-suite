@@ -18,8 +18,8 @@ import {
 import type {
   WltDshFinanceSummaryRecord,
   WltFieldFinanceSnapshot,
-} from '../shared';
-import { useWltDshFieldFinanceSummary } from './useWltDshFieldFinanceSummary';
+} from '../shared/contracts/dshFinance.types';
+import { useWltDshFieldFinanceSummary } from '../shared/view-models/field-finance-summary.model';
 
 function RecordRow({ record }: { record: WltDshFinanceSummaryRecord }) {
   const { theme } = useTheme();

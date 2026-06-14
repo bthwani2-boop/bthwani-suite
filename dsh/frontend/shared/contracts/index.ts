@@ -75,5 +75,20 @@ export * from './dsh-fulfillment-surface-visibility';
 export * from './dsh-marketing-types';
 export * from './dsh-partner-offer-types';
 export * from './field-store-model';
+export * from './field-surface-model';
 export * from './dsh-order-lifecycle-handoffs';
 export type { components, operations, paths } from './openapi';
+// Partner contracts — operational flows, support routes, issue categories, context types
+export * from './partner';
+
+// Captain binding contracts — import directly from './captain' to avoid wildcard conflicts
+export type {
+  DshCaptainOrderSnapshot,
+  DshCaptainOrderActionPayload,
+  DshCaptainProofPayload,
+  DshCaptainFinanceSnapshot,
+  DshCaptainProfileSnapshot,
+  DshCaptainOperationsSnapshot,
+  DshCaptainRegistryFlowId,
+} from './captain';
+export { DSH_CAPTAIN_REGISTRY_FLOW_IDS, getDshCaptainFlowPolicy } from './captain';

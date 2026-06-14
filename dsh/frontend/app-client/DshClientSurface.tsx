@@ -21,7 +21,7 @@ import { useDshClientOrderExecution } from './hooks/useDshClientOrderExecution';
 import { useDshClientMarketingState } from './hooks/useDshClientMarketingState';
 import { useDshClientBellState } from './hooks/useDshClientBellState';
 import { useDshClientHomeActions } from './hooks/useDshClientHomeActions';
-import { mapStoreDetailToScreenStore } from './adapters/dshClientStoreAdapters';
+import { mapStoreDetailToScreenStore } from '../shared/adapters/client/dshClientStoreAdapters';
 import { DshClientBottomNav } from './DshClientBottomNav';
 import { DshClientRouteRenderer } from './DshClientRouteRenderer';
 import { commandTargetToRoute, initialOrders, hostClientStates } from './dsh-client.navigation-bridge';

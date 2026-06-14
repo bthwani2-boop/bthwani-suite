@@ -1,4 +1,7 @@
-import type { DshPartnerRoute } from '../dsh-partner.types';
+import type { DshPartnerRoute, DshPartnerSurfaceId } from '../dsh-partner.types';
+
+// Re-export for consumers that import from this contract file.
+export type { DshPartnerSurfaceId };
 
 // Store delivery policy — how the partner structures store-courier delivery costs.
 // Financial owner is always WLT; settlement owner is always Partner (not BThwani Captain).
@@ -19,8 +22,6 @@ export type StoreCourierCompensation =
   | 'none'
   | 'fixed_per_delivery'
   | 'percentage_of_delivery_fee';
-
-export type DshPartnerSurfaceId = DshPartnerRoute | 'wallet-bridge' | 'detail';
 
 export type DshPartnerBindingContract = {
   surfaceId: DshPartnerSurfaceId;

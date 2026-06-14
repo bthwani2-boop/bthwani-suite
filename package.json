@@ -23,6 +23,7 @@
     "guard:dsh-zero-gap-runtime-boundaries": "node tools/guards/guard-dsh-zero-gap-runtime-boundaries.mjs",
     "guard:dsh-surface-structure": "node tools/guards/guard-dsh-surface-structure.mjs",
     "guard:ui-only-surfaces": "node tools/guards/guard-ui-only-roots-ownership.mjs",
+    "guard:ui-only-file-volume": "node tools/guards/guard-ui-only-file-volume.mjs",
     "guard:dsh-shared-no-ui": "node tools/guards/guard-dsh-shared-no-ui.mjs",
     "guard:wlt-dsh-ui-only-bindings": "node tools/guards/guard-wlt-dsh-shared-ownership.mjs",
     "guard:ui-only-ownership-matrix": "node tools/guards/generate-ui-only-file-ownership-matrix.mjs",

@@ -1432,6 +1432,48 @@
       ]
     },
     {
+      "id": "GUARD_UI_ONLY_FILE_VOLUME",
+      "file": "tools/guards/guard-ui-only-file-volume.mjs",
+      "ownerPolicy": [
+        "governance/03_REPO_BOUNDARIES.md",
+        "governance/06_APPS_AND_SHELLS.md",
+        "governance/22_DSH_GOLDEN_SLICE.md",
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md"
+      ],
+      "purpose": "fail when UI roots contain non-UI folders and non-UI responsibilities to prevent clutter and keep them purely visual",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/app-captain/**",
+        "dsh/frontend/app-client/**",
+        "dsh/frontend/app-field/**",
+        "dsh/frontend/app-partner/**",
+        "dsh/frontend/control-panel/**",
+        "wlt/frontend/dsh/app-captain/**",
+        "wlt/frontend/dsh/app-client/**",
+        "wlt/frontend/dsh/app-field/**",
+        "wlt/frontend/dsh/app-partner/**",
+        "wlt/frontend/dsh/control-panel/**",
+        "tools/guards/guard-ui-only-file-volume.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs"
+      ]
+    },
+    {
       "id": "GUARD_WLT_DSH_SHARED_OWNERSHIP",
       "file": "tools/guards/guard-wlt-dsh-shared-ownership.mjs",
       "ownerPolicy": [

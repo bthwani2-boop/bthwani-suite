@@ -27,7 +27,8 @@ import { DshPreferencesHubScreen } from './screens/DshPreferencesHubScreen';
 import { DshAppearanceHubScreen } from './screens/DshAppearanceHubScreen';
 import { WltHomeGetScreen } from '../../../wlt/frontend/app-client-wlt';
 import { hostClientStates } from './dsh-client.navigation-bridge';
-import { buildDshClientCheckoutPresenterModel } from './presenters/dshClientCheckoutPresenter';
+import { buildDshClientCheckoutPresenterModel } from '../shared/view-models/checkout/dshClientCheckoutPresenter';
+import { mapLiveOrderStatusToClientState } from '../shared/view-models/tracking/tracking-helpers';
 import { getDshClientStateMeta } from 'state-machines/client-state';
 import type { DshClientRouteRendererProps } from './contracts/dsh-client-renderer.contracts';
 
@@ -514,22 +515,10 @@ export function DshClientRouteRenderer({
     let liveStatusLabel = activeTrackedOrder?.statusLabel ?? trackingWltIntent?.clientUiHint;
 
     if (liveOrderDetails) {
-      const order = liveOrderDetails.order;
-      if (order.status === 'CREATED') {
-        liveClientState = hostClientStates.orderCreated;
-        liveStatusLabel = 'قيد المراجعة';
-      } else if (order.status === 'ACCEPTED') {
-        liveClientState = hostClientStates.orderConfirmed;
-        liveStatusLabel = 'تم القبول';
-      } else if (order.status === 'READY_FOR_PICKUP') {
-        liveClientState = hostClientStates.trackingActive;
-        liveStatusLabel = 'جاهز للاستلام';
-      } else if (order.status === 'DELIVERED') {
-        liveClientState = hostClientStates.delivered;
-        liveStatusLabel = 'تم التوصيل';
-      } else if (order.status === 'CANCELLED') {
-        liveClientState = hostClientStates.cancelled;
-        liveStatusLabel = 'تم الإلغاء';
+      const mapped = mapLiveOrderStatusToClientState(liveOrderDetails.order.status);
+      if (mapped) {
+        liveClientState = mapped.clientState;
+        liveStatusLabel = mapped.statusLabel;
       }
     }
 

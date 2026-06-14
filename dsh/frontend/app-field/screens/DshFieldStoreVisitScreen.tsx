@@ -25,7 +25,7 @@ import type {
 } from '../types/DshFieldStoreVisitTypes';
 import { VisitEvidenceSection } from '../sections/VisitEvidenceSection';
 import { getDshFlowPolicySummary } from '../../shared/policies/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/dsh-governance.map';
 
 export type {
   DshFieldStoreVisitErrors,

@@ -6,10 +6,6 @@ import type {
   DshPartnerSupportRouteId,
   PartnerHubSection,
 } from '../dsh-partner.types';
-import {
-  buildSupportCommandContextFromSupportRoute,
-  defaultSupportCommandContext,
-} from '../dsh-partner.navigation-bridge';
 import { DshPartnerHubSurface } from './PartnerHubScreen';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import {
@@ -31,7 +27,7 @@ import { ProductEditScreen } from './ProductEditScreen';
 import { CategoryManagementScreen } from './CategoryManagementScreen';
 import { ProductMediaScreen } from './ProductMediaScreen';
 import { ProductOverridesScreen } from './ProductOverridesScreen';
-import { defaultServiceModes } from '../dsh-partner.navigation-bridge';
+import { defaultServiceModes } from '../../shared/policies/fulfillment';
 
 type Props = {
   route: DshPartnerRoute;

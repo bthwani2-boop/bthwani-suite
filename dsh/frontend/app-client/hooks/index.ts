@@ -1,11 +1,11 @@
 export { useDshNavigation } from './useDshNavigation';
 export type { UseDshNavigationResult } from './useDshNavigation';
 
-export { useDshOrderTracking } from './useDshOrderTracking';
-export type { UseDshOrderTrackingResult, DshTrackingTimelineItem } from './useDshOrderTracking';
+export { useDshOrderTracking } from '../shared/view-models/tracking/useDshOrderTracking';
+export type { UseDshOrderTrackingResult, DshTrackingTimelineItem } from '../shared/view-models/tracking/useDshOrderTracking';
 
-export { useDshCheckout } from './useDshCheckout';
-export type { UseDshCheckoutResult } from './useDshCheckout';
+export { useDshCheckout } from '../shared/view-models/checkout/useDshCheckout';
+export type { UseDshCheckoutResult } from '../shared/view-models/checkout/useDshCheckout';
 
-export { useDshClientHomeCategories } from './useDshClientHomeCategories';
-export type { CategoriesBridgeResult } from './useDshClientHomeCategories';
+export { useDshClientHomeCategories } from '../shared/view-models/home/useDshClientHomeCategories';
+export type { CategoriesBridgeResult } from '../shared/view-models/home/useDshClientHomeCategories';

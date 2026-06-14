@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ScrollView, View, Pressable } from 'react-native';
 import {
   Badge,
@@ -36,12 +36,12 @@ import {
   type FieldOnboardingDraft,
   type FieldOnboardingSectionId,
   type FieldStoreFile,
-  type FieldDocumentPreviewStatus,
+  type FieldDocumentStatus,
 } from '../../shared/contracts/field-store-model';
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
 import { getOperationsSupportFlowsForSurface } from '../../shared/state-machines/support-flows';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/policies/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/dsh-governance.map';
 
 const FIELD_ONBOARDING_OPERATION_FLOWS = getOperationsSupportFlowsForSurface('app-field');
 const FIELD_PRODUCT_OPERATION_FLOWS = FIELD_ONBOARDING_OPERATION_FLOWS.filter(
@@ -175,7 +175,7 @@ export function DshFieldStoreOnboardingScreen({
     }));
   }, [patchStore]);
 
-  const updateNestedField = React.useCallback(
+  const changeDraftField = React.useCallback(
     <T extends keyof FieldOnboardingDraft, K extends keyof FieldOnboardingDraft[T]>(
       sectionKey: T,
       fieldKey: K,
@@ -281,7 +281,7 @@ export function DshFieldStoreOnboardingScreen({
   const handleImportOwnerName = () => {
     setOcrLoading(true);
     setTimeout(() => {
-      updateNestedField('basics', 'ownerName', 'عبدالرحمن بن ثنيان');
+      changeDraftField('basics', 'ownerName', 'عبدالرحمن بن ثنيان');
       setOcrLoading(false);
     }, 600);
   };
@@ -289,13 +289,13 @@ export function DshFieldStoreOnboardingScreen({
   const handleGPSAutofill = () => {
     setGpsLoading(true);
     setTimeout(() => {
-      updateNestedField('location', 'city', 'الرياض');
-      updateNestedField('location', 'zone', 'حي العليا');
-      updateNestedField('location', 'latitude', '24.71358');
-      updateNestedField('location', 'longitude', '46.67529');
-      updateNestedField('location', 'landmark', 'برج المملكة - البوابة الشرقية');
-      updateNestedField('location', 'addressLine', 'طريق الملك فهد، حي العليا');
-      updateNestedField('location', 'coverageSummary', 'نطاق التغطية يغطي كامل مربع العليا وحطين');
+      changeDraftField('location', 'city', 'الرياض');
+      changeDraftField('location', 'zone', 'حي العليا');
+      changeDraftField('location', 'latitude', '24.71358');
+      changeDraftField('location', 'longitude', '46.67529');
+      changeDraftField('location', 'landmark', 'برج المملكة - البوابة الشرقية');
+      changeDraftField('location', 'addressLine', 'طريق الملك فهد، حي العليا');
+      changeDraftField('location', 'coverageSummary', 'نطاق التغطية يغطي كامل مربع العليا وحطين');
       setGpsLoading(false);
     }, 800);
   };
@@ -305,7 +305,7 @@ export function DshFieldStoreOnboardingScreen({
     setTimeout(() => {
       const randomSuffix = Math.floor(100 + Math.random() * 900);
       const mockPhotoRef = `img_${field.replace('PhotoRef', '')}_upload_${randomSuffix}.jpg`;
-      updateNestedField('photos', field, mockPhotoRef);
+      changeDraftField('photos', field, mockPhotoRef);
       setCameraLoading((prev) => ({ ...prev, [field]: false }));
     }, 700);
   };
@@ -369,7 +369,7 @@ export function DshFieldStoreOnboardingScreen({
             value={draft.basics.storeName}
             editable={!readOnly}
             error={errors.storeName}
-            onChangeText={(value) => updateNestedField('basics', 'storeName', value)}
+            onChangeText={(value) => changeDraftField('basics', 'storeName', value)}
             placeholder="مثال: أسواق العليا الطازجة"
           />
 
@@ -379,7 +379,7 @@ export function DshFieldStoreOnboardingScreen({
               value={draft.basics.ownerName}
               editable={!readOnly}
               error={errors.ownerName}
-              onChangeText={(value) => updateNestedField('basics', 'ownerName', value)}
+              onChangeText={(value) => changeDraftField('basics', 'ownerName', value)}
               placeholder="الاسم مطابق للهوية أو السجل التجاري"
             />
             {!readOnly && (
@@ -406,7 +406,7 @@ export function DshFieldStoreOnboardingScreen({
             editable={!readOnly}
             keyboardType="phone-pad"
             error={errors.ownerPhone}
-            onChangeText={(value) => updateNestedField('basics', 'ownerPhone', value)}
+            onChangeText={(value) => changeDraftField('basics', 'ownerPhone', value)}
             placeholder="مثال: 777123456 أو 0551234567"
             hint="يستخدم لإرسال كود التفعيل والاتفاق النهائي"
           />
@@ -415,7 +415,7 @@ export function DshFieldStoreOnboardingScreen({
             label="المسؤول الميداني في المتجر"
             value={draft.basics.managerName}
             editable={!readOnly}
-            onChangeText={(value) => updateNestedField('basics', 'managerName', value)}
+            onChangeText={(value) => changeDraftField('basics', 'managerName', value)}
             placeholder="اسم الشخص المتواجد في الموقع حاليًا"
           />
         </Box>
@@ -457,7 +457,7 @@ export function DshFieldStoreOnboardingScreen({
             disabled={readOnly}
             options={getOptionsWithFallback(typeOptions, draft.classification.storeType)}
             placeholder="اختر نوع المنفذ الميداني"
-            onValueChange={(value) => updateNestedField('classification', 'storeType', value)}
+            onValueChange={(value) => changeDraftField('classification', 'storeType', value)}
           />
 
           <SelectField
@@ -466,7 +466,7 @@ export function DshFieldStoreOnboardingScreen({
             disabled={readOnly}
             options={getOptionsWithFallback(mainCatOptions, draft.classification.mainCategory)}
             placeholder="اختر الفئة الرئيسية في بثواني"
-            onValueChange={(value) => updateNestedField('classification', 'mainCategory', value)}
+            onValueChange={(value) => changeDraftField('classification', 'mainCategory', value)}
           />
 
           <SelectField
@@ -475,7 +475,7 @@ export function DshFieldStoreOnboardingScreen({
             disabled={readOnly}
             options={getOptionsWithFallback(subCatOptions, draft.classification.subCategory)}
             placeholder="اختر التصنيف الأكثر دقة للفرع"
-            onValueChange={(value) => updateNestedField('classification', 'subCategory', value)}
+            onValueChange={(value) => changeDraftField('classification', 'subCategory', value)}
           />
         </Box>
       );
@@ -506,7 +506,7 @@ export function DshFieldStoreOnboardingScreen({
             value={draft.location.city}
             editable={!readOnly}
             error={errors.city}
-            onChangeText={(value) => updateNestedField('location', 'city', value)}
+            onChangeText={(value) => changeDraftField('location', 'city', value)}
             placeholder="مثال: الرياض"
           />
 
@@ -515,7 +515,7 @@ export function DshFieldStoreOnboardingScreen({
             value={draft.location.zone}
             editable={!readOnly}
             error={errors.zone}
-            onChangeText={(value) => updateNestedField('location', 'zone', value)}
+            onChangeText={(value) => changeDraftField('location', 'zone', value)}
             placeholder="مثال: حي العليا"
           />
 
@@ -523,7 +523,7 @@ export function DshFieldStoreOnboardingScreen({
             label="العنوان المختصر ووصف الشارع"
             value={draft.location.addressLine}
             editable={!readOnly}
-            onChangeText={(value) => updateNestedField('location', 'addressLine', value)}
+            onChangeText={(value) => changeDraftField('location', 'addressLine', value)}
             placeholder="مثال: طريق الملك فهد، بجانب البنك الأهلي"
           />
 
@@ -535,7 +535,7 @@ export function DshFieldStoreOnboardingScreen({
                 editable={!readOnly}
                 keyboardType="decimal-pad"
                 error={errors.latitude}
-                onChangeText={(value) => updateNestedField('location', 'latitude', value)}
+                onChangeText={(value) => changeDraftField('location', 'latitude', value)}
                 placeholder="24.71358"
               />
             </View>
@@ -546,7 +546,7 @@ export function DshFieldStoreOnboardingScreen({
                 editable={!readOnly}
                 keyboardType="decimal-pad"
                 error={errors.longitude}
-                onChangeText={(value) => updateNestedField('location', 'longitude', value)}
+                onChangeText={(value) => changeDraftField('location', 'longitude', value)}
                 placeholder="46.67529"
               />
             </View>
@@ -557,7 +557,7 @@ export function DshFieldStoreOnboardingScreen({
             value={draft.location.landmark}
             editable={!readOnly}
             error={errors.landmark}
-            onChangeText={(value) => updateNestedField('location', 'landmark', value)}
+            onChangeText={(value) => changeDraftField('location', 'landmark', value)}
             placeholder="مثال: أمام برج المملكة"
           />
 
@@ -565,7 +565,7 @@ export function DshFieldStoreOnboardingScreen({
             label="ملخص التغطية الجغرافية"
             value={draft.location.coverageSummary}
             editable={!readOnly}
-            onChangeText={(value) => updateNestedField('location', 'coverageSummary', value)}
+            onChangeText={(value) => changeDraftField('location', 'coverageSummary', value)}
             placeholder="وصف إضافي لحدود التوصيل المتفق عليها"
           />
         </Box>
@@ -597,7 +597,7 @@ export function DshFieldStoreOnboardingScreen({
                   editable={!readOnly}
                   error={photoErr}
                   placeholder="لم يتم إرفاق مرجع الصورة بعد"
-                  onChangeText={(value) => updateNestedField('photos', photoKey, value)}
+                  onChangeText={(value) => changeDraftField('photos', photoKey, value)}
                 />
                 {!readOnly && (
                   <Button
@@ -649,7 +649,7 @@ export function DshFieldStoreOnboardingScreen({
             value={draft.products.featuredProductName}
             editable={!readOnly}
             error={errors.featuredProductName}
-            onChangeText={(value) => updateNestedField('products', 'featuredProductName', value)}
+            onChangeText={(value) => changeDraftField('products', 'featuredProductName', value)}
             placeholder="مثال: برجر دجاج كلاسيك"
           />
 
@@ -659,7 +659,7 @@ export function DshFieldStoreOnboardingScreen({
             editable={!readOnly}
             keyboardType="decimal-pad"
             error={errors.featuredProductPrice}
-            onChangeText={(value) => updateNestedField('products', 'featuredProductPrice', value)}
+            onChangeText={(value) => changeDraftField('products', 'featuredProductPrice', value)}
             placeholder="السعر بالعملة المحلية شامل الضريبة"
           />
 
@@ -667,7 +667,7 @@ export function DshFieldStoreOnboardingScreen({
             label="ملاحظات وتفاصيل الكتالوج المختصرة"
             value={draft.products.sampleCatalogNote}
             editable={!readOnly}
-            onChangeText={(value) => updateNestedField('products', 'sampleCatalogNote', value)}
+            onChangeText={(value) => changeDraftField('products', 'sampleCatalogNote', value)}
             placeholder="تفاصيل إضافية للكتالوج الأولي للمتجر"
           />
 
@@ -712,7 +712,7 @@ export function DshFieldStoreOnboardingScreen({
             value={draft.offer.preliminaryOffer}
             editable={!readOnly}
             error={errors.preliminaryOffer}
-            onChangeText={(value) => updateNestedField('offer', 'preliminaryOffer', value)}
+            onChangeText={(value) => changeDraftField('offer', 'preliminaryOffer', value)}
             placeholder="مثال: 12% من قيمة الطلب"
           />
 
@@ -721,7 +721,7 @@ export function DshFieldStoreOnboardingScreen({
             value={draft.offer.operatingHours}
             editable={!readOnly}
             error={errors.operatingHours}
-            onChangeText={(value) => updateNestedField('offer', 'operatingHours', value)}
+            onChangeText={(value) => changeDraftField('offer', 'operatingHours', value)}
             placeholder="مثال: من 8:00 صباحًا إلى 11:30 مساءً"
           />
 
@@ -729,7 +729,7 @@ export function DshFieldStoreOnboardingScreen({
             label="وضعية وجاهزية التوصيل الأولي"
             value={draft.offer.deliveryReadiness}
             editable={!readOnly}
-            onChangeText={(value) => updateNestedField('offer', 'deliveryReadiness', value)}
+            onChangeText={(value) => changeDraftField('offer', 'deliveryReadiness', value)}
             placeholder="مثال: جاهز بتغطية سريعة كباتن بثواني"
           />
 
@@ -737,7 +737,7 @@ export function DshFieldStoreOnboardingScreen({
             label="ملاحظات المحاسبة والمالية"
             value={draft.offer.financeNote}
             editable={!readOnly}
-            onChangeText={(value) => updateNestedField('offer', 'financeNote', value)}
+            onChangeText={(value) => changeDraftField('offer', 'financeNote', value)}
             placeholder="ملاحظات مرجعية للحسابات والعمولات"
           />
 
@@ -811,7 +811,7 @@ export function DshFieldStoreOnboardingScreen({
             label="ملاحظات الميداني الشخصية"
             value={draft.review.fieldNotes}
             editable={!readOnly}
-            onChangeText={(value) => updateNestedField('review', 'fieldNotes', value)}
+            onChangeText={(value) => changeDraftField('review', 'fieldNotes', value)}
             placeholder="دون أي عقبات واجهتها أثناء الزيارة الميدانية للفرع"
           />
 

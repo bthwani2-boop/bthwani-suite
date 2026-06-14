@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import {
   Badge,
@@ -20,7 +20,7 @@ import {
   typographyRoles,
 } from '@bthwani/ui-kit';
 import type { WltDshPartnerWalletTransaction } from '../shared/adapters/partner-finance.adapter';
-import { useWltDshPartnerWalletSummary } from './useWltDshPartnerWalletSummary';
+import { useWltDshPartnerWalletSummary } from '../shared';
 import { getWltDshPartnerCommissionLabel, getWltDshPartnerOperationalModeCommission } from './wlt-dsh-partner.ui-copy';
 import {
   type WltDshFulfillmentMode,

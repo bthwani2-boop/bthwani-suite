@@ -53,8 +53,23 @@ const rules = [
   },
   {
     id: 'wlt_app_owns_money_format_or_policy',
-    regex: /\bformatWltYer\b|\bmoneyPolicy\b|\bfinance[A-Za-z0-9]*(?:Label|Policy|Contract)\b|\bpostingRules\b|\bsubledger\b|\bmakerChecker\b/g,
+    regex: /\bformatWltYer\b|\bmoneyPolicy\b|\bfinance[A-Za-z0-9]*(?:Label|Policy|Contract)\b|\bpostingRules\b|\bsubledger\b|\bmakerChecker\b|\bfinanceContracts\b/g,
     remediation: 'Move money formatting, finance labels, posting rules, subledger, and maker-checker policy to WLT shared.',
+  },
+  {
+    id: 'wlt_app_exposes_finance_methods_directly',
+    regex: /\b(?:getSnapshot|getRecords|getRecordsForSection|getSections)\b/g,
+    remediation: 'Do not expose or import finance query/accessor methods in UI roots; use shared view-models instead.',
+  },
+  {
+    id: 'wlt_app_uses_forbidden_selectors_or_matrices',
+    regex: /\b(?:buildFinancialCenter|buildTrialBalance|finance\.api-matrix)\b/g,
+    remediation: 'Move financial center/trial balance builders and api-matrix to WLT shared.',
+  },
+  {
+    id: 'wlt_app_defines_finance_models',
+    regex: /\b(?:WltLedgerEntry|WltDailyReconciliation|WltTrialBalance|WltFinancialSnapshot)\b/g,
+    remediation: 'Finance model/entity definitions must live in wlt/frontend/dsh/shared/contracts.',
   },
   {
     id: 'wlt_app_imports_control_panel',

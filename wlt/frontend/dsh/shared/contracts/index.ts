@@ -6,3 +6,8 @@ export * from './settlement.types';
 export * from './payout.types';
 export * from './reconciliation.types';
 export * from './dsh-finance-read-model.types';
+export * from './financeContracts';
+export * from './finance.registry';
+export * from './wlt-dsh-captain-bridge.contract';
+export * from './wlt-dsh-client-bridge.contract';
+export * from './wlt-dsh-field-bridge.contract';

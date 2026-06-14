@@ -46,13 +46,18 @@ const rules = [
   },
   {
     id: 'dsh_shared_ui_component_or_stylesheet',
-    regex: /\b(?:StyleSheet\.create|Button|Card|Header|Badge|theme|tokens|colorPalette|brandPalette|dangerPalette|infoPalette|successPalette)\b/g,
+    regex: /\b(?:StyleSheet\.create|Button|Card|Header|Badge|Screen|Sheet|theme|tokens|colorPalette|brandPalette|dangerPalette|infoPalette|successPalette|spacing|shadowPresets)\b/g,
     remediation: 'Move reusable visual design to ui-kit and service-specific UI to the relevant app/control-panel root.',
   },
   {
     id: 'dsh_shared_react_element_creation',
     regex: /\bReact\.createElement\s*\(/g,
     remediation: 'Move React element creation out of shared and keep shared data-only.',
+  },
+  {
+    id: 'dsh_shared_jsx_syntax',
+    regex: /(?:^|[\s([{,;=])<[A-Z][A-Za-z0-9]*(?:\s+|>|\/>)/g,
+    remediation: 'Do not use JSX syntax (e.g. elements or components) inside dsh/frontend/shared. Move to app/control-panel or ui-kit.',
   },
 ];
 

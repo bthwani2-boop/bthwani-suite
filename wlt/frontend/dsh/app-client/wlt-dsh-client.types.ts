@@ -1,7 +1,1 @@
-export type WltDshWalletSessionState = {
-  linked: boolean;
-  balance: number | null;
-  hydrated: boolean;
-  refreshing: boolean;
-  lastError: string | null;
-};
+export type { WltDshWalletSessionState } from '../shared/view-models/client-wallet-session-state';

@@ -16,15 +16,3 @@ export {
 	default as useWltDshWalletSessionDefault,
 	useWltDshWalletSession,
 } from './useWltDshWalletSession';
-export {
-	createDeepLink,
-	getBalance,
-	isLinked,
-	link,
-	requestPayment,
-	unlink,
-	listLedgerEntries,
-} from '../shared/adapters/client-wallet-runtime.adapter';
-export type { WltDshWalletAccount as WalletAccount } from '../shared/adapters/client-wallet-runtime.adapter';
-export { resolveWltDshFinanceEventKindForPaymentMethod } from '../shared';
-export type { WltDshFinanceEventKind } from '../shared';

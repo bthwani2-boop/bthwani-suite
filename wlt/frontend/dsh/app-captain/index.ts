@@ -1,4 +1,4 @@
-﻿export { WltDshCaptainBridge } from './WltDshCaptainBridge';
+export { WltDshCaptainBridge } from './WltDshCaptainBridge';
 export type { WltDshCaptainBridgeProps } from './WltDshCaptainBridge';
 export { WltDshCaptainFinanceSummary } from './WltDshCaptainFinanceSummary';
 export { wltDshCaptainBridgeDataContract } from './wlt-dsh-captain.contract';
@@ -16,14 +16,3 @@ export {
   default as useWltDshCaptainFinanceSummaryDefault,
   useWltDshCaptainFinanceSummary,
 } from './useWltDshCaptainFinanceSummary';
-export {
-  getRecords,
-  getRecordsForSection,
-  getSections,
-  getSnapshot,
-} from '../shared/adapters/captain-finance-runtime.adapter';
-export type {
-  WltCaptainFinanceSection,
-  WltCaptainFinanceSnapshot,
-  WltDshFinanceSummaryRecord,
-} from '../shared';

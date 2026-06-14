@@ -18,3 +18,4 @@ export * from './partner-order-item.adapter';
 export * from './dsh-discovery-stores-client';
 export * from './dsh-discovery-stores-transport';
 export * from './dsh-discovery-stores-runtime-config';
+export * from './support/dsh-partner-support-context.adapter';

@@ -13,7 +13,7 @@ export type FieldFulfillmentModeAgreement = {
 
 export type FieldStatusTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 
-export type FieldLeadSource = 'candidate' | 'manual';
+export type FieldLeadSource = 'candidate' | 'manual' | 'local-draft' | 'backend';
 
 export type FieldLeadStatus =
   | 'new-lead'
@@ -46,6 +46,8 @@ export type FieldDocumentPreviewStatus =
   | 'approved'
   | 'needs_reupload'
   | 'rejected';
+
+export type FieldDocumentStatus = FieldDocumentPreviewStatus;
 
 export type FieldOnboardingDraft = {
   activeSectionId: FieldOnboardingSectionId;
@@ -104,6 +106,8 @@ export type FieldOnboardingDraft = {
 export type FieldStoreFile = {
   id: string;
   source: FieldLeadSource;
+  draftLocalId?: string;
+  syncStatus?: 'local-draft' | 'backend' | 'syncing' | 'sync-failed';
   name: string;
   category: string;
   location: string;
@@ -448,7 +452,9 @@ export function submitFieldStoreForReview(store: FieldStoreFile): FieldStoreFile
 function createBaseStore(overrides?: Partial<FieldStoreFile>): FieldStoreFile {
   return syncFieldStoreFromDraft({
     id: overrides?.id ?? `field-store-${Date.now()}`,
-    source: overrides?.source ?? 'manual',
+    source: overrides?.source ?? 'backend',
+    draftLocalId: overrides?.draftLocalId,
+    syncStatus: overrides?.syncStatus ?? 'backend',
     name: overrides?.name ?? 'ملف انضمام جديد',
     category: overrides?.category ?? 'قيد التحديد',
     location: overrides?.location ?? 'الرياض',
@@ -467,8 +473,12 @@ function createBaseStore(overrides?: Partial<FieldStoreFile>): FieldStoreFile {
 }
 
 export function createManualFieldStore(): FieldStoreFile {
+  const draftLocalId = `field-store-draft-${Date.now()}`;
   return createBaseStore({
-    id: `manual-${Date.now()}`,
+    id: draftLocalId,
+    source: 'local-draft',
+    draftLocalId,
+    syncStatus: 'local-draft',
     draft: createEmptyDraft({
       lastSavedLabel: 'مسودة جديدة',
     }),

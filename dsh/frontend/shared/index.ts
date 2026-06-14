@@ -37,3 +37,6 @@ export * from './media';
 
 // Runtime — surface runtime contracts, operational bindings, platform providers
 export * from './runtime';
+
+// View Models — data/action hooks consumed by UI-only surface shells
+export * from './view-models/field';

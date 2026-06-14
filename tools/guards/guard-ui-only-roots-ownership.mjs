@@ -122,6 +122,21 @@ const rules = [
     regex: /catch\s*\([^)]*\)\s*\{\s*(?:\/\*[\s\S]*?\*\/\s*|\/\/[^\n]*\n\s*)?(?:return\s+undefined\s*;?\s*)?\}/g,
     remediation: 'Replace silent/no-op catch with shared error policy and visible binding state.',
   },
+  {
+    id: 'ui_only_forbidden_hooks',
+    regex: /\buse(?:[A-Za-z0-9]*(?:Runtime|OrderExecution|MarketingState|RuntimeStores|PartnerOrders|CaptainOrder|FieldRuntimeActions))[A-Za-z0-9]*\b/g,
+    remediation: 'Hook represents runtime state/business decisions; move to shared view-models or adapters.',
+  },
+  {
+    id: 'ui_only_forbidden_functions',
+    regex: /\b(?:createManualFieldStore|createManual[A-Za-z0-9]*)\b/g,
+    remediation: 'Do not create manual runtime stores or drafts as live truth inside UI roots; move to shared adapters.',
+  },
+  {
+    id: 'ui_only_arabic_fake_markers',
+    regex: /\b(?:معاينة|محاكاة|محلي\s+فقط|لا\s+يطبق|تجريبي)\b/g,
+    remediation: 'Do not use Arabic fake/preview runtime markers in UI roots; logic must be backed by real backend models.',
+  },
 ];
 
 const files = uiOnlyRoots.flatMap((relativeRoot) => walk(path.join(root, relativeRoot)));

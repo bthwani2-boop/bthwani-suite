@@ -9,3 +9,4 @@ export * from './captain-finance-runtime.adapter';
 export * from './field-finance.adapter';
 export * from './field-finance-runtime.adapter';
 export * from './control-panel-finance.adapter';
+export * from './finance.api-matrix';

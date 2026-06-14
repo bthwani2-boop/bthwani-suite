@@ -1,4 +1,4 @@
-import type { operations } from '../../shared/contracts/openapi/dsh-openapi.types';
+import type { operations } from '../contracts/openapi/dsh-openapi.types';
 
 export const DSH_DISCOVERY_STORES_PATH = '/stores' as const;
 

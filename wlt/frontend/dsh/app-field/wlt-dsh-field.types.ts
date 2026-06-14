@@ -1,7 +1,7 @@
 ﻿import type {
   WltDshFinanceSummaryRecord,
   WltFieldFinanceSnapshot,
-} from '../shared';
+} from '../shared/contracts/dshFinance.types';
 
 export type WltDshFieldFinanceSummaryState = {
   storeIds?: readonly string[];

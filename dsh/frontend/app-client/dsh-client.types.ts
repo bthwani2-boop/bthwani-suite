@@ -1,31 +1,7 @@
 import type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
+import type { DshRoute as SharedDshRoute } from '../shared/contracts/dsh-client-binding.contracts';
 
-export type DshRoute =
-  | 'home'
-  | 'entry'
-  | 'my-space'
-  | 'wlt-home'
-  | 'preferences'
-  | 'notifications'
-  | 'store-items'
-  | 'cart-get'
-  | 'checkout-intent'
-  | 'checkout-failure'
-  | 'search'
-  | 'store-get'
-  | 'bell'
-  | 'benefits'
-  | 'conversation-workspace'
-  | 'listing-status-update'
-  | 'order-issue-workspace'
-  | 'proxy-workspace'
-  | 'service-settings'
-  | 'zone-set'
-  | 'orders-list'
-  | 'addresses-location'
-  | 'identity'
-  | 'appearance'
-  | 'tracking';
+export type DshRoute = SharedDshRoute;
 
 export type DshCommandTarget = 'home' | 'orders-list' | 'tracking' | 'bell' | 'create-order' | 'cart-get';
 
