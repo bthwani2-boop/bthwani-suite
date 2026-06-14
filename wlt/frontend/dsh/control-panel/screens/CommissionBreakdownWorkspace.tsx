@@ -5,7 +5,7 @@
 import React from 'react';
 import { Box, Text, useTheme } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
-import type { WltDshFulfillmentMode } from '../financeContracts';
+import type { WltDshFulfillmentMode } from '../../shared/contracts';
 
 type LineItemShape = { applies: true; label: string } | { applies: false; reason: string };
 type ModeBreakdown = {

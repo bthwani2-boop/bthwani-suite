@@ -4,16 +4,15 @@ import React from 'react';
 import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
-import { formatWltYer } from '../financeContracts';
-import { buildWltFinancialCenter } from '../selectors/buildFinancialCenter';
-import { buildWltAuditPackPreview } from '../models/auditPack.types';
-import { WLT_MAKER_CHECKER_STATE_LABELS } from '../models/makerChecker.types';
-import { getWltCloseGateSubledgers } from '../models/subledger.types';
+import { buildWltFinancialCenter } from '../../shared/read-models';
+import { buildWltAuditPackPreview } from '../../shared/contracts';
+import { WLT_MAKER_CHECKER_STATE_LABELS } from '../../shared/contracts';
+import { getWltCloseGateSubledgers } from '../../shared/contracts';
 import {
   buildWltRuntimeFinancialCenter,
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
-} from '../adapters/wltDshFinanceRuntime.adapter';
+} from '../../shared/adapters';
 export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string }) {
   const businessDate = new Date().toISOString().split('T')[0]!;
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
@@ -122,9 +121,9 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
           {[
-            { label: 'الإجمالي المتوقع', value: formatWltYer(auditPack.expectedTotalMinorUnits), ok: true },
-            { label: 'الإجمالي الفعلي', value: formatWltYer(auditPack.actualTotalMinorUnits), ok: true },
-            { label: 'الفارق', value: formatWltYer(auditPack.varianceTotalMinorUnits), ok: auditPack.varianceTotalMinorUnits === 0 },
+            { label: 'الإجمالي المتوقع', value: auditPack.expectedTotalLabel, ok: true },
+            { label: 'الإجمالي الفعلي', value: auditPack.actualTotalLabel, ok: true },
+            { label: 'الفارق', value: auditPack.varianceTotalLabel, ok: auditPack.varianceTotalMinorUnits === 0 },
             { label: 'استثناءات', value: `${auditPack.exceptions.length} بند`, ok: auditPack.exceptions.length === 0 },
           ].map(({ label, value, ok }) => (
             <div key={label} style={{ padding: '10px 12px', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: 7, background: 'var(--bthwani-control-panel-surface)' }}>

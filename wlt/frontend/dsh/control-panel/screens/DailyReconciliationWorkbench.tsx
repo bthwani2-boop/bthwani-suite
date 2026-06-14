@@ -4,53 +4,17 @@ import React from 'react';
 import { Box, Text, Button,
   radius,
 } from '@bthwani/ui-kit';
-import type { WltDshFinanceEventKind } from '../models/dshFinance.types';
-import { formatWltYer } from '../financeContracts';
 import {
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
-} from '../adapters/wltDshFinanceRuntime.adapter';
-
-type DshFinancePreviewRow = {
-  id: string;
-  amount: string;
-  owner: string;
-  status: string;
-  risk: 'danger' | 'warning' | 'success';
-  evidence: string;
-  nextAction: string;
-  recommendation: string;
-  primaryActionLabel: string;
-  secondaryActionLabel: string;
-  sla: string;
-  actorType: 'client' | 'partner' | 'captain' | 'field' | 'storeCourier' | 'platform';
-  eventKind: WltDshFinanceEventKind | 'unknown';
-  expectedMinorUnits: number;
-  actualMinorUnits: number;
-  varianceMinorUnits: number;
-  evidenceStatus: 'missing' | 'partial' | 'complete';
-  reconciliationStatus: 'unmatched' | 'matched' | 'disputed' | 'closed';
-  currencyCode: 'YER';
-  ownerService: 'wlt';
-  dshRole: 'view_only';
-  sourceOrderId?: string;
-  sourceStoreId?: string;
-  sourceCaptainId?: string;
-  sourceFieldAgentId?: string;
-  debitAccountId?: string;
-  creditAccountId?: string;
-  auditTrailId?: string;
-  allowedAction: 'review' | 'view_evidence' | 'prepare_decision' | 'none';
-  blockedReason?: string;
-  expectedSource: 'order-invoice' | 'settlement-cycle' | 'commission-schedule' | 'eligibility-calc' | 'unbound';
-  actualSource: 'bank-deposit' | 'wallet-debit' | 'cash-bag-delivery' | 'pos-receipt' | 'unbound';
-  evidenceSource: 'bank-statement' | 'pos-log' | 'audit-entry' | 'receipt-upload' | 'none';
-  varianceReason?: string;
-  bankDepositRef?: string;
-  cashBagRef?: string;
-  ledgerEntryRef?: string;
-  workflowState: 'draft' | 'prepared' | 'reviewed' | 'checked' | 'approved' | 'blocked_wlt';
-};
+} from '../../shared/adapters';
+import {
+  type WltDailyReconciliationRow,
+  buildInitialReconciliationRows,
+  buildRuntimeReconciliationRows,
+  buildReconciliationTotals,
+  recomputeRowAmountLabels,
+} from '../../shared/read-models';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 type DayLifecycleStage =
@@ -74,7 +38,7 @@ const LIFECYCLE_STAGES: ReadonlyArray<{ id: DayLifecycleStage; label: string }> 
   { id: 'day-close', label: 'إغلاق اليوم' },
 ] as const;
 
-function computeCurrentStage(rows: ReadonlyArray<DshFinancePreviewRow>): DayLifecycleStage {
+function computeCurrentStage(rows: ReadonlyArray<WltDailyReconciliationRow>): DayLifecycleStage {
   if (rows.length === 0) return 'open';
   if (rows.some((r) => r.workflowState === 'blocked_wlt')) return 'variances';
   if (rows.some((r) => r.varianceMinorUnits !== 0)) return 'variances';
@@ -86,7 +50,7 @@ function computeCurrentStage(rows: ReadonlyArray<DshFinancePreviewRow>): DayLife
   return 'checker-approval';
 }
 
-function resolveRowTone(row: DshFinancePreviewRow) {
+function resolveRowTone(row: WltDailyReconciliationRow) {
   if (row.risk === 'danger') return 'danger' as const;
   if (row.risk === 'warning') return 'warning' as const;
   if (row.varianceMinorUnits !== 0 || row.evidenceStatus !== 'complete') return 'warning' as const;
@@ -135,90 +99,10 @@ const ACTUAL_SOURCE_LABEL: Record<string, string> = {
   'unbound': 'بيانات معاينة',
 };
 
-function buildPreviewWorkbenchRows(): ReadonlyArray<DshFinancePreviewRow> {
-  return [];
-}
-
-function buildRuntimeWorkbenchRows(runtimeFinance: WltDshFinanceRuntimeResult | null): ReadonlyArray<DshFinancePreviewRow> {
-  if (runtimeFinance?.state !== 'runtime') {
-    return [];
-  }
-
-  return runtimeFinance.data.ledgerEntries.map((entry): DshFinancePreviewRow => {
-    const amountMinorUnits = Math.round(entry.amount * 100);
-    const isPosted = entry.status === 'COMPLETED';
-    const isBlocked = entry.status === 'FAILED' || entry.status === 'REVERSED';
-    const actualMinorUnits = isPosted ? amountMinorUnits : 0;
-    const varianceMinorUnits = amountMinorUnits - actualMinorUnits;
-    const actorType: DshFinancePreviewRow['actorType'] =
-      entry.subject.startsWith('captain') ? 'captain'
-      : entry.subject.startsWith('partner') ? 'partner'
-      : entry.subject.startsWith('field') ? 'field'
-      : entry.subject.startsWith('client') ? 'client'
-      : 'platform';
-    const eventKind: DshFinancePreviewRow['eventKind'] =
-      entry.reference_type === 'payment_session' ? 'wallet-payment'
-      : entry.reference_type === 'refund' ? 'refund-adjustment'
-      : entry.reference_type === 'settlement' ? 'partner-settlement'
-      : 'unknown';
-    const expectedSource: DshFinancePreviewRow['expectedSource'] =
-      entry.reference_type === 'settlement' ? 'settlement-cycle'
-      : 'order-invoice';
-    const actualSource: DshFinancePreviewRow['actualSource'] =
-      entry.reference_type === 'payment_session' ? 'wallet-debit'
-      : 'bank-deposit';
-
-    return {
-      id: `runtime-${entry.id}`,
-      amount: formatWltYer(amountMinorUnits),
-      owner: entry.subject,
-      status: entry.status,
-      risk: isBlocked ? 'danger' : isPosted ? 'success' : 'warning',
-      evidence: entry.reference_id ?? entry.order_id ?? entry.id,
-      nextAction: isPosted ? 'مراقبة القيد المرحل من WLT' : 'مطابقة القيد مع WLT runtime وإرفاق الدليل الناقص',
-      recommendation: isPosted ? 'القيد مكتمل ومطابق.' : 'القيد يحتاج استكمال مطابقة قبل الإغلاق.',
-      primaryActionLabel: isPosted ? 'عرض القيد' : 'تحضير مطابقة',
-      secondaryActionLabel: isPosted ? 'مراجعة السجل' : 'عرض الأدلة',
-      sla: isPosted ? 'مغلق' : 'يتطلب متابعة اليوم',
-      actorType,
-      eventKind,
-      expectedMinorUnits: amountMinorUnits,
-      actualMinorUnits,
-      varianceMinorUnits,
-      evidenceStatus: isPosted ? 'complete' : isBlocked ? 'missing' : 'partial',
-      reconciliationStatus: isPosted ? 'matched' : isBlocked ? 'disputed' : 'unmatched',
-      currencyCode: 'YER',
-      ownerService: 'wlt',
-      dshRole: 'view_only',
-      sourceOrderId: entry.order_id,
-      sourceStoreId: actorType === 'partner' ? entry.subject : undefined,
-      sourceCaptainId: actorType === 'captain' ? entry.subject : undefined,
-      sourceFieldAgentId: actorType === 'field' ? entry.subject : undefined,
-      debitAccountId: `[runtime] ${entry.reference_type}:debit`,
-      creditAccountId: `[runtime] ${entry.reference_type}:credit`,
-      auditTrailId: entry.id,
-      allowedAction: isPosted ? 'review' : 'view_evidence',
-      blockedReason: isBlocked ? (entry.reference_id ?? 'wlt_runtime_blocked') : undefined,
-      expectedSource,
-      actualSource,
-      evidenceSource: isPosted ? 'audit-entry' : 'none',
-      varianceReason: varianceMinorUnits !== 0 ? 'WLT runtime لم يؤكد الفعلي بعد' : undefined,
-      bankDepositRef: actualSource === 'bank-deposit' ? entry.reference_id ?? entry.id : undefined,
-      cashBagRef: undefined,
-      ledgerEntryRef: entry.id,
-      workflowState: isPosted ? 'approved' : isBlocked ? 'blocked_wlt' : 'prepared',
-    };
-  });
-}
-
-function buildInitialWorkbenchRows(runtimeFinance: WltDshFinanceRuntimeResult | null): ReadonlyArray<DshFinancePreviewRow> {
-  const runtimeRows = buildRuntimeWorkbenchRows(runtimeFinance);
-  return runtimeRows.length > 0 ? runtimeRows : buildPreviewWorkbenchRows();
-}
 
 export function DailyReconciliationWorkbench() {
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
-  const [allRows, setAllRows] = React.useState<ReadonlyArray<DshFinancePreviewRow>>(() => buildInitialWorkbenchRows(null));
+  const [allRows, setAllRows] = React.useState<ReadonlyArray<WltDailyReconciliationRow>>(() => buildInitialReconciliationRows(null));
 
   React.useEffect(() => {
     let cancelled = false;
@@ -227,7 +111,7 @@ export function DailyReconciliationWorkbench() {
         return;
       }
       setRuntimeFinance(result);
-      setAllRows(buildInitialWorkbenchRows(result));
+      setAllRows(buildInitialReconciliationRows(result));
     });
     return () => {
       cancelled = true;
@@ -279,17 +163,14 @@ export function DailyReconciliationWorkbench() {
 
   const handleUpdateRow = (
     rowId: string,
-    updates: Partial<DshFinancePreviewRow>,
+    updates: Partial<WltDailyReconciliationRow>,
     actionText: string
   ) => {
     setAllRows((prev) =>
       prev.map((r) => {
         if (r.id === rowId) {
-          const nextRow = { ...r, ...updates };
-          if (updates.actualMinorUnits !== undefined || updates.expectedMinorUnits !== undefined) {
-            nextRow.varianceMinorUnits = nextRow.expectedMinorUnits - nextRow.actualMinorUnits;
-          }
-          return nextRow;
+          const recomputedUpdates = recomputeRowAmountLabels(r, updates);
+          return { ...r, ...recomputedUpdates };
         }
         return r;
       })
@@ -317,9 +198,8 @@ export function DailyReconciliationWorkbench() {
   const currentStage = computeCurrentStage(allRows);
   const stageIndex = LIFECYCLE_STAGES.findIndex((s) => s.id === currentStage);
 
-  const totalExpected = allRows.reduce((s, r) => s + r.expectedMinorUnits, 0);
-  const totalActual = allRows.reduce((s, r) => s + r.actualMinorUnits, 0);
-  const totalVariance = totalExpected - totalActual;
+  const totals = React.useMemo(() => buildReconciliationTotals(allRows), [allRows]);
+  const { totalExpected, totalActual, totalVariance } = totals;
   const allEvidenceComplete = allRows.every((r) => r.evidenceStatus === 'complete');
   const allRowsApproved = allRows.every((r) => r.workflowState === 'checked' || r.workflowState === 'approved');
   const noBlockedWlt = allRows.every((r) => r.workflowState !== 'blocked_wlt');
@@ -446,7 +326,7 @@ export function DailyReconciliationWorkbench() {
           <Text role="titleSm" weight="black" style={{ margin: 0 }}>ميزان مطابقة البنود والقيود اليومية ({allRows.length} قيد)</Text>
           <button
             onClick={() => {
-              setAllRows(buildInitialWorkbenchRows(runtimeFinance));
+              setAllRows(buildInitialReconciliationRows(runtimeFinance));
               setAuditTrails({});
             }}
             style={{
@@ -500,16 +380,16 @@ export function DailyReconciliationWorkbench() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexGrow: 1, justifyContent: 'center', maxWidth: 460 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: 120 }}>
                       <span style={{ fontSize: 12, fontWeight: '700', color: 'var(--bth-info-text)' }}>
-                        <span className={wltStyles.tabularNums}>{formatWltYer(row.expectedMinorUnits)}</span>
+                        <span className={wltStyles.tabularNums}>{row.expectedLabel}</span>
                       </span>
                       <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>{EXPECTED_SOURCE_LABEL[row.expectedSource] || row.expectedSource}</span>
                     </div>
                     <div style={{ fontSize: 10, fontWeight: '800', padding: '1px 6px', borderRadius: 4, background: hasVar ? 'var(--bth-danger-surface)' : 'var(--bth-success-surface)', color: hasVar ? 'var(--bth-danger-text)' : 'var(--bth-success-text)', whiteSpace: 'nowrap' }}>
-                      {hasVar ? `فارق: ${formatWltYer(row.varianceMinorUnits)}` : 'متطابق ✓'}
+                      {hasVar ? `فارق: ${row.varianceLabel}` : 'متطابق ✓'}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: 120 }}>
                       <span style={{ fontSize: 12, fontWeight: '700', color: 'var(--bth-brand-alt)' }}>
-                        <span className={wltStyles.tabularNums}>{formatWltYer(row.actualMinorUnits)}</span>
+                        <span className={wltStyles.tabularNums}>{row.actualLabel}</span>
                       </span>
                       <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>{ACTUAL_SOURCE_LABEL[row.actualSource] || row.actualSource}</span>
                     </div>
@@ -564,7 +444,7 @@ export function DailyReconciliationWorkbench() {
                           <div>
                             <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>رقم مرجع قيد اليومية</span>
                             <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, display: 'inline-block', marginTop: 2 }}>
-                              <Text family="mono" style={{ fontSize: 10 }}>{row.ledgerEntryRef || `LED-PRV-${row.id}`}</Text>
+                              <Text family="mono" style={{ fontSize: 10 }}>{row.auditEntryRef || `LED-PRV-${row.id}`}</Text>
                             </span>
                           </div>
                           <div>
@@ -587,7 +467,7 @@ export function DailyReconciliationWorkbench() {
                                     evidenceStatus: 'complete',
                                     bankDepositRef: row.bankDepositRef || `[معاينة] DEP-${row.id}`,
                                   },
-                                  `تسوية الفارق المالي وتحديث الفعلي المورد إلى ${formatWltYer(row.expectedMinorUnits)}`
+                                  `تسوية الفارق المالي وتحديث الفعلي المورد إلى ${row.expectedLabel}`
                                 );
                               }}
                               style={{
@@ -932,9 +812,9 @@ export function DailyReconciliationWorkbench() {
 
       <div className={wltStyles.reconciliationSummaryGrid}>
         {[
-          { label: 'إجمالي المبالغ المتوقعة', value: formatWltYer(totalExpected), color: 'var(--bth-info-text)' },
-          { label: 'إجمالي المبالغ الفعلية الموردة', value: formatWltYer(totalActual), color: 'var(--bth-brand-alt)' },
-          { label: 'صافي الفارق المالي الإجمالي', value: totalVariance !== 0 ? `${formatWltYer(totalVariance)} ⚠` : '٠ ر.ي ✓', color: totalVariance !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' },
+          { label: 'إجمالي المبالغ المتوقعة', value: totals.totalExpectedLabel, color: 'var(--bth-info-text)' },
+          { label: 'إجمالي المبالغ الفعلية الموردة', value: totals.totalActualLabel, color: 'var(--bth-brand-alt)' },
+          { label: 'صافي الفارق المالي الإجمالي', value: totals.totalVarianceLabel, color: totalVariance !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' },
           { label: 'اكتمال مستندات المطابقة', value: `${allRows.filter((r) => r.evidenceStatus === 'complete').length}/${allRows.length} بند`, color: allEvidenceComplete ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' },
         ].map(({ label, value, color }) => (
           <div key={label} className={wltStyles.reconciliationSummaryCard}>

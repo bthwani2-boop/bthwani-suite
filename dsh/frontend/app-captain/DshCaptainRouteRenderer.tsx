@@ -1,8 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Box, Button, TopBar, spacing, MobileScrollView } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Divider, Icon, KeyValueList, MobileScrollView, Text, TopBar, spacing } from '@bthwani/ui-kit';
+import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import type { DshCaptainRoute } from './dsh-captain.types';
 import type { CaptainSupportRoute } from '../shared/view-models/captain';
+import type { CaptainAvailabilityMeta } from '../shared/view-models/captain/captain-status-meta';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
 import {
   CaptainDeliveryConfirmSheet,
@@ -15,6 +17,10 @@ import {
 import { DshCaptainMapScreen } from './screens/DshCaptainMapScreen';
 import { DshCaptainPickupDropoffScreen } from './screens/DshCaptainPickupDropoffScreen';
 import { DshCaptainPoDSubmissionScreen } from './screens/DshCaptainPoDSubmissionScreen';
+import { DshCaptainFinanceScreen } from './screens/DshCaptainFinanceScreen';
+import { DshCaptainSupportDirectoryScreen } from './screens/DshCaptainOperationsScreen';
+import { DshCaptainAccountSettingsContent } from './screens/DshCaptainAccountSettingsContent';
+import { CaptainAccountNavRow } from './parts/CaptainAccountNavRow';
 import { OfferDeclineSheet } from './sheets';
 import { CaptainSupportScreenRouter } from './CaptainSupportScreenRouter';
 import type { DshCaptainBellEvent } from '../shared/state-machines/dsh-order-journey.model';
@@ -50,6 +56,21 @@ export type DshCaptainRouteRendererProps = {
   bottomNavNode: React.ReactNode;
   dshAuthBearerToken?: string | null;
   dshClientId?: string | null;
+  // Props for account/profile routes
+  isCaptainAvailable: boolean;
+  captainDisplayName: string;
+  currentAvailabilityMeta: CaptainAvailabilityMeta;
+  captainAccountNavItems: ReadonlyArray<{
+    title: string;
+    subtitle: string;
+    badgeLabel: string;
+    icon: string;
+    onPress: () => void;
+  }>;
+  walletBalanceLabel?: string | null;
+  appearanceHydrated: boolean;
+  appearanceMode: BThwaniAppearanceMode;
+  wltSummaryLabel: string;
   onOpenOrder: (id: string) => void;
   onRetryInbox: () => void;
   onConfirmPickup: () => void;
@@ -60,6 +81,7 @@ export type DshCaptainRouteRendererProps = {
   onRetryPod: () => void;
   onBack: () => void;
   onGoToInbox: () => void;
+  onGoToAccount: () => void;
   onClosePickupSheet: () => void;
   onCloseDeliverySheet: () => void;
   onCloseDeclineSheet: () => void;
@@ -68,18 +90,22 @@ export type DshCaptainRouteRendererProps = {
   onDeclineTask: (id: string) => void;
   onOpenSupportScreen: (screenId: CaptainSupportRoute) => void;
   onOpenSupportDirectory: () => void;
+  onOpenCaptainAccountSection: (route: DshCaptainRoute) => void;
+  onToggleCaptainAvailability: () => void;
+  onSetAppearanceMode: (mode: BThwaniAppearanceMode) => void;
+  onToggleStoreCourierMode: (next: boolean) => void;
   onPushLocation: (orderId: string, lat: number, lng: number) => void;
   onRingBell: () => void;
 };
 
 const routeHeaderMeta: Partial<Record<DshCaptainRoute, { title: string; subtitle: string }>> = {
-  entry:          { title: 'بوابة التنفيذ',    subtitle: 'ابدأ من الفرز والقبول.' },
-  inbox:          { title: 'صندوق الطلبات',    subtitle: 'الطلب النشط أولًا.' },
-  detail:         { title: 'تفاصيل الطلب',     subtitle: 'راجع الطلب قبل التنفيذ.' },
-  orderchat:      { title: 'تواصل الطلب',       subtitle: 'مراسلات قصيرة.' },
-  map:            { title: 'خريطة المهمة',      subtitle: 'عرض المسار.' },
-  'pickup-dropoff': { title: 'الاستلام والتسليم', subtitle: 'مراحل التسليم.' },
-  'pod-submission': { title: 'إثبات التسليم',    subtitle: 'التقاط صورة الإثبات.' },
+  entry:             { title: 'بوابة التنفيذ',      subtitle: 'ابدأ من الفرز والقبول.' },
+  inbox:             { title: 'صندوق الطلبات',      subtitle: 'الطلب النشط أولًا.' },
+  detail:            { title: 'تفاصيل الطلب',       subtitle: 'راجع الطلب قبل التنفيذ.' },
+  orderchat:         { title: 'تواصل الطلب',         subtitle: 'مراسلات قصيرة.' },
+  map:               { title: 'خريطة المهمة',        subtitle: 'عرض المسار.' },
+  'pickup-dropoff':  { title: 'الاستلام والتسليم',   subtitle: 'مراحل التسليم.' },
+  'pod-submission':  { title: 'إثبات التسليم',       subtitle: 'التقاط صورة الإثبات.' },
 };
 
 export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
@@ -90,11 +116,14 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
     declineOrderId, declineSheetState, pickupSheetState, captainPodState, captainPodPhotoUri,
     activeOrderMessages, activeOrderDraft, showBottomNav, bottomNavNode,
     dshAuthBearerToken, dshClientId,
+    isCaptainAvailable, captainDisplayName, currentAvailabilityMeta, captainAccountNavItems,
+    walletBalanceLabel, appearanceHydrated, appearanceMode, wltSummaryLabel,
     onOpenOrder, onRetryInbox, onConfirmPickup, onConfirmDelivery, onConfirmPodSubmission,
-    onReportPodFailure, onCapturePhoto, onRetryPod, onBack, onGoToInbox,
+    onReportPodFailure, onCapturePhoto, onRetryPod, onBack, onGoToInbox, onGoToAccount,
     onClosePickupSheet, onCloseDeliverySheet, onCloseDeclineSheet, onConfirmDecline,
-    onAcceptTask, onDeclineTask, onOpenSupportScreen, onOpenSupportDirectory, onPushLocation,
-    onRingBell,
+    onAcceptTask, onDeclineTask, onOpenSupportScreen, onOpenSupportDirectory,
+    onOpenCaptainAccountSection, onToggleCaptainAvailability,
+    onSetAppearanceMode, onToggleStoreCourierMode, onPushLocation, onRingBell,
   } = props;
 
   void captainRuntimeId;
@@ -103,10 +132,12 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
   void activeOrderMessages;
   void activeOrderDraft;
   void onRingBell;
+  void walletBalanceLabel;
 
   const captainEntryState = inboxState === 'loading' ? 'loading' : inboxState === 'empty' ? 'empty' : 'ready';
 
-  function renderFlow() {
+  function renderFlow(): React.ReactNode {
+    // ── Order / delivery routes ────────────────────────────────────────────────
     if (route === 'entry') return (
       <DshEntryScreen
         state={captainEntryState}
@@ -133,7 +164,7 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
             onConfirmPickup={onConfirmPickup}
             onConfirmDelivery={onConfirmDelivery}
             onOpenNextOrder={onGoToInbox}
-            onRetry={() => { /* route stays on detail */ }}
+            onRetry={() => { /* stays on detail */ }}
           />
           <Button label="فتح تواصل الطلب" tone="secondary" fullWidth={false} onPress={() => onOpenSupportScreen('orders-list')} />
           <Button label="مرحلة الاستلام والتسليم" tone="secondary" fullWidth={false} onPress={() => onOpenSupportScreen('order-pickup')} />
@@ -165,7 +196,7 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
       <DshCaptainBellScreen
         onOpenInbox={onGoToInbox}
         onOpenNextOrder={() => onOpenOrder(activeOrderId)}
-        onRetry={() => { /* bell screen self-retry */ }}
+        onRetry={() => { /* bell self-retry */ }}
       />
     );
 
@@ -217,7 +248,161 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
       />
     );
 
+    // ── Account / profile routes ───────────────────────────────────────────────
+    if (route === 'account-finance') return (
+      <DshCaptainFinanceScreen
+        onBack={onGoToAccount}
+        dshAuthBearerToken={dshAuthBearerToken ?? undefined}
+        dshClientId={dshClientId ?? undefined}
+      />
+    );
+
+    if (route === 'account-profile') return (
+      <KeyValueList items={[
+        { label: 'الاسم', value: captainDisplayName },
+        { label: 'النوع', value: 'DSH', tone: 'success' },
+        { label: 'الحالة', value: currentAvailabilityMeta.label, tone: currentAvailabilityMeta.chipTone === 'success' ? 'success' : 'warning' },
+        { label: 'التقييم', value: '4.9 / 5', tone: 'info' },
+        { label: 'المستوى', value: 'Elite 3', tone: 'brand' },
+      ]} />
+    );
+
+    if (route === 'account-orders') return (
+      <KeyValueList items={[
+        { label: 'الطلب النشط', value: `#${activeOrderDisplayId}`, tone: 'success' },
+        { label: 'المرحلة الحالية', value: activeSummary.currentStageLabel, tone: 'info' },
+        { label: 'الاستلام', value: activeSummary.pickupLabel },
+        { label: 'التسليم', value: activeSummary.dropoffLabel },
+        { label: 'الخطوة التالية', value: activeSummary.nextActionLabel, tone: 'warning' },
+      ]} />
+    );
+
+    if (route === 'account-docs') return (
+      <KeyValueList items={[
+        { label: 'التقييم', value: '4.9 / 5', tone: 'info' },
+        { label: 'المستوى', value: 'Elite 3', tone: 'brand' },
+        { label: 'حالة المراجعة', value: 'جاهز' },
+        { label: 'الاعتماد الحقيقي', value: 'قيد الربط', tone: 'warning' },
+      ]} />
+    );
+
+    if (route === 'account-shifts') return (
+      <KeyValueList items={[
+        { label: 'حالة الدوام', value: isCaptainAvailable ? 'متاح اليوم' : 'غير متاح اليوم', tone: isCaptainAvailable ? 'success' : 'warning' },
+        { label: 'جدول اليوم', value: 'صباحي', tone: 'brand' },
+        { label: 'الإجازة القادمة', value: 'قيد المراجعة' },
+      ]} />
+    );
+
+    if (route === 'account-support') return (
+      <DshCaptainAccountSettingsContent
+        appearanceHydrated={appearanceHydrated}
+        appearanceMode={appearanceMode}
+        isStoreCourierMode={isStoreCourierMode}
+        onSetAppearanceMode={onSetAppearanceMode}
+        onToggleStoreCourierMode={onToggleStoreCourierMode}
+      />
+    );
+
+    if (route === 'account') return (
+      <Box gap={4}>
+        <Box layoutDirection="row" align="center" gap={3} style={{ flexDirection: 'row-reverse' }}>
+          <View style={{ width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', borderWidth: 1 }}>
+            <Icon name="person" size={28} tone="brand" />
+          </View>
+          <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
+            <Text role="titleSm">{captainDisplayName}</Text>
+            <Box layoutDirection="row" align="center" gap={2} style={{ flexDirection: 'row-reverse' }}>
+              <Badge label="كابتن DSH" tone="success" />
+              <Badge label={currentAvailabilityMeta.label} tone={currentAvailabilityMeta.chipTone} />
+            </Box>
+          </View>
+        </Box>
+        <Divider />
+        <Box layoutDirection="row" gap={3} style={{ flexDirection: 'row-reverse', flexWrap: 'wrap' }}>
+          <View style={{ flex: 1, minWidth: 80, alignItems: 'center', gap: 1 }}>
+            <Text role="caption" tone="muted">التقييم</Text>
+            <Text role="bodyStrong" tone="info">4.9 ★</Text>
+          </View>
+          <View style={{ flex: 1, minWidth: 80, alignItems: 'center', gap: 1 }}>
+            <Text role="caption" tone="muted">المستوى</Text>
+            <Text role="bodyStrong" tone="brand">Elite 3</Text>
+          </View>
+          <View style={{ flex: 1, minWidth: 80, alignItems: 'center', gap: 1 }}>
+            <Text role="caption" tone="muted">{wltSummaryLabel}</Text>
+            <Text role="bodyStrong" tone="success">{walletBalanceLabel ?? '—'}</Text>
+          </View>
+        </Box>
+        <Divider />
+        <Box gap={0}>
+          {captainAccountNavItems.map((item) => (
+            <CaptainAccountNavRow
+              key={item.title}
+              title={item.title}
+              subtitle={item.subtitle}
+              badgeLabel={item.badgeLabel}
+              icon={item.icon as any}
+              onPress={item.onPress}
+            />
+          ))}
+        </Box>
+      </Box>
+    );
+
+    if (route === 'support-directory') return (
+      <DshCaptainSupportDirectoryScreen
+        onOpenScreen={(id) => onOpenSupportScreen(id as CaptainSupportRoute)}
+      />
+    );
+
+    if (route === 'support-screen') return (
+      <CaptainSupportScreenRouter
+        selectedSupportScreen={selectedSupportScreen}
+        onBack={onOpenSupportDirectory}
+        onNavigate={onOpenSupportScreen}
+        captainCollectsCod={captainCollectsCod}
+        dshAuthBearerToken={dshAuthBearerToken}
+        dshClientId={dshClientId}
+        activeOrderId={activeOrderId}
+        onAcceptTask={onAcceptTask}
+        onDeclineTask={(id) => onDeclineTask(id)}
+      />
+    );
+
     return null;
+  }
+
+  // ── Account/support routes use DshCaptainAccountShell wrapper ─────────────
+  const accountRouteTitle: Partial<Record<DshCaptainRoute, { title: string; subtitle: string }>> = {
+    'account-finance':  { title: 'المالية',               subtitle: 'المحفظة والمستحقات.' },
+    'account-profile':  { title: 'بيانات الكابتن',        subtitle: 'الهوية والحالة والملف التشغيلي.' },
+    'account-orders':   { title: 'الطلبات',               subtitle: 'الطلب النشط والسجل المختصر.' },
+    'account-docs':     { title: 'الوثائق والتقييم',      subtitle: 'الملفات والمستوى وجاهزية الاعتماد.' },
+    'account-shifts':   { title: 'الدوام / الإجازات',     subtitle: 'الحضور وجدول اليوم.' },
+    'account-support':  { title: 'الإعدادات',             subtitle: 'المظهر ووضع التطبيق.' },
+    'account':          { title: 'حساب الكابتن',          subtitle: 'ملف التشغيل والمالية والدوام.' },
+    'support-directory': { title: 'دليل الدعم',           subtitle: 'كل مسارات DSH المتبقية.' },
+    'support-screen': {
+      title: selectedSupportScreen === 'cod-liability' ? 'ذمة الدفع عند الاستلام' : 'الدعم',
+      subtitle: 'المسار المفتوح من الدليل.',
+    },
+    'bell': { title: 'الإشعارات', subtitle: 'تنبيهات الطلبات الجديدة.' },
+  };
+
+  const accountMeta = accountRouteTitle[route];
+  if (accountMeta) {
+    return (
+      <DshCaptainAccountShell
+        title={accountMeta.title}
+        subtitle={accountMeta.subtitle}
+        showBottomNav={showBottomNav}
+        bottomNavNode={bottomNavNode}
+        onToggleAvailability={onToggleCaptainAvailability}
+        onOpenCaptainAccountSection={onOpenCaptainAccountSection}
+      >
+        {renderFlow()}
+      </DshCaptainAccountShell>
+    );
   }
 
   const meta = routeHeaderMeta[route];
@@ -238,23 +423,29 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
   );
 }
 
-export function DshCaptainAccountShell(props: {
+export function DshCaptainAccountShell({
+  title,
+  subtitle,
+  children,
+  showBottomNav,
+  bottomNavNode,
+}: {
   title: string;
   subtitle: string;
-  content: React.ReactNode;
+  children: React.ReactNode;
   showBottomNav: boolean;
   bottomNavNode: React.ReactNode;
-  surfaceBackground: string;
+  onToggleAvailability?: () => void;
+  onOpenCaptainAccountSection?: (route: DshCaptainRoute) => void;
 }) {
-  const { title, subtitle, content, showBottomNav, bottomNavNode, surfaceBackground } = props;
   return (
-    <View style={{ flex: 1, backgroundColor: surfaceBackground }}>
+    <View style={{ flex: 1 }}>
       <TopBar variant="surface" title={title} subtitle={subtitle} />
-      <Box style={{ flex: 1, paddingBottom: showBottomNav ? 80 : 0 }}>
+      <View style={{ flex: 1, paddingBottom: showBottomNav ? 80 : 0 }}>
         <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: spacing[8] }}>
-          <Box padding={4} gap={4}>{content}</Box>
+          <Box padding={4} gap={4}>{children}</Box>
         </MobileScrollView>
-      </Box>
+      </View>
       {showBottomNav && (
         <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
           {bottomNavNode}

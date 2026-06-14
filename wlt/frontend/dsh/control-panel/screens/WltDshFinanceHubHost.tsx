@@ -9,14 +9,14 @@ import {
   getFinanceGroupMeta,
   FINANCE_CANONICAL_GROUPS,
   normalizeFinanceLocation,
-} from '../constants/finance.registry';
-import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from '../models/financeRouting.types';
-import { buildWltFinancialCenter } from '../financeContracts';
+} from '../../shared/contracts';
+import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from '../../shared/contracts';
+import { buildWltFinancialCenter } from '../../shared/read-models';
 import {
   buildWltRuntimeFinancialCenter,
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
-} from '../adapters/wltDshFinanceRuntime.adapter';
+} from '../../shared/adapters';
 import { FinancialCenterScreen } from './FinancialCenterScreen';
 import { LedgerScreen } from './LedgerScreen';
 import { AuditCloseScreen } from './AuditCloseScreen';

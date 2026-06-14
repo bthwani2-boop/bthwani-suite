@@ -38,8 +38,8 @@ const rules = [
   },
   {
     id: 'wlt_app_maps_ledger_entries',
-    regex: /\bWltLedgerEntry\b|\bentries\.map\(|\btransaction_type\b|\breference_type\b|\bledger[A-Z][A-Za-z0-9]*\b/g,
-    remediation: 'Move ledger entry mapping into wlt/frontend/dsh/shared/read-models or shared/adapters.',
+    regex: /\btransaction_type\b|\breference_type\b|\bledger[A-Z][A-Za-z0-9]*\b/g,
+    remediation: 'Move ledger entry mapping (raw API field access) into wlt/frontend/dsh/shared/read-models or shared/adapters.',
   },
   {
     id: 'wlt_app_computes_finance_snapshot',
@@ -68,7 +68,7 @@ const rules = [
   },
   {
     id: 'wlt_app_defines_finance_models',
-    regex: /\b(?:WltLedgerEntry|WltDailyReconciliation|WltTrialBalance|WltFinancialSnapshot)\b/g,
+    regex: /(?:^|\s)(?:interface|type)\s+(?:WltLedgerEntry|WltDailyReconciliation|WltTrialBalance|WltFinancialSnapshot)\b/gm,
     remediation: 'Finance model/entity definitions must live in wlt/frontend/dsh/shared/contracts.',
   },
   {

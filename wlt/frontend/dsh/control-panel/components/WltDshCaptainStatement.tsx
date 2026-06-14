@@ -8,7 +8,7 @@ import type {
   WltDshCaptainStatement as CaptainStatement,
   WltDshCaptainCodBag as CaptainCodBag,
   WltDshCaptainEarningLine as CaptainEarningLine,
-} from '../financeContracts';
+} from '../../shared/contracts';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 const STATUS_LABEL: Record<CaptainStatement['status'], string> = {

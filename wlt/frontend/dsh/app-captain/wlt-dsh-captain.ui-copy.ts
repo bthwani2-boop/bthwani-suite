@@ -2,7 +2,7 @@ export type WltDshCaptainUiCopy = {
   summaryLabel: string;
   financeTitle: string;
   financeSubtitle: string;
-  financeBadgeLabel: string;
+  badgeLabel: string;
   walletAccessibilityLabel: string;
 };
 
@@ -10,7 +10,7 @@ export const wltDshCaptainUiCopy = {
   summaryLabel: 'المحفظة',
   financeTitle: 'المالية',
   financeSubtitle: 'المحفظة والأرباح والتسويات في صفحة واحدة.',
-  financeBadgeLabel: 'مالي',
+  badgeLabel: 'مالي',
   walletAccessibilityLabel: 'المحفظة',
 } as const satisfies WltDshCaptainUiCopy;
 

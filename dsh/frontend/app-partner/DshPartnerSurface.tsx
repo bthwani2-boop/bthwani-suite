@@ -1,20 +1,12 @@
 import React from 'react';
 import { BackHandler, Platform, View } from 'react-native';
-import { BottomNavBar, Box, ModernPremiumHeader, spacing } from '@bthwani/ui-kit';
-import type {
-  DshPartnerOperationalFlowId,
-  DshPartnerRoute,
-  DshPartnerSupportCommandContext,
-  DshPartnerSupportRouteId,
-  DshPartnerSurfaceProps,
-  PartnerHubSection,
-} from './dsh-partner.types';
+import { BottomNavBar, Box, ModernPremiumHeader } from '@bthwani/ui-kit';
+import type { DshPartnerSurfaceProps } from './dsh-partner.types';
 import { storeScopeOptions } from './dsh-partner.navigation-bridge';
 import { useDshPartnerSurfaceModel } from '../shared/view-models/partner/useDshPartnerSurfaceModel';
 import { PlatformVarsProvider, FeatureFlagProvider, usePlatformVars } from '../platform';
 import { PartnerStoreScopeSheet } from './parts/PartnerStoreScopeSheet';
 import { DshPartnerRouteRenderer } from './screens/DshPartnerRouteRenderer';
-import type { PartnerOrderItem } from './screens/OrdersInboxScreen';
 
 export function DshPartnerSurface(props: DshPartnerSurfaceProps) {
   return (
@@ -59,6 +51,11 @@ function DshPartnerSurfaceInner({ initialRoute = 'inbox', initialOrderId = '' }:
   const setAccountHubSection = actions.setAccountHubSection;
   const setEditingProductId = actions.setEditingProductId;
 
+  const openStoreScope = actions.openStoreScope;
+  const setStoreScopeVisible = actions.setStoreScopeVisible;
+  const setSelectedStoreScopeId = actions.setSelectedStoreScopeId;
+  const setSelectedSupportScreen = actions.setSelectedSupportScreen;
+  const setSupportCommandContext = actions.setSupportCommandContext;
   const openOrdersBoard = actions.openOrdersBoard;
   const openOrdersSearch = actions.openOrdersSearch;
   const openAccountHub = actions.openAccountHub;

@@ -3,6 +3,7 @@
  * WLT owns all audit authority. DSH assembles the preparation pack only.
  * PREVIEW_ONLY — CONTRACT_SCAFFOLD_PREVIEW_ONLY
  */
+import { formatWltYer } from './dshFinance.types';
 
 export type WltAuditPackStatus =
   | 'preparing' | 'ready_for_review' | 'reviewed' | 'approved'
@@ -52,6 +53,9 @@ export type WltAuditPack = {
   readonly expectedTotalMinorUnits: number;
   readonly actualTotalMinorUnits: number;
   readonly varianceTotalMinorUnits: number;
+  readonly expectedTotalLabel: string;
+  readonly actualTotalLabel: string;
+  readonly varianceTotalLabel: string;
   readonly journalBatchId?: string;
   readonly evidenceList: ReadonlyArray<WltAuditEvidenceItem>;
   readonly exceptions: ReadonlyArray<WltAuditException>;
@@ -107,6 +111,9 @@ export function buildWltAuditPackPreview(params: {
     expectedTotalMinorUnits: params.expectedTotalMinorUnits,
     actualTotalMinorUnits: params.actualTotalMinorUnits,
     varianceTotalMinorUnits: variance,
+    expectedTotalLabel: formatWltYer(params.expectedTotalMinorUnits),
+    actualTotalLabel: formatWltYer(params.actualTotalMinorUnits),
+    varianceTotalLabel: formatWltYer(variance),
     journalBatchId: allBalanced ? `JB-PRV-${dateSlug}` : undefined,
     evidenceList: params.entries.map((e) => ({
       entryId: e.id,

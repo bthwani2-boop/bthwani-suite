@@ -1,6 +1,7 @@
 import type { WltAccountCode } from '../contracts/chartOfAccounts.types';
 import { getWltAccountByCode } from '../contracts/chartOfAccounts.types';
 import type { WltTrialBalanceLine, WltTrialBalance } from '../contracts/trialBalance.types';
+import { formatWltYer } from '../contracts/dshFinance.types';
 
 type JournalEntryInput = {
   debitAccountCode: WltAccountCode;
@@ -29,25 +30,34 @@ export function buildWltTrialBalancePreview(
     const account = getWltAccountByCode(code);
     totalDebit += debit;
     totalCredit += credit;
+    const net = debit - credit;
     lines.push({
       accountCode: code,
       accountLabel: account?.label ?? `حساب ${code}`,
       accountType: account?.type ?? 'unknown',
       debitMinorUnits: debit,
       creditMinorUnits: credit,
-      netMinorUnits: debit - credit,
+      netMinorUnits: net,
+      debitLabel: debit > 0 ? formatWltYer(debit) : '—',
+      creditLabel: credit > 0 ? formatWltYer(credit) : '—',
+      netLabel: formatWltYer(net),
       isBalanced: debit === credit,
       isPreview: true,
     });
   }
 
+  const imbalance = Math.abs(totalDebit - totalCredit);
+  const sorted = [...lines].sort((a, b) => a.accountCode.localeCompare(b.accountCode));
   return {
     businessDate,
-    lines: lines.sort((a, b) => a.accountCode.localeCompare(b.accountCode)),
+    lines: sorted,
     totalDebitMinorUnits: totalDebit,
     totalCreditMinorUnits: totalCredit,
     isBalanced: totalDebit === totalCredit,
-    imbalanceMinorUnits: Math.abs(totalDebit - totalCredit),
+    imbalanceMinorUnits: imbalance,
+    totalDebitLabel: formatWltYer(totalDebit),
+    totalCreditLabel: formatWltYer(totalCredit),
+    imbalanceLabel: formatWltYer(imbalance),
     contractState: 'CONTRACT_SCAFFOLD_PREVIEW_ONLY',
     isPreview: true,
   };

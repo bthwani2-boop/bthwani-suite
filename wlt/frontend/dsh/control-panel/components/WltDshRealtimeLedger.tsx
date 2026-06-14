@@ -4,10 +4,15 @@ import React from 'react';
 import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
-import type { WltLedgerEntry } from '../../contracts';
-import { loadWltDshFinanceRuntimeReadModel, type WltDshFinanceRuntimeResult } from '../adapters/wltDshFinanceRuntime.adapter';
-import { resolveWltDshRealtimeLedgerWsUrl } from '../../shared/adapters/wlt-dsh-realtime-ledger-runtime';
-import { formatWltYer } from '../models/dshFinance.types';
+import {
+  loadWltDshFinanceRuntimeReadModel,
+  type WltDshFinanceRuntimeResult,
+  resolveWltDshRealtimeLedgerWsUrl,
+  mapToRealtimeLedgerDisplayRow,
+  extractSortedDisplayRows,
+  buildSimulatedLedgerDisplayRow,
+  type WltRealtimeLedgerDisplayRow,
+} from '../../shared/adapters';
 
 const STATUS_LABELS: Record<string, string> = {
   COMPLETED: 'مرحّل',
@@ -28,23 +33,18 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 export function WltDshRealtimeLedger() {
-  const [entries, setEntries] = React.useState<WltLedgerEntry[]>([]);
+  const [entries, setEntries] = React.useState<WltRealtimeLedgerDisplayRow[]>([]);
   const [wsStatus, setWsStatus] = React.useState<'connected' | 'reconnecting' | 'disconnected'>('disconnected');
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
   const [highlightedId, setHighlightedId] = React.useState<string | null>(null);
 
-  // Load initial entries from database read model
   const loadInitialData = React.useCallback(async () => {
     try {
       const result = await loadWltDshFinanceRuntimeReadModel();
       setRuntimeFinance(result);
       if (result.state === 'runtime') {
-        // Sort entries by created_at descending
-        const sorted = [...result.data.ledgerEntries].sort(
-          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-        setEntries(sorted);
+        setEntries(extractSortedDisplayRows(result));
         setErrorMsg(null);
       } else {
         setErrorMsg(result.error);
@@ -58,7 +58,6 @@ export function WltDshRealtimeLedger() {
     loadInitialData();
   }, [loadInitialData]);
 
-  // Establish WebSocket connection
   React.useEffect(() => {
     let ws: WebSocket | null = null;
     let reconnectTimeout: NodeJS.Timeout | null = null;
@@ -79,14 +78,13 @@ export function WltDshRealtimeLedger() {
         if (!active) return;
         try {
           const payload = JSON.parse(event.data);
-          if (payload && payload.ledger_entry) {
-            const newEntry: WltLedgerEntry = payload.ledger_entry;
+          if (payload?.ledger_entry) {
+            const displayRow = mapToRealtimeLedgerDisplayRow(payload.ledger_entry);
             setEntries((prev) => {
-              if (prev.some((e) => e.id === newEntry.id)) return prev;
-              const next = [newEntry, ...prev];
-              setHighlightedId(newEntry.id);
+              if (prev.some((e) => e.id === displayRow.id)) return prev;
+              setHighlightedId(displayRow.id);
               setTimeout(() => setHighlightedId(null), 3000);
-              return next;
+              return [displayRow, ...prev];
             });
           }
         } catch (err) {
@@ -108,7 +106,6 @@ export function WltDshRealtimeLedger() {
 
     connectWs();
 
-    // Fallback polling for live updates every 7 seconds
     const interval = setInterval(() => {
       if (wsStatus !== 'connected') {
         loadInitialData();
@@ -123,25 +120,10 @@ export function WltDshRealtimeLedger() {
     };
   }, [loadInitialData, wsStatus]);
 
-  // Simulate a live transaction for verification/testing
   const simulateLiveEntry = () => {
-    const id = `SIM-TX-${Date.now()}`;
-    const simEntry: WltLedgerEntry = {
-      id,
-      wallet_id: 'WLT-WAL-0099',
-      subject: Math.random() > 0.5 ? 'captain-001' : 'partner-001',
-      transaction_type: Math.random() > 0.4 ? 'CREDIT' : 'DEBIT',
-      amount: Math.floor(Math.random() * 15000) + 1000,
-      currency: 'YER',
-      reference_type: 'payment_session',
-      reference_id: `REF-${Math.floor(Math.random() * 90000) + 10000}`,
-      description: 'حركة مالية فورية محاكاة للتحقق E2E',
-      status: 'COMPLETED',
-      created_at: new Date().toISOString(),
-    };
-
-    setEntries((prev) => [simEntry, ...prev]);
-    setHighlightedId(id);
+    const displayRow = buildSimulatedLedgerDisplayRow();
+    setEntries((prev) => [displayRow, ...prev]);
+    setHighlightedId(displayRow.id);
     setTimeout(() => setHighlightedId(null), 3000);
   };
 
@@ -149,7 +131,6 @@ export function WltDshRealtimeLedger() {
 
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%', padding: '16px' }}>
-      {/* Header & Status Indicator */}
       <Box padding={4} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div>
@@ -163,33 +144,19 @@ export function WltDshRealtimeLedger() {
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <span
               style={{
-                fontSize: 11,
-                fontWeight: 700,
-                padding: '4px 10px',
-                borderRadius: 12,
+                fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 12,
                 color: wsStatus === 'connected' ? 'var(--bth-success-text)' : 'var(--bth-warning-text)',
                 background: wsStatus === 'connected' ? 'rgba(46, 204, 113, 0.15)' : 'rgba(241, 196, 15, 0.15)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
+                display: 'inline-flex', alignItems: 'center', gap: 6,
               }}
             >
-              <span
-                style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: 3,
-                  background: wsStatus === 'connected' ? 'var(--bth-success-text)' : 'var(--bth-warning-text)',
-                  animation: wsStatus === 'connected' ? 'pulse 2s infinite' : 'none',
-                }}
-              />
+              <span style={{ width: 6, height: 6, borderRadius: 3, background: wsStatus === 'connected' ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' }} />
               {wsStatus === 'connected' ? 'متصل (WebSocket)' : 'استعادة الاتصال (سحب دوري)'}
             </span>
           </div>
         </div>
       </Box>
 
-      {/* Interactive Controls & KPI */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -202,15 +169,8 @@ export function WltDshRealtimeLedger() {
             onClick={simulateLiveEntry}
             style={{
               background: 'linear-gradient(135deg, var(--bthwani-brand-primary) 0%, var(--bthwani-brand-secondary, var(--bthwani-brand-primary)) 100%)',
-              color: 'var(--bthwani-brand-contrast)',
-              border: 'none',
-              borderRadius: 8,
-              padding: '10px 20px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              fontSize: 12,
-              boxShadow: '0 4px 12px rgba(26, 188, 156, 0.2)',
-              transition: 'all 0.2s ease',
+              color: 'var(--bthwani-brand-contrast)', border: 'none', borderRadius: 8, padding: '10px 20px',
+              fontWeight: 700, cursor: 'pointer', fontSize: 12, boxShadow: '0 4px 12px rgba(26, 188, 156, 0.2)',
             }}
           >
             ⚡ محاكاة قيد لحظي (Simulate Live Entry)
@@ -224,7 +184,6 @@ export function WltDshRealtimeLedger() {
         </Box>
       )}
 
-      {/* Real-time Ledger entries table */}
       <Box padding={3} background="surface" radiusToken="lg" border borderTone="line" gap={2}>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
@@ -245,8 +204,6 @@ export function WltDshRealtimeLedger() {
               ) : (
                 entries.map((entry) => {
                   const isHighlighted = highlightedId === entry.id;
-                  const isCredit = entry.transaction_type === 'CREDIT';
-
                   return (
                     <tr
                       key={entry.id}
@@ -264,35 +221,31 @@ export function WltDshRealtimeLedger() {
                       </td>
                       <td style={{ padding: '8px 12px' }}>
                         <span style={{
-                          color: isCredit ? 'var(--bth-success-text)' : 'var(--bth-danger-text)',
-                          fontWeight: 700,
-                          fontSize: 10,
-                          background: isCredit ? 'color-mix(in srgb, var(--bth-success-text) 10%, transparent)' : 'color-mix(in srgb, var(--bth-danger-text) 10%, transparent)',
-                          padding: '2px 8px',
-                          borderRadius: radius.xs
+                          color: entry.isCredit ? 'var(--bth-success-text)' : 'var(--bth-danger-text)',
+                          fontWeight: 700, fontSize: 10,
+                          background: entry.isCredit ? 'color-mix(in srgb, var(--bth-success-text) 10%, transparent)' : 'color-mix(in srgb, var(--bth-danger-text) 10%, transparent)',
+                          padding: '2px 8px', borderRadius: radius.xs,
                         }}>
-                          {isCredit ? 'إيداع / دائن' : 'سحب / مدين'}
+                          {entry.transactionKindLabel}
                         </span>
                       </td>
                       <td style={{ padding: '8px 12px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
-                        {formatWltYer(Math.round(entry.amount * 100))}
+                        {entry.amountLabel}
                       </td>
                       <td style={{ padding: '8px 12px' }}>
                         <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '2px 6px', borderRadius: 3 }}>
-                          {entry.reference_id || '—'}
+                          {entry.referenceId}
                         </code>
                       </td>
                       <td style={{ padding: '8px 12px', color: 'var(--bthwani-control-panel-text-muted)' }}>
-                        {new Date(entry.created_at).toLocaleString('ar-YE', { hour12: false })}
+                        {entry.createdAtDisplay}
                       </td>
                       <td style={{ padding: '8px 12px' }}>
                         <span style={{
-                          fontSize: 9,
-                          fontWeight: 700,
+                          fontSize: 9, fontWeight: 700,
                           color: STATUS_COLOR[entry.status] ?? 'inherit',
                           background: `color-mix(in srgb, ${STATUS_COLOR[entry.status] ?? 'transparent'} 12%, transparent)`,
-                          padding: '2px 6px',
-                          borderRadius: 4
+                          padding: '2px 6px', borderRadius: 4,
                         }}>
                           {STATUS_LABELS[entry.status] ?? entry.status}
                         </span>

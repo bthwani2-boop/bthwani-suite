@@ -2,6 +2,7 @@ export * from './partner-finance.adapter';
 export * from './partner-finance-runtime.adapter';
 export * from './wltDshFinanceRuntime.adapter';
 export * from './wlt-dsh-realtime-ledger-runtime';
+export * from './wlt-dsh-realtime-ledger-display';
 export * from './client-wallet.adapter';
 export * from './client-wallet-runtime.adapter';
 export * from './captain-finance.adapter';
