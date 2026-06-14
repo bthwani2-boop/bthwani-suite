@@ -1,0 +1,20 @@
+# فول ستاك بثواني — DSH Full-Stack Command
+
+## Scope
+
+فول ستاك بثواني هو معيار الإغلاق الكامل عبر طبقات DSH Backend و WLT finance bridge
+والواجهات الأمامية (app-client, app-captain, app-partner, app-field, control-panel).
+
+## Full-Stack Closure Requirement
+
+كل capability يجب أن يكون مغلقاً عبر:
+1. DSH Backend API — endpoint وثوق runtime فعلي
+2. WLT finance bridge — ربط قراءة المحفظة والمدفوعات
+3. dsh/frontend/shared — contracts, view-models, policies
+4. UI surface — عرض حالة runtime حقيقية بدون fixture
+
+## Authority
+
+- governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md
+- governance/22_DSH_GOLDEN_SLICE.md
+- governance/10_SERVICE_CLOSURE.md

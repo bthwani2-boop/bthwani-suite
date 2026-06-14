@@ -92,7 +92,7 @@ for (const relativeRoot of uiOnlyRoots) {
         if (file.isFile()) {
           const ext = path.extname(file.name);
           if (['.ts', '.tsx', '.js', '.jsx'].includes(ext)) {
-            const isTypeOnly = file.name.endsWith('.types.ts') || file.name.endsWith('.contract.ts') || file.name.endsWith('.contracts.ts') || file.name === 'index.ts';
+            const isTypeOnly = file.name.endsWith('.types.ts') || file.name.endsWith('.contract.ts') || file.name.endsWith('.contracts.ts') || file.name.endsWith('-props.ts') || file.name === 'index.ts';
             if (!isTypeOnly) {
               findings.push({
                 severity: 'FAIL',

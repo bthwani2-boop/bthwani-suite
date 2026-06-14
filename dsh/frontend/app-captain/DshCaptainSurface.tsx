@@ -31,7 +31,8 @@ import { CaptainAccountNavRow } from './parts/CaptainAccountNavRow';
 import { DshCaptainRouteRenderer, DshCaptainAccountShell } from './DshCaptainRouteRenderer';
 import type { DshCaptainCommandTarget, DshCaptainRoute, DshCaptainSurfaceProps } from './dsh-captain.types';
 import { isModeVisibleInCaptainInbox, isCaptainPodRequiredForMode, isCaptainCodCollectorForMode } from '../shared/contracts/dsh-fulfillment-surface-visibility';
-import { resolveDshRuntimeOrderId, useCaptainActiveLocationPush, useCaptainOrderRuntime } from '../shared';
+import { resolveDshRuntimeOrderId } from '../shared';
+import { useDshCaptainSurfaceModel } from '../shared/view-models/captain/useDshCaptainSurfaceModel';
 import { PlatformVarsProvider, FeatureFlagProvider, usePlatformVars } from '../platform';
 import { OfferDeclineSheet } from './sheets';
 import type {
@@ -60,22 +61,6 @@ const CAPTAIN_BOTTOM_NAV_ROUTES = new Set<DshCaptainRoute>([
   'support-directory', 'support-screen',
 ]);
 
-type ObjectStateAction<S> = { readonly key: keyof S; readonly value: S[keyof S] | ((current: S[keyof S]) => S[keyof S]) };
-
-function useObjectState<S extends Record<string, unknown>>(initialState: S) {
-  const reducer = React.useCallback((state: S, action: ObjectStateAction<S>): S => {
-    const next = typeof action.value === 'function'
-      ? (action.value as (c: S[keyof S]) => S[keyof S])(state[action.key])
-      : action.value;
-    return { ...state, [action.key]: next };
-  }, []);
-  const [state, dispatch] = React.useReducer(reducer, initialState);
-  const setValue = React.useCallback(<K extends keyof S>(key: K, value: S[K] | ((current: S[K]) => S[K])) => {
-    dispatch({ key, value: value as ObjectStateAction<S>['value'] });
-  }, []);
-  return [state, setValue] as const;
-}
-
 export function DshCaptainSurface(props: DshCaptainSurfaceProps) {
   return (
     <PlatformVarsProvider>
@@ -93,30 +78,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
   const { hydrated: appearanceHydrated, mode: appearanceMode, setMode: setAppearanceMode } = useAppCaptainAppearance();
   const insets = useSafeAreaInsets();
 
-  const [ui, set] = useObjectState({
-    activeServiceType: 'dsh' as CaptainServiceType,
-    route: getRouteForCommandTarget(command.target),
-    inboxState: 'ready' as CaptainOrdersInboxScreenState,
-    activeOrderId: '',
-    selectedSupportScreen: 'orders-list' as CaptainSupportRoute,
-    isPickupSheetVisible: false,
-    isDeliverySheetVisible: false,
-    captainAvailabilityStatus: 'available' as CaptainAvailabilityStatus,
-    gpsStatus: 'limited' as CaptainGpsStatus,
-    activeOrderExpanded: false,
-    activeOrderPhase: 'pickup' as ActiveOrderPhase,
-    captainAppMode: 'bthwani_captain_mode' as CaptainAppMode,
-    activeOrderDraft: '',
-    activeOrderMessages: [] as CompactOrderChatMessage[],
-    storeCourierStage: 'ready_for_pickup' as StoreCourierStage,
-    captainPodState: 'ready' as _PodScreenProps,
-    captainPodPhotoUri: undefined as string | undefined,
-    captainPodMediaKey: undefined as string | undefined,
-    isDeclineSheetVisible: false,
-    declineSheetState: 'ready' as 'ready' | 'loading' | 'success' | 'error',
-    declineOrderId: '',
-    pickupSheetState: 'ready' as 'ready' | 'loading' | 'success' | 'error',
-  });
+  const { state: ui, actions, captainOrderRuntime } = useDshCaptainSurfaceModel(command, captainRuntimeId);
 
   const {
     activeServiceType, route, inboxState, activeOrderId, selectedSupportScreen,
@@ -126,30 +88,47 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
     isDeclineSheetVisible, declineSheetState, declineOrderId, pickupSheetState,
   } = ui;
 
-  const mk = <K extends keyof typeof ui>(key: K) =>
-    (v: typeof ui[K] | ((c: typeof ui[K]) => typeof ui[K])) => set(key, v);
-  const setRoute = mk('route');
-  const setInboxState = mk('inboxState');
-  const setActiveOrderId = mk('activeOrderId');
-  const setSelectedSupportScreen = mk('selectedSupportScreen');
-  const setIsPickupSheetVisible = mk('isPickupSheetVisible');
-  const setIsDeliverySheetVisible = mk('isDeliverySheetVisible');
-  const setCaptainAvailabilityStatus = mk('captainAvailabilityStatus');
-  const setGpsStatus = mk('gpsStatus');
-  const setActiveOrderExpanded = mk('activeOrderExpanded');
-  const setActiveOrderPhase = mk('activeOrderPhase');
-  const setCaptainAppMode = mk('captainAppMode');
-  const setActiveOrderDraft = mk('activeOrderDraft');
-  const setActiveOrderMessages = mk('activeOrderMessages');
-  const setStoreCourierStage = mk('storeCourierStage');
-  const setCaptainPodState = mk('captainPodState');
-  const setCaptainPodPhotoUri = mk('captainPodPhotoUri');
-  const setCaptainPodMediaKey = mk('captainPodMediaKey');
-  const setIsDeclineSheetVisible = mk('isDeclineSheetVisible');
-  const setDeclineSheetState = mk('declineSheetState');
-  const setDeclineOrderId = mk('declineOrderId');
-  const setPickupSheetState = mk('pickupSheetState');
-  const setActiveServiceType = mk('activeServiceType');
+  const setRoute = actions.setRoute;
+  const setInboxState = actions.setInboxState;
+  const setActiveOrderId = actions.setActiveOrderId;
+  const setSelectedSupportScreen = actions.setSelectedSupportScreen;
+  const setIsPickupSheetVisible = actions.setIsPickupSheetVisible;
+  const setIsDeliverySheetVisible = actions.setIsDeliverySheetVisible;
+  const setCaptainAvailabilityStatus = actions.setCaptainAvailabilityStatus;
+  const setGpsStatus = actions.setGpsStatus;
+  const setActiveOrderExpanded = actions.setActiveOrderExpanded;
+  const setActiveOrderPhase = actions.setActiveOrderPhase;
+  const setCaptainAppMode = actions.setCaptainAppMode;
+  const setActiveOrderDraft = actions.setActiveOrderDraft;
+  const setActiveOrderMessages = actions.setActiveOrderMessages;
+  const setStoreCourierStage = actions.setStoreCourierStage;
+  const setCaptainPodState = actions.setCaptainPodState;
+  const setCaptainPodPhotoUri = actions.setCaptainPodPhotoUri;
+  const setCaptainPodMediaKey = actions.setCaptainPodMediaKey;
+  const setIsDeclineSheetVisible = actions.setIsDeclineSheetVisible;
+  const setDeclineSheetState = actions.setDeclineSheetState;
+  const setDeclineOrderId = actions.setDeclineOrderId;
+  const setPickupSheetState = actions.setPickupSheetState;
+  const setActiveServiceType = actions.setActiveServiceType;
+
+  const handleAcceptTask = actions.handleAcceptTask;
+  const handleDeclineConfirm = actions.handleDeclineConfirm;
+  const confirmPickup = actions.confirmPickup;
+  const confirmDelivery = actions.confirmDelivery;
+  const confirmPodSubmission = actions.confirmPodSubmission;
+  const reportPodFailure = actions.reportPodFailure;
+  const resetOrderState = actions.resetOrderState;
+  const goBack = actions.goBack;
+  const openOrderDetail = actions.openOrderDetail;
+  const openCaptainAccount = actions.openCaptainAccount;
+  const openCaptainAccountSection = actions.openCaptainAccountSection;
+  const openSupportDirectory = actions.openSupportDirectory;
+  const openCaptainSupportScreen = actions.openCaptainSupportScreen;
+  const goToInbox = actions.goToInbox;
+  const resetInboxState = actions.resetInboxState;
+  const sendQuickMessage = actions.sendQuickMessage;
+  const handleSelectServiceType = actions.handleSelectServiceType;
+  const openStoreCourierProof = actions.openStoreCourierProof;
 
   const isStoreCourierMode = captainAppMode === 'store_courier_mode';
   const bthwaniDeliveryVisibleInInbox = isModeVisibleInCaptainInbox('bthwani_delivery') && isCaptainInboxVisibleForMode('bthwani_delivery');
@@ -157,8 +136,6 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
   const captainPodRequired = !isStoreCourierMode && isCaptainPodRequiredForMode('bthwani_delivery');
   const captainCollectsCod = !isStoreCourierMode && isCaptainCodCollectorForMode('bthwani_delivery');
   const showCaptainBottomNav = isStoreCourierMode ? route === 'home' || route === 'account' : CAPTAIN_BOTTOM_NAV_ROUTES.has(route);
-  const captainOrderRuntime = useCaptainOrderRuntime();
-  useCaptainActiveLocationPush({ activeOrderId, captainId: captainRuntimeId, lifecycleStatus: inboxState });
 
   const activeSummary = EMPTY_CAPTAIN_ORDER_SUMMARY as NonNullable<CaptainOrderDetailSummary>;
   const activeOrderDisplayId = activeOrderId ? resolveDshRuntimeOrderId(activeOrderId) : '';
@@ -168,154 +145,11 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
   const isGpsEnabled = gpsStatus !== 'disabled';
   const currentAvailabilityMeta = getCaptainAvailabilityMeta(captainAvailabilityStatus);
 
-  const routeHistoryRef = React.useRef<DshCaptainRoute[]>(['home']);
-  const routeTransitionFromBackRef = React.useRef(false);
-  const commandKeyRef = React.useRef(`${command.target}:${command.token ?? ''}`);
-
-  const resetOrderState = React.useCallback(() => {
-    setActiveOrderExpanded(false);
-    setActiveOrderPhase('pickup');
-    setActiveOrderDraft('');
-    setActiveOrderMessages([]);
-    setCaptainPodState('ready');
-    setCaptainPodPhotoUri(undefined);
-    setCaptainPodMediaKey(undefined);
-  }, []);
-
-  const goBack = React.useCallback(() => {
-    if (routeHistoryRef.current.length > 1) {
-      routeTransitionFromBackRef.current = true;
-      routeHistoryRef.current.pop();
-      const prev = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'home';
-      setRoute(prev);
-      return true;
-    }
-    if (route !== 'home') { setRoute('home'); return true; }
-    return false;
-  }, [route]);
-
-  React.useEffect(() => {
-    const commandKey = `${command.target}:${command.token ?? ''}`;
-    if (commandKey !== commandKeyRef.current) {
-      commandKeyRef.current = commandKey;
-      const nextRoute = getRouteForCommandTarget(command.target);
-      routeHistoryRef.current = [nextRoute];
-      routeTransitionFromBackRef.current = false;
-      setRoute(nextRoute);
-      return;
-    }
-    const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1];
-    if (route !== previousRoute) {
-      if (routeTransitionFromBackRef.current) {
-        routeTransitionFromBackRef.current = false;
-      } else {
-        routeHistoryRef.current.push(route);
-      }
-    }
-  }, [command.target, command.token, route]);
-
   React.useEffect(() => {
     if (Platform.OS !== 'android') return undefined;
     const sub = BackHandler.addEventListener('hardwareBackPress', () => goBack());
     return () => sub.remove();
   }, [goBack]);
-
-  // ─── Action handlers (UI state orchestration calling shared runtime) ───────────
-
-  const handleAcceptTask = React.useCallback(async (orderId: string) => {
-    if (!captainRuntimeId) return void setInboxState('error');
-    try {
-      setInboxState('offer-accepting');
-      await captainOrderRuntime.acceptTask(resolveDshRuntimeOrderId(orderId), captainRuntimeId);
-      setInboxState('offer-accepted');
-      setActiveOrderId(orderId);
-      resetOrderState();
-      if (!isStoreCourierMode) setStoreCourierStage('ready_for_pickup');
-      setRoute('detail');
-      setInboxState('ready');
-    } catch { setInboxState('error'); }
-  }, [captainOrderRuntime, captainRuntimeId, isStoreCourierMode, resetOrderState]);
-
-  const handleDeclineConfirm = React.useCallback(async (orderId: string, reason: string) => {
-    if (!captainRuntimeId) return void setDeclineSheetState('error');
-    try {
-      setDeclineSheetState('loading');
-      await captainOrderRuntime.declineTask(resolveDshRuntimeOrderId(orderId), captainRuntimeId, reason);
-      setDeclineSheetState('success');
-      setTimeout(() => { setIsDeclineSheetVisible(false); setDeclineSheetState('ready'); setRoute('inbox'); }, 1000);
-    } catch { setDeclineSheetState('error'); }
-  }, [captainOrderRuntime, captainRuntimeId]);
-
-  const confirmPickup = React.useCallback(async () => {
-    if (!captainRuntimeId) return void setPickupSheetState('error');
-    try {
-      setPickupSheetState('loading');
-      await captainOrderRuntime.confirmPickup(resolveDshRuntimeOrderId(activeOrderId), captainRuntimeId);
-      setPickupSheetState('success');
-      setTimeout(() => {
-        setIsPickupSheetVisible(false);
-        setPickupSheetState('ready');
-        setActiveOrderPhase('delivery');
-        setActiveOrderMessages((cur) => [...cur, { id: `msg-${cur.length + 1}`, sender: 'النظام', text: 'تم تأكيد الاستلام. المرحلة التالية هي التسليم.', time: 'الآن', side: 'start' }]);
-      }, 1000);
-    } catch { setPickupSheetState('error'); }
-  }, [activeOrderId, captainOrderRuntime, captainRuntimeId]);
-
-  const confirmDelivery = React.useCallback(async () => {
-    if (!captainRuntimeId) return void setCaptainPodState('error');
-    try {
-      await captainOrderRuntime.deliverOrder(resolveDshRuntimeOrderId(activeOrderId), captainRuntimeId);
-      setInboxState('delivered');
-      setActiveOrderExpanded(false);
-    } catch { setCaptainPodState('error'); }
-  }, [activeOrderId, captainOrderRuntime, captainRuntimeId]);
-
-  const confirmPodSubmission = React.useCallback(async () => {
-    if (!captainRuntimeId || !captainPodPhotoUri || !captainPodMediaKey) return;
-    setCaptainPodState('loading');
-    try {
-      await captainOrderRuntime.deliverOrder(resolveDshRuntimeOrderId(activeOrderId), captainRuntimeId, captainPodMediaKey);
-      setCaptainPodState('success');
-      if (isStoreCourierMode) { setStoreCourierStage('delivered'); setInboxState('delivered'); }
-    } catch { setCaptainPodState('error'); }
-  }, [activeOrderId, captainAppMode, captainOrderRuntime, captainRuntimeId, captainPodMediaKey, captainPodPhotoUri, isStoreCourierMode]);
-
-  const reportPodFailure = React.useCallback(async () => {
-    if (!captainRuntimeId) return void setCaptainPodState('error');
-    try {
-      await captainOrderRuntime.failDelivery(resolveDshRuntimeOrderId(activeOrderId), captainRuntimeId);
-      setCaptainPodState('retry-required');
-      if (isStoreCourierMode) setStoreCourierStage('delivery_failed');
-    } catch { setCaptainPodState('error'); }
-  }, [activeOrderId, captainOrderRuntime, captainRuntimeId, isStoreCourierMode]);
-
-  // ─── Navigation helpers ────────────────────────────────────────────────────────
-
-  const openOrderDetail = React.useCallback((id: string) => { setActiveOrderId(id); setRoute('detail'); }, []);
-  const openCaptainAccount = React.useCallback(() => setRoute('account'), []);
-  const openCaptainAccountSection = React.useCallback((r: DshCaptainRoute) => setRoute(r), []);
-  const openSupportDirectory = React.useCallback(() => setRoute('support-directory'), []);
-  const openCaptainSupportScreen = React.useCallback((screenId: CaptainSupportRoute) => { setSelectedSupportScreen(screenId); setRoute('support-screen'); }, []);
-  const goToInbox = React.useCallback(() => setRoute('inbox'), []);
-  const resetInboxState = React.useCallback(() => setInboxState('ready'), []);
-
-  const sendQuickMessage = React.useCallback(() => {
-    const text = activeOrderDraft.trim();
-    if (!text) return;
-    setActiveOrderMessages((cur) => [...cur, { id: `msg-${cur.length + 1}`, sender: 'الكابتن', text, time: 'الآن', side: 'end' }]);
-    setActiveOrderDraft('');
-  }, [activeOrderDraft]);
-
-  const handleSelectServiceType = React.useCallback((typeId: string) => {
-    setActiveServiceType(typeId === 'amn' ? 'amn' : 'dsh');
-    setRoute('home'); setInboxState('ready'); setActiveOrderId('');
-    setActiveOrderExpanded(false); setIsPickupSheetVisible(false); setIsDeliverySheetVisible(false);
-  }, []);
-
-  const openStoreCourierProof = React.useCallback(() => {
-    setCaptainPodState('ready');
-    setRoute(getCaptainLifecycleForOrderStage('proof', isStoreCourierMode).captainRoute);
-  }, [isStoreCourierMode]);
 
   // ─── Home ticker (UI display model) ──────────────────────────────────────────
 

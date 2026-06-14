@@ -1,74 +1,13 @@
-﻿import type { DshCanonicalPublishStage, DshCanonicalSource } from '../../shared/presentation-models/dshStoreProductCardModel';
-import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
-
-export type DshPartnerIntakeSource = 'app-field' | 'app-partner';
-export type DshPartnerIntakeQueue = 'offer-approval' | 'partner-review' | 'marketing-review';
-
-export type DshPartnerIntakeItem = {
-  storeName: string;
-  categoryLabel: string;
-  source: DshPartnerIntakeSource;
-  queue: DshPartnerIntakeQueue;
-  ownerLabel: string;
-  fieldStatusLabel: string;
-  note: string;
-  nextStep: string;
-  submittedAt: string;
-  canonicalStoreId?: string;
-  canonicalProductId?: string;
-  canonicalStage?: DshCanonicalPublishStage;
-  canonicalSource?: DshCanonicalSource;
-} & {
-  id: string;
-};
-
-export type DshPartnerIntakeMetric = {
-  id: string;
-  label: string;
-  value: number;
-  description: string;
-};
-
-// Data moved to central preview data
-
-// Data moved to central preview data
-
-// SCAFFOLD — commission and settlement figures are WLT-owned, not authoritative here
-export type DshPartnerFulfillmentMode = DshFulfillmentDeliveryMode;
-
-export type DshPartnerModeAgreement = {
-  mode: DshPartnerFulfillmentMode;
-  modeLabel: string;
-  enabled: boolean;
-  /** SCAFFOLD — actual rate lives in WLT commission engine */
-  commissionRatePreview: string;
-  settlementBasis: string;
-  operationalReadiness: 'ready' | 'pending' | 'unavailable';
-  validityLabel: string;
-  negotiationNote?: string;
-};
-
-export type DshPartnerFulfillmentAgreement = {
-  partnerId: string;
-  storeName: string;
-  categoryLabel: string;
-  modes: readonly DshPartnerModeAgreement[];
-};
-
-// Data moved to central preview data
-
-export const dshPartnerIntakeMetrics: ReadonlyArray<{ id: string; label: string; value: number; description: string }> = [];
-export const dshPartnerIntakeItems: ReadonlyArray<DshPartnerIntakeItem> = [];
-export const dshPartnerApprovalLanes: ReadonlyArray<string> = [];
-
-// Re-export centralized models and getters/setters from shared workflow store
+﻿// Re-export from canonical locations.
+// Types: dsh/frontend/shared/contracts/partner/partner-intake.types.ts
+// Runtime functions: dsh/frontend/shared/state-machines/workflow.ts
+export * from '../../shared/contracts/partner/partner-intake.types';
 export type {
   DshPartnerDocumentKind,
   DshPartnerDocumentVerification,
   DshPartnerCatalogOverride,
   DshPromotionCandidate,
 } from '../../shared/state-machines/workflow';
-
 export {
   resolvePartnerIdForStore,
   getPartnerActivationStatus,

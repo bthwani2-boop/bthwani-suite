@@ -90,7 +90,7 @@ export const DSH_FIXTURE_EVIDENCE: readonly FixtureEvidenceEntry[] = [
   {
     file: 'dsh/frontend/app-client/screens/parts/OrdersTrackingHelpers.tsx',
     classification: 'RUNTIME_VIOLATION_FIXED',
-    reason: 'Removed fake support attachment behavior and disabled demo heartbeat progression in the client order journey. Screen now stays runtime-safe and does not fabricate proof or live-tracking updates.',
+    reason: 'Removed fake support attachment behavior and disabled demo heartbeat progression in the client order journey. The view now stays runtime-safe and does not fabricate proof or live-tracking updates.',
   },
   {
     file: 'dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx',

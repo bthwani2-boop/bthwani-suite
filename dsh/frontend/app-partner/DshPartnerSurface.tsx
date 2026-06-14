@@ -9,16 +9,8 @@ import type {
   DshPartnerSurfaceProps,
   PartnerHubSection,
 } from './dsh-partner.types';
-import {
-  buildSupportCommandContextFromOperationalFlow,
-  buildSupportCommandContextFromSupportRoute,
-  defaultSupportCommandContext,
-  isCommandCenterInlineManagedRoute,
-  storeScopeOptions,
-} from './dsh-partner.navigation-bridge';
-import { buildPartnerDeliveryOpsSummary, buildPartnerProfileFromScope } from '../shared/view-models/partner';
-import { getActionableHandoffsForSurface } from '../shared/contracts/dsh-order-lifecycle-handoffs';
-import { usePartnerOrdersRuntime } from '../shared';
+import { storeScopeOptions } from './dsh-partner.navigation-bridge';
+import { useDshPartnerSurfaceModel } from '../shared/view-models/partner/useDshPartnerSurfaceModel';
 import { PlatformVarsProvider, FeatureFlagProvider, usePlatformVars } from '../platform';
 import { PartnerStoreScopeSheet } from './parts/PartnerStoreScopeSheet';
 import { DshPartnerRouteRenderer } from './screens/DshPartnerRouteRenderer';
@@ -37,144 +29,55 @@ export function DshPartnerSurface(props: DshPartnerSurfaceProps) {
 function DshPartnerSurfaceInner({ initialRoute = 'inbox', initialOrderId = '' }: DshPartnerSurfaceProps = {}) {
   const { dshAuthBearerToken, dshClientId } = usePlatformVars();
 
-  // ── Visual state ──────────────────────────────────────────────────────────
-  const [storeScopeVisible, setStoreScopeVisible] = React.useState(false);
-  const [accountHubSection, setAccountHubSection] = React.useState<PartnerHubSection>('hub');
-  const [ordersSearchMode, setOrdersSearchMode] = React.useState(false);
-  const [selectedStoreScopeId, setSelectedStoreScopeId] = React.useState('all');
-  const [route, setRoute] = React.useState<DshPartnerRoute>(initialRoute);
-  const [editingProductId, setEditingProductId] = React.useState<string | undefined>(undefined);
-  const [activeOrderId, setActiveOrderId] = React.useState(initialOrderId);
-  const [supportNav, setSupportNav] = React.useState<{
-    screen: DshPartnerSupportRouteId;
-    context: DshPartnerSupportCommandContext;
-  }>({
-    screen: initialRoute === 'order-rejection' ? 'order-reject' : 'order-issue-queue',
-    context: initialRoute === 'order-rejection'
-      ? buildSupportCommandContextFromSupportRoute('order-reject', 'orders')
-      : { ...defaultSupportCommandContext },
-  });
+  const {
+    state,
+    actions,
+    selectedStoreScope,
+    runtimePartnerProfile,
+    partnerOrdersState,
+    partnerOrders,
+    deliveryOpsSummary,
+  } = useDshPartnerSurfaceModel(initialRoute, initialOrderId);
+
+  const {
+    route,
+    storeScopeVisible,
+    accountHubSection,
+    ordersSearchMode,
+    selectedStoreScopeId,
+    editingProductId,
+    activeOrderId,
+    supportNav,
+  } = state;
 
   const selectedSupportScreen = supportNav.screen;
   const supportCommandContext = supportNav.context;
-  const setSelectedSupportScreen = (screen: DshPartnerSupportRouteId) =>
-    setSupportNav((s) => ({ ...s, screen }));
-  const setSupportCommandContext = (context: DshPartnerSupportCommandContext) =>
-    setSupportNav((s) => ({ ...s, context }));
 
-  const routeHistoryRef = React.useRef<DshPartnerRoute[]>([initialRoute]);
-  const routeTransitionFromBackRef = React.useRef(false);
-  const supportDirectoryIntentRef = React.useRef(false);
+  const setRoute = actions.setRoute;
+  const setActiveOrderId = actions.setActiveOrderId;
+  const setOrdersSearchMode = actions.setOrdersSearchMode;
+  const setAccountHubSection = actions.setAccountHubSection;
+  const setEditingProductId = actions.setEditingProductId;
 
-  // ── Runtime data (from shared) ────────────────────────────────────────────
-  const { orders: partnerOrders, state: partnerOrdersState, markReady: handleMarkReady } = usePartnerOrdersRuntime(route) as {
-    orders: readonly PartnerOrderItem[];
-    state: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled' | 'partial';
-    markReady: (orderId: string) => void;
-  };
-
-  // ── Route history (UI-only navigation tracking) ───────────────────────────
-  React.useEffect(() => {
-    const prev = routeHistoryRef.current[routeHistoryRef.current.length - 1];
-    if (route !== prev) {
-      if (routeTransitionFromBackRef.current) {
-        routeTransitionFromBackRef.current = false;
-      } else {
-        routeHistoryRef.current.push(route);
-      }
-    }
-    if (route !== 'inbox' && ordersSearchMode) setOrdersSearchMode(false);
-  }, [ordersSearchMode, route]);
+  const openOrdersBoard = actions.openOrdersBoard;
+  const openOrdersSearch = actions.openOrdersSearch;
+  const openAccountHub = actions.openAccountHub;
+  const goBackToHub = actions.goBackToHub;
+  const openSupportDirectory = actions.openSupportDirectory;
+  const returnToSupportDirectory = actions.returnToSupportDirectory;
+  const openSupportScreen = actions.openSupportScreen;
+  const openInventoryManagement = actions.openInventoryManagement;
+  const openStoreCourier = actions.openStoreCourier;
+  const openSupportCommandFromOperationalFlow = actions.handleOperationalFlowNavigation;
+  const handleMarkReady = actions.handleMarkReady;
 
   React.useEffect(() => {
     if (Platform.OS !== 'android') return undefined;
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (storeScopeVisible) { setStoreScopeVisible(false); return true; }
-      if (ordersSearchMode) { setOrdersSearchMode(false); return true; }
-      if (route === 'home' && accountHubSection !== 'hub') { setAccountHubSection('hub'); return true; }
-      if (routeHistoryRef.current.length > 1) {
-        routeTransitionFromBackRef.current = true;
-        routeHistoryRef.current.pop();
-        setRoute(routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'entry');
-        return true;
-      }
-      return false;
+      return actions.handleHardwareBackPress();
     });
     return () => subscription.remove();
-  }, [accountHubSection, ordersSearchMode, route, storeScopeVisible]);
-
-  // ── Derived model from shared pure functions ───────────────────────────────
-  const selectedStoreScope = React.useMemo(
-    () => storeScopeOptions.find((o) => o.id === selectedStoreScopeId) ?? storeScopeOptions[0],
-    [selectedStoreScopeId],
-  );
-  const runtimePartnerProfile = React.useMemo(
-    () => buildPartnerProfileFromScope(selectedStoreScope),
-    [selectedStoreScope],
-  );
-  const partnerActionableHandoffs = React.useMemo(
-    () => getActionableHandoffsForSurface('app-partner'),
-    [],
-  );
-  const deliveryOpsSummary = React.useMemo(
-    () => buildPartnerDeliveryOpsSummary(partnerOrders, partnerActionableHandoffs),
-    [partnerActionableHandoffs, partnerOrders],
-  );
-
-  // ── Navigation actions (UI-only) ──────────────────────────────────────────
-  const openOrdersBoard = React.useCallback(() => {
-    setOrdersSearchMode(false);
-    setRoute('inbox');
-  }, []);
-  const openOrdersSearch = React.useCallback(() => {
-    setOrdersSearchMode(true);
-    setRoute('inbox');
-  }, []);
-  const openAccountHub = React.useCallback((section: PartnerHubSection) => {
-    setAccountHubSection(section);
-    setRoute('home');
-  }, []);
-  const goBackToHub = React.useCallback(() => {
-    if (routeHistoryRef.current.length > 1) {
-      routeTransitionFromBackRef.current = true;
-      routeHistoryRef.current.pop();
-      setRoute(routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'entry');
-      return;
-    }
-    openAccountHub('hub');
-  }, [openAccountHub]);
-  const markSupportDirectoryIntent = React.useCallback(() => {
-    supportDirectoryIntentRef.current = true;
-    Promise.resolve().then(() => { supportDirectoryIntentRef.current = false; });
-  }, []);
-  const openSupportDirectory = React.useCallback((context?: Partial<DshPartnerSupportCommandContext>) => {
-    markSupportDirectoryIntent();
-    setSupportCommandContext({ ...defaultSupportCommandContext, ...context } as DshPartnerSupportCommandContext);
-    setRoute('support-directory');
-  }, [markSupportDirectoryIntent]);
-  const returnToSupportDirectory = React.useCallback(() => setRoute('support-directory'), []);
-  const openSupportCommandFromOperationalFlow = React.useCallback(
-    (flowId: DshPartnerOperationalFlowId, source: DshPartnerSupportCommandContext['source'] = 'operations') => {
-      openSupportDirectory(buildSupportCommandContextFromOperationalFlow(flowId, source));
-    },
-    [openSupportDirectory],
-  );
-  const openInventoryManagement = React.useCallback(() => setRoute('inventory-management'), []);
-  const openStoreCourier = React.useCallback(() => setRoute('store-courier'), []);
-  const openWalletHub = React.useCallback(() => openAccountHub('wallet'), [openAccountHub]);
-  const openStoreScope = React.useCallback(() => setStoreScopeVisible(true), []);
-  const openSupportScreen = React.useCallback(
-    (screenId: DshPartnerSupportRouteId, source: DshPartnerSupportCommandContext['source'] = 'operations') => {
-      const nextContext = buildSupportCommandContextFromSupportRoute(screenId, source);
-      const shouldStay = supportDirectoryIntentRef.current && isCommandCenterInlineManagedRoute(screenId);
-      supportDirectoryIntentRef.current = false;
-      setSupportCommandContext(nextContext);
-      if (shouldStay) { setRoute('support-directory'); return; }
-      setSelectedSupportScreen(screenId);
-      setRoute('support-screen');
-    },
-    [],
-  );
+  }, [actions]);
 
   // ── UI chrome ────────────────────────────────────────────────────────────
   const topBar = (
