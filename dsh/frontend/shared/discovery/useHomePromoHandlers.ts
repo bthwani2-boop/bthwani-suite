@@ -4,7 +4,7 @@ import type {
   DshHomeGetPromo,
   DiscoveryFilter,
 } from './dsh-home-types';
-import { resolveDshColorToken } from '../../platform/resolve-dsh-color-token';
+import { resolveDshColorToken } from '../platform/resolve-dsh-color-token';
 import { resolveHomeCategoryContext } from './home-promo-mappers';
 
 type UseHomePromoHandlersParams = {

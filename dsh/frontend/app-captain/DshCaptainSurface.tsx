@@ -26,7 +26,7 @@ import { DshCaptainRouteRenderer } from './DshCaptainRouteRenderer';
 import type { DshCaptainRoute, DshCaptainSurfaceProps } from './dsh-captain.types';
 import { EMPTY_CAPTAIN_ORDER_SUMMARY } from '../shared';
 import { useDshCaptainSurfaceModel } from './useDshCaptainSurfaceModel';
-import { PlatformVarsProvider, FeatureFlagProvider, usePlatformVars } from '../platform';
+import { PlatformVarsProvider, FeatureFlagProvider, usePlatformVars } from '../shared';
 import type { CaptainOrderDetailScreen } from './screens/DshCaptainOrdersScreen';
 
 type CaptainOrderDetailSummary = React.ComponentProps<typeof CaptainOrderDetailScreen>['summary'];

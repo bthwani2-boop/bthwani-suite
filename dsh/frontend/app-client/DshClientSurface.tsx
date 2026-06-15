@@ -5,7 +5,7 @@ import {
   FeatureFlagProvider,
   PlatformVarsProvider,
   useFeatureFlag,
-} from '../platform';
+} from '../shared';
 import type { DshClientSurfaceProps } from './dsh-client.types';
 import { DshClientBottomNav } from './DshClientBottomNav';
 import { DshClientRouteRenderer } from './DshClientRouteRenderer';

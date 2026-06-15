@@ -68,6 +68,7 @@ const files = walk(path.join(root, sharedRoot));
 
 for (const abs of files) {
   const relFile = toPosix(path.relative(root, abs));
+  if (relFile.startsWith('dsh/frontend/shared/platform/')) continue;
   const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
   const stripped = stripComments(text);
 

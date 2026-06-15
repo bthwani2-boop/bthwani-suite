@@ -4,7 +4,7 @@ import {
   DEFAULT_FEATURE_FLAGS,
   FeatureFlagsRegistry,
   type FeatureFlagsConfig,
-} from '../shared/platform/feature-flags';
+} from './feature-flags';
 
 const FeatureFlagContext = React.createContext<FeatureFlagsConfig>(DEFAULT_FEATURE_FLAGS);
 

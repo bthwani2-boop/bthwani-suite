@@ -8,7 +8,7 @@ import {
 import {
   PlatformVarsProvider,
   FeatureFlagProvider,
-} from '../platform';
+} from '../shared';
 import type { DshFieldSurfaceProps } from './dsh-field.types';
 import { DshFieldRouteRenderer } from './screens/DshFieldRouteRenderer';
 

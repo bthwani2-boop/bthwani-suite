@@ -4,7 +4,7 @@ import {
   DEFAULT_PLATFORM_VARS,
   PlatformVarsRegistry,
   type PlatformVarsConfig,
-} from '../shared/platform/platform-vars';
+} from './platform-vars';
 
 const PlatformVarsContext = React.createContext<PlatformVarsConfig>(DEFAULT_PLATFORM_VARS);
 
