@@ -72,6 +72,7 @@ export type FieldStoreFile = {
   id: string;
   source: FieldLeadSource;
   draftLocalId?: string;
+  backendStoreId?: string;
   syncStatus?: 'local-ui-draft' | 'backend' | 'syncing' | 'sync-failed';
   name: string;
   category: string;

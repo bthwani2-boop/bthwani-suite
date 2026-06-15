@@ -2,3 +2,4 @@ export * from './checkout.contract';
 export * from './checkout.api';
 export * from './checkout.view-model';
 export * from './useCheckoutAuth';
+export * from './checkout.model';

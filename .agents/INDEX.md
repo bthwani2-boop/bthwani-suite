@@ -52,6 +52,7 @@
 | `bthwani-observability-performance-contract` | See `.agents/skills/bthwani-observability-performance-contract/SKILL.md`. |
 | `bthwani-agent-skill-authoring-contract` | See `.agents/skills/bthwani-agent-skill-authoring-contract/SKILL.md`. |
 | `bthwani-agent-registry-validator` | See `.agents/skills/bthwani-agent-registry-validator/SKILL.md`. |
+| `bthwani-full-stack-clean-code-skill` | See `.agents/skills/bthwani-full-stack-clean-code-skill/SKILL.md`. |
 | `bthwani-frontend-design-excellence-contract` | See `.agents/skills/bthwani-frontend-design-excellence-contract/SKILL.md`. |
 | `bthwani-stop-slop-prose-contract` | See `.agents/skills/bthwani-stop-slop-prose-contract/SKILL.md`. |
 | `bthwani-evidence-gate-router-contract` | Select minimum gate tier and tool set. Use before any guard or analysis tool selection. See `.agents/skills/bthwani-evidence-gate-router-contract/SKILL.md`. |

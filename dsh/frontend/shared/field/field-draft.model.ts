@@ -62,9 +62,57 @@ export function useFieldDraftModel({
   const handleSubmitReview = React.useCallback(
     (store: FieldStoreFile) => {
       patchStore(store.id, (s) => ({ ...s, syncStatus: 'syncing' as const }));
-      void fieldRuntime.createStoreFromDraft(store).then(() => {
-        patchStore(store.id, (s) => ({ ...s, syncStatus: 'backend' as const }));
-      }).catch(() => {
+      void fieldRuntime.createStoreFromDraft(store).then(async (res) => {
+        if (!res || !res.id) {
+          throw new Error('No backend store ID returned on review submission confirmation.');
+        }
+        patchStore(store.id, (s) => ({
+          ...s,
+          syncStatus: 'backend' as const,
+          backendStoreId: res.id,
+        }));
+
+        // Asynchronously sync any documents collected during the draft stage now that backendStoreId is available
+        const docs = store.draft.documents;
+        const photos = store.draft.photos;
+
+        if (docs.commercialRegistrationRef) {
+          try {
+            await fieldRuntime.submitDocument(res.id, 'commercial_registration', docs.commercialRegistrationRef);
+          } catch (e) {
+            console.error('[field:sync-docs] Failed to submit CR document:', e);
+          }
+        }
+        if (docs.ownerIdRef) {
+          try {
+            await fieldRuntime.submitDocument(res.id, 'identity_proof', docs.ownerIdRef);
+          } catch (e) {
+            console.error('[field:sync-docs] Failed to submit ID document:', e);
+          }
+        }
+        if (docs.tradeLicenseRef) {
+          try {
+            await fieldRuntime.submitDocument(res.id, 'tax_certificate', docs.tradeLicenseRef);
+          } catch (e) {
+            console.error('[field:sync-docs] Failed to submit tax cert document:', e);
+          }
+        }
+        if (photos.storefrontPhotoRef) {
+          try {
+            await fieldRuntime.submitDocument(res.id, 'storefront_photo', photos.storefrontPhotoRef);
+          } catch (e) {
+            console.error('[field:sync-docs] Failed to submit storefront photo:', e);
+          }
+        }
+        if (photos.interiorPhotoRef) {
+          try {
+            await fieldRuntime.submitDocument(res.id, 'interior_photo', photos.interiorPhotoRef);
+          } catch (e) {
+            console.error('[field:sync-docs] Failed to submit interior photo:', e);
+          }
+        }
+      }).catch((err) => {
+        console.error('[field:submit-review] Error creating store from draft:', err);
         patchStore(store.id, (s) => ({ ...s, syncStatus: 'sync-failed' as const }));
       });
       patchStore(store.id, submitFieldStoreForReview);
@@ -75,7 +123,9 @@ export function useFieldDraftModel({
 
   const handleDocumentUpload = React.useCallback(
     async (store: FieldStoreFile, kind: DshFieldDocumentKind, uploadedRef: string) => {
-      await fieldRuntime.submitDocument(store.id, kind, uploadedRef);
+      if (store.backendStoreId) {
+        await fieldRuntime.submitDocument(store.backendStoreId, kind, uploadedRef);
+      }
       patchStore(store.id, (current) => applyFieldDocumentUploadToStore(current, kind, uploadedRef));
     },
     [fieldRuntime, patchStore],

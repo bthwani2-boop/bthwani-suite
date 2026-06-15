@@ -48,10 +48,14 @@ export function useFieldVisitModel({
         setVisitErrors((current) => ({ ...current, [store.id]: nextErrors }));
         return;
       }
+      if (!store.backendStoreId) {
+        throw new Error('لا يمكن تسجيل زيارة ميدانية قبل تأكيد المتجر الخلفي وحصوله على معرّف معتمد (backendStoreId غير متوفر).');
+      }
       patchStore(store.id, (s) => ({ ...s, syncStatus: 'syncing' as const }));
-      void fieldRuntime.submitVisit(store.id, nextValues).then(() => {
+      void fieldRuntime.submitVisit(store.backendStoreId, nextValues).then(() => {
         patchStore(store.id, (s) => ({ ...s, syncStatus: 'backend' as const }));
-      }).catch(() => {
+      }).catch((err) => {
+        console.error('[field:submit-visit] Error submitting visit:', err);
         patchStore(store.id, (s) => ({ ...s, syncStatus: 'sync-failed' as const }));
       });
       patchStore(store.id, (current) => ({

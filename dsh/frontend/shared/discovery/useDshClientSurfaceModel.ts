@@ -1,26 +1,25 @@
 // Canonical location: dsh/frontend/shared/discovery/useDshClientSurfaceModel.ts
 // Authority: dsh/frontend/shared/discovery — thin orchestration shell for DshClientSurface.
-// Calls topic-level models and wires cross-topic dependencies. No business state.
-// Appearance is injected by the app-client shell (useAppClientAppearance is shell-specific).
+// Wires topic-level models and cross-topic dependencies. No business state.
+// Appearance is injected by the app-client shell.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import { useDshClientHomeComposition } from './client-home.composition';
-import { useDshClientNavigation } from './useDshClientNavigation';
-import { useDshClientHomeActions } from './useDshClientHomeActions';
-import { useDshClientStoreModel } from '../stores/client-store.model';
-import { useDshClientCartState } from '../cart';
-import { useDshOrderTracking } from '../orders';
-import { useWltDshWalletSession } from '../../../../wlt/frontend/dsh/shared';
-import { useDshClientOrderExecution } from '../checkout';
-import { useDshClientNotificationsModel } from '../notifications/client-notifications.model';
-import { useCheckoutAuth } from '../checkout/useCheckoutAuth';
+import type { useDshClientHomeComposition } from './client-home.composition';
+import type { useDshClientNavigation } from './useDshClientNavigation';
+import type { useDshClientHomeActions } from './useDshClientHomeActions';
+import type { useDshClientStoreModel } from '../stores/client-store.model';
+import type { useDshClientCartModel } from '../cart/cart.model';
+import type { useDshClientOrderTrackingModel } from '../orders/client-order-tracking.model';
+import type { useWltDshWalletSession } from '../../../../wlt/frontend/dsh/shared';
+import type { useDshClientCheckoutModel } from '../checkout/checkout.model';
+import type { useDshClientNotificationsModel } from '../notifications/client-notifications.model';
+import type { useCheckoutAuth } from '../checkout/useCheckoutAuth';
 import type {
   DshNavigationCommand,
-  DshFulfillmentDeliveryMode,
 } from '../checkout/dsh-client-binding.contracts';
 
-// Topic-level models
+// Topic-level presenter models (pure computed models)
 import { useDshClientSessionModel } from './client-session.model';
 import { useDshClientNavigationModel } from './client-navigation.model';
 import { useDshClientHomeModel } from './client-home.model';
@@ -41,122 +40,44 @@ export type DshClientSurfaceSharedProps = {
   command: DshNavigationCommand;
   onExit?: () => void;
   onOpenService?: (serviceId: string) => void;
-  authToken?: string;
-  devClientId?: string;
-  dshApiBaseUrl: string | undefined;
-  dshAuthBearerToken: string | undefined;
-  dshClientId: string | undefined;
   isAwnakEnabled: boolean;
   appearance: DshClientAppearance;
+  dshAuthBearerToken: string | undefined;
+  dshClientId: string | undefined;
+
+  // Pre-instantiated models/states passed from the host container (app-client)
+  homeComposition: ReturnType<typeof useDshClientHomeComposition>;
+  navigation: ReturnType<typeof useDshClientNavigation>;
+  storeModel: ReturnType<typeof useDshClientStoreModel>;
+  cart: ReturnType<typeof useDshClientCartModel>;
+  checkoutAuth: ReturnType<typeof useCheckoutAuth>;
+  walletSession: ReturnType<typeof useWltDshWalletSession>;
+  ordersTracking: ReturnType<typeof useDshClientOrderTrackingModel>;
+  checkoutExecution: ReturnType<typeof useDshClientCheckoutModel>;
+  notificationsModel: ReturnType<typeof useDshClientNotificationsModel>;
+  homeActions: ReturnType<typeof useDshClientHomeActions>;
 };
 
 export function useDshClientSurfaceModel({
   command,
   onExit,
   onOpenService,
-  authToken,
-  devClientId,
-  dshApiBaseUrl,
-  dshAuthBearerToken,
-  dshClientId,
   isAwnakEnabled,
   appearance,
+  dshAuthBearerToken,
+  dshClientId,
+  homeComposition,
+  navigation,
+  storeModel,
+  cart,
+  checkoutAuth,
+  walletSession,
+  ordersTracking,
+  checkoutExecution,
+  notificationsModel,
+  homeActions,
 }: DshClientSurfaceSharedProps) {
-  // ── Home + discovery stores ───────────────────────────────────────────────────
-  const homeComposition = useDshClientHomeComposition();
-
-  // ── Navigation ────────────────────────────────────────────────────────────────
-  const navigation = useDshClientNavigation({ command, onExit });
-
-  // ── Store topic model ─────────────────────────────────────────────────────────
-  const storeModel = useDshClientStoreModel({
-    route: navigation.route,
-    clientVisibleDiscoveryStores: homeComposition.clientVisibleDiscoveryStores,
-  });
-
-  // ── Cart ──────────────────────────────────────────────────────────────────────
-  const defaultFulfillmentMode: DshFulfillmentDeliveryMode = 'bthwani_delivery';
-  const cart = useDshClientCartState({
-    activeStore: storeModel.activeStore,
-    activeCanonicalStoreId: storeModel.activeCanonicalStoreId,
-    setActiveCanonicalStoreId: storeModel.setActiveCanonicalStoreId,
-    activeCanonicalProductId: storeModel.activeCanonicalProductId,
-    setActiveCanonicalProductId: storeModel.setActiveCanonicalProductId,
-    setActiveStoreId: storeModel.setActiveStoreId,
-    setRoute: navigation.setRoute,
-    clientVisibleDiscoveryStores: homeComposition.clientVisibleDiscoveryStores,
-    defaultFulfillmentMode,
-  });
-
-  // ── Auth + WLT wallet ─────────────────────────────────────────────────────────
-  const checkoutAuth = useCheckoutAuth({ authToken, dshAuthBearerToken, devClientId, dshClientId });
-  const walletSession = useWltDshWalletSession(checkoutAuth.clientId, checkoutAuth.bearerToken);
-
-  // ── Orders tracking ───────────────────────────────────────────────────────────
-  const ordersTracking = useDshOrderTracking({
-    route: navigation.route,
-    checkoutAuth,
-    createOrderValues: cart.createOrderValues,
-    selectedFulfillmentMode: cart.selectedFulfillmentMode,
-    defaultFulfillmentMode,
-    setRoute: navigation.setRoute,
-    setSelectedFulfillmentMode: cart.setSelectedFulfillmentMode,
-    setCreateOrderValues: cart.setCreateOrderValues,
-  });
-
-  // ── Checkout execution ────────────────────────────────────────────────────────
-  const checkoutExecution = useDshClientOrderExecution({
-    cartItems: cart.cartItems,
-    setCartItems: cart.setCartItems,
-    activeStore: storeModel.activeStore,
-    selectedFulfillmentMode: cart.selectedFulfillmentMode,
-    setSelectedFulfillmentMode: cart.setSelectedFulfillmentMode,
-    checkoutAuth,
-    walletSession,
-    createOrderValues: cart.createOrderValues,
-    setCreateOrderValues: cart.setCreateOrderValues,
-    setRoute: navigation.setRoute,
-    openTrackedOrder: ordersTracking.openTrackedOrder,
-    setOrdersListState: ordersTracking.setOrdersListState,
-    setSelectedOrderId: ordersTracking.setSelectedOrderId,
-    setTrackingClientState: ordersTracking.setTrackingClientState,
-    setTrackingOrderOverride: ordersTracking.setTrackingOrderOverride,
-  });
-
-  // ── Notifications topic model ─────────────────────────────────────────────────
-  const notificationsModel = useDshClientNotificationsModel({
-    route: navigation.route,
-    dshApiBaseUrl,
-    checkoutAuth,
-    setRoute: navigation.setRoute,
-  });
-
-  // ── Home actions (cross-topic) ────────────────────────────────────────────────
-  const homeActions = useDshClientHomeActions({
-    setRoute: navigation.setRoute,
-    clientVisibleDiscoveryStores: homeComposition.clientVisibleDiscoveryStores,
-    clientVisibleHomeStores: homeComposition.clientVisibleHomeStores,
-    isAwnakEnabled,
-    setSheinInlineOpen: navigation.setSheinInlineOpen,
-    setAwnakInlineOpen: navigation.setAwnakInlineOpen,
-    activeStore: storeModel.activeStore,
-    selectedFulfillmentMode: cart.selectedFulfillmentMode,
-    setSelectedFulfillmentMode: cart.setSelectedFulfillmentMode,
-    setCreateOrderValues: cart.setCreateOrderValues,
-    setActiveStoreId: storeModel.setActiveStoreId,
-    setActiveCanonicalStoreId: storeModel.setActiveCanonicalStoreId,
-    setActiveCanonicalProductId: storeModel.setActiveCanonicalProductId,
-    setItemsQuery: storeModel.setItemsQuery,
-    setItemsCategory: storeModel.setItemsCategory,
-    setSelectedItemId: storeModel.setSelectedItemId,
-    setStoreItemsEntryOrigin: cart.setStoreItemsEntryOrigin,
-    favoriteOverrides: storeModel.favoriteOverrides,
-    setFavoriteOverrides: storeModel.setFavoriteOverrides,
-    hasStoreTarget: (storeId?: string) =>
-      typeof storeId === 'string' && homeComposition.clientVisibleDiscoveryStores.some((s) => s.id === storeId),
-  });
-
-  // ── Topic-level compositions ─────────────────────────────────────────────────
+  // Topic-level compositions (pure presenter models, no state ownership)
   const sessionTopic = useDshClientSessionModel({
     dshAuthBearerToken,
     dshClientId,

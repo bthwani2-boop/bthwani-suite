@@ -1,6 +1,12 @@
-// Canonical location: dsh/frontend/shared/delivery/index.ts
-// Authority: dsh/frontend/shared/delivery — delivery domain entrypoint.
-
+// Types & Contracts
 export * from './delivery.contract';
-export * from './delivery.policy';
 export * from './fulfillment';
+
+// Policies
+export * from './delivery.policy';
+
+// View-Models
+export * from './delivery.view-model';
+
+// Adapters
+export * from './delivery.adapters';

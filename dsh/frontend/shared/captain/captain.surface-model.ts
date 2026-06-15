@@ -1,21 +1,17 @@
 // Canonical location: dsh/frontend/shared/captain/captain.surface-model.ts
 // Authority: dsh/frontend/shared/captain — thin orchestration shell for captain surface.
 // Wires topic models (navigation, chat, service-mode, pod, delivery) around shared state.
+// Composition-only: no local React state or side-effects.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
 import type {
   DshCaptainRoute,
-  CaptainAvailabilityStatus,
-  CaptainAppMode,
   CaptainSupportRoute,
   CompactOrderChatMessage,
-  CaptainServiceType,
 } from './captain.contract';
-import {
-  type DshCaptainLocationPush,
-  useCaptainOrderRuntime,
-  useCaptainActiveLocationPush,
+import type {
+  DshCaptainLocationPush,
 } from './use-captain-order-runtime';
 import type {
   DshCaptainNavigationCommand,
@@ -23,20 +19,18 @@ import type {
   DshCaptainSurfaceDerived,
 } from './captain.surface.types';
 import { buildCaptainDerived } from './captain.derived';
-import { getRouteForCommandTarget } from '../delivery/delivery.policy';
 
-// Topic models
-import { useCaptainAvailabilityModel } from './captain-availability.model';
-import { useCaptainGpsModel } from './captain-gps.model';
-import { useCaptainProfileModel } from './captain-profile.model';
-import { useDeliveryLifecycle } from '../delivery/delivery.lifecycle';
-import { useCaptainDeliveryActions } from '../delivery/delivery.actions';
-import { usePodUploadFlow } from '../media/pod/pod-upload-flow';
-import { useCaptainOrderModel } from '../orders/captain-order.model';
-import { useCaptainChatModel } from '../support/captain-chat.model';
-
-import { useCaptainNavigationModel } from './captain-navigation.model';
-import { useCaptainServiceModeModel } from './captain-service-mode.model';
+// Import type annotations for sub-models
+import type { useCaptainAvailabilityModel } from './captain-availability.model';
+import type { useCaptainGpsModel } from './captain-gps.model';
+import type { useCaptainProfileModel } from './captain-profile.model';
+import type { useDeliveryLifecycle } from '../delivery/delivery.lifecycle';
+import type { useCaptainDeliveryActions } from '../delivery/delivery.actions';
+import type { usePodUploadFlow } from '../media/pod/pod-upload-flow';
+import type { useCaptainOrderModel } from '../orders/captain-order.model';
+import type { useCaptainChatModel } from '../support/captain-chat.model';
+import type { useCaptainNavigationModel } from './captain-navigation.model';
+import type { useCaptainServiceModeModel } from './captain-service-mode.model';
 
 export type {
   ActiveOrderPhase,
@@ -46,81 +40,53 @@ export type {
   DshCaptainSurfaceDerived,
 } from './captain.surface.types';
 
-export function useDshCaptainSurfaceModel(
-  command: DshCaptainNavigationCommand,
-  captainRuntimeId: string,
-): { state: DshCaptainSurfaceState; actions: ReturnType<typeof buildCaptainActions>; derived: DshCaptainSurfaceDerived } {
-  const [route, setRoute] = React.useState<DshCaptainRoute>(getRouteForCommandTarget(command.target));
-  const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<CaptainSupportRoute>('orders-list');
+export type DshCaptainSurfaceSharedProps = {
+  command: DshCaptainNavigationCommand;
+  captainRuntimeId: string;
 
-  // Topic states and actions
-  const availabilityModel = useCaptainAvailabilityModel();
-  const gpsModel = useCaptainGpsModel();
-  const profileModel = useCaptainProfileModel();
-  const lifecycle = useDeliveryLifecycle();
-  const podUpload = usePodUploadFlow();
-  const orderModel = useCaptainOrderModel();
-  const chatModel = useCaptainChatModel();
+  // Pre-instantiated state & setters
+  route: DshCaptainRoute;
+  setRoute: React.Dispatch<React.SetStateAction<DshCaptainRoute>>;
+  selectedSupportScreen: CaptainSupportRoute;
+  setSelectedSupportScreen: React.Dispatch<React.SetStateAction<CaptainSupportRoute>>;
 
-  const captainOrderRuntime = useCaptainOrderRuntime();
-  useCaptainActiveLocationPush({
-    activeOrderId: orderModel.activeOrderId,
-    captainId: captainRuntimeId,
-    lifecycleStatus: lifecycle.inboxState,
-  });
+  // Pre-instantiated topic models
+  availabilityModel: ReturnType<typeof useCaptainAvailabilityModel>;
+  gpsModel: ReturnType<typeof useCaptainGpsModel>;
+  profileModel: ReturnType<typeof useCaptainProfileModel>;
+  lifecycle: ReturnType<typeof useDeliveryLifecycle>;
+  podUpload: ReturnType<typeof usePodUploadFlow>;
+  orderModel: ReturnType<typeof useCaptainOrderModel>;
+  chatModel: ReturnType<typeof useCaptainChatModel>;
+  navModel: ReturnType<typeof useCaptainNavigationModel>;
+  serviceModeModel: ReturnType<typeof useCaptainServiceModeModel>;
+  deliveryActions: ReturnType<typeof useCaptainDeliveryActions>;
+  pushLocation: (push: DshCaptainLocationPush) => Promise<any>;
+};
 
-  // ── Topic models navigation & mode switching ─────────────────────────────────
-  const navModel = useCaptainNavigationModel({
-    command,
-    route,
-    setRoute,
-    setActiveOrderId: orderModel.setActiveOrderId,
-    setSelectedSupportScreen,
-  });
-
-  const serviceModeModel = useCaptainServiceModeModel({
-    setActiveServiceType: profileModel.setActiveServiceType,
-    setRoute,
-    setInboxState: lifecycle.setInboxState,
-    setActiveOrderId: orderModel.setActiveOrderId,
-    setActiveOrderExpanded: orderModel.setActiveOrderExpanded,
-    setIsPickupSheetVisible: lifecycle.setIsPickupSheetVisible,
-    setIsDeliverySheetVisible: lifecycle.setIsDeliverySheetVisible,
-    setCaptainAppMode: profileModel.setCaptainAppMode,
-  });
-
-  // ── Reset helpers shared across delivery + pod ────────────────────────────────
-  const resetOrderState = React.useCallback(() => {
-    orderModel.setActiveOrderExpanded(false);
-    lifecycle.setActiveOrderPhase('pickup');
-    chatModel.setActiveOrderDraft('');
-    chatModel.setActiveOrderMessages([]);
-    podUpload.resetPodFields();
-  }, [orderModel, lifecycle, chatModel, podUpload]);
-
-  // ── Delivery actions ──────────────────────────────────────────────────────────
-  const deliveryActions = useCaptainDeliveryActions({
-    captainRuntimeId,
-    activeOrderId: orderModel.activeOrderId,
-    setActiveOrderId: orderModel.setActiveOrderId,
-    captainPodPhotoUri: podUpload.captainPodPhotoUri,
-    captainPodMediaKey: podUpload.captainPodMediaKey,
-    captainAppMode: profileModel.captainAppMode,
-    setRoute,
-    resetOrderState,
-    inboxState: lifecycle.inboxState,
-    setInboxState: lifecycle.setInboxState,
-    setStoreCourierStage: lifecycle.setStoreCourierStage,
-    setIsDeclineSheetVisible: lifecycle.setIsDeclineSheetVisible,
-    setDeclineSheetState: lifecycle.setDeclineSheetState,
-    setIsPickupSheetVisible: lifecycle.setIsPickupSheetVisible,
-    setPickupSheetState: lifecycle.setPickupSheetState,
-    setActiveOrderPhase: lifecycle.setActiveOrderPhase,
-    setActiveOrderMessages: chatModel.setActiveOrderMessages,
-    setCaptainPodState: podUpload.setCaptainPodState,
-    setActiveOrderExpanded: orderModel.setActiveOrderExpanded,
-  });
-
+export function useDshCaptainSurfaceModel({
+  command,
+  captainRuntimeId,
+  route,
+  setRoute,
+  selectedSupportScreen,
+  setSelectedSupportScreen,
+  availabilityModel,
+  gpsModel,
+  profileModel,
+  lifecycle,
+  podUpload,
+  orderModel,
+  chatModel,
+  navModel,
+  serviceModeModel,
+  deliveryActions,
+  pushLocation,
+}: DshCaptainSurfaceSharedProps): {
+  state: DshCaptainSurfaceState;
+  actions: ReturnType<typeof buildCaptainActions>;
+  derived: DshCaptainSurfaceDerived;
+} {
   // ── State aggregation for backward compatibility ──────────────────────────────
   const state: DshCaptainSurfaceState = {
     activeServiceType: profileModel.activeServiceType,
@@ -206,7 +172,7 @@ export function useDshCaptainSurfaceModel(
     handleSelectServiceType: serviceModeModel.handleSelectServiceType,
     openStoreCourierProof: () => podUpload.openStoreCourierProof(profileModel.captainAppMode, setRoute),
     toggleStoreCourierMode: serviceModeModel.toggleStoreCourierMode,
-    pushLocation: (push: DshCaptainLocationPush) => captainOrderRuntime.pushLocation(push),
+    pushLocation,
     ...deliveryActions,
   });
 

@@ -5,6 +5,7 @@ export * from './orders.client-state';
 export * from './orders.api';
 export * from './orders.adapters';
 export * from './orders.view-model';
+export * from './client-order-tracking.model';
 
 export {
   getSurfaceModeCapability,

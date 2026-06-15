@@ -226,11 +226,16 @@ export function submitFieldStoreForReview(store: FieldStoreFile): FieldStoreFile
 }
 
 function createBaseStore(overrides?: Partial<FieldStoreFile>): FieldStoreFile {
+  const syncStatus = overrides?.syncStatus ?? 'backend';
+  const id = overrides?.id ?? generateDraftId('field-store');
+  const backendStoreId = syncStatus === 'backend' ? id : overrides?.backendStoreId;
+
   return syncFieldStoreFromDraft({
-    id: overrides?.id ?? generateDraftId('field-store'),
+    id,
     source: overrides?.source ?? 'backend',
     draftLocalId: overrides?.draftLocalId,
-    syncStatus: overrides?.syncStatus ?? 'backend',
+    backendStoreId,
+    syncStatus,
     name: overrides?.name ?? 'ملف انضمام جديد',
     category: overrides?.category ?? 'قيد التحديد',
     location: overrides?.location ?? 'الرياض',

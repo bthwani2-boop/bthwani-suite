@@ -41,6 +41,10 @@
     "useHomeFilterRail.tsx": [
       "ui_only_media_upload_logic"
     ],
+    "dsh/frontend/app-captain/useDshCaptainSurfaceModel.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_forbidden_hooks"
+    ],
     "dsh/frontend/app-captain/screens/DshCaptainFinanceScreen.tsx": [
       "ui_only_preview_demo_mock_fallback_runtime"
     ],

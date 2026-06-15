@@ -82,7 +82,8 @@ const requiredSkills = [
   "bthwani-release-runtime-gates",
   "bthwani-observability-performance-contract",
   "bthwani-agent-skill-authoring-contract",
-  "bthwani-agent-registry-validator"
+  "bthwani-agent-registry-validator",
+  "bthwani-full-stack-clean-code-skill"
 ];
 
 for (const skill of requiredSkills) {

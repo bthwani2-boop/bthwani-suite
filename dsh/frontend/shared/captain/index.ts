@@ -6,6 +6,4 @@ export * from './captain.cod';
 export * from './captain.state';
 export * from './captain.surface-model';
 export * from './captain-navigation.model';
-export * from './captain-chat.model';
 export * from './captain-service-mode.model';
-export * from './captain-pod.model';
