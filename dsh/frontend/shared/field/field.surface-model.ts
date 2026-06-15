@@ -32,15 +32,18 @@ export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
 
   // activeStore derived in shell — avoids circular dep (navModel used to take stores)
   const activeStore = React.useMemo(() => {
+    if (route.kind === 'visit') {
+      return draftModel.stores.find((s) => s.backendStoreId === route.backendStoreId) ?? null;
+    }
     if (!('storeId' in route)) return null;
-    return draftModel.stores.find((s) => s.id === (route as { storeId: string }).storeId) ?? null;
+    return draftModel.stores.find((s) => s.id === route.storeId) ?? null;
   }, [route, draftModel.stores]);
 
   const readiness = useFieldReadinessModel(activeStore);
 
   // Guard: if current route points to a deleted storeId, fall back to stores list
   React.useEffect(() => {
-    if ('storeId' in route && !activeStore) {
+    if ((('storeId' in route) || route.kind === 'visit') && !activeStore) {
       resetToStores();
     }
   }, [activeStore, route, resetToStores]);

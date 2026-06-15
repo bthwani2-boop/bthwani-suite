@@ -7,23 +7,27 @@ import type { DshFieldNavigationCommand, DshFieldRouteState } from './field.type
 
 function isSameRoute(left: DshFieldRouteState, right: DshFieldRouteState): boolean {
   if (left.kind !== right.kind) return false;
-  if (
-    (left.kind === 'onboarding' || left.kind === 'visit' || left.kind === 'readiness-escalation' || left.kind === 'document-upload') &&
-    (right.kind === 'onboarding' || right.kind === 'visit' || right.kind === 'readiness-escalation' || right.kind === 'document-upload')
-  ) {
-    return (left as { storeId: string }).storeId === (right as { storeId: string }).storeId;
+  if (left.kind === 'visit' && right.kind === 'visit') {
+    return left.backendStoreId === right.backendStoreId;
+  }
+  if (left.kind === 'onboarding' && right.kind === 'onboarding') {
+    return left.storeId === right.storeId;
+  }
+  if (left.kind === 'readiness-escalation' && right.kind === 'readiness-escalation') {
+    return left.storeId === right.storeId;
+  }
+  if (left.kind === 'document-upload' && right.kind === 'document-upload') {
+    return left.storeId === right.storeId;
   }
   return true;
 }
 
 function resolveCommandRoute(command?: DshFieldNavigationCommand): DshFieldRouteState | null {
   if (!command) return null;
-  if (
-    command.target === 'onboarding' ||
-    command.target === 'visit' ||
-    command.target === 'readiness-escalation' ||
-    command.target === 'document-upload'
-  ) {
+  if (command.target === 'visit') {
+    return command.storeId ? { kind: 'visit', backendStoreId: command.storeId } : { kind: 'stores' };
+  }
+  if (command.target === 'onboarding' || command.target === 'readiness-escalation' || command.target === 'document-upload') {
     return command.storeId ? { kind: command.target, storeId: command.storeId } : { kind: 'stores' };
   }
   return { kind: command.target };

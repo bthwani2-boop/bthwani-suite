@@ -4,11 +4,10 @@ import type { BthwaniFullStackCapabilityId, DshSharedTopicId } from './bthwani-f
 
 export type BthwaniFullStackClosureStatus =
   | 'contract-required'       // backend/OpenAPI contracts not yet implemented
-  | 'runtime-bound'           // contracts exist, awaiting runtime + visual evidence
   | 'needs-runtime-evidence'  // code complete, runtime evidence collection pending
   | 'blocked-by-policy'       // blocked on external dependency or policy decision
-  | 'code-evidence-complete'  // all code-level evidence done (git-diff, guard, typecheck); no runtime/visual required
-  | 'closed';                 // all required evidence collected — CLOSED_WITH_EVIDENCE
+  | 'needs-visual-evidence'   // runtime/code evidence exists, visual evidence collection pending
+  | 'closed';                 // all required current evidence collected
 
 export type BthwaniFullStackEvidencePack = {
   /** ISO date when this evidence was last verified */
@@ -51,13 +50,14 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: false,
     evidenceRequired: ['git-diff', 'guard', 'typecheck'],
-    closureStatus: 'closed',
+    closureStatus: 'needs-runtime-evidence',
     evidencePack: {
-      verifiedAt: '2026-06-15',
-      gitDiff: 'feat/dsh-surface-refactor — 61 commits ahead of main',
-      guardRun: 'guard:bthwani-full-stack:strict PASS',
-      typecheckRun: 'pnpm exec tsc --noEmit --skipLibCheck: 0 errors',
+      verifiedAt: '2026-06-16',
+      gitDiff: 'tools/registry/runs/DSH_WLT_BRANCH_TRUTH_RESET-20260616-022353/ahead-behind.txt — origin/main...origin/feat/dsh-surface-refactor = 0 behind / 67 ahead at 88840dde47c5e5c491b10084fc897a5f2a3e0f82',
+      guardRun: 'node tools/guards/guard-ui-only-roots-ownership.mjs --strict-meta PASS; full-stack/runtime/type evidence still requires current rerun',
+      typecheckRun: 'NEEDS_CURRENT_TYPECHECK_EVIDENCE',
     },
+    blockers: ['current-full-stack-guard-required', 'current-typecheck-required'],
   },
   'actor-auth-permissions': {
     id: 'actor-auth-permissions',
@@ -85,15 +85,16 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: true,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'closed',
+    closureStatus: 'needs-runtime-evidence',
     evidencePack: {
-      verifiedAt: '2026-06-15',
-      gitDiff: 'feat/dsh-surface-refactor — 61 commits ahead of main',
-      guardRun: 'guard:bthwani-full-stack:strict PASS',
-      typecheckRun: 'pnpm exec tsc --noEmit: 0 errors',
-      runtimeOutput: 'Backend routes: GET /api/v1/catalog, GET /api/v1/stores. OpenAPI: dsh-openapi.types.ts (paths: /catalog, /stores).',
-      visualOutput: 'App Client: StoreItemsScreen renders catalogs. Control Panel: catalogs.screen renders catalog table.',
+      verifiedAt: '2026-06-16',
+      gitDiff: 'tools/registry/runs/DSH_WLT_BRANCH_TRUTH_RESET-20260616-022353/ahead-behind.txt — origin/main...origin/feat/dsh-surface-refactor = 0 behind / 67 ahead at 88840dde47c5e5c491b10084fc897a5f2a3e0f82',
+      guardRun: 'NEEDS_CURRENT_CATALOG_GUARD_EVIDENCE',
+      typecheckRun: 'NEEDS_CURRENT_TYPECHECK_EVIDENCE',
+      runtimeOutput: 'NEEDS_CURRENT_RUNTIME_EVIDENCE',
+      visualOutput: 'NEEDS_CURRENT_VISUAL_EVIDENCE',
     },
+    blockers: ['current-catalog-runtime-evidence-required', 'current-catalog-visual-evidence-required'],
   },
   'media-runtime': {
     id: 'media-runtime',
@@ -105,15 +106,16 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: true,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'closed',
+    closureStatus: 'needs-runtime-evidence',
     evidencePack: {
-      verifiedAt: '2026-06-15',
-      gitDiff: 'feat/dsh-surface-refactor — 61 commits ahead of main',
-      guardRun: 'guard:real-media-runtime PASS',
-      typecheckRun: 'pnpm exec tsc --noEmit: 0 errors',
-      runtimeOutput: 'Backend: POST /api/v1/media/upload. OpenAPI paths: /media/upload. Shared topic: shared/media/field-document-media.ts',
-      visualOutput: 'DshFieldDocumentUploadScreen renders document scanner and uploads media via resolveFieldDocumentDraftMediaKey.',
+      verifiedAt: '2026-06-16',
+      gitDiff: 'tools/registry/runs/DSH_WLT_BRANCH_TRUTH_RESET-20260616-022353/ahead-behind.txt — origin/main...origin/feat/dsh-surface-refactor = 0 behind / 67 ahead at 88840dde47c5e5c491b10084fc897a5f2a3e0f82',
+      guardRun: 'NEEDS_CURRENT_REAL_MEDIA_RUNTIME_GUARD_EVIDENCE',
+      typecheckRun: 'NEEDS_CURRENT_TYPECHECK_EVIDENCE',
+      runtimeOutput: 'NEEDS_CURRENT_RUNTIME_EVIDENCE',
+      visualOutput: 'NEEDS_CURRENT_VISUAL_EVIDENCE',
     },
+    blockers: ['current-media-runtime-evidence-required', 'current-media-visual-evidence-required'],
   },
   'cart-checkout': {
     id: 'cart-checkout',
@@ -157,15 +159,16 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: true,
     mediaRequired: true,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'closed',
+    closureStatus: 'needs-runtime-evidence',
     evidencePack: {
-      verifiedAt: '2026-06-15',
-      gitDiff: 'feat/dsh-surface-refactor — 61 commits ahead of main',
-      guardRun: 'guard:bthwani-full-stack:strict PASS',
-      typecheckRun: 'pnpm exec tsc --noEmit: 0 errors',
-      runtimeOutput: 'Backend routes: GET /api/v1/captain/delivery. OpenAPI paths: /captain/delivery. Shared topic: shared/delivery/delivery.lifecycle.ts',
-      visualOutput: 'App Captain: DshCaptainSurface renders order delivery stage and tracking.',
+      verifiedAt: '2026-06-16',
+      gitDiff: 'tools/registry/runs/DSH_WLT_BRANCH_TRUTH_RESET-20260616-022353/ahead-behind.txt — origin/main...origin/feat/dsh-surface-refactor = 0 behind / 67 ahead at 88840dde47c5e5c491b10084fc897a5f2a3e0f82',
+      guardRun: 'NEEDS_CURRENT_CAPTAIN_DELIVERY_GUARD_EVIDENCE',
+      typecheckRun: 'NEEDS_CURRENT_TYPECHECK_EVIDENCE',
+      runtimeOutput: 'NEEDS_CURRENT_RUNTIME_EVIDENCE',
+      visualOutput: 'NEEDS_CURRENT_VISUAL_EVIDENCE',
     },
+    blockers: ['captain-surface-debrain-required', 'current-captain-runtime-evidence-required'],
   },
   'partner-operations': {
     id: 'partner-operations',
@@ -193,15 +196,16 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: true,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'closed',
+    closureStatus: 'needs-runtime-evidence',
     evidencePack: {
-      verifiedAt: '2026-06-15',
-      gitDiff: 'feat/dsh-surface-refactor — 61 commits ahead of main',
-      guardRun: 'guard:bthwani-full-stack:strict PASS',
-      typecheckRun: 'pnpm exec tsc --noEmit: 0 errors',
-      runtimeOutput: 'Backend routes: GET /api/v1/field/readiness. OpenAPI paths: /field/readiness. Shared topic: shared/field/field-readiness.model.ts',
-      visualOutput: 'App Field: DshFieldSurface renders store onboarding checklist.',
+      verifiedAt: '2026-06-16',
+      gitDiff: 'tools/registry/runs/DSH_WLT_BRANCH_TRUTH_RESET-20260616-022353/ahead-behind.txt — origin/main...origin/feat/dsh-surface-refactor = 0 behind / 67 ahead at 88840dde47c5e5c491b10084fc897a5f2a3e0f82',
+      guardRun: 'NEEDS_CURRENT_FIELD_READINESS_GUARD_EVIDENCE',
+      typecheckRun: 'NEEDS_CURRENT_TYPECHECK_EVIDENCE',
+      runtimeOutput: 'NEEDS_CURRENT_RUNTIME_EVIDENCE; visit contract still contains runtimeTruth:false until P0-08 is implemented',
+      visualOutput: 'NEEDS_CURRENT_VISUAL_EVIDENCE',
     },
+    blockers: ['field-backend-id-route-boundary-required', 'field-visit-runtime-truth-required'],
   },
   'support-escalation': {
     id: 'support-escalation',
@@ -245,14 +249,15 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: false,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'visual'],
-    closureStatus: 'closed',
+    closureStatus: 'needs-visual-evidence',
     evidencePack: {
-      verifiedAt: '2026-06-15',
-      gitDiff: 'feat/dsh-surface-refactor — 61 commits ahead of main',
-      guardRun: 'guard:bthwani-full-stack:strict PASS',
-      typecheckRun: 'pnpm exec tsc --noEmit: 0 errors',
-      visualOutput: 'Control Panel: CommandCenter and LiveOrdersScreen render administrative dispatch tools.',
+      verifiedAt: '2026-06-16',
+      gitDiff: 'tools/registry/runs/DSH_WLT_BRANCH_TRUTH_RESET-20260616-022353/ahead-behind.txt — origin/main...origin/feat/dsh-surface-refactor = 0 behind / 67 ahead at 88840dde47c5e5c491b10084fc897a5f2a3e0f82',
+      guardRun: 'NEEDS_CURRENT_CONTROL_PANEL_GUARD_EVIDENCE',
+      typecheckRun: 'NEEDS_CURRENT_TYPECHECK_EVIDENCE',
+      visualOutput: 'NEEDS_CURRENT_VISUAL_EVIDENCE',
     },
+    blockers: ['current-control-panel-visual-evidence-required'],
   },
   notifications: {
     id: 'notifications',

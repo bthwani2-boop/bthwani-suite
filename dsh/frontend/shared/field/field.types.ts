@@ -113,7 +113,7 @@ export type DshFieldRoute =
 export type DshFieldRouteState =
   | { kind: 'stores' }
   | { kind: 'onboarding'; storeId: string }
-  | { kind: 'visit'; storeId: string }
+  | { kind: 'visit'; backendStoreId: string }
   | { kind: 'account' }
   | { kind: 'profile' }
   | { kind: 'history' }
@@ -139,10 +139,10 @@ export type DshFieldSurfaceHostProps = DshFieldSurfaceProps;
 // ── Visit contract ─────────────────────────────────────────────────────────
 
 export const dshFieldVisitContractMeta = {
-  dataKind: 'SCAFFOLD_PENDING_BINDING',
-  runtimeTruth: false,
-  backendSource: false,
-  bindingSource: false,
+  dataKind: 'BACKEND_RUNTIME_BINDING_REQUIRED',
+  runtimeTruth: true,
+  backendSource: true,
+  bindingSource: true,
 } as const;
 
 export type DshFieldStoreVisitState =

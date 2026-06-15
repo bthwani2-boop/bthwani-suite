@@ -34,6 +34,7 @@ export * from './bridges';
 
 // Finance Hub Topic — DSH finance event kinds, maker-checker, statements, runtime adapters
 export * from './finance-hub';
+export * from './control-panel/finance-hub-view.model';
 
 // Clients — typed HTTP clients for WLT backend
 export * from './clients';

@@ -11,6 +11,7 @@ import type {
 } from './captain.contract';
 import type {
   DshCaptainLocationPush,
+  useCaptainOrderRuntime,
 } from './use-captain-order-runtime';
 import type {
   DshCaptainNavigationCommand,
@@ -57,7 +58,7 @@ export type DshCaptainSurfaceSharedProps = {
   navModel: ReturnType<typeof useCaptainNavigationModel>;
   serviceModeModel: ReturnType<typeof useCaptainServiceModeModel>;
   deliveryActions: ReturnType<typeof useCaptainDeliveryActions>;
-  pushLocation: (push: DshCaptainLocationPush) => Promise<any>;
+  pushLocation: ReturnType<typeof useCaptainOrderRuntime>['pushLocation'];
 };
 
 export function useDshCaptainSurfaceModel({

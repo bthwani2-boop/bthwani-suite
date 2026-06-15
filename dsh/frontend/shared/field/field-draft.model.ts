@@ -66,7 +66,7 @@ export function useFieldDraftModel({
         if (!res || !res.id) {
           throw new Error('No backend store ID returned on review submission confirmation.');
         }
-        patchStore(store.id, (s) => ({
+        patchStore(store.id, (s) => submitFieldStoreForReview({
           ...s,
           syncStatus: 'backend' as const,
           backendStoreId: res.id,
@@ -111,12 +111,15 @@ export function useFieldDraftModel({
             console.error('[field:sync-docs] Failed to submit interior photo:', e);
           }
         }
+        pushRoute({ kind: 'visit', backendStoreId: res.id });
       }).catch((err) => {
         console.error('[field:submit-review] Error creating store from draft:', err);
-        patchStore(store.id, (s) => ({ ...s, syncStatus: 'sync-failed' as const }));
+        patchStore(store.id, (s) => ({
+          ...s,
+          syncStatus: 'sync-failed' as const,
+          reviewFeedback: 'تعذر تأكيد المتجر من الخلفية. ابق في الإضافة ولا تفتح الزيارة حتى يتوفر backendStoreId.',
+        }));
       });
-      patchStore(store.id, submitFieldStoreForReview);
-      pushRoute({ kind: 'visit', storeId: store.id });
     },
     [fieldRuntime, patchStore, pushRoute],
   );

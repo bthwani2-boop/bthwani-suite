@@ -11,7 +11,7 @@ import type { useDshClientHomeActions } from './useDshClientHomeActions';
 import type { useDshClientStoreModel } from '../stores/client-store.model';
 import type { useDshClientCartModel } from '../cart/cart.model';
 import type { useDshClientOrderTrackingModel } from '../orders/client-order-tracking.model';
-import type { useWltDshWalletSession } from '../../../../wlt/frontend/dsh/shared';
+import type { useDshClientWltReadModel } from '../finance-boundary';
 import type { useDshClientCheckoutModel } from '../checkout/checkout.model';
 import type { useDshClientNotificationsModel } from '../notifications/client-notifications.model';
 import type { useCheckoutAuth } from '../checkout/useCheckoutAuth';
@@ -51,7 +51,7 @@ export type DshClientSurfaceSharedProps = {
   storeModel: ReturnType<typeof useDshClientStoreModel>;
   cart: ReturnType<typeof useDshClientCartModel>;
   checkoutAuth: ReturnType<typeof useCheckoutAuth>;
-  walletSession: ReturnType<typeof useWltDshWalletSession>;
+  walletSession: ReturnType<typeof useDshClientWltReadModel>;
   ordersTracking: ReturnType<typeof useDshClientOrderTrackingModel>;
   checkoutExecution: ReturnType<typeof useDshClientCheckoutModel>;
   notificationsModel: ReturnType<typeof useDshClientNotificationsModel>;

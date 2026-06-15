@@ -12,7 +12,7 @@ import {
 } from '../../shared';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from '../../shared';
 import {
-  buildWltRuntimeFinancialCenter,
+  buildWltDshFinanceHubViewModel,
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
 } from '../../shared';
@@ -172,14 +172,19 @@ export function WltDshFinanceHubHost({
     };
   }, []);
 
-  // Daily center metrics calculation
-  const center = React.useMemo(() => {
-    const businessDate = new Date().toISOString().split('T')[0]!;
-    if (runtimeFinance?.state === 'runtime') {
-      return buildWltRuntimeFinancialCenter(businessDate, runtimeFinance.data);
-    }
-    return null;
-  }, [runtimeFinance]);
+  const financeHubView = React.useMemo(
+    () => buildWltDshFinanceHubViewModel(runtimeFinance),
+    [runtimeFinance],
+  );
+  const {
+    center,
+    pendingCount,
+    openRisksCount,
+    affectedSurfaces,
+    requiredAction,
+    operationalRisk,
+    holdsStatus,
+  } = financeHubView;
 
   const runtimeSourceLabel = React.useMemo(() => {
     if (!runtimeFinance) return 'WLT runtime: loading';
@@ -187,65 +192,8 @@ export function WltDshFinanceHubHost({
     return `WLT runtime blocked: ${runtimeFinance.baseUrl}`;
   }, [runtimeFinance]);
 
-  const pendingCount = React.useMemo(
-    () => center?.allEntries.filter((e) => e.isPending).length ?? 0,
-    [center],
-  );
-
-  const openRisksCount = React.useMemo(
-    () => center?.allEntries.filter((e) => e.status === 'blocked' || e.status === 'disputed').length ?? 0,
-    [center],
-  );
-
   const activeGroupMeta = getFinanceGroupMeta(activeGroup);
   const hubHref = buildFinanceHref(activeGroup, { subGroup: activeSubGroup, panel });
-
-  const affectedSurfaces = React.useMemo(() => {
-    if (!center) return '—';
-    const list = new Set<string>();
-    center.allEntries.forEach((e) => {
-      if (e.isPending || e.status === 'blocked' || e.status === 'disputed') {
-        if (e.partyKind === 'client') list.add('العملاء');
-        if (e.partyKind === 'partner') list.add('الشركاء');
-        if (e.partyKind === 'captain') list.add('الكباتن');
-        if (e.partyKind === 'field') list.add('الميدانيين');
-      }
-    });
-    if (list.size === 0) return 'لا يوجد طرف متأثر حالياً';
-    return Array.from(list).join(' · ');
-  }, [center]);
-
-  const requiredAction = React.useMemo(() => {
-    if (!center) return '—';
-    if (center.blockingVariances.length > 0) return 'تحقيق ومطابقة الفوارق يدوياً';
-    if (center.allEntries.some((e) => e.status === 'pending')) return 'اعتماد وصرف المستحقات مع WLT';
-    return 'مراقبة وتدقيق الأرصدة اليومية';
-  }, [center]);
-
-  const operationalRisk = React.useMemo(() => {
-    if (!center) return '—';
-    if (center.blockingVariances.length > 0) {
-      return `يوجد فوارق معلقة (${center.blockingVariances.length} فارق نشط)`;
-    }
-    if (center.allEntries.some((e) => e.status === 'blocked')) {
-      return 'مخاطر حرج عالية (High Risk)';
-    }
-    if (center.allEntries.some((e) => e.status === 'disputed' || e.status === 'pending')) {
-      return 'تنبيه تدقيق متوسط (Medium Risk)';
-    }
-    return 'لا توجد مخاطر مالية مكشوفة';
-  }, [center]);
-
-  const holdsStatus = React.useMemo(() => {
-    if (!center) return '—';
-    if (center.blockingVariances.length > 0) {
-      return '🔒 معلق بالكامل (تسوية وصرف محجوبة)';
-    }
-    if (center.allEntries.some((entry) => entry.status === 'blocked' || entry.status === 'disputed')) {
-      return '⚠️ تعليق جزئي (حظر تسوية متأثرة)';
-    }
-    return '✓ لا يوجد حظر (جاهز للتسوية)';
-  }, [center]);
 
   const renderActiveScreen = (groupId: CanonicalFinanceGroupId, subGroupId: string | undefined, currentHref: string) => {
     const activeSub = subGroupId || getFinanceGroupMeta(groupId).subGroups?.[0]?.id;

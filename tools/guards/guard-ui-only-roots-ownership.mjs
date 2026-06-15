@@ -3,11 +3,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 function parseArgs(argv = process.argv.slice(2)) {
-  const args = { root: process.cwd(), mode: 'CHECK', jsonOut: '', mdOut: '' };
+  const args = { root: process.cwd(), mode: 'CHECK', jsonOut: '', mdOut: '', strictMeta: false };
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (token === '--root') args.root = argv[++i];
     else if (token === '--mode') args.mode = argv[++i];
+    else if (token === '--strict-meta') args.strictMeta = true;
     else if (token === '--json-out') args.jsonOut = argv[++i];
     else if (token === '--md-out') args.mdOut = argv[++i];
     else if (token.startsWith('--root=')) args.root = token.slice('--root='.length);
@@ -35,6 +36,7 @@ let uiOnlyRoots = [
 ];
 let allowlist = {};
 let globalAllowRules = [];
+let allowlistMeta = {};
 
 if (fs.existsSync(configPath)) {
   try {
@@ -47,6 +49,9 @@ if (fs.existsSync(configPath)) {
     }
     if (Array.isArray(config.globalAllowRules)) {
       globalAllowRules = config.globalAllowRules;
+    }
+    if (config.allowlistMeta && typeof config.allowlistMeta === 'object') {
+      allowlistMeta = config.allowlistMeta;
     }
   } catch (err) {
     console.warn('Error reading config file:', err);
@@ -179,6 +184,126 @@ const rules = [
 const files = uiOnlyRoots.flatMap((relativeRoot) => walk(path.join(root, relativeRoot)));
 const findings = [];
 
+function rootForAllowlistKey(key) {
+  const normalizedKey = toPosix(key);
+  return uiOnlyRoots.find((relativeRoot) => normalizedKey.includes(toPosix(relativeRoot))) ?? 'UNMAPPED_ROOT';
+}
+
+function expiryStatus(expiry) {
+  if (typeof expiry !== 'string' || expiry.trim().length === 0) return 'missing';
+  const parsed = new Date(`${expiry}T23:59:59Z`);
+  if (Number.isNaN(parsed.getTime())) return 'invalid';
+  const today = new Date();
+  const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+  return parsed.getTime() < todayUtc ? 'past' : 'active';
+}
+
+function hasVagueReason(reason) {
+  if (typeof reason !== 'string') return true;
+  const normalized = reason.trim().toLowerCase();
+  if (normalized.length < 24) return true;
+  return /^(todo|tbd|temp|temporary|fix later|legacy|misc|allowed|false positive|n\/a)$/i.test(normalized);
+}
+
+function incrementCounter(map, key) {
+  map[key] = (map[key] ?? 0) + 1;
+}
+
+function buildAllowlistMetaReport() {
+  const metaFindings = [];
+  const summary = {
+    allowlistEntries: Object.keys(allowlist).length,
+    metadataEntries: Object.keys(allowlistMeta).length,
+    byRule: {},
+    byRoot: {},
+    byOwner: {},
+    byBlocksClosure: {},
+    byExpiryStatus: {},
+  };
+
+  for (const [key, rulesForFile] of Object.entries(allowlist)) {
+    const meta = allowlistMeta[key];
+    const rootKey = rootForAllowlistKey(key);
+    incrementCounter(summary.byRoot, rootKey);
+
+    for (const ruleId of rulesForFile) {
+      incrementCounter(summary.byRule, ruleId);
+    }
+
+    if (!meta || typeof meta !== 'object') {
+      metaFindings.push({
+        severity: 'FAIL',
+        rule: 'allowlist_meta_missing',
+        file: key,
+        evidence: 'allowlist entry has no allowlistMeta entry',
+        remediation: 'Add owner, reason, expiry, removalStep, and blocksClosure metadata for this allowlist entry.',
+      });
+      incrementCounter(summary.byOwner, 'MISSING_OWNER');
+      incrementCounter(summary.byBlocksClosure, 'missing');
+      incrementCounter(summary.byExpiryStatus, 'missing');
+      continue;
+    }
+
+    const owner = typeof meta.owner === 'string' && meta.owner.trim() ? meta.owner.trim() : 'MISSING_OWNER';
+    const blocksClosure = String(meta.blocksClosure);
+    const status = expiryStatus(meta.expiry);
+    incrementCounter(summary.byOwner, owner);
+    incrementCounter(summary.byBlocksClosure, blocksClosure);
+    incrementCounter(summary.byExpiryStatus, status);
+
+    if (owner === 'MISSING_OWNER') {
+      metaFindings.push({
+        severity: 'FAIL',
+        rule: 'allowlist_meta_owner_missing',
+        file: key,
+        evidence: 'owner is missing',
+        remediation: 'Assign a concrete owner for this allowlist entry.',
+      });
+    }
+    if (hasVagueReason(meta.reason)) {
+      metaFindings.push({
+        severity: 'FAIL',
+        rule: 'allowlist_meta_reason_vague',
+        file: key,
+        evidence: String(meta.reason ?? 'MISSING_REASON').slice(0, 160),
+        remediation: 'Replace vague metadata with a specific reason tied to a known blocker or false-positive rule.',
+      });
+    }
+    if (status !== 'active') {
+      metaFindings.push({
+        severity: 'FAIL',
+        rule: 'allowlist_meta_expiry_invalid',
+        file: key,
+        evidence: String(meta.expiry ?? 'MISSING_EXPIRY'),
+        remediation: 'Set a valid future YYYY-MM-DD expiry or remove the allowlist entry.',
+      });
+    }
+    if (meta.blocksClosure === true) {
+      metaFindings.push({
+        severity: 'FAIL',
+        rule: 'allowlist_meta_blocks_closure',
+        file: key,
+        evidence: 'blocksClosure: true',
+        remediation: 'Do not use this allowlist entry as final closure evidence; remove the blocker or keep closure FIX_REQUIRED.',
+      });
+    }
+  }
+
+  for (const key of Object.keys(allowlistMeta)) {
+    if (!Object.prototype.hasOwnProperty.call(allowlist, key)) {
+      metaFindings.push({
+        severity: 'FAIL',
+        rule: 'allowlist_meta_orphan',
+        file: key,
+        evidence: 'allowlistMeta entry has no matching allowlist entry',
+        remediation: 'Remove orphan metadata or add the matching allowlist entry if it is still justified.',
+      });
+    }
+  }
+
+  return { summary, findings: metaFindings };
+}
+
 for (const abs of files) {
   const rel = toPosix(path.relative(root, abs));
   const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
@@ -214,6 +339,7 @@ for (const abs of files) {
 const output = {
   guardId: 'GUARD_UI_ONLY_SURFACES',
   status: findings.length > 0 ? 'FAIL' : 'PASS',
+  strictMeta: args.strictMeta,
   uiOnlyRoots,
   sharedOwners: [
     'dsh/frontend/shared',
@@ -221,10 +347,16 @@ const output = {
   ],
   filesScanned: files.length,
   findings,
+  allowlistMeta: buildAllowlistMetaReport(),
   failCount: findings.filter((f) => f.severity === 'FAIL').length,
   warnCount: findings.filter((f) => f.severity === 'WARN').length,
   infoCount: findings.filter((f) => f.severity === 'INFO').length,
 };
+
+if (args.strictMeta && output.allowlistMeta.findings.length > 0) {
+  output.status = 'FAIL';
+  output.failCount += output.allowlistMeta.findings.length;
+}
 
 console.log(JSON.stringify(output, null, 2));
 
@@ -237,12 +369,15 @@ if (args.mdOut) {
     '',
     `status: ${output.status}`,
     `findings: ${output.findings.length}`,
+    `strictMeta: ${output.strictMeta}`,
+    `allowlistMetaFindings: ${output.allowlistMeta.findings.length}`,
     '',
     '| Severity | Rule | File | Evidence |',
     '|---|---|---|---|',
     ...findings.map((f) => `| ${f.severity} | ${f.rule} | ${f.file} | ${f.evidence} |`),
+    ...output.allowlistMeta.findings.map((f) => `| ${f.severity} | ${f.rule} | ${f.file} | ${f.evidence} |`),
   ].join('\n');
   fs.writeFileSync(args.mdOut, md, 'utf8');
 }
 
-if (findings.length > 0) process.exitCode = 1;
+if (findings.length > 0 || (args.strictMeta && output.allowlistMeta.findings.length > 0)) process.exitCode = 1;
