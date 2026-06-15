@@ -66,6 +66,18 @@ export function DshSubscriptionsScreen({
 
   const selectedPlan = subscriptionPlanCards.find((plan) => plan.id === selectedPlanId) ?? subscriptionPlanCards[0];
   const currentPlan = subscriptionPlanCards.find((plan) => plan.id === currentPlanId) ?? subscriptionPlanCards[0];
+
+  if (!selectedPlan || !currentPlan) {
+    return (
+      <View style={{ padding: spacing[4], alignItems: 'center', gap: spacing[2] }}>
+        <Icon name="cube-outline" tone="muted" size={40} />
+        <Text role="bodyStrong" style={{ color: theme.text, textAlign: 'center' }}>
+          لا توجد خطط اشتراك متاحة حاليًا.
+        </Text>
+      </View>
+    );
+  }
+
   const selectedPaymentProfile = paymentProfiles[paymentProfileIndex % paymentProfiles.length];
 
   // Price calculations

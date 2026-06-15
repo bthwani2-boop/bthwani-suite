@@ -399,7 +399,7 @@ export function DshBenefitsHubScreen({
     if (focusedSection === 'subscription') {
       return (
         <ContentCard hint={sectionHints.subscription}>
-          <DshSubscriptionsScreen compact onStatusChange={setFeedback} />
+          <DshSubscriptionsScreen compact plans={subscriptionPlans} onStatusChange={setFeedback} />
         </ContentCard>
       );
     }
