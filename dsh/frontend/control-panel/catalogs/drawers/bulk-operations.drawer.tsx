@@ -19,6 +19,7 @@
  */
 
 import React, { useState } from 'react';
+import { generateLocalTempId } from '../../../shared/platform/local-temp-id';
 import { Box, Button, Surface, Text, useTheme,
   radius,
 } from '@bthwani/ui-kit';
@@ -115,7 +116,7 @@ export function CatalogBulkOperationsWorkspace({
     setActionResult(result);
 
     onProposal({
-      id: `bulk-${action}-${Date.now()}`, // draft proposal ID only
+      id: generateLocalTempId(`bulk-${action}`),
       type: action === 'bulk-send-marketing' ? 'bulk-send-marketing'
         : action === 'bulk-request-fix' ? 'bulk-request-fix'
           : 'bulk-approve',

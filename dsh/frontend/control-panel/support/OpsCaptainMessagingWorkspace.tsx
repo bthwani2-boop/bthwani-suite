@@ -2,6 +2,7 @@
 // Authority: control-panel/support owns this channel. Captain sees handoff/delivery/PoD context only.
 // Forbidden: captain escalation must not bypass control-panel; no financial mutation from this surface.
 import React from 'react';
+import { generateLocalTempId } from '../../shared/platform/local-temp-id';
 import { Box, Button, Chip, Surface, Text, TextField } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 type DshSupportTicketMessage = {
@@ -65,7 +66,7 @@ export function OpsCaptainMessagingWorkspace({
   const handleSend = () => {
     if (!draft.trim()) return;
     const newMessage: DshSupportTicketMessage = {
-      id: `msg-captain-custom-${Date.now()}`,
+      id: generateLocalTempId('msg-captain-custom'),
       senderKind: 'ops',
       senderLabel: 'فريق الدعم',
       body: draft.trim(),
@@ -78,7 +79,7 @@ export function OpsCaptainMessagingWorkspace({
   const handleEscalate = () => {
     if (isEscalated) return;
     const newSystemMsg: DshSupportTicketMessage = {
-      id: `msg-captain-system-${Date.now()}`,
+      id: generateLocalTempId('msg-captain-system'),
       senderKind: 'ops',
       senderLabel: 'النظام',
       body: 'تم تصعيد المحادثة إلى إدارة الدعم والالتزام لشؤون الكباتن والتوصيل.',

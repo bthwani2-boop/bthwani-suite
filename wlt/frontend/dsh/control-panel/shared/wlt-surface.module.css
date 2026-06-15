@@ -1,0 +1,98 @@
+/* ===== WLT DSH Control Panel Surface Layout ===== */
+/* Owned by WLT control-panel — do NOT import from dsh/frontend/control-panel */
+
+.surfaceCockpit {
+  width: 100%;
+  min-height: 0;
+  background-color: var(--bthwani-control-panel-background);
+  direction: rtl;
+  text-align: right;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.surfaceTopBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 20px;
+  background-color: var(--bthwani-control-panel-surface);
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+  flex-shrink: 0;
+}
+
+.surfaceTitleBlock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.surfaceHeaderTextRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.surfaceHeaderTitle {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--bthwani-control-panel-text);
+  font-weight: 800;
+}
+
+.surfaceHeaderSubtitle {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.surfaceHeaderBadgeText {
+  color: var(--bthwani-brand);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.surfaceMainPanel {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  background-color: var(--bthwani-control-panel-stage);
+}
+
+.surfaceInnerScroll {
+  padding: 10px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.navigationDock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background-color: var(--bthwani-control-panel-surface);
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.filterDock {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bthwani-control-panel-surface);
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.filterDockTint {
+  background-color: var(--bthwani-control-panel-surface-inset);
+}

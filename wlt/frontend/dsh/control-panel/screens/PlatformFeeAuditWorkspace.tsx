@@ -2,7 +2,7 @@
 // DSH displays WLT-owned platform fee data. No fee computation or mutation inside DSH.
 import React from 'react';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
-import styles from '../../../../../dsh/frontend/control-panel/shared/control-panel-surface.module.css';
+import styles from '../shared/wlt-surface.module.css';
 import { WltBoundaryBanner } from '../components/WltBoundaryBanner';
 import { buildDshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/finance-boundary';
 

@@ -21,6 +21,7 @@ import { useDshClientOrderExecution } from '../checkout';
 import { useDshClientMarketingState } from '../marketing/useDshClientMarketingState';
 import { useDshClientBellState } from './useDshClientBellState';
 import { useDshClientHomeActions } from './useDshClientHomeActions';
+import { useCheckoutAuth } from '../checkout/useCheckoutAuth';
 import type {
   DshNavigationCommand,
   DshFulfillmentDeliveryMode,
@@ -113,12 +114,7 @@ export function useDshClientSurfaceModel({
     setActiveStoreId, setRoute, clientVisibleDiscoveryStores, defaultFulfillmentMode,
   });
 
-  const checkoutAuth = React.useMemo(() => {
-    const bearerToken = (authToken ?? dshAuthBearerToken ?? undefined)?.trim();
-    if (bearerToken) return { bearerToken };
-    const clientId = (devClientId ?? dshClientId ?? '').trim();
-    return clientId ? { clientId } : {};
-  }, [authToken, dshAuthBearerToken, devClientId, dshClientId]);
+  const checkoutAuth = useCheckoutAuth({ authToken, dshAuthBearerToken, devClientId, dshClientId });
 
   const {
     selectedOrderId, setSelectedOrderId,

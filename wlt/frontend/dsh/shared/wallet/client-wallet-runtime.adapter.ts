@@ -1,4 +1,11 @@
 import { createWltDshTypedClient } from '../clients';
+import {
+  createPaymentDeepLink,
+  createWalletFundingDeepLink,
+  resolveDeepLinkUrl,
+} from '../payments/payment-deeplink.policy';
+
+export { createPaymentDeepLink, createWalletFundingDeepLink, resolveDeepLinkUrl };
 
 export type WltDshWalletAccount = { id: string; name: string };
 
@@ -87,9 +94,8 @@ export const topUp = async (): Promise<never> => {
   throw new Error('wlt_topup_must_be_initiated_via_wlt_ui: use createDeepLink and redirect');
 };
 
-export const createDeepLink = (orderId: string, amountYer: number): string => {
-  return `wlt://pay?order=${encodeURIComponent(orderId)}&amount=${amountYer}`;
-};
+export const createDeepLink = (orderId: string, amountYer: number): string =>
+  resolveDeepLinkUrl(createPaymentDeepLink(orderId, amountYer));
 
 const WltDshClientWalletRuntimeAdapter = {
   isLinked,

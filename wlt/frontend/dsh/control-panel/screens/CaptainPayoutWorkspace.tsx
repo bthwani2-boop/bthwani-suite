@@ -3,7 +3,7 @@
 // bthwani_captain_mode only — store_courier_mode compensation is outside WLT captain settlement.
 import React from 'react';
 import { Box, KeyValueList, Text } from '@bthwani/ui-kit';
-import styles from '../../../../../dsh/frontend/control-panel/shared/control-panel-surface.module.css';
+import styles from '../shared/wlt-surface.module.css';
 import { WltBoundaryBanner } from '../components/WltBoundaryBanner';
 import { buildDshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/finance-boundary';
 

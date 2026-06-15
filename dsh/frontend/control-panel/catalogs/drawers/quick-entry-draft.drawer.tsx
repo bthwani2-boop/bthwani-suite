@@ -21,6 +21,7 @@
  */
 
 import React, { useState } from 'react';
+import { generateLocalTempId } from '../../../shared/platform/local-temp-id';
 import { Box, Button, Surface, Text, TextField, useTheme,
   radius,
 } from '@bthwani/ui-kit';
@@ -79,7 +80,7 @@ export function CatalogQuickEntryDraftWorkspace({
     const subLabel = selectedMainCat?.subcategories.find((s) => s.id === form.categorySubId)?.label;
 
     onProposal({
-      id: `draft-create-${Date.now()}`, // draft ID only — not a canonical product ID
+      id: generateLocalTempId('draft-create'),
       type: 'create-product',
       label: `طلب إنشاء منتج: "${form.productName.trim()}"`,
       status: 'ready-for-api',

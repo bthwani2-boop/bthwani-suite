@@ -9,23 +9,20 @@ import {
   type CaptainSupportRoute,
   type CompactOrderChatMessage,
   type CaptainServiceType,
-  getCaptainAvailabilityMeta,
 } from './captain.contract';
-import { EMPTY_CAPTAIN_ORDER_SUMMARY } from './captain.cod';
 import {
   type DshCaptainLocationPush,
-  resolveDshRuntimeOrderId,
   useCaptainOrderRuntime,
   useCaptainActiveLocationPush,
 } from './use-captain-order-runtime';
 import { getCaptainLifecycleForOrderStage, getRouteForCommandTarget } from '../delivery/delivery.policy';
-import { isCaptainPodRequiredForMode, isCaptainCodCollectorForMode } from '../identity-access/surface-visibility.policy';
 import type {
   DshCaptainNavigationCommand,
   DshCaptainSurfaceState,
   DshCaptainSurfaceDerived,
 } from './captain.surface.types';
 import { useCaptainDeliveryActions } from './captain.delivery-actions';
+import { buildCaptainDerived } from './captain.derived';
 
 export type {
   ActiveOrderPhase,
@@ -35,11 +32,6 @@ export type {
   DshCaptainSurfaceDerived,
 } from './captain.surface.types';
 
-const CAPTAIN_BOTTOM_NAV_ROUTES = new Set<DshCaptainRoute>([
-  'home', 'map', 'inbox', 'account', 'account-finance', 'account-orders',
-  'account-profile', 'account-docs', 'account-shifts', 'account-support',
-  'support-directory', 'support-screen',
-]);
 
 type ObjectStateAction<S> = { readonly key: keyof S; readonly value: S[keyof S] | ((current: S[keyof S]) => S[keyof S]) };
 
@@ -193,53 +185,18 @@ export function useDshCaptainSurfaceModel(
     [captainOrderRuntime],
   );
 
-  // ── Derived state ─────────────────────────────────────────────────────────────
-  const isStoreCourierMode = state.captainAppMode === 'store_courier_mode';
-  const isCaptainAvailable = state.captainAvailabilityStatus === 'available';
-  const isGpsEnabled = state.gpsStatus !== 'disabled';
-  const captainPodRequired = !isStoreCourierMode && isCaptainPodRequiredForMode('bthwani_delivery');
-  const captainCollectsCod = !isStoreCourierMode && isCaptainCodCollectorForMode('bthwani_delivery');
-  const currentAvailabilityMeta = getCaptainAvailabilityMeta(state.captainAvailabilityStatus);
-  const activeOrderDisplayId = state.activeOrderId ? resolveDshRuntimeOrderId(state.activeOrderId) : '';
-  const activeSummary = EMPTY_CAPTAIN_ORDER_SUMMARY;
+  // ── Derived state — delegated to captain.derived (pure functions) ──────────────
+  const derivedCallbacks = React.useMemo(() => ({
+    toggleAvailability: () => set('captainAvailabilityStatus', (c: CaptainAvailabilityStatus) => c === 'available' ? 'unavailable' : 'available'),
+    goToInbox,
+    resetInboxState,
+    toggleOrderExpanded: () => set('activeOrderExpanded', (c: boolean) => !c),
+  }), [set, goToInbox, resetInboxState]);
 
-  const showBottomNav = isStoreCourierMode
-    ? state.route === 'home' || state.route === 'account'
-    : CAPTAIN_BOTTOM_NAV_ROUTES.has(state.route);
-
-  let captainBottomActiveId = '';
-  if (isStoreCourierMode) {
-    captainBottomActiveId = state.route === 'home' ? 'my-orders' : state.route === 'account' ? 'profile' : '';
-  } else {
-    if (state.route === 'inbox' || state.route === 'account-orders') captainBottomActiveId = 'orders';
-    else if (state.route === 'account-finance') captainBottomActiveId = 'wallet';
-    else if (state.route === 'support-directory' || state.route === 'support-screen') captainBottomActiveId = 'support';
-    else if (['account', 'account-profile', 'account-docs', 'account-shifts', 'account-support'].includes(state.route)) captainBottomActiveId = 'profile';
-  }
-
-  const homeTicker = React.useMemo((): DshCaptainSurfaceDerived['homeTicker'] => {
-    if (!isCaptainAvailable) return {
-      statusLabel: currentAvailabilityMeta.label,
-      message: currentAvailabilityMeta.description,
-      onPress: () => set('captainAvailabilityStatus', (c: CaptainAvailabilityStatus) => c === 'available' ? 'unavailable' : 'available'),
-      marquee: false,
-    };
-    if (state.inboxState === 'loading') return { statusLabel: 'تحميل', message: 'جارٍ تجهيز حركة الكابتن.', onPress: goToInbox, marquee: false };
-    if (state.inboxState === 'error') return { statusLabel: 'تنبيه', message: 'تعذر تحميل الطلب النشط.', onPress: resetInboxState, marquee: false };
-    if (state.inboxState === 'empty') return { statusLabel: 'انتظار', message: 'لا يوجد طلب نشط الآن.', onPress: goToInbox, marquee: false };
-    if (state.inboxState === 'delivered') return { statusLabel: 'مغلق', message: 'تم تسليم الطلب الأخير.', onPress: goToInbox, marquee: false };
-    return {
-      statusLabel: `#${activeOrderDisplayId}`,
-      message: `${activeSummary.currentStageLabel} · ${activeSummary.etaLabel}`,
-      onPress: () => set('activeOrderExpanded', (c: boolean) => !c),
-      marquee: false,
-    };
-  }, [isCaptainAvailable, state.inboxState, currentAvailabilityMeta, activeOrderDisplayId, activeSummary, goToInbox, resetInboxState, set]);
-
-  const derived: DshCaptainSurfaceDerived = {
-    isStoreCourierMode, isCaptainAvailable, isGpsEnabled, captainPodRequired, captainCollectsCod,
-    showBottomNav, captainBottomActiveId, currentAvailabilityMeta, activeOrderDisplayId, homeTicker,
-  };
+  const derived: DshCaptainSurfaceDerived = React.useMemo(
+    () => buildCaptainDerived(state, derivedCallbacks),
+    [state, derivedCallbacks],
+  );
 
   const actions = buildCaptainActions({
     set,

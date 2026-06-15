@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { usePlatformAuditState } from '../usePlatformAuditState';
 import type {
@@ -13,6 +13,17 @@ import type {
   DshPlatformVarScope,
   DshPlatformVarStatus,
 } from './vars.types';
+import {
+  PLATFORM_VAR_STATUS_BADGE,
+  PLATFORM_VAR_RISK_CSS_CLASS,
+  PLATFORM_VAR_RISK_LABEL,
+  PLATFORM_VAR_STATUS_LABEL,
+  PLATFORM_VAR_QUICK_PICKS,
+  isPlatformVarMutationAllowed,
+  isPlatformDesignVar,
+  isPlatformDesignValValid,
+  type PlatformVarMutationAction,
+} from '../../../shared/platform/platform-vars.policy';
 import styles from './dsh-platform-vars.module.css';
 
 const DSH_PLATFORM_AUDIT_LOG: DshPlatformAuditEntry[] = [];
@@ -34,32 +45,22 @@ const DOMAIN_TABS: { id: VarsDomainId; label: string }[] = [
 ];
 
 const STATUS_BADGE: Record<DshPlatformVarStatus, { label: string; cls: string }> = {
-  'runtime-bound':        { label: 'مرتبط تشغيلياً', cls: styles.badgeBinding },
-  'contract-required':    { label: 'يتطلب عقداً',    cls: styles.badgeContract },
-  'read-only-reference':  { label: 'مرجع قراءة',      cls: styles.badgeReference },
-  'disabled-by-policy':   { label: 'محجوب بالسياسة', cls: styles.badgeDisabled },
+  'runtime-bound':       { label: PLATFORM_VAR_STATUS_BADGE['runtime-bound'].label,       cls: styles[PLATFORM_VAR_STATUS_BADGE['runtime-bound'].cssClass] },
+  'contract-required':   { label: PLATFORM_VAR_STATUS_BADGE['contract-required'].label,   cls: styles[PLATFORM_VAR_STATUS_BADGE['contract-required'].cssClass] },
+  'read-only-reference': { label: PLATFORM_VAR_STATUS_BADGE['read-only-reference'].label, cls: styles[PLATFORM_VAR_STATUS_BADGE['read-only-reference'].cssClass] },
+  'disabled-by-policy':  { label: PLATFORM_VAR_STATUS_BADGE['disabled-by-policy'].label,  cls: styles[PLATFORM_VAR_STATUS_BADGE['disabled-by-policy'].cssClass] },
 };
 
 const RISK_DOT: Record<DshPlatformVarRecord['risk'], string> = {
-  low:       styles.riskLow,
-  medium:    styles.riskMedium,
-  high:      styles.riskHigh,
-  financial: styles.riskFinancial,
+  low:       styles[PLATFORM_VAR_RISK_CSS_CLASS.low],
+  medium:    styles[PLATFORM_VAR_RISK_CSS_CLASS.medium],
+  high:      styles[PLATFORM_VAR_RISK_CSS_CLASS.high],
+  financial: styles[PLATFORM_VAR_RISK_CSS_CLASS.financial],
 };
 
-const RISK_LABEL: Record<DshPlatformVarRecord['risk'], string> = {
-  low:       'منخفضة',
-  medium:    'متوسطة',
-  high:      'عالية',
-  financial: 'مالية',
-};
+const RISK_LABEL: Record<DshPlatformVarRecord['risk'], string> = PLATFORM_VAR_RISK_LABEL;
 
-const STATUS_LABEL: Record<DshPlatformVarStatus, string> = {
-  'runtime-bound':       'مرتبط بعقد تشغيل موثق',
-  'contract-required':   'يتطلب عقد Backend أو Provider',
-  'read-only-reference': 'مرجع قراءة فقط',
-  'disabled-by-policy':  'محجوب بالسياسة',
-};
+const STATUS_LABEL: Record<DshPlatformVarStatus, string> = PLATFORM_VAR_STATUS_LABEL;
 
 const SCOPE_ORDER = new Map(DSH_PLATFORM_SCOPE_PRECEDENCE.map((l) => [l.scope, l.order]));
 
@@ -102,21 +103,7 @@ function resolveDomainKpis(domain: VarsDomainId) {
   ];
 }
 
-/* ─── QUICK-PICK OPTIONS PER VAR KEY ─── */
-const QUICK_PICKS: Record<string, string[]> = {
-  VAR_DSH_VISIBILITY_REGION_SANAA:        ['مفعّل', 'مفعّل مع القيود', 'مخفي'],
-  VAR_DSH_CAPTAIN_MIN_WALLET_BALANCE:     ['5,000 ريال', '10,000 ريال', '15,000 ريال', '20,000 ريال'],
-  VAR_DSH_PARTNER_ACCEPTANCE_TIMEOUT_SECS:['45 ثانية', '60 ثانية', '90 ثانية'],
-  VAR_DSH_DISPATCH_SEARCH_RADIUS_KM:      ['2.5 كم', '3.5 كم', '5.0 كم'],
-  VAR_DSH_PARTNER_SETTLEMENT_SCHEDULE:    ['يومياً 10:00 ص', 'كل أحد 10:00 ص', 'كل ثلاثاء 10:00 ص'],
-  VAR_UI_APPEARANCE_MODE:                 ['lightPremium', 'darkGlass'],
-  VAR_UI_FONT_PROFILE:                    ['arabic-system', 'arabic-premium', 'arabic-readable'],
-  VAR_UI_DENSITY_PROFILE:                 ['compact', 'comfortable', 'spacious'],
-  VAR_UI_RADIUS_PROFILE:                  ['soft', 'balanced', 'sharp'],
-  VAR_UI_MOTION_PROFILE:                  ['reduced', 'standard', 'expressive'],
-  VAR_UI_MARKETING_EMPHASIS:              ['calm', 'premium', 'campaign'],
-  VAR_UI_CONTROL_PANEL_DENSITY:           ['compact', 'balanced'],
-};
+const QUICK_PICKS = PLATFORM_VAR_QUICK_PICKS;
 
 /* ─── VAR ROW (compact list item) ─── */
 function VarRow({
@@ -193,7 +180,7 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
   });
 
   const [editVal,     setEditVal]     = React.useState('');
-  const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = React.useState<PlatformVarMutationAction | null>(null);
 
   const getLive = (v: DshPlatformVarRecord) => {
     const s = varsState[v.id];
@@ -251,51 +238,38 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
   const kpis            = resolveDomainKpis(activeDomain);
   const quickPicks      = selectedVar ? (QUICK_PICKS[selectedVar.key] ?? []) : [];
 
-  const handleConfirm = (action: string) => {
+  const handleConfirm = (action: PlatformVarMutationAction) => {
     if (!selectedVar) return;
+    if (!isPlatformVarMutationAllowed(action, selectedVar.key)) {
+      setShowConfirm(null);
+      return;
+    }
     const prev = varsState[selectedVar.id] ?? {
       current: selectedVar.currentValue, proposed: selectedVar.proposedValue ?? null, status: selectedVar.status,
     };
 
-    let nextCurrent  = prev.current;
-    let nextProposed = prev.proposed;
-    let nextStatus   = prev.status;
-
     if (action === 'save-proposed') {
-      if (selectedVar.key.startsWith('VAR_UI_') && !QUICK_PICKS[selectedVar.key]?.includes(editVal)) {
-        return;
-      }
-      nextProposed = editVal || null;
-    } else if (action === 'apply') {
-      if (prev.proposed) { nextCurrent = prev.proposed; nextProposed = null; }
-    } else if (action === 'rollback') {
-      nextCurrent = selectedVar.currentValue;
-      nextProposed = null;
-    } else if (action === 'mark-contract-ready') {
-      nextStatus = 'runtime-bound';
+      if (!isPlatformDesignValValid(selectedVar.key, editVal)) return;
+      setVarsState((s) => ({ ...s, [selectedVar.id]: { ...prev, proposed: editVal || null } }));
+      addAuditEvent({
+        action: `حفظ مقترح (${selectedVar.label})`,
+        operator: 'platform-operator',
+        status: 'success',
+        oldValue: prev.proposed ?? '',
+        newValue: editVal,
+        reason: 'حفظ قيمة مقترحة (محلي فقط)',
+        scope: selectedVar.scope,
+        impact: selectedVar.effectSummary,
+        rollbackAvailable: false,
+      });
     }
 
-    setVarsState((prev) => ({
-      ...prev,
-      [selectedVar.id]: { current: nextCurrent, proposed: nextProposed, status: nextStatus },
-    }));
-    addAuditEvent({
-      action: `تعديل متغير (${selectedVar.label}): ${action}`,
-      operator: 'platform-operator',
-      status: action === 'rollback' ? 'danger' : 'success',
-      oldValue: prev.current,
-      newValue: nextCurrent,
-      reason: 'تعديل سياسة runtime',
-      scope: selectedVar.scope,
-      impact: selectedVar.effectSummary,
-      rollbackAvailable: true,
-    });
     setShowConfirm(null);
   };
 
-  const hasProposed = Boolean(selectedVar?.proposedValue);
-  const isDesignVar = Boolean(selectedVar?.key.startsWith('VAR_UI_'));
-  const isValidDesignVal = isDesignVar && selectedVar ? (QUICK_PICKS[selectedVar.key]?.includes(editVal)) : true;
+  const hasProposed = Boolean(selectedVar?.proposedValue ?? varsState[selectedVar?.id ?? '']?.proposed);
+  const isDesignVar = selectedVar ? isPlatformDesignVar(selectedVar.key) : false;
+  const isValidDesignVal = selectedVar ? isPlatformDesignValValid(selectedVar.key, editVal) : true;
 
   return (
     <Box gap={4}>
@@ -488,7 +462,8 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
                     <button
                       type="button"
                       className={styles.btnPrimary}
-                      disabled={showConfirm !== null || !hasProposed}
+                      disabled={true}
+                      title="يتطلب عقد Backend موثق — غير مفعّل حالياً"
                       onClick={() => setShowConfirm('apply')}
                     >
                       تطبيق المقترح ←
@@ -499,7 +474,8 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
                     <button
                       type="button"
                       className={styles.btnSecondary}
-                      disabled={showConfirm !== null}
+                      disabled={true}
+                      title="التعليم بالعقد يتطلب مسار Backend موثق — غير مفعّل حالياً"
                       onClick={() => setShowConfirm('mark-contract-ready')}
                     >
                       تعليمه كمرتبط بالعقد
@@ -507,7 +483,8 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
                     <button
                       type="button"
                       className={styles.btnDanger}
-                      disabled={showConfirm !== null}
+                      disabled={true}
+                      title="الرجوع يتطلب مسار Backend موثق — غير مفعّل حالياً"
                       onClick={() => setShowConfirm('rollback')}
                     >
                       الرجوع للقيمة الموثقة
@@ -516,16 +493,10 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
                 </div>
 
                 {/* Confirm banner */}
-                {showConfirm && (
+                {showConfirm === 'save-proposed' && (
                   <div className={styles.confirmBanner}>
                     <div className={styles.confirmText}>
-                      {showConfirm === 'apply'
-                        ? `طلب اعتماد "${selectedVar.proposedValue}" كقيمة تشغيلية موثقة عبر عقد Backend أو Provider.`
-                        : showConfirm === 'rollback'
-                        ? 'إلغاء المقترح والرجوع إلى القيمة الموثقة الحالية.'
-                        : showConfirm === 'mark-contract-ready'
-                        ? 'تعليم المتغير كمرتبط بالعقد بعد وجود مسار Backend أو Provider قابل للتدقيق.'
-                        : 'حفظ القيمة المقترحة بانتظار اعتماد عقد التشغيل.'}
+                      {'حفظ القيمة المقترحة بانتظار اعتماد عقد التشغيل (محلي فقط — لا يُطبَّق على الخوادم).'}
                     </div>
                     <div className={styles.confirmActions}>
                       <button type="button" className={styles.btnPrimary} onClick={() => handleConfirm(showConfirm)}>

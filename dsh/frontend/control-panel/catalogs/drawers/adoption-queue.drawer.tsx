@@ -17,6 +17,7 @@
  */
 
 import React from 'react';
+import { generateLocalTempId } from '../../../shared/platform/local-temp-id';
 import { Box, Button, Surface, Text, useTheme,
   radius,
 } from '@bthwani/ui-kit';
@@ -146,7 +147,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
 
     // Emit proposal — proposal pattern (router-ready, matches all other workspaces)
     onProposal({
-      id: `adoption-${action}-${id}-${Date.now()}`,
+      id: generateLocalTempId(`adoption-${action}-${id}`),
       type: action === 'visible' ? 'visibility-change' : 'bulk-approve',
       productId: id,
       label: result.label,

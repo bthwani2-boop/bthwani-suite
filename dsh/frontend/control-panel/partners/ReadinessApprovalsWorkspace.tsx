@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { generateLocalTempId } from '../../shared/platform/local-temp-id';
 import { Box, Text, Surface, KeyValueList } from '@bthwani/ui-kit';
 import {
   WebControlPanelDecisionRow,
@@ -56,7 +57,7 @@ export function ReadinessApprovalsWorkspace() {
       console.error(e);
       // Fallback for preview/mock demo
       const mockRec: FieldReadinessApprovalRecord = {
-        id: `appr-mock-${Date.now()}`,
+        id: generateLocalTempId('appr-local'),
         store_id: selectedStoreId,
         decision,
         reason,

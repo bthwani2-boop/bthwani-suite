@@ -17,6 +17,7 @@
  */
 
 import React, { useState } from 'react';
+import { generateLocalTempId } from '../../../shared/platform/local-temp-id';
 import { Box, Button, Surface, Text, useTheme,
   radius,
 } from '@bthwani/ui-kit';
@@ -82,7 +83,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
     setActionResult(result);
 
     onProposal({
-      id: `taxonomy-${action}-${id}-${Date.now()}`, // draft proposal ID only
+      id: generateLocalTempId(`taxonomy-${action}-${id}`),
       type: 'taxonomy-mapping',
       label,
       status,

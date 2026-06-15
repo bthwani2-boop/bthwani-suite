@@ -3,3 +3,5 @@
 
 export * from './feature-flags';
 export * from './platform-vars';
+export * from './platform-vars.policy';
+export * from './local-temp-id';

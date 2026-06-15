@@ -2,6 +2,7 @@
 // Authority: control-panel/support owns this channel. Partner sees support linked to order/catalog only.
 // WLT boundary: financial-impact mentions are read-only preview tags — no mutation from this surface.
 import React from 'react';
+import { generateLocalTempId } from '../../shared/platform/local-temp-id';
 import { Box, Button, Chip, Surface, Text, TextField } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 type DshSupportTicketMessage = {
@@ -65,7 +66,7 @@ export function OpsPartnerMessagingWorkspace({
   const handleSend = () => {
     if (!draft.trim()) return;
     const newMessage: DshSupportTicketMessage = {
-      id: `msg-partner-custom-${Date.now()}`,
+      id: generateLocalTempId('msg-partner-custom'),
       senderKind: 'ops',
       senderLabel: 'فريق الدعم',
       body: draft.trim(),
@@ -78,7 +79,7 @@ export function OpsPartnerMessagingWorkspace({
   const handleEscalate = () => {
     if (isEscalated) return;
     const newSystemMsg: DshSupportTicketMessage = {
-      id: `msg-partner-system-${Date.now()}`,
+      id: generateLocalTempId('msg-partner-system'),
       senderKind: 'ops',
       senderLabel: 'النظام',
       body: 'تم تصعيد المحادثة إلى إدارة الدعم والالتزام لشؤون الشركاء.',

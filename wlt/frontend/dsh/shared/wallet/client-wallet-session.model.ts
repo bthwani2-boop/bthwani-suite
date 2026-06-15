@@ -1,11 +1,15 @@
 import React from 'react';
 import {
-  createDeepLink,
   getBalance as getRuntimeBalance,
   isLinked as getRuntimeLinkedState,
   link as linkRuntimeWallet,
   requestPayment as requestRuntimePayment,
 } from '../wallet/client-wallet-runtime.adapter';
+import {
+  createWalletFundingDeepLink,
+  createPaymentDeepLink,
+  resolveDeepLinkUrl,
+} from '../payments/payment-deeplink.policy';
 
 export function useWltDshWalletSession(clientId: string | undefined, bearerToken?: string) {
   const runtimeClientId = (clientId ?? '').trim();
@@ -16,6 +20,10 @@ export function useWltDshWalletSession(clientId: string | undefined, bearerToken
   const [lastError, setLastError] = React.useState<string | null>(null);
 
   const refresh = React.useCallback(async () => {
+    if (!runtimeClientId) {
+      setHydrated(true);
+      return;
+    }
     setRefreshing(true);
     try {
       const isLinked = await getRuntimeLinkedState(runtimeClientId, bearerToken);
@@ -59,7 +67,11 @@ export function useWltDshWalletSession(clientId: string | undefined, bearerToken
   }, [runtimeClientId, bearerToken, refresh]);
 
   const createWalletFundingLink = React.useCallback((amountMinorUnits: number) => {
-    return createDeepLink('wallet-funding', amountMinorUnits);
+    return resolveDeepLinkUrl(createWalletFundingDeepLink(amountMinorUnits));
+  }, []);
+
+  const createOrderPaymentLink = React.useCallback((orderId: string, amountYer: number) => {
+    return resolveDeepLinkUrl(createPaymentDeepLink(orderId, amountYer));
   }, []);
 
   return {
@@ -73,6 +85,6 @@ export function useWltDshWalletSession(clientId: string | undefined, bearerToken
     getBalance,
     link,
     createWalletFundingLink,
-    createDeepLink,
+    createOrderPaymentLink,
   } as const;
 }

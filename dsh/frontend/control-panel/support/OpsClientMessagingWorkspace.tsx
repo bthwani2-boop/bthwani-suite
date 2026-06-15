@@ -2,6 +2,7 @@
 // Authority: control-panel/support owns this channel. Messages are on-demand; no bulk history load.
 // WLT boundary: any financial-impact mention is a read-only preview tag — no mutation from this surface.
 import React from 'react';
+import { generateLocalTempId } from '../../shared/platform/local-temp-id';
 import { Box, Button, Chip, Surface, Text, TextField } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 type DshSupportTicketMessage = {
@@ -65,7 +66,7 @@ export function OpsClientMessagingWorkspace({
   const handleSend = () => {
     if (!draft.trim()) return;
     const newMessage: DshSupportTicketMessage = {
-      id: `msg-client-custom-${Date.now()}`,
+      id: generateLocalTempId('msg-client-custom'),
       senderKind: 'ops',
       senderLabel: 'فريق الدعم',
       body: draft.trim(),
@@ -78,7 +79,7 @@ export function OpsClientMessagingWorkspace({
   const handleEscalate = () => {
     if (isEscalated) return;
     const newSystemMsg: DshSupportTicketMessage = {
-      id: `msg-client-system-${Date.now()}`,
+      id: generateLocalTempId('msg-client-system'),
       senderKind: 'ops',
       senderLabel: 'النظام',
       body: 'تم تصعيد المحادثة إلى إدارة الدعم والالتزام.',
