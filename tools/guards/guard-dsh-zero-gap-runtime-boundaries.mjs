@@ -53,6 +53,11 @@ const forbiddenText = [
   { id: 'skip_preview_ids_comment', regex: /\/\/\s*skip preview IDs/i },
   // MockAdminUser export from shared root (renamed to DshAdminUser — catches regression)
   { id: 'mock_admin_user_in_shared', regex: /MockAdminUser/i },
+  // Payment/session IDs must never use Date.now() or Math.random() — use crypto.randomUUID() via payment-session-ids.ts
+  { id: 'date_now_as_payment_id', regex: /(?:checkout_intent_id|idempotency_key|confirmation_ref)\s*:\s*`[^`]*Date\.now\(\)/i, onlyIn: /^(?:wlt\/frontend|dsh\/frontend)/ },
+  { id: 'math_random_as_payment_id', regex: /(?:checkout_intent_id|idempotency_key|confirmation_ref)\s*:\s*`[^`]*Math\.random\(\)/i, onlyIn: /^(?:wlt\/frontend|dsh\/frontend)/ },
+  // WLT OpenAPI types must live at wlt/frontend/dsh/shared/contracts/openapi/ not wlt/frontend/contracts/
+  { id: 'wlt_openapi_wrong_location', regex: /from\s+['"][^'"]*wlt[\\/]frontend[\\/](?:dsh[\\/])?contracts[\\/]wlt-dsh-openapi\.types['"]/im, onlyIn: /^wlt\/frontend/ },
 ];
 
 const forbiddenWltRuntimeNames = /\b(?:Preview|preview-data|FinancePreview|PaymentPreview|Demo|Mock|Sample|Fallback)\b/;

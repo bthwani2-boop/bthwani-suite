@@ -57,7 +57,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: true,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'needs-runtime-evidence',
+    closureStatus: 'runtime-bound',
   },
   'media-runtime': {
     id: 'media-runtime',
@@ -69,7 +69,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: true,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'needs-runtime-evidence',
+    closureStatus: 'runtime-bound',
   },
   'cart-checkout': {
     id: 'cart-checkout',
@@ -105,7 +105,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: true,
     mediaRequired: true,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'needs-runtime-evidence',
+    closureStatus: 'runtime-bound',
   },
   'partner-operations': {
     id: 'partner-operations',
@@ -129,7 +129,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: true,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'needs-runtime-evidence',
+    closureStatus: 'runtime-bound',
   },
   'support-escalation': {
     id: 'support-escalation',

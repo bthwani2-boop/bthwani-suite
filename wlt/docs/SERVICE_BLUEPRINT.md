@@ -77,7 +77,7 @@ DSH and app shells may display WLT references and statuses only. They must not c
 |---|---|---|---|---|
 | Auth dependency | `AUTH_CONTRACT_ROLE_MATRIX_V3` | `auth.openapi.yaml` | `pnpm run openapi:lint:auth` | WLT production mode verifies Bearer tokens through `GET /auth/session`. |
 | OpenAPI | `WLT_SERVICE_V1_LIVE` | `wlt/wlt.openapi.yaml` | `pnpm run openapi:lint:wlt` | Contract covers wallet, payment, refund, settlement, ledger, operator, and reporting flows. |
-| API types | `WLT_DSH_TYPED_CLIENT_GENERATED` | `wlt/frontend/contracts/wlt-dsh-openapi.types.ts` | `pnpm run openapi:types:wlt` | Generated contract output; not app visual proof. |
+| API types | `WLT_DSH_TYPED_CLIENT_GENERATED` | `wlt/frontend/dsh/shared/contracts/openapi/wlt-dsh-openapi.types.ts` | `pnpm run openapi:types:wlt` | Generated contract output; not app visual proof. |
 | Typed client | `WLT_DSH_TYPED_CLIENT_PRESENT / RUNTIME_BOUND` | `wlt/frontend/contracts/wlt-dsh-client.ts` | targeted TypeScript/Nx check | App shells remain composition-only. |
 | Backend handler | `GO_HTTP_RUNTIME_BOUND` | `wlt/backend/cmd/wlt-api`; `wlt/backend/internal/http/*` | `go test ./internal/http` from `wlt/backend` | Registers payment, refund, settlement, wallet, health, operator, and reporting routes. |
 | Persistence model | `POSTGRES_RUNTIME_BOUND` | `wlt/backend/internal/store/postgres_repository.go`; `wlt/backend/migrations/*` | `TestWltPostgresE2EJourney` | Local Postgres availability gates full E2E execution. |

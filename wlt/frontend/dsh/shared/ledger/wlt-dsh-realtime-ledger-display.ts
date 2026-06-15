@@ -43,19 +43,3 @@ export function extractSortedDisplayRows(
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .map(mapToRealtimeLedgerDisplayRow);
 }
-
-export function buildSimulatedLedgerDisplayRow(): WltRealtimeLedgerDisplayRow {
-  const id = `SIM-TX-${Date.now()}`;
-  const isCredit = Math.random() > 0.4;
-  const amountMinorUnits = Math.floor(Math.random() * 15000 + 1000) * 100;
-  return {
-    id,
-    subject: Math.random() > 0.5 ? 'captain-001' : 'partner-001',
-    isCredit,
-    transactionKindLabel: isCredit ? 'إيداع / دائن' : 'سحب / مدين',
-    amountLabel: formatWltYer(amountMinorUnits),
-    referenceId: `REF-${Math.floor(Math.random() * 90000) + 10000}`,
-    createdAtDisplay: new Date().toLocaleString('ar-YE', { hour12: false }),
-    status: 'COMPLETED',
-  };
-}

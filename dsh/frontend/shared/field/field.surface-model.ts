@@ -16,6 +16,7 @@ import type {
   DshFieldStoreVisitValues,
 } from './field.types';
 import type { DshFieldDocumentKind } from './dsh-field-document-client';
+import { validateVisitFields, hasVisitErrors } from './field.visit-policy';
 
 export type DshFieldReadinessEscalationState = 'ready' | 'loading' | 'pending-response' | 'error' | 'offline';
 
@@ -32,9 +33,6 @@ const ESCALATION_TARGETS = [
   { id: 'marketing', label: 'فريق التسويق (Marketing)' },
 ] as const;
 
-export function resolveFieldDocumentDraftMediaKey(kind: string, timeSource: () => number = Date.now): string {
-  return `field.doc.${kind}.${timeSource().toString().slice(-4)}`;
-}
 
 function isSameRoute(left: DshFieldRouteState, right: DshFieldRouteState): boolean {
   if (left.kind !== right.kind) return false;
@@ -153,10 +151,8 @@ export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
 
   const handleVisitSubmit = React.useCallback((store: FieldStoreFile, fallbackValues: DshFieldStoreVisitValues) => {
     const nextValues = visitValues[store.id] ?? fallbackValues;
-    const nextErrors: DshFieldStoreVisitErrors = {};
-    if (!nextValues.visitSummary.trim()) nextErrors.visitSummary = 'اكتب ملخص الزيارة قبل الإرسال.';
-    if (!nextValues.followUpAction.trim()) nextErrors.followUpAction = 'حدد خطوة المتابعة قبل الإرسال.';
-    if (nextErrors.visitSummary || nextErrors.followUpAction) {
+    const nextErrors = validateVisitFields(nextValues);
+    if (hasVisitErrors(nextErrors)) {
       setVisitErrors((current) => ({ ...current, [store.id]: nextErrors }));
       return;
     }

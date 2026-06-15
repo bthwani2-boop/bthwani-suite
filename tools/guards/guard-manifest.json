@@ -1507,6 +1507,34 @@
         ".js",
         ".jsx"
       ]
+    },
+    {
+      "id": "GUARD_NO_SURFACE_MODEL_GOD_HOOKS",
+      "file": "tools/guards/guard-no-surface-model-god-hooks.mjs",
+      "ownerPolicy": [
+        "governance/15_AGENT_AND_AI_EXECUTION.md",
+        ".agents/AUTHORITY_BOUNDARY.md"
+      ],
+      "purpose": "Enforce that *.surface-model.ts files are orchestration-only: no direct fetch/HTTP clients, no inline business validation, max useState budget per file",
+      "runners": [
+        "agent",
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "dsh",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/**/*.surface-model.ts",
+        "tools/guards/guard-no-surface-model-god-hooks.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts"
+      ]
     }
   ]
 }

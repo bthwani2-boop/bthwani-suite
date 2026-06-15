@@ -1,0 +1,206 @@
+.root {
+  direction: rtl;
+  width: 100%;
+  padding: 16px;
+}
+
+/* ── Header ── */
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.wsStatusBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wsStatusBadge[data-ws="connected"] {
+  color: var(--bth-success-text);
+  background: rgba(46, 204, 113, 0.15);
+}
+
+.wsStatusBadge[data-ws="reconnecting"],
+.wsStatusBadge[data-ws="disconnected"] {
+  color: var(--bth-warning-text);
+  background: rgba(241, 196, 15, 0.15);
+}
+
+.wsStatusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.wsStatusDot[data-ws="connected"] {
+  background: var(--bth-success-text);
+}
+
+.wsStatusDot[data-ws="reconnecting"],
+.wsStatusDot[data-ws="disconnected"] {
+  background: var(--bth-warning-text);
+}
+
+/* ── KPI grid ── */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.kpiBoxInner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kpiValue {
+  color: var(--bthwani-brand-primary);
+}
+
+.kpiActionBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.simulateBtn {
+  background: linear-gradient(
+    135deg,
+    var(--bthwani-brand-primary) 0%,
+    var(--bthwani-brand-secondary, var(--bthwani-brand-primary)) 100%
+  );
+  color: var(--bthwani-brand-contrast);
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 12px;
+  box-shadow: 0 4px 12px rgba(26, 188, 156, 0.2);
+}
+
+/* ── Error ── */
+.errorBox {
+  border: 1px solid var(--bth-danger-text);
+  background: rgba(231, 76, 60, 0.1);
+}
+
+/* ── Table ── */
+.tableScroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.tableHead {
+  background: var(--bthwani-control-panel-surface-raised);
+  border-bottom: 2px solid var(--bthwani-control-panel-border);
+}
+
+.th {
+  padding: 8px 12px;
+  text-align: right;
+  font-weight: 700;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--bthwani-control-panel-border);
+  transition: background-color 1.5s ease;
+  background: transparent;
+}
+
+.tableRow.highlighted {
+  background: color-mix(in srgb, var(--bth-success-text) 15%, transparent);
+}
+
+.td {
+  padding: 8px 12px;
+}
+
+.tdMuted {
+  padding: 8px 12px;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.tdEmpty {
+  padding: 24px;
+  text-align: center;
+  color: var(--bthwani-control-panel-text-muted);
+}
+
+.entryId {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.entrySubject {
+  font-weight: 600;
+}
+
+.entryKindBadge {
+  font-weight: 700;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: var(--bthwani-radius-xs, 4px);
+}
+
+.entryKindBadge[data-credit="true"] {
+  color: var(--bth-success-text);
+  background: color-mix(in srgb, var(--bth-success-text) 10%, transparent);
+}
+
+.entryKindBadge[data-credit="false"] {
+  color: var(--bth-danger-text);
+  background: color-mix(in srgb, var(--bth-danger-text) 10%, transparent);
+}
+
+.entryAmount {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.entryRef {
+  font-size: 9px;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.entryStatusBadge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.entryStatusBadge[data-status="COMPLETED"],
+.entryStatusBadge[data-status="posted"] {
+  color: var(--bth-success-text);
+  background: color-mix(in srgb, var(--bth-success-text) 12%, transparent);
+}
+
+.entryStatusBadge[data-status="PENDING"],
+.entryStatusBadge[data-status="pending"] {
+  color: var(--bth-warning-text);
+  background: color-mix(in srgb, var(--bth-warning-text) 12%, transparent);
+}
+
+.entryStatusBadge[data-status="FAILED"],
+.entryStatusBadge[data-status="failed"] {
+  color: var(--bth-danger-text);
+  background: color-mix(in srgb, var(--bth-danger-text) 12%, transparent);
+}

@@ -1,18 +1,35 @@
 'use client';
 
 import React from 'react';
-import { Box, Text,
-  radius,
-} from '@bthwani/ui-kit';
+import { Box, Text } from '@bthwani/ui-kit';
 import {
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
   resolveWltDshRealtimeLedgerWsUrl,
   mapToRealtimeLedgerDisplayRow,
   extractSortedDisplayRows,
-  buildSimulatedLedgerDisplayRow,
   type WltRealtimeLedgerDisplayRow,
 } from '../../shared';
+import { formatWltYer } from '../../shared/boundary/dshFinance.types';
+import styles from './wlt-dsh-realtime-ledger.module.css';
+
+let _simRowCounter = 0;
+function buildSimulatedLedgerDisplayRow(): WltRealtimeLedgerDisplayRow {
+  const seq = ++_simRowCounter;
+  const isCredit = seq % 2 === 0;
+  const amountMinorUnits = ((seq * 3_713) % 14_000 + 1_000) * 100;
+  const subjects = ['captain-001', 'partner-001', 'captain-002', 'partner-002'];
+  return {
+    id: `SIM-TX-${seq}`,
+    subject: subjects[seq % subjects.length],
+    isCredit,
+    transactionKindLabel: isCredit ? 'إيداع / دائن' : 'سحب / مدين',
+    amountLabel: formatWltYer(amountMinorUnits),
+    referenceId: `REF-${10_000 + (seq * 7_919) % 90_000}`,
+    createdAtDisplay: new Date().toLocaleString('ar-YE', { hour12: false }),
+    status: 'COMPLETED',
+  };
+}
 
 const STATUS_LABELS: Record<string, string> = {
   COMPLETED: 'مرحّل',
@@ -21,15 +38,6 @@ const STATUS_LABELS: Record<string, string> = {
   pending: 'قيد المراجعة',
   FAILED: 'حظر / فشل',
   failed: 'حظر / فشل',
-};
-
-const STATUS_COLOR: Record<string, string> = {
-  COMPLETED: 'var(--bth-success-text)',
-  posted: 'var(--bth-success-text)',
-  PENDING: 'var(--bth-warning-text)',
-  pending: 'var(--bth-warning-text)',
-  FAILED: 'var(--bth-danger-text)',
-  failed: 'var(--bth-danger-text)',
 };
 
 export function WltDshRealtimeLedger() {
@@ -130,9 +138,9 @@ export function WltDshRealtimeLedger() {
   const runtimeData = runtimeFinance?.state === 'runtime' ? runtimeFinance.data : null;
 
   return (
-    <Box gap={4} style={{ direction: 'rtl', width: '100%', padding: '16px' }}>
+    <Box gap={4} className={styles.root}>
       <Box padding={4} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <div className={styles.headerRow}>
           <div>
             <Text role="titleMd" weight="black">دفتر الأستاذ العام اللحظي (Real-time Ledger)</Text>
             <Text role="bodySm" tone="soft">
@@ -141,63 +149,49 @@ export function WltDshRealtimeLedger() {
                 : 'معاينة حالة دفتر الأستاذ دون اتصال بالخدمة الخلفية.'}
             </Text>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span
-              style={{
-                fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 12,
-                color: wsStatus === 'connected' ? 'var(--bth-success-text)' : 'var(--bth-warning-text)',
-                background: wsStatus === 'connected' ? 'rgba(46, 204, 113, 0.15)' : 'rgba(241, 196, 15, 0.15)',
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-              }}
-            >
-              <span style={{ width: 6, height: 6, borderRadius: 3, background: wsStatus === 'connected' ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' }} />
+          <div>
+            <span className={styles.wsStatusBadge} data-ws={wsStatus}>
+              <span className={styles.wsStatusDot} data-ws={wsStatus} />
               {wsStatus === 'connected' ? 'متصل (WebSocket)' : 'استعادة الاتصال (سحب دوري)'}
             </span>
           </div>
         </div>
       </Box>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-        <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className={styles.kpiGrid}>
+        <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" className={styles.kpiBoxInner}>
           <div>
             <Text role="caption" tone="muted">إجمالي القيود اللحظية</Text>
-            <Text role="titleLg" weight="black" style={{ color: 'var(--bthwani-brand-primary)' }}>{entries.length}</Text>
+            <Text role="titleLg" weight="black" className={styles.kpiValue}>{entries.length}</Text>
           </div>
         </Box>
-        <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <button
-            onClick={simulateLiveEntry}
-            style={{
-              background: 'linear-gradient(135deg, var(--bthwani-brand-primary) 0%, var(--bthwani-brand-secondary, var(--bthwani-brand-primary)) 100%)',
-              color: 'var(--bthwani-brand-contrast)', border: 'none', borderRadius: 8, padding: '10px 20px',
-              fontWeight: 700, cursor: 'pointer', fontSize: 12, boxShadow: '0 4px 12px rgba(26, 188, 156, 0.2)',
-            }}
-          >
+        <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" className={styles.kpiActionBox}>
+          <button type="button" className={styles.simulateBtn} onClick={simulateLiveEntry}>
             ⚡ محاكاة قيد لحظي (Simulate Live Entry)
           </button>
         </Box>
       </div>
 
       {errorMsg && (
-        <Box padding={3} background="surfaceInset" radiusToken="lg" style={{ border: '1px solid var(--bth-danger-text)', background: 'rgba(231, 76, 60, 0.1)' }}>
+        <Box padding={3} background="surfaceInset" radiusToken="lg" className={styles.errorBox}>
           <Text tone="danger" role="bodySm">{errorMsg}</Text>
         </Box>
       )}
 
       <Box padding={3} background="surface" radiusToken="lg" border borderTone="line" gap={2}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 11 }}>
+        <div className={styles.tableScroll}>
+          <table className={styles.table}>
             <thead>
-              <tr style={{ background: 'var(--bthwani-control-panel-surface-raised)', borderBottom: '2px solid var(--bthwani-control-panel-border)' }}>
+              <tr className={styles.tableHead}>
                 {['المعرف', 'الطرف', 'نوع الحركة', 'المبلغ', 'المرجع', 'تاريخ الإنشاء', 'الحالة'].map((h) => (
-                  <th key={h} style={{ padding: '8px 12px', textAlign: 'right', fontWeight: 700, color: 'var(--bthwani-control-panel-text-muted)' }}>{h}</th>
+                  <th key={h} className={styles.th}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {entries.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ padding: '24px', textAlign: 'center', color: 'var(--bthwani-control-panel-text-muted)' }}>
+                  <td colSpan={7} className={styles.tdEmpty}>
                     لا توجد قيود مالية مسجلة في الجلسة الحالية.
                   </td>
                 </tr>
@@ -207,46 +201,36 @@ export function WltDshRealtimeLedger() {
                   return (
                     <tr
                       key={entry.id}
-                      style={{
-                        background: isHighlighted ? 'color-mix(in srgb, var(--bth-success-text) 15%, transparent)' : 'transparent',
-                        borderBottom: '1px solid var(--bthwani-control-panel-border)',
-                        transition: 'background-color 1.5s ease',
-                      }}
+                      className={`${styles.tableRow}${isHighlighted ? ` ${styles.highlighted}` : ''}`}
                     >
-                      <td style={{ padding: '8px 12px' }}>
-                        <code style={{ fontSize: 10, fontWeight: 700 }}>{entry.id}</code>
+                      <td className={styles.td}>
+                        <code className={styles.entryId}>{entry.id}</code>
                       </td>
-                      <td style={{ padding: '8px 12px' }}>
-                        <span style={{ fontWeight: 600 }}>{entry.subject}</span>
+                      <td className={styles.td}>
+                        <span className={styles.entrySubject}>{entry.subject}</span>
                       </td>
-                      <td style={{ padding: '8px 12px' }}>
-                        <span style={{
-                          color: entry.isCredit ? 'var(--bth-success-text)' : 'var(--bth-danger-text)',
-                          fontWeight: 700, fontSize: 10,
-                          background: entry.isCredit ? 'color-mix(in srgb, var(--bth-success-text) 10%, transparent)' : 'color-mix(in srgb, var(--bth-danger-text) 10%, transparent)',
-                          padding: '2px 8px', borderRadius: radius.xs,
-                        }}>
+                      <td className={styles.td}>
+                        <span
+                          className={styles.entryKindBadge}
+                          data-credit={String(entry.isCredit)}
+                        >
                           {entry.transactionKindLabel}
                         </span>
                       </td>
-                      <td style={{ padding: '8px 12px', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+                      <td className={`${styles.td} ${styles.entryAmount}`}>
                         {entry.amountLabel}
                       </td>
-                      <td style={{ padding: '8px 12px' }}>
-                        <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.04)', padding: '2px 6px', borderRadius: 3 }}>
-                          {entry.referenceId}
-                        </code>
+                      <td className={styles.td}>
+                        <code className={styles.entryRef}>{entry.referenceId}</code>
                       </td>
-                      <td style={{ padding: '8px 12px', color: 'var(--bthwani-control-panel-text-muted)' }}>
+                      <td className={styles.tdMuted}>
                         {entry.createdAtDisplay}
                       </td>
-                      <td style={{ padding: '8px 12px' }}>
-                        <span style={{
-                          fontSize: 9, fontWeight: 700,
-                          color: STATUS_COLOR[entry.status] ?? 'inherit',
-                          background: `color-mix(in srgb, ${STATUS_COLOR[entry.status] ?? 'transparent'} 12%, transparent)`,
-                          padding: '2px 6px', borderRadius: 4,
-                        }}>
+                      <td className={styles.td}>
+                        <span
+                          className={styles.entryStatusBadge}
+                          data-status={entry.status}
+                        >
                           {STATUS_LABELS[entry.status] ?? entry.status}
                         </span>
                       </td>

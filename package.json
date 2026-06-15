@@ -12,7 +12,7 @@
     "openapi:lint:dsh": "spectral lint dsh/dsh.openapi.yaml --ruleset .spectral.yaml",
     "openapi:types:dsh": "openapi-typescript dsh/dsh.openapi.yaml -o dsh/frontend/shared/contracts/openapi/dsh-openapi.types.ts",
     "openapi:lint:wlt": "spectral lint wlt/wlt.openapi.yaml --ruleset .spectral.yaml",
-    "openapi:types:wlt": "openapi-typescript wlt/wlt.openapi.yaml -o wlt/frontend/contracts/wlt-dsh-openapi.types.ts",
+    "openapi:types:wlt": "openapi-typescript wlt/wlt.openapi.yaml -o wlt/frontend/dsh/shared/contracts/openapi/wlt-dsh-openapi.types.ts",
     "guard:react-scanner:dsh": "pnpm exec react-scanner -c react-scanner.config.js",
     "guard:ast-grep:live-boundaries": "pwsh -NoProfile -Command \"pnpm exec ast-grep scan --report-style short --rule tools/guards/design/ast-grep-rules/no-direct-tamagui-outside-ui-kit.rule.yml dsh/frontend wlt/frontend control-panel/runtime; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; pnpm exec ast-grep scan --report-style short --rule tools/guards/logic/ast-grep-rules/no-runtime-preview-data-imports.yml dsh/frontend wlt/frontend/dsh control-panel/runtime\"",
     "guard:depcruise:live-boundaries": "pnpm exec depcruise --config tools/guards/design/configs/dependency-cruiser.live-boundaries.cjs dsh/frontend/app-client dsh/frontend/app-partner dsh/frontend/app-captain dsh/frontend/app-field dsh/frontend/shared dsh/frontend/control-panel wlt/frontend/dsh control-panel/runtime",

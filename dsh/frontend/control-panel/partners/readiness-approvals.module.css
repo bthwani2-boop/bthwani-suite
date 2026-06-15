@@ -1,0 +1,31 @@
+.splitGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr;
+  gap: 20px;
+}
+
+.storeCard {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--bth-color-line);
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.storeCardSelected {
+  border-color: var(--bth-color-brand);
+  background-color: var(--bth-color-brand-surface);
+}
+
+.formBox {
+  margin-top: 12px;
+}
+
+.reasonInput {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--bth-color-line);
+  font-size: 14px;
+  width: 100%;
+}

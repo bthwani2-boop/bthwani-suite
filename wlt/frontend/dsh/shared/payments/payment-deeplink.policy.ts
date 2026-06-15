@@ -16,12 +16,15 @@ export type WltPaymentDeepLink = {
 };
 
 export function createPaymentDeepLink(orderId: string, amountYer: number): WltPaymentDeepLink {
-  const url = `${WLT_DEEPLINK_SCHEME}://pay?order=${encodeURIComponent(orderId)}&amount=${amountYer}`;
+  if (!orderId.trim()) throw new Error('wlt:deeplink:empty_order_id');
+  if (amountYer <= 0) throw new Error('wlt:deeplink:non_positive_amount');
+  const url = `${WLT_DEEPLINK_SCHEME}://pay?order=${encodeURIComponent(orderId)}&amount=${amountYer}&v=${WLT_DEEPLINK_VERSION}`;
   return { kind: 'payment', url, scheme: WLT_DEEPLINK_SCHEME, version: WLT_DEEPLINK_VERSION };
 }
 
 export function createWalletFundingDeepLink(amountMinorUnits: number): WltPaymentDeepLink {
-  const url = `${WLT_DEEPLINK_SCHEME}://pay?order=wallet-funding&amount=${amountMinorUnits}`;
+  if (amountMinorUnits <= 0) throw new Error('wlt:deeplink:non_positive_amount');
+  const url = `${WLT_DEEPLINK_SCHEME}://pay?order=wallet-funding&amount=${amountMinorUnits}&v=${WLT_DEEPLINK_VERSION}`;
   return { kind: 'wallet-funding', url, scheme: WLT_DEEPLINK_SCHEME, version: WLT_DEEPLINK_VERSION };
 }
 

@@ -5,10 +5,6 @@ import { Box } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { usePlatformAuditState } from '../usePlatformAuditState';
 import type {
-  DshPlatformAuditEntry,
-  DshPlatformPolicyScenario,
-  DshPlatformProviderControlRecord,
-  DshPlatformScopeLayer,
   DshPlatformVarRecord,
   DshPlatformVarScope,
   DshPlatformVarStatus,
@@ -24,17 +20,22 @@ import {
   isPlatformDesignValValid,
   type PlatformVarMutationAction,
 } from '../../../shared/platform/platform-vars.policy';
+import {
+  DSH_PLATFORM_AUDIT_LOG,
+  DSH_PLATFORM_OPERATIONAL_VARS,
+  DSH_PLATFORM_PROVIDER_CONTROL_VARS,
+  DSH_PLATFORM_SCOPE_PRECEDENCE,
+  DSH_PLATFORM_POLICY_SCENARIOS,
+  DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
+  DSH_PLATFORM_DESIGN_POLICY_VARS,
+  resolvePlatformVarsDomainRecords,
+  sortPlatformVarsByScope,
+  resolvePlatformVarsDomainKpis,
+  resolvePlatformVarsFilteredScopes,
+  isProviderVarRecord,
+  type VarsDomainId,
+} from '../../../shared/platform/platform-vars.view-model';
 import styles from './dsh-platform-vars.module.css';
-
-const DSH_PLATFORM_AUDIT_LOG: DshPlatformAuditEntry[] = [];
-const DSH_PLATFORM_OPERATIONAL_VARS: DshPlatformVarRecord[] = [];
-const DSH_PLATFORM_PROVIDER_CONTROL_VARS: DshPlatformProviderControlRecord[] = [];
-const DSH_PLATFORM_SCOPE_PRECEDENCE: DshPlatformScopeLayer[] = [];
-const DSH_PLATFORM_POLICY_SCENARIOS: DshPlatformPolicyScenario[] = [];
-const DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS: DshPlatformVarRecord[] = [];
-const DSH_PLATFORM_DESIGN_POLICY_VARS: DshPlatformVarRecord[] = [];
-
-type VarsDomainId = 'dsh' | 'wlt' | 'provider' | 'policy' | 'design';
 
 const DOMAIN_TABS: { id: VarsDomainId; label: string }[] = [
   { id: 'dsh',      label: 'عمليات DSH' },
@@ -62,46 +63,6 @@ const RISK_LABEL: Record<DshPlatformVarRecord['risk'], string> = PLATFORM_VAR_RI
 
 const STATUS_LABEL: Record<DshPlatformVarStatus, string> = PLATFORM_VAR_STATUS_LABEL;
 
-const SCOPE_ORDER = new Map(DSH_PLATFORM_SCOPE_PRECEDENCE.map((l) => [l.scope, l.order]));
-
-function isProviderRecord(r: DshPlatformVarRecord): r is DshPlatformProviderControlRecord {
-  return 'providerId' in r;
-}
-
-function resolveDomainRecords(domain: VarsDomainId): readonly DshPlatformVarRecord[] {
-  if (domain === 'dsh')      return DSH_PLATFORM_OPERATIONAL_VARS;
-  if (domain === 'wlt')      return DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS;
-  if (domain === 'provider') return DSH_PLATFORM_PROVIDER_CONTROL_VARS;
-  if (domain === 'design')   return DSH_PLATFORM_DESIGN_POLICY_VARS;
-  return [];
-}
-
-function sortByScope(records: readonly DshPlatformVarRecord[]): DshPlatformVarRecord[] {
-  return [...records].sort((a, b) => {
-    const ao = SCOPE_ORDER.get(a.scope) ?? 999;
-    const bo = SCOPE_ORDER.get(b.scope) ?? 999;
-    return ao !== bo ? ao - bo : a.label.localeCompare(b.label, 'ar');
-  });
-}
-
-function resolveDomainKpis(domain: VarsDomainId) {
-  if (domain === 'policy') {
-    const blocked = DSH_PLATFORM_POLICY_SCENARIOS.filter((s) => s.blockedReason.length > 0).length;
-    return [
-      { id: 'p', label: 'طبقات', value: String(DSH_PLATFORM_SCOPE_PRECEDENCE.length), cls: '' },
-      { id: 's', label: 'سيناريوهات', value: String(DSH_PLATFORM_POLICY_SCENARIOS.length), cls: styles.kpiCellWarning },
-      { id: 'a', label: 'تدقيق', value: String(DSH_PLATFORM_AUDIT_LOG.length), cls: styles.kpiCellSuccess },
-      { id: 'b', label: 'محجوب', value: String(blocked), cls: styles.kpiCellDanger },
-    ];
-  }
-  const records = resolveDomainRecords(domain);
-  return [
-    { id: 'total',    label: 'إجمالي',    value: String(records.length),                                                                         cls: '' },
-    { id: 'binding',  label: 'مرتبط',     value: String(records.filter((r) => r.status === 'runtime-bound').length),                               cls: styles.kpiCellSuccess },
-    { id: 'contract', label: 'يتطلب عقد', value: String(records.filter((r) => r.status === 'contract-required').length),                           cls: styles.kpiCellWarning },
-    { id: 'wlt',      label: 'WLT',        value: String(records.filter((r) => r.owner === 'WLT').length),                                         cls: styles.kpiCellDanger },
-  ];
-}
 
 const QUICK_PICKS = PLATFORM_VAR_QUICK_PICKS;
 
@@ -192,7 +153,7 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
   React.useEffect(() => {
     setActiveScope('all');
     setShowConfirm(null);
-    const records = resolveDomainRecords(activeDomain);
+    const records = resolvePlatformVarsDomainRecords(activeDomain);
     const first = records[0] ?? null;
     setSelectedId(first?.id ?? null);
     if (first) {
@@ -222,7 +183,7 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
-  const domainRecords   = sortByScope(resolveDomainRecords(activeDomain));
+  const domainRecords   = sortPlatformVarsByScope(resolvePlatformVarsDomainRecords(activeDomain));
   const filteredRecords = activeScope === 'all'
     ? domainRecords
     : domainRecords.filter((r) => r.scope === (activeScope as DshPlatformVarScope));
@@ -230,12 +191,12 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
   const rawSelected  = filteredRecords.find((r) => r.id === selectedId) ?? filteredRecords[0] ?? domainRecords[0] ?? null;
   const selectedVar  = rawSelected ? getLive(rawSelected) : null;
 
-  const scopes = Array.from(new Set(domainRecords.map((r) => r.scope)));
-  const orderedScopes = DSH_PLATFORM_SCOPE_PRECEDENCE.map((l) => l.scope).filter((s) => scopes.includes(s));
+  const orderedScopes = resolvePlatformVarsFilteredScopes(domainRecords);
 
   const linkedScenarios = selectedVar ? DSH_PLATFORM_POLICY_SCENARIOS.filter((s) => s.relatedKeys.includes(selectedVar.key)) : [];
   const linkedAudits    = selectedVar ? DSH_PLATFORM_AUDIT_LOG.filter((e) => e.targetKey === selectedVar.key) : [];
-  const kpis            = resolveDomainKpis(activeDomain);
+  const kpiCssClasses = { warning: styles.kpiCellWarning, success: styles.kpiCellSuccess, danger: styles.kpiCellDanger };
+  const kpis          = resolvePlatformVarsDomainKpis(activeDomain, kpiCssClasses);
   const quickPicks      = selectedVar ? (QUICK_PICKS[selectedVar.key] ?? []) : [];
 
   const handleConfirm = (action: PlatformVarMutationAction) => {
@@ -581,7 +542,7 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
                 )}
 
                 {/* Provider details */}
-                {isProviderRecord(selectedVar) && (
+                {isProviderVarRecord(selectedVar) && (
                   <div className={styles.metaSection}>
                     <span className={styles.metaSectionTitle}>تفاصيل المزود</span>
                     <div className={styles.metaGrid}>

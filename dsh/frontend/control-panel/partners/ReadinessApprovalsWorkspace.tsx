@@ -1,11 +1,8 @@
 'use client';
 
 import React from 'react';
-import { generateLocalTempId } from '../../shared/platform/local-temp-id';
 import { Box, Text, Surface, KeyValueList } from '@bthwani/ui-kit';
 import {
-  WebControlPanelDecisionRow,
-  WebControlPanelInspectorShell,
   WebControlPanelActionCluster,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
@@ -13,27 +10,35 @@ import {
   getDshFieldReadinessRuntimeClient,
   type FieldReadinessApprovalRecord,
 } from '../../shared';
+import styles from './readiness-approvals.module.css';
 
 export function ReadinessApprovalsWorkspace() {
   const [selectedStoreId, setSelectedStoreId] = React.useState('store-1001');
   const [latestApproval, setLatestApproval] = React.useState<FieldReadinessApprovalRecord | null>(null);
+  const [approvalLoadState, setApprovalLoadState] = React.useState<'idle' | 'loading' | 'not-found' | 'error'>('idle');
   const [reason, setReason] = React.useState('');
   const [actionMessage, setActionMessage] = React.useState('يرجى التحقق من اكتمال دليل الزيارة الميدانية والمستندات قبل الاعتماد.');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
-  const client = React.useMemo(() => {
-    return getDshFieldReadinessRuntimeClient();
-  }, []);
+  const client = React.useMemo(() => getDshFieldReadinessRuntimeClient(), []);
 
   const loadLatestApproval = React.useCallback(async (storeId: string) => {
     setErrorMsg(null);
+    setApprovalLoadState('loading');
     try {
       const rec = await client.getLatestFieldReadinessApproval(storeId);
       setLatestApproval(rec);
-    } catch (e) {
-      console.log('No approval record or API error:', e);
-      setLatestApproval(null);
+      setApprovalLoadState('idle');
+    } catch (e: unknown) {
+      const status = (e as { status?: number })?.status;
+      if (status === 404 || (e instanceof Error && /not.found|no.record/i.test(e.message))) {
+        setLatestApproval(null);
+        setApprovalLoadState('not-found');
+      } else {
+        console.error('Failed to load readiness approval:', e);
+        setApprovalLoadState('error');
+      }
     }
   }, [client]);
 
@@ -55,18 +60,7 @@ export function ReadinessApprovalsWorkspace() {
       setActionMessage(`تم تسجيل قرار الجاهزية بنجاح: ${decision === 'approved' ? 'اعتماد المتجر وتأهيل بوابة الظهور' : 'رفض الملف مع طلب إصلاح'}`);
     } catch (e) {
       console.error(e);
-      // Fallback for preview/mock demo
-      const mockRec: FieldReadinessApprovalRecord = {
-        id: generateLocalTempId('appr-local'),
-        store_id: selectedStoreId,
-        decision,
-        reason,
-        operator_id: 'operator-1',
-        created_at: new Date().toISOString(),
-      };
-      setLatestApproval(mockRec);
-      setReason('');
-      setActionMessage(`[معاينة] تم تسجيل قرار الجاهزية بنجاح: ${decision === 'approved' ? 'اعتماد المتجر وتأهيل بوابة الظهور' : 'رفض الملف مع طلب إصلاح'}`);
+      setErrorMsg('فشل تسجيل القرار. تحقق من الاتصال وأعد المحاولة.');
     } finally {
       setIsSubmitting(false);
     }
@@ -90,7 +84,7 @@ export function ReadinessApprovalsWorkspace() {
         </Surface>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 2fr', gap: '20px' }}>
+      <div className={styles.splitGrid}>
         {/* Store Selector Board */}
         <Surface tone="raised" padding={5} gap={4} radiusToken="lg">
           <Text role="titleLg" tone="brand">
@@ -104,14 +98,7 @@ export function ReadinessApprovalsWorkspace() {
                 <div
                   key={store.id}
                   onClick={() => setSelectedStoreId(store.id)}
-                  style={{
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: `1px solid ${isSelected ? 'var(--bth-color-brand)' : 'var(--bth-color-line)'}`,
-                    backgroundColor: isSelected ? 'var(--bth-color-brand-surface)' : 'transparent',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                  }}
+                  className={`${styles.storeCard}${isSelected ? ` ${styles.storeCardSelected}` : ''}`}
                 >
                   <Text role="bodyMd" tone={isSelected ? 'brand' : 'default'}>
                     {store.name}
@@ -131,7 +118,17 @@ export function ReadinessApprovalsWorkspace() {
             حالة واعتماد الجاهزية لـ {selectedStoreId}
           </Text>
 
-          {latestApproval ? (
+          {approvalLoadState === 'loading' && (
+            <Surface tone="raised" padding={3} radiusToken="sm">
+              <Text role="bodySm" tone="muted">جارٍ تحميل سجل الاعتماد...</Text>
+            </Surface>
+          )}
+          {approvalLoadState === 'error' && (
+            <Surface tone="danger" padding={3} radiusToken="sm" border>
+              <Text role="bodySm" tone="danger">تعذّر تحميل سجل الاعتماد. تحقق من الاتصال وأعد تحديد المتجر.</Text>
+            </Surface>
+          )}
+          {approvalLoadState !== 'loading' && approvalLoadState !== 'error' && latestApproval && (
             <Surface tone={latestApproval.decision === 'approved' ? 'success' : 'danger'} padding={4} radiusToken="sm" border>
               <Text role="titleSm" tone={latestApproval.decision === 'approved' ? 'success' : 'danger'}>
                 القرار الحالي: {latestApproval.decision === 'approved' ? '✓ معتمد وجاهز للظهور في التطبيق' : '⚠ مرفوض / بحاجة لإصلاح'}
@@ -142,14 +139,12 @@ export function ReadinessApprovalsWorkspace() {
                   { label: 'رقم الاعتماد', value: latestApproval.id },
                   { label: 'المدقق المسؤول', value: latestApproval.operator_id || 'غير محدد' },
                   { label: 'السبب/الملاحظة', value: latestApproval.reason || 'لا توجد ملاحظات إضافية' },
-                  {
-                    label: 'تاريخ القرار',
-                    value: new Date(latestApproval.created_at).toLocaleString('ar-SA'),
-                  },
+                  { label: 'تاريخ القرار', value: new Date(latestApproval.created_at).toLocaleString('ar-SA') },
                 ]}
               />
             </Surface>
-          ) : (
+          )}
+          {(approvalLoadState === 'not-found' || (approvalLoadState === 'idle' && !latestApproval)) && (
             <Surface tone="warning" padding={3} radiusToken="sm" border>
               <Text role="bodySm" tone="warning">
                 تنبيه: لا يوجد قرار اعتماد مسجل لهذا المتجر حتى الآن. هو حالياً "غير جاهز" (not_ready) تلقائياً.
@@ -157,7 +152,7 @@ export function ReadinessApprovalsWorkspace() {
             </Surface>
           )}
 
-          <Box gap={3} style={{ marginTop: 12 }}>
+          <Box gap={3} className={styles.formBox}>
             <Text role="bodySm" tone="default">
               إقرار مدقق العمليات (اعتماد أو رفض الملف الميداني كاملاً):
             </Text>
@@ -166,13 +161,7 @@ export function ReadinessApprovalsWorkspace() {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="اكتب مبررات الاعتماد أو أسباب الرفض بالتفصيل..."
-              style={{
-                padding: '12px',
-                borderRadius: '8px',
-                border: '1px solid var(--bth-color-line)',
-                fontSize: '14px',
-                width: '100%',
-              }}
+              className={styles.reasonInput}
               disabled={isSubmitting}
             />
 

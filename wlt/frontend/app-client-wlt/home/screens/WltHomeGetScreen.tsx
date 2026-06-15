@@ -3,7 +3,7 @@ import { ScrollView, View } from 'react-native';
 import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, TopBar, amountToArabicText, useBThwaniAppearance, useI18n,
   spacing,
 } from '@bthwani/ui-kit';
-import { financeProviders, createWltDshTypedClient, type FinanceProvider } from '../../../dsh/shared';
+import { financeProviders, createWltDshTypedClient, type FinanceProvider, generatePaymentSessionIds } from '../../../dsh/shared';
 
 export const WltHomeGetScreen: React.FC<{
   onBack?: () => void;
@@ -63,17 +63,18 @@ export const WltHomeGetScreen: React.FC<{
   const handleTopup = async () => {
     if (!canSubmit) return setState('error');
     setState('loading');
+    const { checkoutIntentId, idempotencyKey, confirmationRef } = generatePaymentSessionIds('topup');
     try {
       const session = await client.createClientPaymentSession({
-        checkout_intent_id: `topup-${Date.now()}`,
+        checkout_intent_id: checkoutIntentId,
         client_id: activeClientId,
         amount: topupAmount,
         currency: 'YER',
         payment_method: method ?? 'wallet',
-        idempotency_key: `topup-idem-${Date.now()}-${topupAmount}`,
+        idempotency_key: idempotencyKey,
       });
 
-      await client.confirmPaymentSession(session.id, `ref-topup-${Date.now()}`);
+      await client.confirmPaymentSession(session.id, confirmationRef);
 
       setState('success');
       setTrigger((t) => t + 1);
