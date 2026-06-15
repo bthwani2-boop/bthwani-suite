@@ -38,7 +38,8 @@ export function readFieldStoresLocal(): FieldStoreFile[] {
       const parsed = JSON.parse(raw) as FieldStoreFile[];
       fieldStoresMemory = parsed;
       return parsed;
-    } catch {
+    } catch (err) {
+      console.error('[field:storage:read]', err);
       return fieldStoresMemory ?? [];
     }
   }

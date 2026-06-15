@@ -1,6 +1,6 @@
 import type { DshControlPanelSectionId } from '../control-panel/dsh-governance.map';
 import type { DshSurfaceId } from '../runtime/dsh-flow-registry';
-import type { BthwaniFullStackCapabilityId } from './bthwani-full-stack-capabilities';
+import type { BthwaniFullStackCapabilityId, DshSharedTopicId } from './bthwani-full-stack-capabilities';
 
 export type BthwaniFullStackClosureStatus =
   | 'contract-required'
@@ -12,7 +12,8 @@ export type BthwaniFullStackCapabilityBinding = {
   readonly id: BthwaniFullStackCapabilityId;
   readonly backendRequired: boolean;
   readonly openapiRequired: boolean;
-  readonly sharedOwner: 'contracts' | 'adapters' | 'runtime' | 'view-models' | 'state-machines' | 'policies';
+  /** Topics in dsh/frontend/shared that own this capability's contracts, adapters, and view-models. */
+  readonly sharedTopics: readonly DshSharedTopicId[];
   readonly controlPanelSections: readonly DshControlPanelSectionId[];
   readonly mobileSurfaces: readonly DshSurfaceId[];
   readonly wltRequired: boolean;
@@ -26,7 +27,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'foundation',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'runtime',
+    sharedTopics: ['runtime', 'identity-access', 'platform'],
     controlPanelSections: ['dashboard', 'platform', 'administration'],
     mobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel'],
     wltRequired: false,
@@ -38,7 +39,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'actor-auth-permissions',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'policies',
+    sharedTopics: ['identity-access', 'platform'],
     controlPanelSections: ['administration', 'platform'],
     mobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel'],
     wltRequired: false,
@@ -50,7 +51,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'catalog-store',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'adapters',
+    sharedTopics: ['catalog', 'stores', 'products', 'media'],
     controlPanelSections: ['catalogs', 'partners', 'marketing'],
     mobileSurfaces: ['app-client', 'app-partner', 'app-field', 'control-panel'],
     wltRequired: false,
@@ -62,7 +63,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'media-runtime',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'adapters',
+    sharedTopics: ['media', 'platform'],
     controlPanelSections: ['catalogs', 'support', 'marketing', 'platform'],
     mobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel'],
     wltRequired: false,
@@ -74,7 +75,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'cart-checkout',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'view-models',
+    sharedTopics: ['cart', 'checkout', 'orders'],
     controlPanelSections: ['operations', 'finance', 'platform'],
     mobileSurfaces: ['app-client', 'control-panel'],
     wltRequired: true,
@@ -86,7 +87,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'order-lifecycle',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'state-machines',
+    sharedTopics: ['orders', 'operations', 'delivery'],
     controlPanelSections: ['operations', 'support', 'finance'],
     mobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'control-panel'],
     wltRequired: true,
@@ -98,7 +99,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'captain-delivery',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'state-machines',
+    sharedTopics: ['captain', 'delivery', 'orders', 'media'],
     controlPanelSections: ['operations', 'support', 'finance'],
     mobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'control-panel'],
     wltRequired: true,
@@ -110,7 +111,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'partner-operations',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'adapters',
+    sharedTopics: ['partner', 'stores', 'products', 'media', 'operations'],
     controlPanelSections: ['operations', 'catalogs', 'partners', 'support'],
     mobileSurfaces: ['app-partner', 'control-panel'],
     wltRequired: false,
@@ -122,7 +123,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'field-readiness',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'state-machines',
+    sharedTopics: ['field', 'media', 'operations'],
     controlPanelSections: ['partners', 'catalogs', 'support'],
     mobileSurfaces: ['app-field', 'app-partner', 'control-panel'],
     wltRequired: false,
@@ -134,7 +135,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'support-escalation',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'state-machines',
+    sharedTopics: ['support', 'operations', 'media'],
     controlPanelSections: ['support', 'operations'],
     mobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel'],
     wltRequired: false,
@@ -146,7 +147,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'wlt-finance-read-model',
     backendRequired: false,
     openapiRequired: true,
-    sharedOwner: 'contracts',
+    sharedTopics: ['finance-boundary'],
     controlPanelSections: ['finance', 'dashboard'],
     mobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel', 'wlt-finance'],
     wltRequired: true,
@@ -158,7 +159,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'control-panel-governance',
     backendRequired: false,
     openapiRequired: false,
-    sharedOwner: 'policies',
+    sharedTopics: ['identity-access', 'platform', 'control-panel'],
     controlPanelSections: ['dashboard', 'operations', 'support', 'finance', 'catalogs', 'partners', 'marketing', 'platform', 'administration', 'hr'],
     mobileSurfaces: ['control-panel'],
     wltRequired: false,
@@ -170,7 +171,7 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     id: 'notifications',
     backendRequired: true,
     openapiRequired: true,
-    sharedOwner: 'adapters',
+    sharedTopics: ['notifications', 'platform'],
     controlPanelSections: ['operations', 'support', 'platform'],
     mobileSurfaces: ['app-client', 'app-partner', 'app-captain', 'app-field', 'control-panel'],
     wltRequired: false,

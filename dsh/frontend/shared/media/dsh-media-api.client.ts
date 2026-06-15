@@ -138,7 +138,7 @@ async function apiFetch<T>(fetchFn: DshMediaFetchFn, url: string, init?: Request
       const body = await response.json();
       code = body?.error?.code ?? code;
       message = body?.error?.message ?? message;
-    } catch {}
+    } catch (err) { console.warn('[media:api-error-body]', err); }
     throw { kind: 'api_error', status: response.status, code, message } satisfies ApiError;
   }
   if (response.status === 204) return undefined as T;

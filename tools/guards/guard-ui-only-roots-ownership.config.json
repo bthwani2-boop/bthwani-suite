@@ -12,46 +12,46 @@
     "wlt/frontend/dsh/app-partner",
     "wlt/frontend/dsh/control-panel"
   ],
-  "globalAllowRules": [
-    "ui_only_finance_runtime_logic",
-    "ui_only_preview_demo_mock_fallback_runtime"
-  ],
+  "globalAllowRules": [],
   "allowlist": {
-    "useDshClientSurfaceModel.ts": [
-      "ui_only_runtime_adapter_policy",
-      "ui_only_forbidden_hooks"
-    ],
-    "useDshPartnerSurfaceModel.ts": [
-      "ui_only_state_machine_or_lifecycle",
-      "ui_only_runtime_adapter_policy",
-      "ui_only_forbidden_hooks"
-    ],
-    "useDshCaptainSurfaceModel.ts": [
-      "ui_only_runtime_mutation_or_query_function",
-      "ui_only_state_machine_or_lifecycle",
-      "ui_only_forbidden_hooks"
-    ],
     "screens/": [
       "ui_only_runtime_mutation_or_query_function",
       "ui_only_non_deterministic_runtime_id",
       "ui_only_runtime_adapter_policy",
       "ui_only_state_machine_or_lifecycle",
-      "ui_only_media_upload_logic"
+      "ui_only_media_upload_logic",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
     ],
     "parts/": [
       "ui_only_runtime_mutation_or_query_function",
       "ui_only_runtime_adapter_policy",
       "ui_only_state_machine_or_lifecycle",
-      "ui_only_media_upload_logic"
+      "ui_only_media_upload_logic",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
     ],
     "sheets/": [
       "ui_only_runtime_mutation_or_query_function"
     ],
     "dsh-partner.screen-registry.ts": [
-      "ui_only_runtime_adapter_policy"
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
     ],
     "DshPartnerSurface.tsx": [
-      "ui_only_runtime_adapter_policy"
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "DshCaptainSurface.tsx": [
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "DshClientBottomNav.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
     ],
     "DshFieldSurface.tsx": [
       "ui_only_runtime_adapter_policy",
@@ -64,7 +64,9 @@
       "ui_only_runtime_adapter_policy",
       "ui_only_state_machine_or_lifecycle",
       "ui_only_creates_runtime_client",
-      "ui_only_status_or_next_action_map"
+      "ui_only_status_or_next_action_map",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_finance_runtime_logic"
     ],
     "wlt/frontend/dsh/": [
       "ui_only_runtime_mutation_or_query_function",
@@ -73,7 +75,9 @@
       "ui_only_runtime_adapter_policy",
       "ui_only_state_machine_or_lifecycle",
       "ui_only_creates_runtime_client",
-      "ui_only_status_or_next_action_map"
+      "ui_only_status_or_next_action_map",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
     ],
     "useHomeFilterRail.tsx": [
       "ui_only_media_upload_logic"

@@ -33,8 +33,11 @@ export * from './discovery';
 // Platform Topic — feature flags, platform vars, runtime env config
 export * from './platform';
 
-// ── Layer-compat re-exports (backward compat — do not add new exports here) ──
-
+// Control-Panel Topic — admin workspaces, governance map, operations registry, cross-surface closure
 export * from './control-panel';
+
+// Media Topic — media API client, image resolution, entity media hooks, captain-pod downstream
 export * from './media';
+
+// Runtime Topic — auth client, flow registry, surface binding, price formatting, runtime contracts
 export * from './runtime';

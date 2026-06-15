@@ -1,3 +1,31 @@
+export const DSH_SHARED_TOPICS = [
+  'full-stack',
+  'catalog',
+  'marketing',
+  'notifications',
+  'support',
+  'field',
+  'partner',
+  'operations',
+  'products',
+  'orders',
+  'stores',
+  'cart',
+  'checkout',
+  'captain',
+  'delivery',
+  'finance-boundary',
+  'presentation-models',
+  'identity-access',
+  'discovery',
+  'platform',
+  'control-panel',
+  'media',
+  'runtime',
+] as const;
+
+export type DshSharedTopicId = (typeof DSH_SHARED_TOPICS)[number];
+
 export const BTHWANI_FULL_STACK_CAPABILITIES = [
   'foundation',
   'actor-auth-permissions',

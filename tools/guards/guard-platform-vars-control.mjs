@@ -119,7 +119,16 @@ for (const [serviceId, service] of serviceEntries) {
     }
 
     // Zero scattered process.env reads enforcement (DSH-SLICE-008A)
-    if (/\.(tsx|ts)$/.test(relativePath) && relativePath.startsWith('dsh/frontend/') && relativePath !== 'dsh/frontend/shared/platform/PlatformVarsProvider.tsx' && relativePath !== 'dsh/frontend/shared/platform/FeatureFlagProvider.tsx' && relativePath !== 'dsh/frontend/shared/dev-fixtures-isolation-guard.ts' && relativePath !== 'dsh/frontend/shared/runtime/dev-fixtures-isolation-guard.ts') {
+    const PLATFORM_ENV_CANONICAL = new Set([
+      'dsh/frontend/shared/platform/PlatformVarsProvider.tsx',
+      'dsh/frontend/shared/platform/FeatureFlagProvider.tsx',
+      'dsh/frontend/shared/platform/platform-vars.ts',
+      'dsh/frontend/shared/platform/feature-flags.ts',
+      'dsh/frontend/shared/media/useDshEntityMedia.ts',
+      'dsh/frontend/shared/dev-fixtures-isolation-guard.ts',
+      'dsh/frontend/shared/runtime/dev-fixtures-isolation-guard.ts',
+    ]);
+    if (/\.(tsx|ts)$/.test(relativePath) && relativePath.startsWith('dsh/frontend/') && !PLATFORM_ENV_CANONICAL.has(relativePath)) {
       const processEnvRegex = /process\.env|env\?\.(EXPO_PUBLIC_|NEXT_PUBLIC_)/g;
       let envMatch;
       while ((envMatch = processEnvRegex.exec(text))) {

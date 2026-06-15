@@ -1,5 +1,6 @@
 // Field store lifecycle helpers — draft management, status resolution, filter logic.
 // No JSX. No ui-kit. No Tamagui.
+// Draft IDs are UI-only handles; backend assigns the real id on sync.
 
 import type {
   FieldStoreFile,
@@ -8,7 +9,7 @@ import type {
   FieldLeadFilter,
   FieldOnboardingSectionId,
   FieldSectionSummary,
-  FieldDocumentPreviewStatus,
+  FieldDocumentRuntimeStatus,
 } from './field.types';
 import {
   fieldStatusLabels,
@@ -16,6 +17,13 @@ import {
   fieldSectionOrder,
   fieldSectionLabels,
 } from './field.types';
+
+function generateDraftId(prefix: string): string {
+  const rand = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID().replace(/-/g, '').slice(0, 12)
+    : Math.random().toString(36).slice(2, 14).padEnd(12, '0');
+  return `${prefix}-${rand}`;
+}
 
 function formatNowLabel() {
   try {
@@ -51,7 +59,7 @@ export function createEmptyDraft(overrides?: Partial<FieldOnboardingDraft>): Fie
 
 export function getFieldRequiredMissingItems(draft: FieldOnboardingDraft): string[] {
   const missing: string[] = [];
-  const documentIsResolved = (ref: string, status: FieldDocumentPreviewStatus) =>
+  const documentIsResolved = (ref: string, status: FieldDocumentRuntimeStatus) =>
     ref.trim().length > 0 && (status === 'uploaded' || status === 'approved');
 
   if (!draft.basics.storeName.trim()) missing.push('اسم المتجر');
@@ -220,7 +228,7 @@ export function submitFieldStoreForReview(store: FieldStoreFile): FieldStoreFile
 
 function createBaseStore(overrides?: Partial<FieldStoreFile>): FieldStoreFile {
   return syncFieldStoreFromDraft({
-    id: overrides?.id ?? `field-store-${Date.now()}`,
+    id: overrides?.id ?? generateDraftId('field-store'),
     source: overrides?.source ?? 'backend',
     draftLocalId: overrides?.draftLocalId,
     syncStatus: overrides?.syncStatus ?? 'backend',
@@ -242,7 +250,7 @@ function createBaseStore(overrides?: Partial<FieldStoreFile>): FieldStoreFile {
 }
 
 export function createManualFieldStore(): FieldStoreFile {
-  const draftLocalId = `field-store-draft-${Date.now()}`;
+  const draftLocalId = generateDraftId('field-store-draft');
   return createBaseStore({
     id: draftLocalId,
     source: 'local-draft',

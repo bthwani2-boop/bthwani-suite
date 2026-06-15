@@ -104,7 +104,8 @@ export function useDshCheckout({
           ? intentResp.total_amount_minor_units
           : cartItems.reduce((sum, item) => sum + parseCartItemPrice(item.priceLabel) * item.qty, 0)
             + (selectedFulfillmentMode === 'pickup' ? 0 : 1500);
-      } catch {
+      } catch (err) {
+        console.error('[checkout:intent]', err);
         setCheckoutState('payment-failed');
         setPaymentErrorMessage('تعذر إنشاء جلسة الدفع. تحقق من تسجيل الدخول وحاول مرة أخرى.');
         return;
@@ -130,7 +131,8 @@ export function useDshCheckout({
               : 'فشلت عملية الدفع. يُرجى التحقق من المحفظة والمحاولة مرة أخرى.',
           );
         }
-      } catch {
+      } catch (err) {
+        console.error('[checkout:wallet-payment]', err);
         setCheckoutState('payment-failed');
         setPaymentErrorMessage('حدث خطأ أثناء الاتصال بمحفظتك. يُرجى المحاولة لاحقاً.');
       }

@@ -14,3 +14,7 @@ export type {
 
 export * from './home-search-helpers';
 export * from './home-promo-mappers';
+export * from './client.navigation-bridge';
+export * from './useDshClientNavigation';
+export * from './useDshClientBellState';
+export * from './useDshClientSurfaceModel';

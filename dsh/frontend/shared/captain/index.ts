@@ -4,3 +4,4 @@
 export * from './captain.contract';
 export * from './captain.cod';
 export * from './captain.state';
+export * from './captain.surface-model';

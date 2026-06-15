@@ -42,8 +42,10 @@ export type FieldOnboardingSectionId =
   | 'offer'
   | 'review';
 
-export type FieldDocumentPreviewStatus = 'missing' | 'uploaded' | 'approved' | 'needs_reupload' | 'rejected';
-export type FieldDocumentStatus = FieldDocumentPreviewStatus;
+export type FieldDocumentRuntimeStatus = 'missing' | 'uploaded' | 'approved' | 'needs_reupload' | 'rejected';
+/** @deprecated Use FieldDocumentRuntimeStatus */
+export type FieldDocumentPreviewStatus = FieldDocumentRuntimeStatus;
+export type FieldDocumentStatus = FieldDocumentRuntimeStatus;
 
 export type FieldOnboardingDraft = {
   activeSectionId: FieldOnboardingSectionId;
@@ -55,9 +57,9 @@ export type FieldOnboardingDraft = {
     commercialRegistrationRef: string;
     ownerIdRef: string;
     tradeLicenseRef: string;
-    commercialRegistrationStatus: FieldDocumentPreviewStatus;
-    ownerIdStatus: FieldDocumentPreviewStatus;
-    tradeLicenseStatus: FieldDocumentPreviewStatus;
+    commercialRegistrationStatus: FieldDocumentRuntimeStatus;
+    ownerIdStatus: FieldDocumentRuntimeStatus;
+    tradeLicenseStatus: FieldDocumentRuntimeStatus;
   };
   products: { featuredProductName: string; featuredProductPrice: string; sampleCatalogNote: string };
   offer: { preliminaryOffer: string; operatingHours: string; deliveryReadiness: string; financeNote: string };

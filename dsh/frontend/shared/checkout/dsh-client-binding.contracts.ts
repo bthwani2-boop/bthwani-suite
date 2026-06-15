@@ -530,6 +530,13 @@ export type DshRoute =
   | 'appearance'
   | 'tracking';
 
+export type DshCommandTarget = 'home' | 'orders-list' | 'tracking' | 'bell' | 'create-order' | 'cart-get';
+
+export type DshNavigationCommand = {
+  token: number;
+  target: DshCommandTarget;
+};
+
 export function resolveStorePickupAddress(store: { subtitle?: string; name?: string }) {
   const subtitle = store.subtitle?.trim();
   if (subtitle) {

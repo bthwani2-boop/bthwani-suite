@@ -132,7 +132,12 @@ export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
   }, [patchStore]);
 
   const handleSubmitReview = React.useCallback((store: FieldStoreFile) => {
-    void fieldRuntime.createStoreFromDraft(store).catch(() => {});
+    patchStore(store.id, (s) => ({ ...s, syncStatus: 'syncing' as const }));
+    void fieldRuntime.createStoreFromDraft(store).then(() => {
+      patchStore(store.id, (s) => ({ ...s, syncStatus: 'backend' as const }));
+    }).catch(() => {
+      patchStore(store.id, (s) => ({ ...s, syncStatus: 'sync-failed' as const }));
+    });
     patchStore(store.id, submitFieldStoreForReview);
     pushRoute({ kind: 'visit', storeId: store.id });
   }, [fieldRuntime, patchStore, pushRoute]);
@@ -155,7 +160,12 @@ export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
       setVisitErrors((current) => ({ ...current, [store.id]: nextErrors }));
       return;
     }
-    void fieldRuntime.submitVisit(store.id, nextValues).catch(() => {});
+    patchStore(store.id, (s) => ({ ...s, syncStatus: 'syncing' as const }));
+    void fieldRuntime.submitVisit(store.id, nextValues).then(() => {
+      patchStore(store.id, (s) => ({ ...s, syncStatus: 'backend' as const }));
+    }).catch(() => {
+      patchStore(store.id, (s) => ({ ...s, syncStatus: 'sync-failed' as const }));
+    });
     patchStore(store.id, (current) => ({
       ...current,
       lifecycleNote: nextValues.visitSummary.trim() || current.lifecycleNote,
