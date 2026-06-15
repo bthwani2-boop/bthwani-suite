@@ -14,5 +14,5 @@ export async function getPaymentSession(
   sessionId: string,
   bearerToken?: string,
 ): Promise<WltPaymentSession> {
-  return createWltDshTypedClient({ bearerToken }).getPaymentSession(sessionId);
+  return createWltDshTypedClient({ bearerToken }).getClientPaymentSession(sessionId);
 }

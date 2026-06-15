@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import type { WltDshAccountStatement as WltDshAccountStatementModel } from '../../shared/contracts/accountStatement.types';
-import type { WltDshFinanceRuntimeResult } from '../../shared/adapters/wltDshFinanceRuntime.adapter';
-import { buildRuntimeAccountStatements } from '../../shared/read-models/account-statement.read-model';
+import type { WltDshAccountStatement as WltDshAccountStatementModel } from '../../shared/control-panel/accountStatement.types';
+import type { WltDshFinanceRuntimeResult } from '../../shared/boundary/wltDshFinanceRuntime.adapter';
+import { buildRuntimeAccountStatements } from '../../shared/control-panel/account-statement.read-model';
 
 const STATUS_LABEL: Record<WltDshAccountStatementModel['lines'][number]['status'], string> = {
   posted_preview: 'مرحل كمعاينة',

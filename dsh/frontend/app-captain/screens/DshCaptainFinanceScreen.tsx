@@ -4,7 +4,7 @@ import { DshOperationScreen } from '../parts/OperationScreen';
 import type {
 	DshCaptainFinanceScreenState,
 	DshCaptainFinanceSection,
-} from '../../shared/state-machines/client-state';
+} from '../../shared/client-state';
 
 export type DshCaptainFinanceScreenProps = {
 	section?: DshCaptainFinanceSection;

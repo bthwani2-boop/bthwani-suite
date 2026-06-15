@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Badge, Box, colorPalette, Icon, Text, useDirection, useTheme, withAlpha,
   radius,
@@ -11,7 +11,7 @@ import {
   resolveFieldStoreStatusLabel,
   resolveFieldStoreStatusTone,
   type FieldStoreFile,
-} from '../../shared/contracts/field-store-model';
+} from '../../shared';
 
 type FieldStoreCardProps = {
   store: FieldStoreFile;

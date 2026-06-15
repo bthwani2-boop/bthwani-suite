@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
-import { getDshSignalSummaries, getDshSignalUnreadCount } from '../../shared/contracts/dsh-signal-layer.model';
+import { getDshSignalSummaries, getDshSignalUnreadCount } from '../../shared/marketing/dsh-signal-layer.model';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type ControlPanelDshMarketingScreenProps = {

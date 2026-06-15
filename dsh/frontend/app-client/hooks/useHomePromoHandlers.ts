@@ -1,1 +1,1 @@
-export * from '../../shared/view-models/home/useHomePromoHandlers';
+export * from '../../shared/discovery/useHomePromoHandlers';

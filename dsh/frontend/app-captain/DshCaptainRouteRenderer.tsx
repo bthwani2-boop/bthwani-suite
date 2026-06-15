@@ -3,8 +3,7 @@ import { View } from 'react-native';
 import { Badge, Box, Button, Divider, Icon, KeyValueList, MobileScrollView, Text, TopBar, spacing } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import type { DshCaptainRoute } from './dsh-captain.types';
-import type { CaptainSupportRoute } from '../shared/view-models/captain';
-import type { CaptainAvailabilityMeta } from '../shared/view-models/captain/captain-status-meta';
+import type { CaptainSupportRoute, CaptainAvailabilityMeta } from '../shared';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
 import {
   CaptainDeliveryConfirmSheet,
@@ -23,8 +22,8 @@ import { DshCaptainAccountSettingsContent } from './screens/DshCaptainAccountSet
 import { CaptainAccountNavRow } from './parts/CaptainAccountNavRow';
 import { OfferDeclineSheet } from './sheets';
 import { CaptainSupportScreenRouter } from './CaptainSupportScreenRouter';
-import type { DshCaptainBellEvent } from '../shared/state-machines/dsh-order-journey.model';
-import type { CompactOrderChatMessage } from '../shared/view-models/captain';
+import type { DshCaptainBellEvent } from '../shared/orders';
+import type { CompactOrderChatMessage } from '../shared';
 
 type CaptainOrderDetailSummary = React.ComponentProps<typeof CaptainOrderDetailScreen>['summary'];
 type CaptainOrdersInboxScreenState = NonNullable<React.ComponentProps<typeof CaptainOrdersInboxScreen>>['state'];

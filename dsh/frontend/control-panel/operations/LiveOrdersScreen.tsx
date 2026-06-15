@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import {
   WebControlPanelKpiStrip,
@@ -10,15 +10,15 @@ import {
 } from '@bthwani/ui-kit/web';
 import { Box, KeyValueList, useTheme } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
-import type { DshOperationsDecisionKind, DshOrderLifecycleStatus } from '../../shared/state-machines/dsh-order-journey.model';
-import { mapOperationsDecisionToLifecycle } from '../../shared/state-machines/dsh-order-journey.model';
+import type { DshOperationsDecisionKind, DshOrderLifecycleStatus } from '../../shared/orders';
+import { mapOperationsDecisionToLifecycle } from '../../shared/orders';
 import { buildOperationsHref } from './operations.registry';
-import { getLiveOrderDecisions, updateLiveOrderDecision } from '../../shared/state-machines/workflow';
+import { getLiveOrderDecisions, updateLiveOrderDecision } from '../../shared';
 import { OpsOrderDetailPanel, PENDING_APPROVAL_ORDERS } from './OpsOrderDetailPanel';
 import { getOperationsActorLabel } from './FulfillmentModeQueueSection';
 import type { DshFulfillmentOperationalMode } from './operations.types';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
-import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/adapters/dsh-operational-runtime-adapter';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/operations/dsh-operational-runtime-adapter';
 import { DSH_CONTROL_PANEL_TONE_MAP, resolveRuntimeOrderStatusTone } from '../shared/dsh-control-panel-display';
 
 export type LiveOrdersScreenProps = {

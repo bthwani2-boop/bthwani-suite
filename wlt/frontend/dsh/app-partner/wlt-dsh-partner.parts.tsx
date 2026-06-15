@@ -19,7 +19,7 @@ import {
   radius,
   typographyRoles,
 } from '@bthwani/ui-kit';
-import type { WltDshPartnerWalletTransaction } from '../shared/adapters/partner-finance.adapter';
+import type { WltDshPartnerWalletTransaction } from '../shared/settlements/partner-finance.adapter';
 import { useWltDshPartnerWalletSummary } from '../shared';
 import { getWltDshPartnerCommissionLabel, getWltDshPartnerOperationalModeCommission } from './wlt-dsh-partner.ui-copy';
 import {

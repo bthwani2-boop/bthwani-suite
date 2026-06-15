@@ -9,7 +9,7 @@ import {
   WebControlPanelActionCluster,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import { type DshPartnerActivationStatus } from '../../shared/contracts/dsh-partner-activation.model';
+import { type DshPartnerActivationStatus } from '../../shared/partner/dsh-partner-activation.model';
 import {
   PARTNER_FULFILLMENT_AGREEMENTS,
   type DshPartnerDocumentVerification,

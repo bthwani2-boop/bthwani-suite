@@ -13,10 +13,10 @@ import type { CatalogProductMaster } from '../catalogs.data';
 import {
   resolveDshProductClientVisibility,
   type DshClientVisibilityBlockedCode,
-} from '../../../shared/contracts/dsh-client-visibility.model';
+} from '../../../shared/stores/dsh-client-visibility.model';
 import {
   mapApprovalStageToPartnerActivationStatus,
-} from '../../../shared/contracts/dsh-client-visibility.model';
+} from '../../../shared/stores/dsh-client-visibility.model';
 import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

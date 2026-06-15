@@ -22,7 +22,7 @@ import { Box, Button, Surface, Text, useTheme,
 import { WorkspacePreviewNotice } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
 import { getDshProductRuntimeClient } from '../../../shared';
-import type { DshCatalogConflict } from '../../../shared/api/dsh-product-api.client';
+import type { DshCatalogConflict } from '../../../shared/products/dsh-product-api.client';
 
 export type CatalogAuditTrailWorkspaceProps = {
   productId?: string;

@@ -9,7 +9,7 @@ import {
 import type { DshClientSurfaceProps } from './dsh-client.types';
 import { DshClientBottomNav } from './DshClientBottomNav';
 import { DshClientRouteRenderer } from './DshClientRouteRenderer';
-import { useDshClientSurfaceModel } from '../shared/view-models/client/useDshClientSurfaceModel';
+import { useDshClientSurfaceModel } from './useDshClientSurfaceModel';
 
 export function DshClientSurface(props: DshClientSurfaceProps) {
   return (

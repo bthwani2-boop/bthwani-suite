@@ -1,15 +1,13 @@
 // DSH Runtime — surface runtime contracts and operational bindings.
+// use-captain-order-runtime canonical exports: shared/orders topic (orders.view-model)
+// use-partner-orders-runtime canonical exports: shared/orders topic (orders.view-model)
+// platform-vars / feature-flags canonical exports: shared/platform topic
 export * from './dsh-surface-runtime.contract';
 export * from './dsh-operational-surface-binding';
-export * from './use-partner-orders-runtime';
-export * from './use-field-runtime-actions';
-export * from './use-captain-order-runtime';
-export * from './field-onboarding-storage';
+export * from '../field/use-field-runtime-actions';
+export * from '../field/field-onboarding-storage';
 export * from './ui-only-runtime-clients';
-export type { PlatformVarsConfig } from '../platform/platform-vars';
-export { PlatformVarsRegistry } from '../platform/platform-vars';
-export type { FeatureFlagsConfig } from '../platform/feature-flags';
-export { FeatureFlagsRegistry } from '../platform/feature-flags';
+export * from './dsh-flow-registry';
 export type { FixtureEvidenceEntry } from './dev-fixtures-isolation-guard';
 export {
   DSH_FIXTURE_EVIDENCE,

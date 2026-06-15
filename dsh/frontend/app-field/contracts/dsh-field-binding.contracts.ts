@@ -1,4 +1,4 @@
-﻿import type { DshFieldSurfaceId } from '../../shared/contracts/field-store-model';
+import type { DshFieldSurfaceId } from '../../shared';
 
 export type DshFieldBindingContract = {
   surfaceId: DshFieldSurfaceId;

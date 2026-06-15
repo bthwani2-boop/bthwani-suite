@@ -1,2 +1,2 @@
-export type { HomeStoreCardEntry, UseHomeDerivedStoresResult } from '../shared/view-models/home/useHomeDerivedStores';
-export { useHomeDerivedStores } from '../shared/view-models/home/useHomeDerivedStores';
+export type { HomeStoreCardEntry, UseHomeDerivedStoresResult } from '../../shared/discovery/useHomeDerivedStores';
+export { useHomeDerivedStores } from '../../shared/discovery/useHomeDerivedStores';

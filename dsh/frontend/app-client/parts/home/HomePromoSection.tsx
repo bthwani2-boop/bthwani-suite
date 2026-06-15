@@ -3,15 +3,15 @@ import { Image, Pressable, ScrollView, View } from 'react-native';
 import { BannerCarousel, Icon, Text, colorPalette, spacing } from '@bthwani/ui-kit';
 
 import { CategoryHubIcon, CategoryIconImage, CategorySelectorItem } from './HomeCategoryCarousel';
-import { normalizeHomePromoActionType } from 'home-promo-mappers';
-import type { DshHomeGetPromo } from '../../contracts/dsh-home-types';
+import { normalizeHomePromoActionType } from '../../../shared/discovery/home-promo-mappers';
+import type { DshHomeGetPromo } from '../../../shared/discovery/dsh-home-types';
 import type { HomeScreenShellProps } from './HomeScreenShell';
 
 const ACTIVE_PROMO_INTERVAL_MS = 5000;
 
 type HomePromoSectionProps = Pick<HomeScreenShellProps, 'props' | 'theme' | 'styles' | 'homeState' | 'promoHandlers' | 'activeHomePromo' | 'categoriesAnchorRef'> & {
   bannerItems: HomeScreenShellProps['promoHandlers']['bannerItems'];
-  selectedCategoryFixture: HomeScreenShellProps['filterRail']['selectedCategoryFixture'];
+  selectedCategory: HomeScreenShellProps['filterRail']['selectedCategory'];
   selectedCategoryLabel: string;
   selectedSubcategoryCards: Array<{ id: string; emoji?: string; title: string; subtitle?: string }>;
   activeCategoryDialItem: HomeScreenShellProps['filterRail']['activeCategoryDialItem'];
@@ -29,7 +29,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
   bannerItems,
   activeHomePromo,
   promoHandlers,
-  selectedCategoryFixture,
+  selectedCategory,
   selectedCategoryLabel,
   selectedSubcategoryCards,
   activeCategoryDialItem,
@@ -84,7 +84,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
               />
             </View>
 
-            {selectedCategoryFixture && (
+            {selectedCategory && (
               <CategorySelectorItem
                 isSelected
                 label={selectedCategoryLabel}

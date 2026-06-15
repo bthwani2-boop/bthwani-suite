@@ -7,14 +7,14 @@ import { Box, Text, Button,
 import {
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
-} from '../../shared/adapters';
+} from '../../shared';
 import {
   type WltDailyReconciliationRow,
   buildInitialReconciliationRows,
   buildRuntimeReconciliationRows,
   buildReconciliationTotals,
   recomputeRowAmountLabels,
-} from '../../shared/read-models';
+} from '../../shared';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 type DayLifecycleStage =

@@ -5,7 +5,7 @@ import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, Key
   radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType, PartnerOfferSource } from '../../shared/contracts/dsh-partner-offer-types';
+import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType, PartnerOfferSource } from '../../shared/partner/dsh-partner-offer-types';
 type PartnerOfferSummary = { id: (string); title: (string); status: (PartnerOfferStatus) };
 function getPartnerOfferItems(): PartnerOfferRecord[] { return []; }
 function getPartnerOfferSummaries(_opts?: unknown): { items: PartnerOfferSummary[]; total: number; page: number; pageSize: number } { return { items: [], total: 0, page: 1, pageSize: 20 }; }
@@ -18,8 +18,8 @@ function pausePartnerOfferItem(_id: string): void {}
 function rejectPartnerOfferItem(_id: string, _reason: string): void {}
 function archivePartnerOfferItem(_id: string): void {}
 function removePartnerOfferItem(_id: string): void {}
-import { mapStoreCommercialFeatures } from '../../shared/adapters/store-card-commercial-map';
-import { validatePartnerOfferForPublish } from '../../shared/contracts/commercial-contract';
+import { mapStoreCommercialFeatures } from '../../shared/marketing/store-card-commercial-map';
+import { validatePartnerOfferForPublish } from '../../shared/marketing/commercial-contract';
 import { CommercialParityPreview } from './commercial-parity-viewer';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 

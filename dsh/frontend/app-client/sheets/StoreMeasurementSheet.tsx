@@ -17,12 +17,12 @@ import {
   spacing,
   typographyRoles,
 } from '@bthwani/ui-kit';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/products';
 import {
   formatCurrencyValue,
   normalizeDisplayText,
   resolveMeasurementUnitPrice,
-} from 'store-formatting';
+} from '../../shared/stores';
 
 // ---------------------------------------------------------------------------
 // Appearance token subset passed from the Store screen shell.

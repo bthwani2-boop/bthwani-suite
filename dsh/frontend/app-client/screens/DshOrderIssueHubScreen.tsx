@@ -18,10 +18,11 @@ import {
   getOperationsSupportFlowsForSurface,
   getOperationsSupportSurfaceEntry,
   type DshOperationsSupportFlowId,
-} from 'state-machines/support-flows';
-import { getDshClientFlowPolicy } from '../contracts/dsh-client-binding.contracts';
-import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from 'policies/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
+  getDshFlowPolicySummary,
+  resolveDshOnDemandPolicyLabel,
+  resolveDshControlPanelSectionLabel,
+} from '../../shared';
+import { getDshClientFlowPolicy } from '../../shared/checkout/dsh-client-binding.contracts';
 
 function resolveClientIssueOwnerLabel(ownerSurface?: string): string {
   if (ownerSurface === 'control-panel') {
@@ -85,8 +86,8 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
             items={[
               { label: 'نوع المشكلة', value: selectedFlow?.title ?? '' },
               { label: 'الإجراء التالي', value: selectedFlow?.nextAction ?? 'بانتظار المراجعة', tone: 'brand' },
-              ...(selectedFlow?.financialImpactPreview
-                ? [{ label: 'الأثر المالي Preview', value: selectedFlow.financialImpactPreview, tone: 'info' as const }]
+              ...(selectedFlow?.financialImpactRef
+                ? [{ label: 'الأثر المالي Preview', value: selectedFlow.financialImpactRef, tone: 'info' as const }]
                 : []),
               { label: 'تفاصيل إضافية', value: detailsText.trim() || 'لا يوجد تفاصيل إضافية' },
             ]}
@@ -175,9 +176,9 @@ export function DshOrderIssueHubScreen({ state = 'ready', onPrimaryAction, onSec
           <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
             {`يفتح هذا السياق الأدلة أو المرفقات عند الطلب فقط، ولا يفتح مركز عمليات مستقل للعميل.`}
           </Text>
-          {selectedFlow.financialImpactPreview ? (
+          {selectedFlow.financialImpactRef ? (
             <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-              {`Preview only: ${selectedFlow.financialImpactPreview}`}
+              {`Preview only: ${selectedFlow.financialImpactRef}`}
             </Text>
           ) : null}
         </Surface>

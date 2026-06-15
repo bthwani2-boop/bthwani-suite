@@ -19,7 +19,11 @@ import {
   radius,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
-import type { DshMySpaceSubScreenProps } from './DshWalletHubScreen';
+export type DshMySpaceSubScreenProps = {
+  readonly state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
+  readonly onRetry?: () => void;
+  readonly onBack?: () => void;
+};
 
 export function DshPreferencesHubScreen({ state = 'ready', onRetry, onBack }: DshMySpaceSubScreenProps) {
   const { theme } = useTheme();

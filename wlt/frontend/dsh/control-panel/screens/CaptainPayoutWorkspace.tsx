@@ -5,7 +5,7 @@ import React from 'react';
 import { Box, KeyValueList, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { WltBoundaryBanner } from '../components/WltBoundaryBanner';
-import { buildDshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/dshFinancePreviewModel';
+import { buildDshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/finance-boundary';
 
 export type CaptainPayoutWorkspaceProps = {
   captainId?: string;

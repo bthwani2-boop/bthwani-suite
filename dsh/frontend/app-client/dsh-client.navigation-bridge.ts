@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import type { DshClientState } from '../shared/state-machines/client-state';
+import type { DshClientState } from '../shared/orders/orders.client-state';
 import {
   type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,
@@ -11,7 +11,7 @@ import {
   initialCreateOrderValues as sharedInitialCreateOrderValues,
   resolveStorePickupAddress as sharedResolveStorePickupAddress,
   publishedPromoCategoryIds as sharedPublishedPromoCategoryIds,
-} from '../shared/contracts/dsh-client-binding.contracts';
+} from '../shared/checkout/dsh-client-binding.contracts';
 import type { DshCommandTarget, DshRoute } from './dsh-client.types';
 
 export type CreateOrderValues = SharedCreateOrderValues;

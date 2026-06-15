@@ -1,2 +1,2 @@
-export { useWltDshWalletSession } from '../shared/view-models/client-wallet-session.model';
-export { useWltDshWalletSession as default } from '../shared/view-models/client-wallet-session.model';
+export { useWltDshWalletSession } from '../shared/wallet/client-wallet-session.model';
+export { useWltDshWalletSession as default } from '../shared/wallet/client-wallet-session.model';

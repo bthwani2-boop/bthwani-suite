@@ -18,7 +18,7 @@ import {
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
-import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/policies/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
 
 export type DshCaptainPickupDropoffScreenProps = {

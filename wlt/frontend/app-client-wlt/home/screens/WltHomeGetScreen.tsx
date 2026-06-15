@@ -3,8 +3,7 @@ import { ScrollView, View } from 'react-native';
 import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, TopBar, amountToArabicText, useBThwaniAppearance, useI18n,
   spacing,
 } from '@bthwani/ui-kit';
-import { financeProviders } from '../../../dsh/control-panel/financeContracts';
-import { createWltDshTypedClient } from '../../../dsh/contracts';
+import { financeProviders, createWltDshTypedClient, type FinanceProvider } from '../../../dsh/shared';
 
 export const WltHomeGetScreen: React.FC<{
   onBack?: () => void;
@@ -58,7 +57,7 @@ export const WltHomeGetScreen: React.FC<{
   const canSubmit = topupAmount > 0 && !!method;
 
   const methods = useMemo(() => (
-    financeProviders.map((p) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
+    financeProviders.map((p: FinanceProvider) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
   ), [t]);
 
   const handleTopup = async () => {

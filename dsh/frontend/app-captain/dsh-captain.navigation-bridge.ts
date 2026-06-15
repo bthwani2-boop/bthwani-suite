@@ -8,7 +8,7 @@ export type {
   DshCaptainRouteMapping,
   DshCaptainOrderStageMapping,
   DshCaptainInboxModeFilter,
-} from '../shared/policies/captain-route-policy';
+} from '../shared';
 
 export {
   DSH_CAPTAIN_ROUTE_MAP,
@@ -18,23 +18,23 @@ export {
   DSH_CAPTAIN_INBOX_MODE_FILTERS,
   isCaptainInboxVisibleForMode,
   getCaptainActionableHandoffs,
-} from '../shared/policies/captain-route-policy';
+} from '../shared';
 
 export type {
   DshCaptainCodState,
   DshCaptainCodEntry,
-} from '../shared/view-models/captain';
+} from '../shared';
 
 export {
   DSH_CAPTAIN_COD_STATE_META,
   buildCaptainCodEntry,
-} from '../shared/view-models/captain';
+} from '../shared';
 
 export type { DshCaptainPodDownstreamTarget } from '../shared/media/captain-pod-downstream';
 export { DSH_CAPTAIN_POD_DOWNSTREAM } from '../shared/media/captain-pod-downstream';
 
-export type { DshCaptainSupportEscalationContext } from '../shared/policies/captain-support-escalation';
+export type { DshCaptainSupportEscalationContext } from '../shared/captain-support-escalation';
 export {
   DSH_CAPTAIN_SUPPORT_ESCALATION_MAP,
   getCaptainEscalationContext,
-} from '../shared/policies/captain-support-escalation';
+} from '../shared/captain-support-escalation';

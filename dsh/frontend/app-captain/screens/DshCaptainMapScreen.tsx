@@ -4,7 +4,7 @@ import React from 'react';
 import { Badge, Box, Button, KeyValueList, SectionHeader, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
-import { getDshFlowPolicySummary } from '../../shared/policies/dsh-flow-registry';
+import { getDshFlowPolicySummary } from '../../shared/runtime/dsh-flow-registry';
 
 import type { DshCaptainLifecycleStatus } from '../../shared/runtime';
 import { type DshOperationScreenState } from '../parts/OperationScreen';

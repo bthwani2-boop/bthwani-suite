@@ -1,1 +1,1 @@
-export type { WltDshWalletSessionState } from '../shared/view-models/client-wallet-session-state';
+export type { WltDshWalletSessionState } from '../shared/wallet/client-wallet-session-state';

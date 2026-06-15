@@ -8,7 +8,7 @@
  * Not a runtime binding — not API/backend source.
  */
 
-import type { DshFulfillmentDeliveryMode } from './dsh-delivery-mode.model';
+import type { DshFulfillmentDeliveryMode } from '../delivery';
 
 export const dshCpOperationsContractMeta = {
   dataKind: 'SCAFFOLD_PENDING_BINDING',

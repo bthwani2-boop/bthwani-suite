@@ -1,15 +1,15 @@
 // Thin re-exports from shared — all domain logic lives in dsh/frontend/shared.
-export type { PartnerStoreScopeOption } from '../shared/view-models/partner';
-export { storeScopeOptions } from '../shared/view-models/partner';
+export type { PartnerStoreScopeOption } from '../shared/partner';
+export { storeScopeOptions } from '../shared/partner';
 
-export type { PartnerStoreHoursDay } from '../shared/policies/fulfillment';
-export { defaultServiceModes, defaultZone, defaultStoreHours } from '../shared/policies/fulfillment';
+export type { PartnerStoreHoursDay } from '../shared/delivery/fulfillment';
+export { defaultServiceModes, defaultZone, defaultStoreHours } from '../shared/delivery/fulfillment';
 
 export {
   defaultSupportCommandContext,
   buildSupportCommandContextFromOperationalFlow,
   buildSupportCommandContextFromSupportRoute,
-} from '../shared/adapters/support/dsh-partner-support-context.adapter';
+} from '../shared/support/support.partner-context';
 
 export {
   isCommandCenterInlineManagedRoute,
@@ -17,4 +17,4 @@ export {
   resolveSupportFilterFromRoute,
   resolveIssueCategoryFromOperationalFlow,
   resolveIssueCategoryFromRoute,
-} from '../shared/policies/partner-support';
+} from '../shared/support/support.partner-policies';

@@ -1,4 +1,4 @@
-﻿// ML-049: CP support escalation queue screen skeleton
+// ML-049: CP support escalation queue screen skeleton
 // BLOCKED_BY_CONTRACT: implement dedicated escalation queue when CG-032 READ+STREAM proven
 import React from 'react';
 import { Box, Surface, Text } from '@bthwani/ui-kit';
@@ -6,7 +6,7 @@ import {
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
-import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/policies/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
 import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,

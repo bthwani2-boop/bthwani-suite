@@ -5,16 +5,16 @@ import { CategoryIconImage } from '../parts/home/HomeCategoryCarousel';
 import {
   DSH_CATEGORY_ICONS as categoryIconMap,
   DSH_SUBCATEGORY_ICONS as subcategoryIconMap,
-} from 'contracts/category-icons';
-import { DSH_HOME_DISCOVERY_FILTERS as discoveryFilters } from 'adapters/home-service-config';
-import { getDshCategoryIconUrl } from 'get-dsh-category-icon-url';
+} from '../../shared/catalog/catalog.icons';
+import { DSH_HOME_DISCOVERY_FILTERS as discoveryFilters } from '../../shared/discovery/home-service-config';
+import { getDshCategoryIconUrl } from '../../shared/catalog/catalog.icon-url';
 import {
   buildHomeCategoryFilterId,
   buildHomeModeFilterId,
   HOME_CATEGORY_FILTER_PREFIX,
   HOME_MODE_FILTER_PREFIX,
-} from 'home-search-helpers';
-import type { DiscoveryFilter, DshHomeCategory } from '../contracts/dsh-home-types';
+} from '../../shared/discovery/home-search-helpers';
+import type { DiscoveryFilter, DshHomeCategory } from '../../shared/discovery/dsh-home-types';
 import { useFeatureFlag } from '../../platform';
 
 export function useHomeFilterRail({

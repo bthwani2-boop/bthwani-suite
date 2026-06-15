@@ -7,12 +7,12 @@ import {
   colorPalette,
   type BThwaniFilterRailItem,
 } from '@bthwani/ui-kit';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
-import type { DshStoreSearchCategory } from 'store-search-helpers';
-import type { DshFulfillmentDeliveryMode } from '../../contracts/dsh-client-binding.contracts';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/products';
+import type { DshStoreSearchCategory } from '../../../shared/stores';
+import type { DshFulfillmentDeliveryMode } from '../../../shared/checkout/dsh-client-binding.contracts';
 import { MenuItemCard } from './StoreMenuItemCard';
-import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from 'contracts/category-icons';
-import { normalizeDisplayText } from 'store-formatting';
+import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../../../shared/catalog/catalog.icons';
+import { normalizeDisplayText } from '../../../shared/stores';
 import { StoreFilterRailSection } from './StoreFilterRailSection';
 import type { styles as storeScreenStyles } from './store-screen.styles';
 

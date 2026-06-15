@@ -10,10 +10,10 @@ import { useHomeFilterRail } from '../hooks/useHomeFilterRail';
 import { useHomeVideoHandlers } from '../hooks/useHomeVideoHandlers';
 import { useHomeTickerState } from '../hooks/useHomeTickerState';
 import { useDebounce } from '../hooks/useDebounce';
-import { resolveDshImageSource } from 'resolve-image-source';
+import { resolveDshImageSource } from '../../shared/media';
 import { HomeScreenShell } from '../parts/home/HomeScreenShell';
 import { buildHomeScreenStyles } from '../parts/home/home-screen.styles';
-import type { DshHomeGetPromo, DshHomeGetStore } from '../contracts/dsh-home-types';
+import type { DshHomeGetPromo, DshHomeGetStore } from '../../shared/discovery/dsh-home-types';
 import type { DshHomeGetScreenProps } from '../contracts/dsh-home-screen-props';
 function resolveDshHomeBannerImageSource(imageUrl?: string): ReturnType<typeof resolveDshImageSource> {
   return resolveDshImageSource(imageUrl);

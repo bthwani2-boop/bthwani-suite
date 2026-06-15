@@ -1,1 +1,1 @@
-export * from '../shared/policies/field-route-policy';
+export * from '../shared/field/field-route-policy';

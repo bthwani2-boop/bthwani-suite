@@ -24,8 +24,8 @@ import { DshCaptainMapLayer } from './screens/DshCaptainMapLayer';
 import { DshCaptainHomeOrderPanel } from './screens/DshCaptainHomeOrderPanel';
 import { DshCaptainRouteRenderer } from './DshCaptainRouteRenderer';
 import type { DshCaptainRoute, DshCaptainSurfaceProps } from './dsh-captain.types';
-import { EMPTY_CAPTAIN_ORDER_SUMMARY } from '../shared/view-models/captain/captain-cod.model';
-import { useDshCaptainSurfaceModel } from '../shared/view-models/captain/useDshCaptainSurfaceModel';
+import { EMPTY_CAPTAIN_ORDER_SUMMARY } from '../shared';
+import { useDshCaptainSurfaceModel } from './useDshCaptainSurfaceModel';
 import { PlatformVarsProvider, FeatureFlagProvider, usePlatformVars } from '../platform';
 import type { CaptainOrderDetailScreen } from './screens/DshCaptainOrdersScreen';
 

@@ -1,13 +1,10 @@
-﻿// Re-export from canonical locations.
-// Types: dsh/frontend/shared/contracts/partner/partner-intake.types.ts
-// Runtime functions: dsh/frontend/shared/state-machines/workflow.ts
-export * from '../../shared/contracts/partner/partner-intake.types';
+// Re-export from canonical locations.
 export type {
   DshPartnerDocumentKind,
   DshPartnerDocumentVerification,
   DshPartnerCatalogOverride,
   DshPromotionCandidate,
-} from '../../shared/state-machines/workflow';
+} from '../../shared';
 export {
   resolvePartnerIdForStore,
   getPartnerActivationStatus,
@@ -27,4 +24,6 @@ export {
   updatePartnerDisputeStatus,
   getPromotionCandidates,
   updatePromotionCandidateStatus,
-} from '../../shared/state-machines/workflow';
+  dshPartnerIntakeMetrics,
+  dshPartnerIntakeItems,
+} from '../../shared';

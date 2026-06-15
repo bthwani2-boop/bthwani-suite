@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
@@ -16,8 +16,8 @@ import {
   DSH_REASON_EVIDENCE_POLICY,
   getDshRoleCanPerform,
   getDshRoleArabicName,
-} from '../../shared/policies/dsh-role-permission.model';
-import type { DshRoleId } from '../../shared/policies/dsh-role-permission.model';
+} from '../../shared/identity-access/dsh-role-permission.model';
+import type { DshRoleId } from '../../shared/identity-access/dsh-role-permission.model';
 import styles from '../shared/control-panel-surface.module.css';
 
 const ADMIN_ROLES: AdminRole[] = [];

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import {
 	Badge,
@@ -29,7 +29,7 @@ import type {
 	DshCaptainOrderServiceType,
 	DshCaptainOrderStage,
 	DshCaptainOrdersScreenState,
-} from '../../shared/contracts/dsh-order.contract';
+} from '../../shared/orders';
 
 type ServiceBadge = { badgeLabel: string; badgeTone: 'warning' | 'info' | 'brand' };
 

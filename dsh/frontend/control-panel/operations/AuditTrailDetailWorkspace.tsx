@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 // P0-09: CP audit trail detail workspace — full audit entry display.
 // Shows: actor/role, timestamp, section, decision, reason, evidence,
@@ -9,13 +9,13 @@ import { Box, KeyValueList, Surface, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelInspectorShell,
 } from '@bthwani/ui-kit/web';
-import type { DshAuditEntry } from '../../shared/policies/dsh-role-permission.model';
+import type { DshAuditEntry } from '../../shared/identity-access/dsh-role-permission.model';
 import {
   getDshAuditEntryById,
   getDshRoleArabicName,
   getDshRolePermission,
   DSH_AUDIT_ENTRIES,
-} from '../../shared/policies/dsh-role-permission.model';
+} from '../../shared/identity-access/dsh-role-permission.model';
 
 export type AuditTrailDetailWorkspaceProps = {
   orderId?: string;

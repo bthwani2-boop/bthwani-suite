@@ -2,4 +2,4 @@ export type {
   WltDshCaptainBridgeSection,
   WltDshCaptainFinanceSummaryState,
   WltDshCaptainBridgeState,
-} from '../shared/view-models/captain-bridge-state';
+} from '../shared/bridges/captain-bridge-state';

@@ -6,9 +6,9 @@ import type {
   DshOperationalProofRequirement,
   DshOperationalRollbackHint,
   DshWltOwnershipBoundary,
-} from './dsh-operational.contract';
-import type { DshSurfaceId } from './dsh-flow-registry';
-import { getDshOperationalEntriesByWorkspace } from './dsh-operational-registry';
+} from '../operations/dsh-operational.contract';
+import type { DshSurfaceId } from '../runtime/dsh-flow-registry';
+import { getDshOperationalEntriesByWorkspace } from '../operations/dsh-operational-registry';
 
 export const dshControlPanelOperationsRoomMeta = {
   dataKind: 'CONTROL_PANEL_OPERATIONS_ROOM_CONTRACT',

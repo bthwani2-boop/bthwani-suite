@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { View, Pressable } from 'react-native';
@@ -115,7 +115,7 @@ function EligibilitySection({
       setSuccess(true);
       setShowFundingForm(false);
     } catch (err) {
-      // ignore
+      console.warn('Failed to submit eligibility funding:', err);
     } finally {
       setLoading(false);
     }
@@ -352,7 +352,7 @@ function SettlementSection({
       await onSettlementRequestSubmit();
       setSuccess(true);
     } catch (err) {
-      // ignore
+      console.warn('Failed to request settlement:', err);
     } finally {
       setLoading(false);
     }

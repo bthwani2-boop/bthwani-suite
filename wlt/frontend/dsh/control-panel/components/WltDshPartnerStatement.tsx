@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import type { WltDshPartnerStatement as PartnerStatement } from '../../shared/contracts';
+import type { WltDshPartnerStatement as PartnerStatement } from '../../shared';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 const STATUS_LABEL: Record<PartnerStatement['status'], string> = {

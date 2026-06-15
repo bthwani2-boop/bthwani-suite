@@ -1,11 +1,11 @@
-import { createDshCheckoutHttpClient, type DshCheckoutAuthContext } from '../api/dsh-checkout-client';
-import { createDshFieldReadinessHttpClient, resolveDshFieldReadinessBaseUrl } from '../api/dsh-field-readiness-client';
-import { createDshMediaApiHttpClient } from '../api/dsh-media-api.client';
-import { createDshOrderLifecycleHttpClient, resolveDshOrderApiBaseUrl } from '../api/dsh-order-lifecycle-client';
-import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../api/dsh-product-api.transport';
-import { createDshStoreVisibilityHttpClient, resolveDshStoreVisibilityBaseUrl } from '../api/dsh-store-visibility-transport';
-import { resolveDshAuthBaseUrl } from '../api/dsh-auth-client';
-import { createDshDiscoveryStoresClient, type DshDiscoveryStoresRuntimeConfig } from '../adapters';
+import { createDshCheckoutHttpClient, type DshCheckoutAuthContext } from '../checkout';
+import { createDshFieldReadinessHttpClient, resolveDshFieldReadinessBaseUrl } from '../field/dsh-field-readiness-client';
+import { createDshMediaApiHttpClient } from '../media/dsh-media-api.client';
+import { createDshOrderLifecycleHttpClient, resolveDshOrderApiBaseUrl } from '../orders/dsh-order-lifecycle-client';
+import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../products/dsh-product-api.transport';
+import { createDshStoreVisibilityHttpClient, resolveDshStoreVisibilityBaseUrl } from '../stores/dsh-store-visibility-transport';
+import { resolveDshAuthBaseUrl } from '../runtime/dsh-auth-client';
+import { createDshDiscoveryStoresClient, type DshDiscoveryStoresRuntimeConfig } from '../stores';
 
 export function getDshProductRuntimeClient() {
   return createDshProductApiHttpClient(resolveDshProductApiBaseUrl());

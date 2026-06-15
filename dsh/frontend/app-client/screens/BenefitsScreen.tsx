@@ -26,16 +26,16 @@ import {
   type LoyaltyReward,
   type CommercialEntitlement,
   type SubscriptionClientCard,
-} from 'contracts/commercial-contract';
+} from '../../shared/marketing/commercial-contract';
 import {
   DSH_LOYALTY_UI_BOUNDARY_NOTE,
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,
   isMarketingRenderable,
-} from 'contracts/marketing-visibility.contract';
+} from '../../shared/marketing/marketing.visibility';
 import type { DshNotificationItem } from './NotificationsScreen';
-import type { CampaignRecord } from 'contracts/dsh-marketing-types';
-import type { PartnerOfferRecord } from 'contracts/dsh-partner-offer-types';
+import type { CampaignRecord } from '../../shared/marketing/marketing.types';
+import type { PartnerOfferRecord } from '../../shared/partner/dsh-partner-offer-types';
 
 type DshBenefitsSection = 'now' | 'loyalty' | 'subscription' | 'offers' | 'history';
 

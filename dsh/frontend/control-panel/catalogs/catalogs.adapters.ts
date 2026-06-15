@@ -1,1 +1,1 @@
-export * from '../../shared/view-models/control-panel/catalogs/catalogs.adapters';
+export * from '../../shared/catalog/catalogs.adapters';

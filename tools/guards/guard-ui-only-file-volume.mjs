@@ -2,7 +2,24 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const root = process.cwd();
+function parseArgs(argv = process.argv.slice(2)) {
+  const args = { root: process.cwd(), mode: 'CHECK', jsonOut: '', mdOut: '' };
+  for (let i = 0; i < argv.length; i += 1) {
+    const token = argv[i];
+    if (token === '--root') args.root = argv[++i];
+    else if (token === '--mode') args.mode = argv[++i];
+    else if (token === '--json-out') args.jsonOut = argv[++i];
+    else if (token === '--md-out') args.mdOut = argv[++i];
+    else if (token.startsWith('--root=')) args.root = token.slice('--root='.length);
+    else if (token.startsWith('--mode=')) args.mode = token.slice('--mode='.length);
+    else if (token.startsWith('--json-out=')) args.jsonOut = token.slice('--json-out='.length);
+    else if (token.startsWith('--md-out=')) args.mdOut = token.slice('--md-out='.length);
+  }
+  return args;
+}
+
+const args = parseArgs();
+const root = args.root;
 const uiOnlyRoots = [
   'dsh/frontend/app-captain',
   'dsh/frontend/app-client',
@@ -137,8 +154,28 @@ const output = {
   status: findings.length > 0 ? 'FAIL' : 'PASS',
   uiOnlyRoots,
   findings,
-  failCount: findings.length,
+  failCount: findings.filter((f) => f.severity === 'FAIL').length,
+  warnCount: findings.filter((f) => f.severity === 'WARN').length,
+  infoCount: findings.filter((f) => f.severity === 'INFO').length,
 };
 
 console.log(JSON.stringify(output, null, 2));
+
+if (args.jsonOut) {
+  fs.writeFileSync(args.jsonOut, JSON.stringify(output, null, 2), 'utf8');
+}
+if (args.mdOut) {
+  const md = [
+    '# GUARD_UI_ONLY_FILE_VOLUME',
+    '',
+    `status: ${output.status}`,
+    `findings: ${output.findings.length}`,
+    '',
+    '| Severity | Rule | File | Evidence |',
+    '|---|---|---|---|',
+    ...findings.map((f) => `| ${f.severity} | ${f.rule} | ${f.file} | ${f.evidence} |`),
+  ].join('\n');
+  fs.writeFileSync(args.mdOut, md, 'utf8');
+}
+
 if (findings.length > 0) process.exitCode = 1;

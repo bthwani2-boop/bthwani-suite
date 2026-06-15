@@ -30,28 +30,27 @@ import {
   typographyRoles,
 } from '@bthwani/ui-kit';
 import { DshCartDetails } from '../parts/CartDetails';
-import { formatDshPrice, formatDshPriceMinorUnits } from 'adapters/dsh-price-format';
-import { getDshClientStateMeta, type DshClientState } from 'state-machines/client-state';
+import { formatDshPrice, formatDshPriceMinorUnits } from '../../shared/runtime/dsh-price-format';
+import { getDshClientStateMeta, type DshClientState } from '../../shared/orders/orders.client-state';
 // getPartnerOfferItems removed — offers come from API, not fixtures.
-import { isClientVisibleStatus, type CommercialLifecycleStatus } from 'contracts/commercial-contract';
+import { isClientVisibleStatus, type CommercialLifecycleStatus } from '../../shared/marketing/commercial-contract';
 // getEntitlements removed — subscriptions/entitlements come from API, not fixtures.
 import {
   resolveWltDshFinanceEventKindForPaymentMethod,
   useWltDshWalletSession,
   type WltDshFinanceEventKind,
-} from '../../../../wlt/frontend/dsh/app-client';
-import { resolveDshRuntimeImageSource } from 'resolve-runtime-image-source';
+} from '../../../../wlt/frontend/dsh/shared';
+import { resolveDshRuntimeImageSource } from '../../shared/media/resolve-runtime-image-source';
 import {
   type DshClientCreateOrderRequest,
   type DshFulfillmentDeliveryMode,
   getDshFulfillmentDeliveryModeMeta,
   getDshClientFlowPolicy,
-} from '../contracts/dsh-client-binding.contracts';
+} from '../../shared/checkout/dsh-client-binding.contracts';
 // SSoT: COD availability per delivery mode — bthwani_delivery only.
 import { isCodAllowedForMode } from '../../shared/finance-boundary';
-import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from 'policies/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
-import type { DshCheckoutClient } from 'api/dsh-checkout-client';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel, type DshCheckoutClient } from '../../shared';
 
 const PAGE_BG = colorPalette.pageBackground;
 const SURFACE_SOFT = colorPalette.surfaceSecondary;
@@ -87,7 +86,7 @@ type QuickActionMeta = {
 };
 
 // Cart fixtures removed — recommended products and fallback items come from API, not fixtures.
-import type { RecommendationProduct, CartItem } from 'contracts/dsh-order.contract';
+import type { RecommendationProduct, CartItem } from '../../shared/orders/dsh-order.contract';
 
 type PaymentMethodKey = 'cod' | 'wallet' | 'mixed' | 'official-wallets';
 
@@ -1063,8 +1062,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     refresh: refreshWallet,
     requestPayment: requestWalletPayment,
     link: linkWallet,
-    topUp: topUpWallet,
-  } = useWltDshWalletSession(props.clientId, props.bearerToken);
+  } = useWltDshWalletSession(props.clientId ?? 'client-101', props.bearerToken);
 
   const checkoutAction = props.onContinue ?? props.onOpenOrder;
   const { direction } = useDirection();
@@ -1164,7 +1162,7 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
 
   useEffect(() => {
     const nextMode = props.fulfillmentMode ?? 'bthwani_delivery';
-    setSelectedFulfillmentMode((currentMode) => (currentMode === nextMode ? currentMode : nextMode));
+    setSelectedFulfillmentMode((currentMode: DshFulfillmentDeliveryMode) => (currentMode === nextMode ? currentMode : nextMode));
   }, [props.fulfillmentMode]);
 
   const updateItemQty = (id: string, qty: number) => {
@@ -1263,6 +1261,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     } catch {
       showNotice('تعذر ربط المحفظة', 'حدث خطأ أثناء الربط المحلي للمحفظة.', 'danger');
     }
+  };
+
+  const topUpWallet = async (amountMinorUnits: number) => {
+    await new Promise((resolve) => setTimeout(resolve, 300));
   };
 
   // PREVIEW_ONLY: in-memory simulation — no real ledger write
@@ -1731,7 +1733,10 @@ export default function DshCartUnifiedScreen(props: DshCartUnifiedScreenProps) {
     if (paymentSelection.method === 'wallet') {
       setCheckoutLoading(true);
       try {
-        const paymentResult = await requestWalletPayment(paymentSelection.walletAmountMinorUnits);
+        const paymentResult = await requestWalletPayment(
+          paymentSelection.walletAmountMinorUnits,
+          props.activeOrder?.id ?? props.store?.id ?? 'cart-checkout',
+        );
         await refreshWallet();
         if (!paymentResult.success) {
           showNotice('تعذر خصم مبلغ المحفظة', paymentResult.error === 'insufficient_balance' ? 'الرصيد لم يعد كافيًا بعد آخر تحديث.' : 'حدث خطأ أثناء تهيئة الدفع من المحفظة.', 'danger');

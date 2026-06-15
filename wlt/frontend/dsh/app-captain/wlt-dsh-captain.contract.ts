@@ -1,2 +1,2 @@
-export { wltDshCaptainBridgeDataContract } from '../shared/contracts/wlt-dsh-captain-bridge.contract';
-export type { WltDshCaptainBridgeContract } from '../shared/contracts/wlt-dsh-captain-bridge.contract';
+export { wltDshCaptainBridgeDataContract } from '../shared/bridges/wlt-dsh-captain-bridge.contract';
+export type { WltDshCaptainBridgeContract } from '../shared/bridges/wlt-dsh-captain-bridge.contract';

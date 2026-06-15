@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import {
   Badge,
@@ -19,21 +19,23 @@ import {
   useDirection,
   spacing,
 } from '@bthwani/ui-kit';
-import type { DshPartnerOrderConversationMode } from '../../shared/contracts/dsh-order.contract';
+import type {
+  DshPartnerOrderConversationMode,
+  PartnerOrderItem,
+  PartnerOrderStatus,
+  PartnerOrderPriority,
+} from '../../shared';
 import { AcceptanceTimerSheet } from '../sheets';
-// SSoT: delivery mode labels from dsh-delivery-mode.model.
-import { getDshDeliveryModeDefinition } from '../../shared/contracts/dsh-delivery-mode.model';
+// SSoT: delivery mode labels from delivery contract.
 import {
+  getDshDeliveryModeDefinition,
   getHandoffsForSurface,
   getActionableHandoffsForSurface,
   getSurfaceObservation,
-} from '../../shared/contracts/dsh-order-lifecycle-handoffs';
-import { getSurfaceModeCapability } from '../../shared/contracts/dsh-fulfillment-surface-visibility';
+  getSurfaceModeCapability,
+} from '../../shared';
 
-// ML-018: added preparation_started; ML-019: preparing + items_ready distinguish in-progress vs done
-// ML-021: added captain_assigned / captain_arriving so partner can track handoff event
-type PartnerOrderStatus = 'new' | 'needs_accept' | 'preparation_started' | 'preparing' | 'items_ready' | 'ready' | 'handoff' | 'captain_assigned' | 'captain_arriving' | 'delivering' | 'completed' | 'cancelled';
-type PartnerOrderPriority = 'high' | 'normal' | 'low';
+
 type OrderHubAction = 'accept' | 'details' | 'prepare' | 'ready' | 'handoff' | 'issue' | 'delivering';
 
 export type OrderStageFilterId =
@@ -63,29 +65,7 @@ export type SortMode =
 
 export type PartnerOrdersHomeScreenState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled' | 'partial';
 
-export type PartnerOrderItem = {
-  id: string;
-  orderCode: string;
-  branchLabel: string;
-  status: PartnerOrderStatus;
-  priority: PartnerOrderPriority;
-  orderTypeLabel: 'استلم بنفسك' | 'توصيل المتجر' | 'توصيل بثواني';
-  orderMode: DshPartnerOrderConversationMode;
-  itemsCountLabel: string;
-  amountLabel: string;
-  createdAtLabel: string;
-  elapsedLabel: string;
-  nextActionLabel: string;
-  urgent?: boolean;
-  slaRisk?: boolean;
-  unread?: boolean;
-  issueRequired?: boolean;
-  // Optional enrichment fields — safe to omit; callers that don't supply them get graceful fallback
-  itemsSummaryLabel?: string;   // e.g. "برغر كلاسيك، بطاطس، مشروب"
-  paymentLabel?: string;        // e.g. "نقد عند التسليم" | "محفظة" | "بطاقة"
-  slaLabel?: string;            // e.g. "يتبقى 8 دقائق"
-  nextOwnerLabel?: string;      // e.g. "موصل المتجر" | "كابتن بثواني" | "العميل"
-};
+
 
 export type PartnerOrdersHomeScreenProps = {
   state?: PartnerOrdersHomeScreenState;

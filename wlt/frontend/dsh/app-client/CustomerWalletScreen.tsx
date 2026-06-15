@@ -19,16 +19,16 @@ import {
 	spacing,
 } from '@bthwani/ui-kit';
 import { useWltDshWalletSession } from './useWltDshWalletSession';
-import { listLedgerEntries } from '../shared/adapters/client-wallet-runtime.adapter';
+import { listLedgerEntries } from '../shared/wallet/client-wallet-runtime.adapter';
 import { adaptClientLedgerEntries, formatWltDshAmountLabel } from '../shared';
 import type { WltDshClientWalletLedgerRow } from '../shared';
 
 export type CustomerWalletScreenProps = {
-	clientId?: string;
+	clientId: string;
 	bearerToken?: string;
 };
 
-export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken }: CustomerWalletScreenProps) {
+export function CustomerWalletScreen({ clientId, bearerToken }: CustomerWalletScreenProps) {
 	const { theme } = useTheme();
 	const wallet = useWltDshWalletSession(clientId, bearerToken);
 	const [transactions, setTransactions] = React.useState<readonly WltDshClientWalletLedgerRow[]>([]);

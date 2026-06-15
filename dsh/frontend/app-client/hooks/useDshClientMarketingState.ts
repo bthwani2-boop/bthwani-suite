@@ -1,1 +1,1 @@
-export * from '../shared/view-models/marketing/useDshClientMarketingState';
+export * from '../../shared/marketing/useDshClientMarketingState';

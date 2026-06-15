@@ -4,15 +4,15 @@ import React from 'react';
 import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
-import { buildWltFinancialCenter } from '../../shared/read-models';
-import { buildWltAuditPackPreview } from '../../shared/contracts';
-import { WLT_MAKER_CHECKER_STATE_LABELS } from '../../shared/contracts';
-import { getWltCloseGateSubledgers } from '../../shared/contracts';
+import { buildWltFinancialCenter } from '../../shared';
+import { buildWltAuditPackPreview } from '../../shared';
+import { WLT_MAKER_CHECKER_STATE_LABELS } from '../../shared';
+import { getWltCloseGateSubledgers } from '../../shared';
 import {
   buildWltRuntimeFinancialCenter,
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
-} from '../../shared/adapters';
+} from '../../shared';
 export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string }) {
   const businessDate = new Date().toISOString().split('T')[0]!;
   const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);

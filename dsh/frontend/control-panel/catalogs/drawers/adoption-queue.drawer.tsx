@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 /**
  * CatalogAdoptionQueueWorkspace — SCAFFOLD: ربط API قيد التنفيذ
@@ -21,7 +21,7 @@ import { Box, Button, Surface, Text, useTheme,
   radius,
 } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader, WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import { type ApprovalRecord, type ApprovalStage, translateStage, translateEntityType, translateOwner } from '../../../shared/state-machines/workflow';
+import { type ApprovalRecord, type ApprovalStage, translateStage, translateEntityType, translateOwner } from '../../../shared';
 import type { CatalogPreviewProposal } from '../catalogs.model';
 
 // ── Types ─────────────────────────────────────────────────────────────────────

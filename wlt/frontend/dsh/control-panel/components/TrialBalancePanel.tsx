@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import { buildWltTrialBalancePreview } from '../../shared/read-models';
-import type { WltLedgerEntry } from '../../shared/contracts';
+import { buildWltTrialBalancePreview } from '../../shared';
+import type { WltLedgerEntry } from '../../shared';
 
 export function TrialBalancePanel({ entries, businessDate }: {
   entries: readonly WltLedgerEntry[];

@@ -5,7 +5,7 @@ export type {
   DshPartnerSupportCommandFilterId,
   DshPartnerSupportIssueCategoryId,
   DshPartnerSupportRouteId,
-} from '../shared/contracts/partner';
+} from '../shared/partner';
 export {
   DSH_PARTNER_OPERATIONAL_FLOW_IDS,
   DSH_PARTNER_HIDDEN_COMPAT_OPERATIONAL_FLOW_IDS,
@@ -19,7 +19,7 @@ export {
   mapDshPartnerSupportRouteToOperationalFlow,
   isDshPartnerHiddenCompatOperationalFlow,
   isDshPartnerHiddenCompatSupportRoute,
-} from '../shared/contracts/partner';
+} from '../shared/partner';
 
 // UI-only: surface route identifiers and props.
 export type DshPartnerRoute =

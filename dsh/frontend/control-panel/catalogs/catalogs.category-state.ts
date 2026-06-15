@@ -1,1 +1,1 @@
-export * from '../../shared/view-models/control-panel/catalogs/catalogs.category-state';
+export * from '../../shared/catalog/catalogs.category-state';

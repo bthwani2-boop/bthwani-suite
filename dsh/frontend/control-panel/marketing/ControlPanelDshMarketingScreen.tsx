@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
@@ -29,7 +29,7 @@ function WorkspaceSkeleton() {
 
 import styles from '../shared/control-panel-surface.module.css';
 import marketingStyles from './control-panel-marketing.module.css';
-import { dshPromotionCandidates } from '../../shared/state-machines/workflow';
+import { dshPromotionCandidates } from '../../shared';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import type { MarketingControlView } from './types';
 
@@ -74,38 +74,38 @@ import type {
   CampaignRecord,
   CampaignStatus,
   CampaignTargetType,
-} from '../../shared/contracts/dsh-marketing-types';
+} from '../../shared/dsh-marketing-types';
 import type {
   PartnerOfferRecord,
   PartnerOfferStatus,
-} from '../../shared/contracts/dsh-partner-offer-types';
+} from '../../shared/partner/dsh-partner-offer-types';
 import {
   buildCommercialProjection,
   type CommercialCampaign,
   type CommercialLifecycleStatus,
   type PartnerOffer,
-} from '../../shared/contracts/commercial-contract';
+} from '../../shared/marketing/commercial-contract';
 import {
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,
-} from '../../shared/contracts/marketing-visibility.contract';
+} from '../../shared';
 import {
   getDshPartnerActivationStateMetadata,
   type DshPartnerActivationStatus,
-} from '../../shared/contracts/dsh-partner-activation.model';
+} from '../../shared/partner/dsh-partner-activation.model';
 import {
   getDshProductApprovalStateMetadata,
   type DshProductCategoryMappingStatus,
   type DshProductDuplicateStatus,
   type DshProductIdentityApprovalStatus,
-} from '../../shared/contracts/dsh-product-identity.model';
+} from '../../shared';
 import {
   resolveDshProductClientVisibility,
   resolveDshStoreClientVisibility,
-} from '../../shared/contracts/dsh-client-visibility.model';
+} from '../../shared/stores/dsh-client-visibility.model';
 import {
   getDshSignalSummaries,
-} from '../../shared/contracts/dsh-signal-layer.model';
+} from '../../shared/marketing/dsh-signal-layer.model';
 
 export type ControlPanelDshMarketingScreenProps = SmartSignalLayerScreenProps;
 

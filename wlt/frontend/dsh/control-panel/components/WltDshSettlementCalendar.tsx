@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import type { WltDshFinanceRuntimeResult } from '../../shared/adapters/wltDshFinanceRuntime.adapter';
-import { buildRuntimeSettlementCycles } from '../../shared/read-models/settlement-calendar.read-model';
+import type { WltDshFinanceRuntimeResult } from '../../shared/boundary/wltDshFinanceRuntime.adapter';
+import { buildRuntimeSettlementCycles } from '../../shared/settlements/settlement-calendar.read-model';
 
 const STATUS_LABEL: Record<string, string> = {
   open_preview: 'مفتوحة كمعاينة',

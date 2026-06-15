@@ -17,7 +17,7 @@ import {
 import {
 	 type DshMediaAsset,
 	 type DshMediaApiError,
-} from '../../shared/api/dsh-media-api.client';
+} from '../../shared/media/dsh-media-api.client';
 import { getDshMediaRuntimeClient } from '../../shared';
 
 // RUNTIME_VIOLATION_FIXED: removed DSH_PRODUCT_MEDIA_FIXTURE_KEYS, resolveDshImageSource, Manifest selector.

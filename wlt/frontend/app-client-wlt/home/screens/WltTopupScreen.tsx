@@ -4,8 +4,7 @@ import { ScreenWrapper, ScreenState, Text, useI18n, Dialog,
   spacing,
 } from '@bthwani/ui-kit';
 import { AmountInput, PaymentMethodList, SummaryCard, QuickAmountGrid, Button, TextField, amountToArabicText } from '@bthwani/ui-kit';
-import { financeProviders } from '../../../dsh/control-panel/financeContracts';
-import { createWltDshTypedClient } from '../../../dsh/contracts';
+import { financeProviders, createWltDshTypedClient, type FinanceProvider } from '../../../dsh/shared';
 
 export const WltTopupScreen: React.FC = () => {
   const { t } = useI18n();
@@ -21,7 +20,7 @@ export const WltTopupScreen: React.FC = () => {
   const client = useMemo(() => createWltDshTypedClient({ devClientId: 'client-demo' }), []);
 
   const methods = useMemo(() => (
-    financeProviders.map((p) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
+    financeProviders.map((p: FinanceProvider) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
   ), [t]);
 
   const topupAmount = Math.floor(parseFloat(amount.replace(/,/g, '')) || 0);

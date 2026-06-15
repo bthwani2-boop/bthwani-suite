@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ScrollView, View } from 'react-native';
 import {
   Badge,
@@ -23,10 +23,10 @@ import type {
   DshPartnerSupportRouteId,
 } from '../dsh-partner.types';
 import { getPartnerOrderIssueCategorySpec } from '../parts/PartnerOrderIssuePanel';
-import { isDshHiddenCompatFlow } from '../../shared/policies/dsh-flow-registry';
+import { isDshHiddenCompatFlow } from '../../shared/runtime/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
-import { DSH_ORDER_LIFECYCLE_HANDOFFS, getHandoffsForSurface, getSurfaceObservation } from '../../shared/contracts/dsh-order-lifecycle-handoffs';
-import { getSurfaceModeCapability } from '../../shared/contracts/dsh-fulfillment-surface-visibility';
+import { DSH_ORDER_LIFECYCLE_HANDOFFS, getHandoffsForSurface, getSurfaceObservation } from '../../shared/orders';
+import { getSurfaceModeCapability } from '../../shared/orders';
 
 export type PartnerSupportRouteId = DshPartnerSupportRouteId;
 

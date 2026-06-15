@@ -1,7 +1,7 @@
-// Re-export from shared — canonical location: dsh/frontend/shared/contracts/captain/dsh-captain-routes.ts
+// Re-export from shared topic
 export type {
   DshCaptainRouteId,
   DshCaptainLegacyRoute,
   DshCaptainRouteRecord,
-} from '../shared/contracts/captain/dsh-captain-routes';
-export { dshCaptainRoutes } from '../shared/contracts/captain/dsh-captain-routes';
+} from '../shared';
+export { dshCaptainRoutes } from '../shared';

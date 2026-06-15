@@ -3,9 +3,9 @@ import type {
   DshOperationalDataClassification,
   DshOperationalEntityId,
   DshOperationalWltImpact,
-} from './dsh-operational.contract';
-import type { DshOperationalSurfaceSummary } from './dsh-operational-summary-adapter';
-import { buildDshOperationalSummaryForSurface } from './dsh-operational-summary-adapter';
+} from '../operations/dsh-operational.contract';
+import type { DshOperationalSurfaceSummary } from '../operations/dsh-operational-summary-adapter';
+import { buildDshOperationalSummaryForSurface } from '../operations/dsh-operational-summary-adapter';
 
 export const dshOperationalSurfaceBindingMeta = {
   dataKind: 'OPERATIONAL_SURFACE_BINDING_METADATA',

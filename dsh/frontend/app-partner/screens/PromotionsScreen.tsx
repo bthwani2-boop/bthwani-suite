@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   Badge,
   Box,
@@ -12,10 +12,10 @@ import {
   useTheme,
   spacing,
 } from '@bthwani/ui-kit';
-import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType } from '../../shared/contracts/dsh-partner-offer-types';
+import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType } from '../../shared/partner/dsh-partner-offer-types';
 import {
   getPartnerOfferVisibilityRecord,
-} from '../../shared/contracts/marketing-visibility.contract';
+} from '../../shared/marketing/marketing.visibility';
 import { getDshControlPanelGovernanceEntry } from '../../shared';
 
 type AnalyticsWorkspaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'no-analytics' | 'no-campaigns';
@@ -102,7 +102,7 @@ function PromotionRow({
   onActionPress: (offer: PartnerOfferRecord) => void;
 }) {
   const { theme } = useTheme();
-  const statusMeta = translateStatus(offer.status);
+  const statusDisplay = translateStatus(offer.status);
   const metaLabel = offer.activeFromDate && offer.activeToDate
     ? `${offer.activeFromDate} → ${offer.activeToDate}`
     : visibilityNote || offer.rejectionReason || offer.eligibility;
@@ -119,7 +119,7 @@ function PromotionRow({
       <Box layoutDirection="row" align="flex-start" justify="space-between" style={{ gap: spacing[3] }}>
         <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
           <Box layoutDirection="row" style={{ gap: spacing[2], flexWrap: 'wrap', justifyContent: 'flex-start', width: '100%' }}>
-            <Badge label={statusMeta.label} tone={statusMeta.tone} />
+            <Badge label={statusDisplay.label} tone={statusDisplay.tone} />
             <Text role="bodyStrong" numberOfLines={1} style={{ textAlign: 'right' }}>
               {offer.title}
             </Text>

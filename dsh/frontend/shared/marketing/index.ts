@@ -1,0 +1,10 @@
+// ── Marketing Topic ───────────────────────────────────────────────────────────
+// Banner/video/campaign/promo types, visibility contracts, target adapters, client state.
+// No JSX. No ui-kit. No Tamagui.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export * from './marketing.types';
+export * from './marketing.visibility';
+export * from './marketing.adapters';
+export * from './marketing.client-state';
+export * from './marketing.permissions';

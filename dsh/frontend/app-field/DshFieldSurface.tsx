@@ -4,7 +4,7 @@ import { useAppFieldAppearance } from '../../../app-field/shell/appearance';
 import { BottomNavBar, useTheme } from '@bthwani/ui-kit';
 import {
   useDshFieldSurfaceModel,
-} from '../shared/view-models/field';
+} from '../shared/field';
 import {
   PlatformVarsProvider,
   FeatureFlagProvider,

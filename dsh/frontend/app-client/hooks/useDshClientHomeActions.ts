@@ -1,1 +1,1 @@
-export * from '../shared/view-models/home/useDshClientHomeActions';
+export * from '../../shared/discovery/useDshClientHomeActions';

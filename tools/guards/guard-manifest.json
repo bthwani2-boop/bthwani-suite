@@ -1394,6 +1394,7 @@
     {
       "id": "GUARD_UI_ONLY_ROOTS_OWNERSHIP",
       "file": "tools/guards/guard-ui-only-roots-ownership.mjs",
+      "config": "tools/guards/guard-ui-only-roots-ownership.config.json",
       "ownerPolicy": [
         "governance/03_REPO_BOUNDARIES.md",
         "governance/06_APPS_AND_SHELLS.md",

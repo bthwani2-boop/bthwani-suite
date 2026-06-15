@@ -10,8 +10,8 @@ import {
   radius,
 } from '@bthwani/ui-kit';
 
-import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
-import type { DshFulfillmentDeliveryMode } from '../../contracts/dsh-client-binding.contracts';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/products';
+import type { DshFulfillmentDeliveryMode } from '../../../shared/checkout/dsh-client-binding.contracts';
 import type { useStoreShellDerivedState } from '../../hooks/useStoreShellDerivedState';
 import type { useStoreAppearanceChrome } from './store-appearance-chrome';
 import type { DshStoreGetScreenProps } from '../../contracts/dsh-store-screen-props';
@@ -20,8 +20,9 @@ import {
   normalizeDisplayText,
   normalizeTagLabel,
   type StoreScreenDeliveryLabels,
-} from 'store-formatting';
-import { isNewItem, isOfferItem } from 'store-search-helpers';
+  isNewItem,
+  isOfferItem,
+} from '../../../shared/stores';
 import { resolveDshStoreMenuItemImageSource } from './StoreMenuItemCard';
 import { stylesTokens, styles as storeScreenStyles } from './store-screen.styles';
 

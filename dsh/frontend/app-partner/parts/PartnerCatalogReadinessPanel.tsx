@@ -1,4 +1,4 @@
-﻿/**
+/**
  * PartnerCatalogReadinessPanel — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: app-partner surface
  * API boundary: GET /partner/:id/catalog-readiness (not yet bound)
@@ -29,7 +29,7 @@ import {
   translateStage,
   translateOwner,
   canRenderInClientSurface,
-} from '../../shared/state-machines/workflow';
+} from '../../shared';
 
 export type PartnerCatalogReadinessPanelProps = {
   productId: string;

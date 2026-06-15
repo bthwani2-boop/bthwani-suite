@@ -5,10 +5,10 @@ import { Icon, Text,
   spacing,
 } from '@bthwani/ui-kit';
 
-import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/products';
 import type { useStoreAppearanceChrome } from './store-appearance-chrome';
 import type { DshStoreGetScreenProps } from '../../contracts/dsh-store-screen-props';
-import { normalizeDisplayText } from 'store-formatting';
+import { normalizeDisplayText } from '../../../shared/stores';
 import { resolveDshStoreMenuItemImageSource } from './StoreMenuItemCard';
 import { stylesTokens, styles as storeScreenStyles } from './store-screen.styles';
 

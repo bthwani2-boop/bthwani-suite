@@ -2,15 +2,15 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { borders, Box, colorPalette, radius, Surface, withAlpha } from '@bthwani/ui-kit';
 import { useTheme } from '@bthwani/ui-kit';
-import type { MapHeatZone } from '../../shared/view-models/captain';
+import type { MapHeatZone } from '../../shared';
 
-const demandHeatZones: readonly MapHeatZone[] = [
+const mapDemandZones: readonly MapHeatZone[] = [
   { id: 'demand-1', top: 58, right: 34, size: 164, color: withAlpha(colorPalette.brand, 0.20), label: 'طلب مرتفع' },
   { id: 'demand-2', top: 188, left: 26, size: 118, color: withAlpha(colorPalette.brand, 0.14), label: 'ذروة قريبة' },
   { id: 'demand-3', bottom: 108, right: 96, size: 146, color: 'rgba(255, 133, 75, 0.16)', label: 'متاجر نشطة' },
 ];
 
-const captainHeatZones: readonly MapHeatZone[] = [
+const mapCaptainZones: readonly MapHeatZone[] = [
   { id: 'captain-1', top: 128, left: 112, size: 132, color: withAlpha(colorPalette.brandStrong, 0.14), label: 'كباتن أكثر' },
   { id: 'captain-2', bottom: 138, left: 154, size: 104, color: withAlpha(colorPalette.brandStrong, 0.10), label: 'تغطية قريبة' },
 ];
@@ -63,11 +63,11 @@ export function DshCaptainMapLayer({
           <Box style={{ position: 'absolute', top: 214, right: 58, width: 148, height: 7, borderRadius: radius.pill, backgroundColor: withAlpha(colorPalette.brandStrong, 0.08), transform: [{ rotate: '-18deg' }] }} />
           <Box style={{ position: 'absolute', bottom: 122, left: 92, right: 42, height: 7, borderRadius: radius.pill, backgroundColor: withAlpha(colorPalette.brandStrong, 0.06), transform: [{ rotate: '14deg' }] }} />
 
-          {demandHeatZones.map((zone) => (
+          {mapDemandZones.map((zone) => (
             <Box key={zone.id} style={{ position: 'absolute', width: zone.size, height: zone.size, borderRadius: zone.size / 2, backgroundColor: zone.color, borderWidth: borders.hairline, borderColor: withAlpha(colorPalette.brand, 0.12), ...(zone.top != null ? { top: zone.top } : {}), ...(zone.bottom != null ? { bottom: zone.bottom } : {}), ...(zone.left != null ? { left: zone.left } : {}), ...(zone.right != null ? { right: zone.right } : {}) }} />
           ))}
 
-          {captainHeatZones.map((zone) => (
+          {mapCaptainZones.map((zone) => (
             <Box key={zone.id} style={{ position: 'absolute', width: zone.size, height: zone.size, borderRadius: zone.size / 2, backgroundColor: zone.color, borderWidth: borders.hairline, borderColor: withAlpha(colorPalette.brandStrong, 0.12), ...(zone.top != null ? { top: zone.top } : {}), ...(zone.bottom != null ? { bottom: zone.bottom } : {}), ...(zone.left != null ? { left: zone.left } : {}), ...(zone.right != null ? { right: zone.right } : {}) }} />
           ))}
 

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, KeyValueList, StateView, Surface, Text } from '@bthwani/ui-kit';
@@ -14,8 +14,8 @@ import {
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
 import { translateDshRuntimeBindingStatus } from '../shared';
-import { ApprovalRecord, ApprovalStage, isPartnerOwnedException, resolveApprovalStageMeta, resolveNextOwner, translateEntityType, translateOwner, translateStage } from '../../shared/state-machines/workflow';
-import { getMarketingPermissionResult } from '../../shared/policies/dsh-role-permission.model';
+import { ApprovalRecord, ApprovalStage, isPartnerOwnedException, resolveApprovalStageMeta, resolveNextOwner, translateEntityType, translateOwner, translateStage } from '../../shared';
+import { getMarketingPermissionResult } from '../../shared/identity-access/dsh-role-permission.model';
 
 
 

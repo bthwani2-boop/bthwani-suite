@@ -34,20 +34,20 @@ import {
   wltDshPartnerUiCopy,
 } from '../../../../wlt/frontend/dsh/app-partner/wlt-dsh-partner.ui-copy';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
-import type { DshCanonicalStoreCard } from '../../shared/presentation-models/dshStoreProductCardModel';
-import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/contracts/dsh-client-visibility.model';
-import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/state-machines/workflow';
+import type { DshCanonicalStoreCard } from '../../shared/products';
+import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/stores/dsh-client-visibility.model';
+import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared';
 import { WltDshPartnerBridge } from '../../../../wlt/frontend/dsh/app-partner';
-import type { DshFulfillmentDeliveryMode } from '../../shared/contracts/dsh-delivery-mode.model';
+import type { DshFulfillmentDeliveryMode } from '../../shared/orders';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
 import {
   getDshPartnerJourneyStep,
   resolveDshPartnerLifecycleStageLabel,
   type DshPartnerLifecycleStage,
-} from '../../shared/state-machines/dsh-partner-onboarding-journey.map';
-import { getDshPartnerActivationStatusLabel } from '../../shared/contracts/dsh-partner-activation.model';
-import { useDshEntityMedia } from '../../shared/adapters/media/useDshEntityMedia';
+} from '../../shared/partner/partner.journey';
+import { getDshPartnerActivationStatusLabel } from '../../shared/partner/dsh-partner-activation.model';
+import { useDshEntityMedia } from '../../shared/media/useDshEntityMedia';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';

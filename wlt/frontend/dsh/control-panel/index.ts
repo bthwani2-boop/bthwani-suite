@@ -35,4 +35,4 @@ export { WltDshFinanceHubHost, ControlPanelDshFinanceHubScreen, WltDshFinanceHub
 export type { WltDshFinanceHubHostProps, ControlPanelDshFinanceScreenProps } from './screens/WltDshFinanceHubHost';
 
 // public contracts barrel
-export * as wltDshFinanceContracts from '../shared/contracts';
+export * as wltDshFinanceContracts from '../shared';

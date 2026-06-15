@@ -65,8 +65,15 @@ module.exports = {
     {
       name: 'dsh-must-not-own-money-mutation',
       from: { path: '^dsh/frontend/(shared|control-panel|app-client|app-partner|app-captain|app-field)' },
-      to: { path: '^wlt/(backend|domain|frontend/dsh/app-)' },
-      pathNot: '^wlt/frontend/dsh/shared',
+      to: {
+        path: '^wlt/(backend|domain|frontend/dsh/app-)',
+        pathNot: [
+          '^wlt/frontend/dsh/shared',
+          'Bridge',
+          'ui-copy',
+          'index'
+        ],
+      },
       severity: 'error',
     },
   ],

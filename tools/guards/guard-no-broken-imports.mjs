@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { parseArgs, createReport, finalize, lineNumber } from './lib/guard-utils.mjs';
 
-const root = process.cwd();
+const args = parseArgs();
+const root = args.root;
 const scopeRoots = [
   'dsh/frontend/app-client',
   'dsh/frontend/app-partner',
@@ -30,10 +32,6 @@ function walk(absDir, files = []) {
   return files;
 }
 
-function lineNumber(text, index) {
-  return text.slice(0, index).split(/\r?\n/).length;
-}
-
 const rules = [
   {
     id: 'missing_from_before_module_specifier',
@@ -57,36 +55,27 @@ const rules = [
   },
 ];
 
+const report = createReport('GUARD_NO_BROKEN_IMPORTS', [
+  'governance/03_REPO_BOUNDARIES.md',
+  'governance/14_GUARDS_CATALOG.md'
+]);
+
 const files = scopeRoots.flatMap((scopeRoot) => walk(path.join(root, scopeRoot)));
-const findings = [];
 
 for (const abs of files) {
-  const rel = toPosix(path.relative(root, abs));
+  const relFile = toPosix(path.relative(root, abs));
   const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
   for (const rule of rules) {
     rule.regex.lastIndex = 0;
     let match;
     while ((match = rule.regex.exec(text)) !== null) {
-      findings.push({
-        severity: 'FAIL',
-        rule: rule.id,
-        file: rel,
-        line: lineNumber(text, match.index),
-        evidence: match[0].trim().slice(0, 180),
-        remediation: 'Use a valid ES import/export declaration with from and a quoted module specifier.',
-      });
+      report.fail(
+        relFile,
+        'Use a valid ES import/export declaration with from and a quoted module specifier.',
+        `${rule.id} (line ${lineNumber(text, match.index)}: ${match[0].trim().slice(0, 80)})`
+      );
     }
   }
 }
 
-const output = {
-  guardId: 'GUARD_NO_BROKEN_IMPORTS',
-  status: findings.length > 0 ? 'FAIL' : 'PASS',
-  scopeRoots,
-  filesScanned: files.length,
-  findings,
-  failCount: findings.length,
-};
-
-console.log(JSON.stringify(output, null, 2));
-if (findings.length > 0) process.exitCode = 1;
+finalize(report, args);

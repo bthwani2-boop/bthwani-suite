@@ -1,4 +1,4 @@
-import type { WltDshFinanceEventKind } from '../contracts/dsh-finance-read-model.types';
+import type { WltDshFinanceEventKind } from '../boundary/dsh-finance-read-model.types';
 
 export function resolveKindLabel(kind: WltDshFinanceEventKind): string {
   const map: Record<WltDshFinanceEventKind, string> = {

@@ -4,7 +4,7 @@ import React from 'react';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { WltBoundaryBanner } from '../components/WltBoundaryBanner';
-import { buildDshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/dshFinancePreviewModel';
+import { buildDshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/finance-boundary';
 
 export type PlatformFeeAuditWorkspaceProps = {
   orderId?: string;

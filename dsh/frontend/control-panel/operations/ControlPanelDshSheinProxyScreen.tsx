@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -6,7 +6,7 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { SHEIN_PROXY_STAGE_LABELS } from '../../shared/contracts/dsh-order.contract';
+import { SHEIN_PROXY_STAGE_LABELS } from '../../shared/orders';
 import { buildOperationsHref } from './operations.registry';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';

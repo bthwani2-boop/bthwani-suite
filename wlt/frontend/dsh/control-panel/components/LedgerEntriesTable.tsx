@@ -5,8 +5,8 @@ import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
 import { useRouter } from 'next/navigation';
-import type { WltLedgerEntry } from '../../shared/contracts';
-import { getWltPostingRuleForEvent } from '../../shared/contracts';
+import type { WltLedgerEntry } from '../../shared';
+import { getWltPostingRuleForEvent } from '../../shared';
 
 const STATUS_LABELS: Record<string, string> = {
   posted: 'مرحّل',

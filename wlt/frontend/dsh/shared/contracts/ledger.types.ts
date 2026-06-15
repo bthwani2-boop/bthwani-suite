@@ -10,4 +10,4 @@ export type {
   WalletDepositProof,
   WalletRefundImpact,
   WalletPaymentSplit,
-} from '../../control-panel/models/wallet.types';
+} from './wallet.types';

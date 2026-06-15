@@ -27,9 +27,9 @@ import { DshPreferencesHubScreen } from './screens/DshPreferencesHubScreen';
 import { DshAppearanceHubScreen } from './screens/DshAppearanceHubScreen';
 import { WltHomeGetScreen } from '../../../wlt/frontend/app-client-wlt';
 import { hostClientStates } from './dsh-client.navigation-bridge';
-import { buildDshClientCheckoutPresenterModel } from '../shared/view-models/checkout/dshClientCheckoutPresenter';
-import { mapLiveOrderStatusToClientState } from '../shared/view-models/tracking/tracking-helpers';
-import { getDshClientStateMeta } from 'state-machines/client-state';
+import { buildDshClientCheckoutPresenterModel } from '../shared/checkout';
+import { mapLiveOrderStatusToClientState } from '../shared/orders';
+import { getDshClientStateMeta } from '../shared/orders/orders.client-state';
 import type { DshClientRouteRendererProps } from './contracts/dsh-client-renderer.contracts';
 
 export function DshClientRouteRenderer({

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlatList, View } from 'react-native';
 import { Button, Card, SheetFrame, Surface, Text, colorPalette, spacing } from '@bthwani/ui-kit';
-import { formatDshPrice } from 'adapters/dsh-price-format';
+import { formatDshPrice } from '../../shared/runtime/dsh-price-format';
 
 export type DshCartLine = {
 	id: string;

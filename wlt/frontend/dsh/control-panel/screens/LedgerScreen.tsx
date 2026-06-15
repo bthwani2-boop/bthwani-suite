@@ -4,12 +4,12 @@ import React from 'react';
 import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
-import { buildWltFinancialCenter } from '../../shared/read-models';
+import { buildWltFinancialCenter } from '../../shared';
 import {
   buildWltRuntimeFinancialCenter,
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
-} from '../../shared/adapters';
+} from '../../shared';
 import { LedgerEntriesTable } from '../components/LedgerEntriesTable';
 import { TrialBalancePanel } from '../components/TrialBalancePanel';
 

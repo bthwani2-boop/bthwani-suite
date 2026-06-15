@@ -28,7 +28,7 @@ type SavedAddress = {
   isDefault: boolean;
 };
 
-const savedAddresses: SavedAddress[] = [
+const defaultSavedAddresses: SavedAddress[] = [
   { id: 'addr-home', label: 'المنزل', isDefault: true },
   { id: 'addr-work', label: 'العمل', isDefault: false },
   { id: 'addr-other', label: 'عنوان آخر', isDefault: false },
@@ -95,7 +95,7 @@ function AddressRow({ address, isLast = false, onSetDefault, onEdit }: AddressRo
 export function DshAddressLocationScreen({ onBack }: DshAddressLocationScreenProps) {
   const { theme } = useTheme();
   const [addressText, setAddressText] = React.useState('');
-  const [savedAddresses, setSavedAddresses] = React.useState<SavedAddress[]>(savedAddresses);
+  const [savedAddresses, setSavedAddresses] = React.useState<SavedAddress[]>(defaultSavedAddresses);
 
   const handleSetDefault = (id: string) => {
     setSavedAddresses((prev) =>
@@ -186,7 +186,7 @@ export function DshAddressLocationScreen({ onBack }: DshAddressLocationScreenPro
             العناوين المحفوظة
           </Text>
           <Divider />
-          {savedAddresses.map((address, index) => (
+          {savedAddresses.map((address: SavedAddress, index: number) => (
             <AddressRow
               key={address.id}
               address={address}

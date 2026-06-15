@@ -13,7 +13,7 @@ import { DshFieldFinanceScreen } from './DshFieldFinanceScreen';
 import { DshFieldDocumentUploadScreen } from './DshFieldDocumentUploadScreen';
 import { DshFieldReadinessEscalationScreen } from './DshFieldReadinessEscalationScreen';
 import { DshFieldStoresScreen } from './DshFieldStoresScreen';
-import type { useDshFieldSurfaceModel } from '../../shared/view-models/field';
+import type { useDshFieldSurfaceModel } from '../../shared/field';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 
 type FieldSurfaceBinding = ReturnType<typeof useDshFieldSurfaceModel>;

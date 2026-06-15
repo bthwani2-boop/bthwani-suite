@@ -13,7 +13,7 @@ import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
 import {
   getDshStoreVisibilityRuntimeClient,
-} from '../../shared/api/dsh-store-visibility-transport';
+} from '../../shared';
 
 export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
 

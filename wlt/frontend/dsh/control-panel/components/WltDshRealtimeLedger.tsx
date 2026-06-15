@@ -12,7 +12,7 @@ import {
   extractSortedDisplayRows,
   buildSimulatedLedgerDisplayRow,
   type WltRealtimeLedgerDisplayRow,
-} from '../../shared/adapters';
+} from '../../shared';
 
 const STATUS_LABELS: Record<string, string> = {
   COMPLETED: 'مرحّل',

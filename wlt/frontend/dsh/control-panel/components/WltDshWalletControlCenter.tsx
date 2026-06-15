@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import type { WltDshFinanceRuntimeResult } from '../../shared/adapters/wltDshFinanceRuntime.adapter';
-import { buildRuntimeWalletRows, type WalletSummaryRow } from '../../shared/read-models/wallet-control-center.read-model';
+import type { WltDshFinanceRuntimeResult } from '../../shared/boundary/wltDshFinanceRuntime.adapter';
+import { buildRuntimeWalletRows, type WalletSummaryRow } from '../../shared/wallet/wallet-control-center.read-model';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 

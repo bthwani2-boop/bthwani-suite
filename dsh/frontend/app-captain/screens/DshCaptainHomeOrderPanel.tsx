@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge, Box, Button, MobileScrollView, shadowPresets, Surface, Text, TextField } from '@bthwani/ui-kit';
-import type { CompactOrderChatMessage } from '../../shared/view-models/captain';
+import type { CompactOrderChatMessage } from '../../shared';
 import { CompactOrderChatBubble } from '../parts/CompactOrderChatBubble';
 
 type InboxState = 'ready' | 'loading' | 'empty' | 'error' | 'delivered' | 'offer-accepting' | 'offer-accepted' | 'partial' | 'offline' | 'disabled';

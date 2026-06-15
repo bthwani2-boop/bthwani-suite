@@ -1,5 +1,5 @@
 import type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
-import type { DshRoute as SharedDshRoute } from '../shared/contracts/dsh-client-binding.contracts';
+import type { DshRoute as SharedDshRoute } from '../shared/checkout/dsh-client-binding.contracts';
 
 export type DshRoute = SharedDshRoute;
 
@@ -20,7 +20,7 @@ export type DshClientSurfaceProps = {
 };
 
 
-export type { DshClientState } from 'state-machines/client-state';
+export type { DshClientState } from '../shared/orders/orders.client-state';
 export type {
 	DshClientBindingError,
 	DshClientCartLine,

@@ -1,42 +1,40 @@
-// ── BThwani Full-Stack DSH Shared ────────────────────────────────────────────
-// Capability gateways — each sub-directory owns its domain.
-// Rule: no JSX, no ui-kit, no Tamagui in this layer.
-// Design authority: @bthwani/ui-kit only.
+// ── BThwani Full-Stack DSH Shared — Topic-First SSOT ─────────────────────────
+// Rule: no JSX, no ui-kit, no Tamagui. Design authority: @bthwani/ui-kit only.
 // WLT finance mutations: wlt/frontend/dsh/shared only.
+// Import order: topic-first, then layer-compat re-exports.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Full-Stack capability coverage map (13 capabilities)
+// ── Topics ────────────────────────────────────────────────────────────────────
+
 export * from './full-stack';
-
-// WLT Finance Boundary — DSH read-only bridge (no mutations)
+export * from './catalog';
+export * from './marketing';
+export * from './notifications';
+export * from './support';
+export * from './field';
+export * from './partner';
+export * from './operations';
+export * from './products';
+export * from './orders';
+export * from './stores';
+export * from './cart';
+export * from './checkout';
+export * from './captain';
+export * from './delivery';
 export * from './finance-boundary';
-
-// Presentation Models — data-only UI models (no JSX, no ui-kit)
 export * from './presentation-models';
 
-// API Clients — HTTP adapters for all DSH backend endpoints
-export * from './api';
+// Identity-Access Topic — roles, permissions, surface visibility, audit
+export * from './identity-access';
 
-// Contracts — data shapes, type definitions, identity models
-export * from './contracts';
+// Discovery Topic — home feed, store list, service dial, category rails
+export * from './discovery';
 
-// State Machines — lifecycle models, journey maps, approval flows
-export * from './state-machines';
+// Platform Topic — feature flags, platform vars, runtime env config
+export * from './platform';
 
-// Policies — role-based permissions, flow registry, access control
-export * from './policies';
+// ── Layer-compat re-exports (backward compat — do not add new exports here) ──
 
-// Adapters — data mappers, operational adapters, commercial feature mapping
-export * from './adapters';
-
-// Control-Panel Models — governance map, section registries, CP contracts
 export * from './control-panel';
-
-// Media — image resolution and media path utilities
 export * from './media';
-
-// Runtime — surface runtime contracts, operational bindings, platform providers
 export * from './runtime';
-
-// View Models — data/action hooks consumed by UI-only surface shells
-export * from './view-models/field';

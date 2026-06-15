@@ -1,4 +1,5 @@
-export type DshSurfaceId = 'app-client' | 'app-partner' | 'app-captain' | 'app-field' | 'control-panel';
+// DshSurfaceId is canonical in contracts/dsh-flow-registry (exported via shared/policies)
+import type { DshSurfaceId } from '../runtime/dsh-flow-registry';
 
 export type DshLegacySurfaceId = 'client' | 'partner' | 'captain' | 'field';
 

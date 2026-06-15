@@ -7,11 +7,11 @@ import { Box, Text,
 import {
   type WltDshFieldCommissionStatement as WltFieldStatement,
   type WltDshFieldCommissionStoreLine as WltStoreLine,
-} from '../../shared/contracts';
+} from '../../shared';
 import {
   buildFieldStatementDisplayAmounts,
   buildFieldStoreLineDisplayAmounts,
-} from '../../shared/read-models';
+} from '../../shared';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 const STATUS_LABEL: Record<WltFieldStatement['status'], string> = {

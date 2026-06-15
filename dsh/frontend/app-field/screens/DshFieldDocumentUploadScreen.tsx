@@ -19,10 +19,10 @@ import {
   radius,
   spacing,
 } from '@bthwani/ui-kit';
-import { getDshFlowPolicySummary } from '../../shared/policies/dsh-flow-registry';
+import { getDshFlowPolicySummary } from '../../shared/runtime/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/dsh-governance.map';
-import { resolveFieldDocumentDraftMediaKey } from '../../shared/view-models/field';
-import type { DshFieldDocumentKind } from '../../shared/api/dsh-field-document-client';
+import { resolveFieldDocumentDraftMediaKey } from '../../shared/field';
+import type { DshFieldDocumentKind } from '../../shared/field/dsh-field-document-client';
 
 export type DshFieldDocumentUploadScreenProps = {
   storeId: string;

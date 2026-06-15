@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { parseArgs, createReport, finalize, lineNumber } from './lib/guard-utils.mjs';
 
-const root = process.cwd();
+const args = parseArgs();
+const root = args.root;
 const surfaceFiles = [
   'dsh/frontend/app-client/DshClientSurface.tsx',
   'dsh/frontend/app-partner/DshPartnerSurface.tsx',
@@ -12,10 +14,6 @@ const surfaceFiles = [
 
 function toPosix(value) {
   return String(value).replace(/\\/g, '/');
-}
-
-function lineNumber(text, index) {
-  return text.slice(0, index).split(/\r?\n/).length;
 }
 
 function countMatches(text, regex) {
@@ -38,26 +36,29 @@ const rules = [
   { id: 'surface_large_mapping_function', regex: /\bmapRuntimeRowToPartnerItem\b|\bcommissionRecord\b|\bearningRecord\b/g },
 ];
 
-const findings = [];
+const report = createReport('GUARD_SURFACE_LIGHTWEIGHT_BINDINGS', [
+  'governance/07_SURFACES_AND_SERVICES.md',
+  'governance/22_DSH_GOLDEN_SLICE.md'
+]);
 
 for (const relative of surfaceFiles) {
   const abs = path.join(root, relative);
   if (!fs.existsSync(abs)) continue;
   const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
-  const rel = toPosix(relative);
+  const relFile = toPosix(relative);
   const stateCount = countMatches(text, /\bReact\.useState\b|\buseState\b/g);
   const effectCount = countMatches(text, /\bReact\.useEffect\b|\buseEffect\b/g);
 
   if (stateCount > 12) {
-    findings.push({ severity: 'FAIL', rule: 'surface_too_many_local_states', file: rel, line: 1, evidence: `${stateCount} useState calls`, remediation: 'Move business state into shared controller/binding hooks.' });
+    report.fail(relFile, 'Move business state into shared controller/binding hooks.', `${stateCount} useState calls`);
   }
   if (effectCount > 3) {
-    findings.push({ severity: 'FAIL', rule: 'surface_too_many_runtime_effects', file: rel, line: 1, evidence: `${effectCount} useEffect calls`, remediation: 'Move runtime effects into shared controller/binding hooks.' });
+    report.fail(relFile, 'Move runtime effects into shared controller/binding hooks.', `${effectCount} useEffect calls`);
   }
-  if (rel.endsWith('DshClientSurface.tsx')) {
+  if (relFile.endsWith('DshClientSurface.tsx')) {
     const propCount = countJsxProps(text, 'DshClientRouteRenderer');
     if (propCount > 25) {
-      findings.push({ severity: 'FAIL', rule: 'surface_renderer_prop_fanout', file: rel, line: 1, evidence: `${propCount} props passed to DshClientRouteRenderer`, remediation: 'Pass grouped model/actions/runtime objects instead of surface-level prop fanout.' });
+      report.fail(relFile, 'Pass grouped model/actions/runtime objects instead of surface-level prop fanout.', `${propCount} props passed to DshClientRouteRenderer`);
     }
   }
 
@@ -65,26 +66,13 @@ for (const relative of surfaceFiles) {
     rule.regex.lastIndex = 0;
     let match;
     while ((match = rule.regex.exec(text)) !== null) {
-      findings.push({
-        severity: 'FAIL',
-        rule: rule.id,
-        file: rel,
-        line: lineNumber(text, match.index),
-        evidence: match[0].slice(0, 180),
-        remediation: 'Surface hosts must stay as UI/runtime binding shells; move shared behavior into DSH shared controllers/adapters.',
-      });
+      report.fail(
+        relFile,
+        'Surface hosts must stay as UI/runtime binding shells; move shared behavior into DSH shared controllers/adapters.',
+        `${rule.id} (line ${lineNumber(text, match.index)}: ${match[0].slice(0, 80)})`
+      );
     }
   }
 }
 
-const output = {
-  guardId: 'GUARD_SURFACE_LIGHTWEIGHT_BINDINGS',
-  status: findings.length > 0 ? 'FAIL' : 'PASS',
-  surfaceFiles,
-  filesScanned: surfaceFiles.length,
-  findings,
-  failCount: findings.length,
-};
-
-console.log(JSON.stringify(output, null, 2));
-if (findings.length > 0) process.exitCode = 1;
+finalize(report, args);

@@ -3,7 +3,7 @@ import { BackHandler, Platform, View } from 'react-native';
 import { BottomNavBar, Box, ModernPremiumHeader } from '@bthwani/ui-kit';
 import type { DshPartnerSurfaceProps } from './dsh-partner.types';
 import { storeScopeOptions } from './dsh-partner.navigation-bridge';
-import { useDshPartnerSurfaceModel } from '../shared/view-models/partner/useDshPartnerSurfaceModel';
+import { useDshPartnerSurfaceModel } from './useDshPartnerSurfaceModel';
 import { PlatformVarsProvider, FeatureFlagProvider, usePlatformVars } from '../platform';
 import { PartnerStoreScopeSheet } from './parts/PartnerStoreScopeSheet';
 import { DshPartnerRouteRenderer } from './screens/DshPartnerRouteRenderer';

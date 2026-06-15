@@ -1,12 +1,12 @@
-﻿import React from 'react';
+import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Badge, Box, Button, Divider, KeyValueList, MobileScrollView, Text, TextField, useTheme,
   spacing,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
-import type { DshCaptainOrderStage } from '../../shared/contracts/dsh-order.contract';
-import type { DshCaptainProfileSnapshot } from '../../shared/state-machines/client-state';
-import { getOperationsSupportFlowsForSurface, type DshOperationsSupportFlowId } from '../../shared/state-machines/support-flows';
+import type { DshCaptainOrderStage } from '../../shared/orders';
+import type { DshCaptainProfileSnapshot } from '../../shared/client-state';
+import { getOperationsSupportFlowsForSurface, type DshOperationsSupportFlowId } from '../../shared';
 import { type DshCaptainRegistryFlowId } from '../contracts/dshCaptainBinding.contracts';
 
 

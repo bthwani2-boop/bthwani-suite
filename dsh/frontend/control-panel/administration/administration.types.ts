@@ -1,1 +1,1 @@
-export * from '../../shared/policies/permissions/administration.types';
+export * from '../../shared/permissions/administration.types';

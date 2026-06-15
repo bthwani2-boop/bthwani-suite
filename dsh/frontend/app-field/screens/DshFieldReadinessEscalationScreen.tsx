@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { StyleSheet, View, Pressable } from 'react-native';
 import {
   Badge,
@@ -18,8 +18,8 @@ import {
   radius,
   borders,
 } from '@bthwani/ui-kit';
-import { getOperationsSupportFlowSpec, getOperationsSupportFlowsForSurface } from '../../shared/state-machines/support-flows';
-import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/policies/dsh-flow-registry';
+import { getOperationsSupportFlowSpec, getOperationsSupportFlowsForSurface } from '../../shared';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/dsh-governance.map';
 
 

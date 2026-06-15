@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Animated } from 'react-native';
-import type { DshStoreMenuItem as DshStoreGetMenuItem } from 'presentation-models/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/products';
 
 type UseStoreImageViewerStateParams = {
   setPreviewItem: (item: DshStoreGetMenuItem | null) => void;

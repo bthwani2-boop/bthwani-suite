@@ -1,2 +1,2 @@
-﻿// Re-export from canonical location: dsh/frontend/shared/policies/permissions/marketing-permissions.ts
-export * from '../../shared/policies/permissions/marketing-permissions';
+// Re-export from canonical location: dsh/frontend/shared/marketing/marketing.permissions.ts
+export * from '../../shared/marketing';

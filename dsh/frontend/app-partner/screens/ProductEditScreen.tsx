@@ -19,12 +19,12 @@ import {
   type DshProductIdentityApprovalStatus,
   getDshProductApprovalStatusLabel,
   getDshProductApprovalStatusTone,
-} from '../../shared/contracts/dsh-product-identity.model';
+} from '../../shared';
 import {
   type DshProductRecord,
   type DshCreateProductRequest,
   type DshUpdateProductRequest,
-} from '../../shared/api/dsh-product-api.client';
+} from '../../shared/products/dsh-product-api.client';
 import { getDshProductRuntimeClient } from '../../shared';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

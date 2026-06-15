@@ -6,7 +6,7 @@ import { DshOperationScreen } from '../parts/OperationScreen';
 import type {
 	DshCaptainProfileScreenState,
 	DshCaptainProfileSnapshot,
-} from '../../shared/state-machines/client-state';
+} from '../../shared/client-state';
 
 export type DshCaptainProfileScreenProps = {
 	section?: 'profile-get' | 'tier-info' | 'tier-evaluate';

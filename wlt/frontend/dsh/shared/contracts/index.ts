@@ -1,5 +1,4 @@
-export * from './wallet.types';
-export * from './ledger.types';
+// wallet.types and ledger.types are already exported via financeContracts.ts
 export * from './payment-session.types';
 export * from './refund.types';
 export * from './settlement.types';

@@ -1,1 +1,1 @@
-export * from '../../shared/view-models/control-panel/catalogs/catalogs.filter-products';
+export * from '../../shared/catalog/catalogs.filter-products';

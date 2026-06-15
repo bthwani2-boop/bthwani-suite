@@ -167,7 +167,6 @@ export type WalletPaymentSplit = {
 
 export type {
   WltWalletSummary,
-  WltLedgerEntry,
   WltListLedgerResponse,
   WltDshWalletSummary,
   WltDshLedgerEntry,

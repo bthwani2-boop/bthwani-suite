@@ -1,1 +1,1 @@
-export { useStoreShellDerivedState } from '../shared/view-models/store/useStoreShellDerivedState';
+export { useStoreShellDerivedState } from '../../shared/stores';

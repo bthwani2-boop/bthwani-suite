@@ -1,8 +1,8 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { useTheme, Text } from '@bthwani/ui-kit';
-import type { DshOperationsDecisionKind } from '../../shared/state-machines/dsh-order-journey.model';
+import type { DshOperationsDecisionKind } from '../../shared/orders';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import type { DshFulfillmentOperationalMode } from './operations.types';
 

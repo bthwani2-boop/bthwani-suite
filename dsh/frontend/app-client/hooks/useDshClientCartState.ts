@@ -1,1 +1,1 @@
-export * from '../shared/view-models/cart/useDshClientCartState';
+export * from '../../shared/cart';

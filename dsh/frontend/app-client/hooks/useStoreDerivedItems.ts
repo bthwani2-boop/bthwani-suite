@@ -1,1 +1,1 @@
-export { useStoreDerivedItems } from '../shared/view-models/store/useStoreDerivedItems';
+export { useStoreDerivedItems } from '../../shared/stores';

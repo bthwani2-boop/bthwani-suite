@@ -1,11 +1,11 @@
-﻿import React from 'react';
+import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Badge, borders, Box, Button, Divider, Icon, MobileScrollView, Text, TopBar, useTheme,
   radius,
   spacing,
 } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
-import { resolveFieldFilterCounts, type FieldStoreFile } from '../../shared/contracts/field-store-model';
+import { resolveFieldFilterCounts, type FieldStoreFile } from '../../shared/field';
 
 type DshFieldProfileHomeScreenProps = {
   stores: readonly FieldStoreFile[];

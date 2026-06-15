@@ -5,7 +5,7 @@ import { StoreScreenShell, type DshStoreGetScreenProps, type DshStoreGetScreenSh
 import { useStoreState } from '../hooks/useStoreState';
 import { useStoreDerivedItems } from '../hooks/useStoreDerivedItems';
 import { useDebounce } from '../hooks/useDebounce';
-import { resolveStoreItemsForCategory } from 'store-search-helpers';
+import { resolveStoreItemsForCategory } from '../../shared/stores';
 
 export const DshStoreGetScreen = React.memo(function DshStoreGetScreenComponent(props: DshStoreGetScreenProps) {
   const storeState = useStoreState();

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,7 +12,7 @@ function getDshCallIntakePreview(_id: string): DshCallIntakePreview | undefined 
 import type {
   DshGlobalControlLink,
   DshRouteHintedAction,
-} from '../../shared/contracts/dsh-order.contract';
+} from '../../shared/orders';
 import styles from '../shared/control-panel-surface.module.css';
 import { SUPPORT_VERIFICATION_STATUS_META } from './support.types';
 

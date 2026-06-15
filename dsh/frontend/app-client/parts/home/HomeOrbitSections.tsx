@@ -12,11 +12,11 @@ import { ServiceOrbitCarousel, colorPalette, radius, spacing, useDirection, with
 } from '@bthwani/ui-kit';
 import { Text } from '@bthwani/ui-kit';
 
-import type { DshServiceId } from '../../contracts/dsh-home-types';
+import type { DshServiceId } from '../../../shared/discovery/dsh-home-types';
 import type { HomeScreenShellProps } from './HomeScreenShell';
-import type { DshHomeServiceDialItem } from 'adapters/home-service-config';
-import { DSH_HOME_SERVICE_DIAL_ITEMS as dshHomeServiceDialFixtures } from 'adapters/home-service-config';
-import { resolveDshImageSource } from 'media/resolve-dsh-image-source';
+import type { DshHomeServiceDialItem } from '../../../shared/discovery/home-service-config';
+import { DSH_HOME_SERVICE_DIAL_ITEMS as dshHomeServiceDialFixtures } from '../../../shared/discovery/home-service-config';
+import { resolveDshImageSource } from '../../../shared/media';
 
 // --------------------------------------------------------------------------
 // Local DSH category tile — uses runtime media resolution or emoji fallback.

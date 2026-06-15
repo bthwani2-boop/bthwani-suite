@@ -1,34 +1,9 @@
-﻿export type DshCaptainRoute =
-  | 'home'
-  | 'account'
-  | 'account-profile'
-  | 'account-finance'
-  | 'account-orders'
-  | 'account-docs'
-  | 'account-shifts'
-  | 'account-support'
-  | 'entry'
-  | 'inbox'
-  | 'detail'
-  | 'orderchat'
-  | 'bell'
-  | 'support-directory'
-  | 'support-screen'
-  | 'pickup-dropoff'
-  | 'pod-submission'
-  | 'map';
+import type {
+  DshCaptainRoute,
+  DshCaptainCommandTarget,
+} from '../shared';
 
-export type DshCaptainCommandTarget =
-  | 'home'
-  | 'entry'
-  | 'inbox'
-  | 'detail'
-  | 'orderchat'
-  | 'bell'
-  | 'support-directory'
-  | 'account-orders'
-  | 'pickup-dropoff'
-  | 'pod-submission';
+export type { DshCaptainRoute, DshCaptainCommandTarget };
 
 export type DshCaptainNavigationCommand = {
   token: number;
@@ -48,7 +23,7 @@ export type {
   DshCaptainState,
   DshCaptainStateGroup,
   DshCaptainStateMeta,
-} from '../shared/state-machines/client-state';
+} from '../shared/client-state';
 
 export type {
   DshCaptainFinanceSnapshot,

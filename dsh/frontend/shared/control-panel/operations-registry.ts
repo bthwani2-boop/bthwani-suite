@@ -10,9 +10,9 @@ import type {
   OperationsGroupMeta,
   OperationsNormalizationResult,
   OperationsPanelId,
-} from '../contracts/operations/operations.types';
+} from '../operations/operations.types';
 
-export type { AnyOperationsWorkspaceId } from '../contracts/operations/operations.types';
+export type { AnyOperationsWorkspaceId } from '../operations/operations.types';
 
 export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
   {
@@ -286,7 +286,7 @@ export function getOperationsGroupMeta(groupId: CanonicalOperationsGroupId) {
   return OPERATIONS_CANONICAL_GROUPS.find((group) => group.id === groupId) ?? OPERATIONS_CANONICAL_GROUPS[0];
 }
 
-const STATE_COPY: Record<Exclude<import('./operations.types').OperationsViewState, 'ready'>, import('./operations.types').StateViewCopy> = {
+const STATE_COPY: Record<Exclude<import('../operations/operations.types').OperationsViewState, 'ready'>, import('../operations/operations.types').StateViewCopy> = {
   loading: {
     stateId: 'loading',
     title: 'Ø¬Ø§Ø±Ù ØªØ­Ù…ÙŠÙ„ Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª',
@@ -297,13 +297,12 @@ const STATE_COPY: Record<Exclude<import('./operations.types').OperationsViewStat
     stateId: 'empty',
     title: 'Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ù…Ø­ØªÙˆÙ‰ Ø¨Ø¹Ø¯',
     description: 'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¹ÙŠÙ†Ø© ØªØ´ØºÙŠÙ„ÙŠØ© Ù…ØªØ§Ø­Ø© Ù„Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ø¹Ù…Ù„ Ø§Ù„Ø­Ø§Ù„ÙŠØ©.',
-    actionLabel: 'ÙØªØ­ Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª',
+    actionLabel: 'Ù ØªØ­ Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª',
   },
   error: {
     stateId: 'recoverableError',
     title: 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø¹Ø§ÙŠÙ†Ø© ØºÙŠØ± Ù…ØªØ§Ø­Ø©',
-    description: 'ÙŠÙ…ÙƒÙ† Ø£Ù† ØªØªØ¹Ø§ÙÙ‰ Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ø¹Ù…Ù„ Ø¨Ø¹Ø¯ Ø§Ù„ØªØ­Ø¯ÙŠØ« Ø§Ù„ØªØ§Ù„ÙŠ.',
-    description: 'ÙŠÙ…ÙƒÙ† Ø£Ù† ØªØªØ¹Ø§Ù Ù‰ Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ø¹Ù…Ù„ Ø¨Ø¹Ø¯ Ø§Ù„ØªØ­Ø¯ÙŠØ± Ø§Ù„ØªØ§Ù„ÙŠ.',
+    description: 'ÙŠÙ…ÙƒÙ† Ø£Ù† ØªØªØ¹Ø§Ù Ù‰ Ù…Ø³Ø§Ø­Ø© Ø§Ù„Ø¹Ù…Ù„ Ø¨Ø¹Ø¯ Ø§Ù„ØªØ­Ø¯ÙŠØ« Ø§Ù„ØªØ§Ù„ÙŠ.',
     actionLabel: 'Ù ØªØ­ Ø§Ù„Ø¹Ù…Ù„ÙŠØ§Øª',
   },
   offline: {
@@ -320,6 +319,6 @@ const STATE_COPY: Record<Exclude<import('./operations.types').OperationsViewStat
   },
 };
 
-export function resolveOperationsStateCopy(state: Exclude<import('./operations.types').OperationsViewState, 'ready'>): import('./operations.types').StateViewCopy {
+export function resolveOperationsStateCopy(state: Exclude<import('../operations/operations.types').OperationsViewState, 'ready'>): import('../operations/operations.types').StateViewCopy {
   return STATE_COPY[state];
 }

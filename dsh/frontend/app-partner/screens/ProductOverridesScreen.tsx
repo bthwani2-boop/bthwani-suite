@@ -18,7 +18,7 @@ import {
 import {
   type DshProductRecord,
   type DshCatalogOverrideInput,
-} from '../../shared/api/dsh-product-api.client';
+} from '../../shared/products/dsh-product-api.client';
 import { getDshProductRuntimeClient } from '../../shared';
 
 export type ProductOverridesScreenProps = {

@@ -16,7 +16,7 @@ import {
   getDshPartnerVisibilityBadgeLabel,
   getDshPartnerVisibilityBadgeTone,
   getDshPartnerActivationStatusLabel,
-} from '../../shared/contracts/dsh-partner-activation.model';
+} from '../../shared/partner/dsh-partner-activation.model';
 import {
   PARTNER_FULFILLMENT_AGREEMENTS,
   getPartnerActivationStatus,

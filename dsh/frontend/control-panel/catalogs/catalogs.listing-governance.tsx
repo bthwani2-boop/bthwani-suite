@@ -6,7 +6,7 @@
 import React from 'react';
 import { Box, Button, Chip, KeyValueList, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
-import { resolveDshProductClientVisibility } from '../../shared/contracts/dsh-client-visibility.model';
+import { resolveDshProductClientVisibility } from '../../shared/stores/dsh-client-visibility.model';
 import type {
   DshProductIdentityApprovalStatus,
   DshProductCategoryMappingStatus,

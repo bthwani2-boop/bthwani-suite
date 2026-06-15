@@ -1,4 +1,4 @@
-import type { DshPermissionSection, DshRoleId } from './dsh-role-permission.model';
+import type { DshPermissionSection, DshRoleId } from '../identity-access/dsh-role-permission.model';
 
 export type DshSurfaceActor =
   | 'client'

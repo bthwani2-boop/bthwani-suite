@@ -1,1 +1,1 @@
-export * from '../../shared/view-models/control-panel/catalogs/catalogs.hooks';
+export * from '../../shared/catalog/catalogs.hooks';

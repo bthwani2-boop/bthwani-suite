@@ -9,7 +9,7 @@ import { HomePromoSection } from './HomePromoSection';
 import { HomeStoreFeedSection, type HomeStoreCardEntry } from './HomeStoreFeedSection';
 import { HomeVideoReelsSection } from './HomeVideoReelsSection';
 import type { useTheme, useUiText } from '@bthwani/ui-kit';
-import type { DshHomeCategory } from '../../contracts/dsh-home-types';
+import type { DshHomeCategory } from '../../../shared/discovery/dsh-home-types';
 import type { DshHomeGetScreenProps } from '../../contracts/dsh-home-screen-props';
 import type { useHomeState } from '../../hooks/useHomeState';
 import type { useHomeDerivedStores } from '../../hooks/useHomeDerivedStores';
@@ -18,7 +18,7 @@ import type { useHomeFilterRail } from '../../hooks/useHomeFilterRail';
 import type { useHomeVideoHandlers } from '../../hooks/useHomeVideoHandlers';
 import type { useHomeTickerState } from '../../hooks/useHomeTickerState';
 import type { buildHomeScreenStyles } from './home-screen.styles';
-import type { HomePromoRecord } from 'contracts/dsh-marketing-types';
+import type { HomePromoRecord } from '../../../shared/marketing/marketing.types';
 
 export interface HomeScreenShellProps {
   props: DshHomeGetScreenProps;
@@ -182,7 +182,7 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
               bannerItems={promoHandlers.bannerItems}
               activeHomePromo={activeHomePromo}
               promoHandlers={promoHandlers}
-              selectedCategoryFixture={filterRail.selectedCategoryFixture}
+              selectedCategory={filterRail.selectedCategory}
               selectedCategoryLabel={filterRail.selectedCategoryLabel}
               selectedSubcategoryCards={filterRail.selectedSubcategoryCards}
               activeCategoryDialItem={filterRail.activeCategoryDialItem}

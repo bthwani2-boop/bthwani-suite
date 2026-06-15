@@ -1,5 +1,5 @@
-import type { DshControlPanelSectionId } from '../dsh-governance.map';
-import type { DshSurfaceId } from '../dsh-flow-registry';
+import type { DshControlPanelSectionId } from '../control-panel/dsh-governance.map';
+import type { DshSurfaceId } from '../runtime/dsh-flow-registry';
 import type { BthwaniFullStackCapabilityId } from './bthwani-full-stack-capabilities';
 
 export type BthwaniFullStackClosureStatus =

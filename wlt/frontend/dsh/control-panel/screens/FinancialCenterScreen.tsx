@@ -5,14 +5,14 @@ import { useRouter } from 'next/navigation';
 import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
-import { buildFinanceHref } from '../../shared/contracts';
-import { buildWltFinancialCenter } from '../../shared/read-models';
+import { buildFinanceHref } from '../../shared';
+import { buildWltFinancialCenter } from '../../shared';
 import {
   buildWltRuntimeFinancialCenter,
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
-} from '../../shared/adapters';
-import type { WltFinancialCenterSection, WltLedgerEntry, WltFinancialCenterBlockingVariance } from '../../shared/contracts';
+} from '../../shared';
+import type { WltFinancialCenterSection, WltLedgerEntry, WltFinancialCenterBlockingVariance } from '../../shared';
 
 const SECTION_COLOR: Record<string, string> = {
   asset: 'var(--bth-info-text)',

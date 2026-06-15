@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import type { WltDshStoreSettlementStatement as StoreStatement } from '../../shared/contracts/storeSettlement.types';
-import { loadWltDshFinanceRuntimeReadModel, type WltDshFinanceRuntimeResult } from '../../shared/adapters/wltDshFinanceRuntime.adapter';
-import { buildRuntimeStoreStatements } from '../../shared/read-models/store-settlement.read-model';
+import type { WltDshStoreSettlementStatement as StoreStatement } from '../../shared/settlements/storeSettlement.types';
+import { loadWltDshFinanceRuntimeReadModel, type WltDshFinanceRuntimeResult } from '../../shared/boundary/wltDshFinanceRuntime.adapter';
+import { buildRuntimeStoreStatements } from '../../shared/settlements/store-settlement.read-model';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 const STATUS_LABEL: Record<StoreStatement['status'], string> = {

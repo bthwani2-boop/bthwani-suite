@@ -11,7 +11,7 @@ import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-g
 import type { AnyOperationsWorkspaceId } from './operations.registry';
 import { buildOperationsHref, NON_OPERATIONS_SECTION_SHORTCUTS } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
-import { getDshSignalSummaries, getDshSignalEventLabel, getDshSignalEventTone } from '../../shared/contracts/dsh-signal-layer.model';
+import { getDshSignalSummaries, getDshSignalEventLabel, getDshSignalEventTone } from '../../shared/marketing/dsh-signal-layer.model';
 
 export type CommandCenterScreenProps = { hubHref: string; subGroup?: string; };
 

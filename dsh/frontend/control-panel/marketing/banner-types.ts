@@ -1,2 +1,2 @@
-﻿// Re-export from canonical location: dsh/frontend/shared/contracts/marketing/banner-types.ts
-export * from '../../shared/contracts/marketing/banner-types';
+// Re-export from canonical location: dsh/frontend/shared/marketing
+export * from '../../shared/marketing';

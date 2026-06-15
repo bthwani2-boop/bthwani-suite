@@ -1,17 +1,15 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { parseArgs, createReport, finalize, lineNumber } from './lib/guard-utils.mjs';
 
-const root = process.cwd();
+const args = parseArgs();
+const root = args.root;
 const sharedRoot = 'dsh/frontend/shared';
 const extensions = new Set(['.ts', '.tsx', '.js', '.jsx']);
 
 function toPosix(value) {
   return String(value).replace(/\\/g, '/');
-}
-
-function lineNumber(text, index) {
-  return text.slice(0, index).split(/\r?\n/).length;
 }
 
 function walk(absDir, files = []) {
@@ -61,53 +59,41 @@ const rules = [
   },
 ];
 
+const report = createReport('GUARD_DSH_SHARED_NO_UI', [
+  'governance/14_GUARDS_CATALOG.md',
+  'governance/22_DSH_GOLDEN_SLICE.md'
+]);
+
 const files = walk(path.join(root, sharedRoot));
-const findings = [];
 
 for (const abs of files) {
-  const rel = toPosix(path.relative(root, abs));
+  const relFile = toPosix(path.relative(root, abs));
   const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
   const stripped = stripComments(text);
 
   for (const rule of rules) {
-    if (rule.testFile?.(rel)) {
-      findings.push({
-        severity: 'FAIL',
-        rule: rule.id,
-        file: rel,
-        line: 1,
-        evidence: path.extname(rel),
-        remediation: rule.remediation,
-      });
+    if (rule.testFile?.(relFile)) {
+      report.fail(
+        relFile,
+        rule.remediation,
+        `${rule.id}: TSX file extension`
+      );
     }
 
     if (!rule.regex) continue;
-    if (rule.id === 'dsh_shared_ui_component_or_stylesheet' && /(?:^|\/)(?:.*\.types|.*\.contract|.*\.contracts)\.ts$/.test(rel)) {
+    if (rule.id === 'dsh_shared_ui_component_or_stylesheet' && /(?:^|\/)(?:.*\.types|.*\.contract|.*\.contracts)\.ts$/.test(relFile)) {
       continue;
     }
     rule.regex.lastIndex = 0;
     let match;
     while ((match = rule.regex.exec(stripped)) !== null) {
-      findings.push({
-        severity: 'FAIL',
-        rule: rule.id,
-        file: rel,
-        line: lineNumber(stripped, match.index),
-        evidence: match[0].slice(0, 160),
-        remediation: rule.remediation,
-      });
+      report.fail(
+        relFile,
+        rule.remediation,
+        `${rule.id} (line ${lineNumber(stripped, match.index)}: ${match[0].slice(0, 80)})`
+      );
     }
   }
 }
 
-const output = {
-  guardId: 'GUARD_DSH_SHARED_NO_UI',
-  status: findings.length > 0 ? 'FAIL' : 'PASS',
-  sharedRoot,
-  filesScanned: files.length,
-  findings,
-  failCount: findings.length,
-};
-
-console.log(JSON.stringify(output, null, 2));
-if (findings.length > 0) process.exitCode = 1;
+finalize(report, args);

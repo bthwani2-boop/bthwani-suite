@@ -8,9 +8,9 @@
  * Catalog identity (name, category, publishStage) comes from the DSH backend — partners do not define it locally.
  */
 import React from 'react';
-import type { DshCanonicalProductCard } from '../../shared/presentation-models/dshStoreProductCardModel';
+import type { DshCanonicalProductCard } from '../../shared/products';
 import { getDshProductRuntimeClient, getDshStoreVisibilityRuntimeClient } from '../../shared';
-import { useDshEntityMedia } from '../../shared/adapters/media/useDshEntityMedia';
+import { useDshEntityMedia } from '../../shared/media/useDshEntityMedia';
 import {
   type DshCatalogDomainId,
   type DshCatalogMainCategoryId,
@@ -22,9 +22,9 @@ import {
   DSH_PRODUCT_FACET_LABELS as FACET_LABELS,
   DSH_OPERATIONAL_FACETS,
   isDshOperationalFacet,
-} from '../../shared/contracts/catalog';
-import type { DshStoreVisibilityTransportError } from '../../shared/api/dsh-store-visibility-transport';
-import type { PartnerReadinessStatus } from '../../shared/api/dsh-store-visibility-client';
+} from '../../shared/catalog';
+import type { DshStoreVisibilityTransportError } from '../../shared/stores/dsh-store-visibility-transport';
+import type { PartnerReadinessStatus } from '../../shared/stores/dsh-store-visibility-client';
 
 import {
   BThwaniFilterRail,
@@ -59,7 +59,7 @@ import {
   translateStage,
   translateEntityType,
   canRenderInClientSurface,
-} from '../../shared/state-machines/workflow';
+} from '../../shared';
 
 
 // ── Light list model — only what is needed per row ────────────────────

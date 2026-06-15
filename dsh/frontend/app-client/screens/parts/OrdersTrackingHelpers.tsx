@@ -27,9 +27,11 @@ import {
   typographyRoles,
 } from '@bthwani/ui-kit';
 import { DshOperationScreenState } from '../../parts/OperationScreen';
-import { getDshClientStateMeta, type DshClientState } from 'state-machines/client-state';
-import type { DshFulfillmentDeliveryMode } from '../../contracts/dsh-client-binding.contracts';
-import type { DshSmartTrackingSnapshot } from 'state-machines/dsh-order-journey.model';
+import { getDshClientStateMeta, type DshClientState } from '../../../shared/orders/orders.client-state';
+import type { DshFulfillmentDeliveryMode, CreateOrderValues } from '../../../shared/checkout/dsh-client-binding.contracts';
+import { getDshClientFlowPolicy } from '../../../shared/checkout/dsh-client-binding.contracts';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../../shared/runtime/dsh-flow-registry';
+import type { DshSmartTrackingSnapshot } from '../../../shared/orders';
 import {
   normalizeText,
   normalizeClientFacingOrderState,
@@ -37,24 +39,22 @@ import {
   buildDefaultLifecycleStatus,
   buildDefaultProofOfDelivery,
   buildDefaultWalletImpact,
-  getDshClientFlowPolicy,
-  getDshFlowPolicySummary,
   resolveEscalationOwnerLabel,
-  resolveDshOnDemandPolicyLabel,
   getClientWalletVisibilityCopy,
   lifecycleToStepId,
   getMilestoneIndex,
   FULL_JOURNEY_STEPS,
   orderChatAttachmentOptions,
   useSmartTrackingHeartbeat,
-} from '../../../shared/view-models/tracking/tracking-helpers';
+} from '../../../shared/orders';
 
 // ─── Re-export all non-UI from shared for backward compatibility ──────────────
-export type { DshTrackingTimelineItem } from '../../../shared/view-models/tracking/tracking-helpers';
-export type { CreateOrderValues, DshOrderListItem, JourneyStep, JourneyPhase, OrderChatAttachmentKind, OrderChatAttachment, OrderChatMessage } from '../../../shared/view-models/tracking/tracking-helpers';
-export { resolveEscalationOwnerLabel, normalizeText, normalizeClientFacingOrderState, getStepModeOverride, lifecycleToStepId, getMilestoneIndex, formatOrderTime, formatRelativeTime, formatDeliveryLifecycleStatus, formatExceptionReason, formatProofType, formatVerificationResult, formatFulfillmentMode, formatCapacityState, getDefaultExceptionReason, buildDefaultServiceabilityQuote, buildDefaultAddressSnapshot, buildDefaultFulfillmentModeSnapshot, buildDefaultLifecycleStatus, buildDefaultEventTimeline, buildDefaultProofOfDelivery, buildDefaultHandoffVerification, buildDefaultWalletImpact, getClientWalletVisibilityCopy, FULL_JOURNEY_STEPS, orderChatAttachmentOptions, defaultOrderListItems, defaultCreateOrderValues, SMART_TRACKING_SEQUENCE, useSmartTrackingHeartbeat, mapLiveOrderStatusToClientState } from '../../../shared/view-models/tracking/tracking-helpers';
+export type { DshTrackingTimelineItem } from '../../../shared/orders';
+export type { CreateOrderValues } from '../../../shared/checkout/dsh-client-binding.contracts';
+export type { DshOrderListItem, JourneyStep, JourneyPhase, OrderChatAttachmentKind, OrderChatAttachment, OrderChatMessage } from '../../../shared/orders';
+export { resolveEscalationOwnerLabel, normalizeText, normalizeClientFacingOrderState, getStepModeOverride, lifecycleToStepId, getMilestoneIndex, formatOrderTime, formatRelativeTime, formatDeliveryLifecycleStatus, formatExceptionReason, formatProofType, formatVerificationResult, formatFulfillmentMode, formatCapacityState, getDefaultExceptionReason, buildDefaultServiceabilityQuote, buildDefaultAddressSnapshot, buildDefaultFulfillmentModeSnapshot, buildDefaultLifecycleStatus, buildDefaultEventTimeline, buildDefaultProofOfDelivery, buildDefaultHandoffVerification, buildDefaultWalletImpact, getClientWalletVisibilityCopy, FULL_JOURNEY_STEPS, orderChatAttachmentOptions, defaultOrderListItems, defaultCreateOrderValues, SMART_TRACKING_SEQUENCE, useSmartTrackingHeartbeat, mapLiveOrderStatusToClientState } from '../../../shared/orders';
 
-import type { CreateOrderValues, DshOrderListItem, JourneyPhase, OrderChatAttachmentKind, OrderChatMessage, JourneyStep, DshTrackingTimelineItem } from '../../../shared/view-models/tracking/tracking-helpers';
+import type { DshOrderListItem, JourneyPhase, OrderChatAttachmentKind, OrderChatMessage, JourneyStep, DshTrackingTimelineItem } from '../../../shared/orders';
 
 // ─── UI-only prop types ───────────────────────────────────────────────────────
 

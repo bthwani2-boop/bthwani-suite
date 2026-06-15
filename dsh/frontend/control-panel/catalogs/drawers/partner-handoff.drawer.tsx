@@ -17,7 +17,7 @@ import {
   getDshPartnerReadinessChecklist,
   getDshPartnerVisibilityBadge,
   getDshPartnerVisibilityBadgeLabel,
-} from '../../../shared/contracts/dsh-partner-activation.model';
+} from '../../../shared/partner/dsh-partner-activation.model';
 import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

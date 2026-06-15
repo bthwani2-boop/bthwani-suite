@@ -27,7 +27,7 @@ import { ProductEditScreen } from './ProductEditScreen';
 import { CategoryManagementScreen } from './CategoryManagementScreen';
 import { ProductMediaScreen } from './ProductMediaScreen';
 import { ProductOverridesScreen } from './ProductOverridesScreen';
-import { defaultServiceModes } from '../../shared/policies/fulfillment';
+import { defaultServiceModes } from '../../shared/delivery/fulfillment';
 
 type Props = {
   route: DshPartnerRoute;

@@ -11,7 +11,7 @@ import {
   useTheme,
   ActionStrip,
 } from '@bthwani/ui-kit';
-import type { LoyaltyClientMetric, LoyaltyClientSection } from 'contracts/commercial-contract';
+import type { LoyaltyClientMetric, LoyaltyClientSection } from '../../shared/marketing/commercial-contract';
 
 export type DshLoyaltyRewardsScreenProps = {
   title?: string;

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Text, Surface } from '@bthwani/ui-kit';
@@ -9,7 +9,7 @@ import {
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerModifications, updatePartnerModificationStatus } from './workflow';
-import type { PartnerModificationRequest } from '../../shared/state-machines/workflow';
+import type { PartnerModificationRequest } from '../../shared';
 import styles from '../shared/control-panel-surface.module.css';
 
 export function PartnerModificationsWorkspace() {

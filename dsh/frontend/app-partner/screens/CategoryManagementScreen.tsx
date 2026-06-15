@@ -16,11 +16,10 @@ import {
   radius,
 } from '@bthwani/ui-kit';
 import {
-  type DshCategoryRecord,
   type DshCreateCategoryRequest,
   type DshUpdateCategoryRequest,
-} from '../../shared/api/dsh-product-api.client';
-import { useDshPartnerCategories } from '../../shared/adapters/catalog/useDshPartnerCategories';
+} from '../../shared/products/dsh-product-api.client';
+import { getDshProductRuntimeClient } from '../../shared/runtime/ui-only-runtime-clients';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

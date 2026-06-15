@@ -1,9 +1,9 @@
-﻿import React from 'react';
+import React from 'react';
 import { View } from 'react-native';
 import { Badge, Box, Divider, Icon, MobileScrollView, Text, TopBar, useTheme,
   spacing,
 } from '@bthwani/ui-kit';
-import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from '../../shared/contracts/field-store-model';
+import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from '../../shared/field';
 
 type DshFieldStoresHistoryScreenProps = {
   stores: readonly FieldStoreFile[];

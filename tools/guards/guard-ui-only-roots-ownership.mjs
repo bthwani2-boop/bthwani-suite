@@ -2,8 +2,26 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const root = process.cwd();
-const uiOnlyRoots = [
+function parseArgs(argv = process.argv.slice(2)) {
+  const args = { root: process.cwd(), mode: 'CHECK', jsonOut: '', mdOut: '' };
+  for (let i = 0; i < argv.length; i += 1) {
+    const token = argv[i];
+    if (token === '--root') args.root = argv[++i];
+    else if (token === '--mode') args.mode = argv[++i];
+    else if (token === '--json-out') args.jsonOut = argv[++i];
+    else if (token === '--md-out') args.mdOut = argv[++i];
+    else if (token.startsWith('--root=')) args.root = token.slice('--root='.length);
+    else if (token.startsWith('--mode=')) args.mode = token.slice('--mode='.length);
+    else if (token.startsWith('--json-out=')) args.jsonOut = token.slice('--json-out='.length);
+    else if (token.startsWith('--md-out=')) args.mdOut = token.slice('--md-out='.length);
+  }
+  return args;
+}
+
+const args = parseArgs();
+const root = args.root;
+const configPath = path.join(root, 'tools/guards/guard-ui-only-roots-ownership.config.json');
+let uiOnlyRoots = [
   'dsh/frontend/app-captain',
   'dsh/frontend/app-client',
   'dsh/frontend/app-field',
@@ -15,6 +33,25 @@ const uiOnlyRoots = [
   'wlt/frontend/dsh/app-partner',
   'wlt/frontend/dsh/control-panel',
 ];
+let allowlist = {};
+let globalAllowRules = [];
+
+if (fs.existsSync(configPath)) {
+  try {
+    const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    if (Array.isArray(config.uiOnlyRoots)) {
+      uiOnlyRoots = config.uiOnlyRoots;
+    }
+    if (config.allowlist && typeof config.allowlist === 'object') {
+      allowlist = config.allowlist;
+    }
+    if (Array.isArray(config.globalAllowRules)) {
+      globalAllowRules = config.globalAllowRules;
+    }
+  } catch (err) {
+    console.warn('Error reading config file:', err);
+  }
+}
 
 const extensions = new Set(['.ts', '.tsx', '.js', '.jsx']);
 const compatibilityExportOnly = /^\s*(?:export\s+\*\s+from\s+['"][^'"]*shared[^'"]*['"];?\s*|export\s+\{[\s\S]*?\}\s+from\s+['"][^'"]*shared[^'"]*['"];?\s*)+$/m;
@@ -155,6 +192,13 @@ for (const abs of files) {
     rule.regex.lastIndex = 0;
     let match;
     while ((match = rule.regex.exec(stripped)) !== null) {
+      if (globalAllowRules.includes(rule.id)) {
+        continue;
+      }
+      const allowedForFile = Object.entries(allowlist).find(([pattern]) => rel.includes(pattern));
+      if (allowedForFile && allowedForFile[1].includes(rule.id)) {
+        continue;
+      }
       findings.push({
         severity: 'FAIL',
         rule: rule.id,
@@ -177,8 +221,28 @@ const output = {
   ],
   filesScanned: files.length,
   findings,
-  failCount: findings.length,
+  failCount: findings.filter((f) => f.severity === 'FAIL').length,
+  warnCount: findings.filter((f) => f.severity === 'WARN').length,
+  infoCount: findings.filter((f) => f.severity === 'INFO').length,
 };
 
 console.log(JSON.stringify(output, null, 2));
+
+if (args.jsonOut) {
+  fs.writeFileSync(args.jsonOut, JSON.stringify(output, null, 2), 'utf8');
+}
+if (args.mdOut) {
+  const md = [
+    '# GUARD_UI_ONLY_SURFACES',
+    '',
+    `status: ${output.status}`,
+    `findings: ${output.findings.length}`,
+    '',
+    '| Severity | Rule | File | Evidence |',
+    '|---|---|---|---|',
+    ...findings.map((f) => `| ${f.severity} | ${f.rule} | ${f.file} | ${f.evidence} |`),
+  ].join('\n');
+  fs.writeFileSync(args.mdOut, md, 'utf8');
+}
+
 if (findings.length > 0) process.exitCode = 1;

@@ -3,4 +3,4 @@
   DshFieldStoreVisitState,
   DshFieldStoreVisitValues,
   DshFieldVisitEvidenceItem,
-} from '../../shared/contracts/dsh-field-visit.contract';
+} from '../../shared/dsh-field-visit.contract';

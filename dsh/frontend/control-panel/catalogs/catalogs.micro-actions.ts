@@ -1,1 +1,1 @@
-export * from '../../shared/view-models/control-panel/catalogs/catalogs.micro-actions';
+export * from '../../shared/catalog/catalogs.micro-actions';

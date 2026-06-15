@@ -1,2 +1,2 @@
 ﻿// Re-export from canonical location: dsh/frontend/shared/view-models/control-panel/platform/platform.types.ts
-export type { ProviderEnvironment, ProviderStatus, ProviderOwner, ProviderRecord } from '../../../shared/view-models/control-panel/platform/platform.types';
+export type { ProviderEnvironment, ProviderStatus, ProviderOwner, ProviderRecord } from '../../../shared/platform/platform.types';

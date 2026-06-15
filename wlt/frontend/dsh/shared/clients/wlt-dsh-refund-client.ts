@@ -4,7 +4,7 @@ import type { WltRefund, WltCreateRefundRequest, WltListRefundsResponse } from '
 export type { WltRefund, WltCreateRefundRequest, WltListRefundsResponse };
 
 export async function listRefunds(bearerToken?: string): Promise<WltListRefundsResponse> {
-  return createWltDshTypedClient({ bearerToken }).listRefunds();
+  return createWltDshTypedClient({ bearerToken }).listRefundQueue();
 }
 
 export async function getRefund(refundId: string, bearerToken?: string): Promise<WltRefund> {

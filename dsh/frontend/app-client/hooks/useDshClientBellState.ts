@@ -1,1 +1,1 @@
-export * from '../shared/view-models/notifications/useDshClientBellState';
+export { useDshClientBellState } from './useDshClientBellState.impl';

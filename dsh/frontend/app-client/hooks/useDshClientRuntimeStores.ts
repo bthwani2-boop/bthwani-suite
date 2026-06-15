@@ -1,1 +1,1 @@
-export * from '../shared/view-models/client/useDshClientRuntimeStores';
+export * from '../../shared/checkout/useDshClientRuntimeStores';
