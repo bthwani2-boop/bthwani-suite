@@ -11,7 +11,6 @@ import {
   normalizeFinanceLocation,
 } from '../../shared';
 import type { CanonicalFinanceGroupId, FinancePanelId, FinanceViewState } from '../../shared';
-import { buildWltFinancialCenter } from '../../shared';
 import {
   buildWltRuntimeFinancialCenter,
   loadWltDshFinanceRuntimeReadModel,
@@ -179,8 +178,7 @@ export function WltDshFinanceHubHost({
     if (runtimeFinance?.state === 'runtime') {
       return buildWltRuntimeFinancialCenter(businessDate, runtimeFinance.data);
     }
-
-    return buildWltFinancialCenter(businessDate, []);
+    return null;
   }, [runtimeFinance]);
 
   const runtimeSourceLabel = React.useMemo(() => {
@@ -190,20 +188,20 @@ export function WltDshFinanceHubHost({
   }, [runtimeFinance]);
 
   const pendingCount = React.useMemo(
-    () => center.allEntries.filter((e) => e.isPending).length,
+    () => center?.allEntries.filter((e) => e.isPending).length ?? 0,
     [center],
   );
 
   const openRisksCount = React.useMemo(
-    () => center.allEntries.filter((e) => e.status === 'blocked' || e.status === 'disputed').length,
+    () => center?.allEntries.filter((e) => e.status === 'blocked' || e.status === 'disputed').length ?? 0,
     [center],
   );
 
   const activeGroupMeta = getFinanceGroupMeta(activeGroup);
   const hubHref = buildFinanceHref(activeGroup, { subGroup: activeSubGroup, panel });
 
-  // Calculate Operational readiness fields
   const affectedSurfaces = React.useMemo(() => {
+    if (!center) return '—';
     const list = new Set<string>();
     center.allEntries.forEach((e) => {
       if (e.isPending || e.status === 'blocked' || e.status === 'disputed') {
@@ -218,12 +216,14 @@ export function WltDshFinanceHubHost({
   }, [center]);
 
   const requiredAction = React.useMemo(() => {
+    if (!center) return '—';
     if (center.blockingVariances.length > 0) return 'تحقيق ومطابقة الفوارق يدوياً';
     if (center.allEntries.some((e) => e.status === 'pending')) return 'اعتماد وصرف المستحقات مع WLT';
     return 'مراقبة وتدقيق الأرصدة اليومية';
   }, [center]);
 
   const operationalRisk = React.useMemo(() => {
+    if (!center) return '—';
     if (center.blockingVariances.length > 0) {
       return `يوجد فوارق معلقة (${center.blockingVariances.length} فارق نشط)`;
     }
@@ -237,6 +237,7 @@ export function WltDshFinanceHubHost({
   }, [center]);
 
   const holdsStatus = React.useMemo(() => {
+    if (!center) return '—';
     if (center.blockingVariances.length > 0) {
       return '🔒 معلق بالكامل (تسوية وصرف محجوبة)';
     }
@@ -273,16 +274,16 @@ export function WltDshFinanceHubHost({
           return <WltDshWalletControlCenter runtimeFinance={runtimeFinance} />;
         }
         if (activeSub === 'client-wallets') {
-          return <WltDshAccountStatement actorId="CUS-553" runtimeFinance={runtimeFinance} />;
+          return <WltDshAccountStatement runtimeFinance={runtimeFinance} />;
         }
         if (activeSub === 'partner-wallets') {
-          return <WltDshAccountStatement actorId="STORE-99" runtimeFinance={runtimeFinance} />;
+          return <WltDshAccountStatement runtimeFinance={runtimeFinance} />;
         }
         if (activeSub === 'captain-wallets') {
-          return <WltDshAccountStatement actorId="CAP-42" runtimeFinance={runtimeFinance} />;
+          return <WltDshAccountStatement runtimeFinance={runtimeFinance} />;
         }
         if (activeSub === 'platform-wallet') {
-          return <WltDshAccountStatement actorId="DSH-PLATFORM" runtimeFinance={runtimeFinance} />;
+          return <WltDshAccountStatement runtimeFinance={runtimeFinance} />;
         }
         return <WltDshAccountStatement runtimeFinance={runtimeFinance} />;
 
@@ -437,6 +438,28 @@ export function WltDshFinanceHubHost({
       );
     }
 
+    // Runtime unavailable: block display, no preview finance center
+    if (!center) {
+      return (
+        <FinanceStateScreen
+          icon="🔌"
+          title="WLT runtime غير متاح"
+          titleDanger
+          desc="لا يمكن عرض البيانات المالية. يتطلب WLT runtime اتصالاً حياً. لا يُعرض أي بديل أو معاينة."
+          impact={{
+            risk: "انقطاع WLT runtime",
+            affected: "كافة أسطح التحكم المالي",
+            action: "مراجعة حالة WLT runtime وإعادة المحاولة",
+            blocking: "محجوب حتى استعادة الاتصال",
+          }}
+          action={{
+            label: "إعادة المحاولة",
+            onClick: () => router.refresh(),
+          }}
+        />
+      );
+    }
+
     return renderActiveScreen(activeGroup, activeSubGroup, hubHref);
   };
 
@@ -450,7 +473,7 @@ export function WltDshFinanceHubHost({
               <h1 className={styles.surfaceHeaderTitle}>غرفة القيادة المالية</h1>
               <Box paddingX={2} paddingY={1} background="brandSurface" radiusToken="xs">
                 <span className={wltStyles.headerBadgeLabel}>
-                  {runtimeFinance?.state === 'runtime' ? 'WLT runtime' : 'معاينة عند تعذر runtime'}
+                  {runtimeFinance?.state === 'runtime' ? 'WLT runtime' : 'WLT runtime غير متاح'}
                 </span>
               </Box>
             </div>
@@ -475,8 +498,8 @@ export function WltDshFinanceHubHost({
         <div className={wltStyles.signalStrip}>
           <div className={`${wltStyles.signalCard} ${wltStyles.signalCardInfo}`}>
             <span className={wltStyles.signalLabel}>صافي المركز المالي</span>
-            <span className={`${wltStyles.signalValue} ${center.netPosition >= 0 ? wltStyles.signalValuePositive : wltStyles.signalValueNegative}`}>
-              {center.netPositionLabel}
+            <span className={`${wltStyles.signalValue} ${(center?.netPosition ?? 0) >= 0 ? wltStyles.signalValuePositive : wltStyles.signalValueNegative}`}>
+              {center?.netPositionLabel ?? '—'}
             </span>
           </div>
           <div className={`${wltStyles.signalCard} ${wltStyles.signalCardSuccess}`}>
@@ -485,10 +508,10 @@ export function WltDshFinanceHubHost({
               {pendingCount.toLocaleString('ar-YE')} ذمة
             </span>
           </div>
-          <div className={`${wltStyles.signalCard} ${center.blockingVariances.length > 0 ? wltStyles.signalCardDanger : wltStyles.signalCardSuccess}`}>
+          <div className={`${wltStyles.signalCard} ${(center?.blockingVariances.length ?? 0) > 0 ? wltStyles.signalCardDanger : wltStyles.signalCardSuccess}`}>
             <span className={wltStyles.signalLabel}>فوارق مطابقة</span>
-            <span className={`${wltStyles.signalValue} ${center.blockingVariances.length > 0 ? wltStyles.signalValueDanger : wltStyles.signalValuePositive}`}>
-              {center.blockingVariances.length.toLocaleString('ar-YE')} فوارق
+            <span className={`${wltStyles.signalValue} ${(center?.blockingVariances.length ?? 0) > 0 ? wltStyles.signalValueDanger : wltStyles.signalValuePositive}`}>
+              {(center?.blockingVariances.length ?? 0).toLocaleString('ar-YE')} فوارق
             </span>
           </div>
           <div className={`${wltStyles.signalCard} ${openRisksCount > 0 ? wltStyles.signalCardDanger : wltStyles.signalCardSuccess}`}>
@@ -535,18 +558,18 @@ export function WltDshFinanceHubHost({
           <div className={wltStyles.readinessPanel}>
             <div className={wltStyles.readinessInfo}>
               <div className={`${wltStyles.readinessIndicator} ${
-                center.blockingVariances.length > 0 ? wltStyles.readinessIndicatorBlocked :
+                (center?.blockingVariances.length ?? 0) > 0 ? wltStyles.readinessIndicatorBlocked :
                 pendingCount > 0 ? wltStyles.readinessIndicatorAction : wltStyles.readinessIndicatorReady
               }`} />
               <div className={wltStyles.readinessText}>
                 <span className={wltStyles.readinessTitle}>
                   حالة الجاهزية التشغيلية: {
-                    center.blockingVariances.length > 0 ? 'محجوب / يوجد مخاطر (Blocked / Risk)' :
+                    (center?.blockingVariances.length ?? 0) > 0 ? 'محجوب / يوجد مخاطر (Blocked / Risk)' :
                     pendingCount > 0 ? 'يحتاج إجراء (Needs action)' : 'جاهز للمطابقة (Ready)'
                   }
                 </span>
                 <span className={wltStyles.readinessDesc}>
-                  الجهد المالي للمنصة في بيئة المعاينة
+                  الجهد المالي للمنصة
                 </span>
               </div>
             </div>

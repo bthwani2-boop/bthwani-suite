@@ -8,23 +8,3 @@ export interface PlatformVarsApiClient {
   rollbackValue(key: string): Promise<void>;
   markContractReady(key: string): Promise<void>;
 }
-
-export const platformVarsMockApi: PlatformVarsApiClient = {
-  async saveProposedValue(key: string, value: string): Promise<void> {
-    await new Promise((r) => setTimeout(r, 50));
-    void key;
-    void value;
-  },
-  async applyProposedValue(key: string): Promise<void> {
-    await new Promise((r) => setTimeout(r, 50));
-    void key;
-  },
-  async rollbackValue(key: string): Promise<void> {
-    await new Promise((r) => setTimeout(r, 50));
-    void key;
-  },
-  async markContractReady(key: string): Promise<void> {
-    await new Promise((r) => setTimeout(r, 50));
-    void key;
-  },
-};

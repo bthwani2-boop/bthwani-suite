@@ -24,13 +24,10 @@ import {
   VarsDomainId,
 } from './platform-vars.view-model';
 import {
-  isPlatformVarMutationAllowed,
-  isPlatformDesignValValid,
   isPlatformDesignVar,
   PLATFORM_VAR_QUICK_PICKS,
   PlatformVarMutationAction,
 } from './platform-vars.policy';
-import { platformVarsMockApi } from './platform-vars.api';
 
 export type PlatformVarsSessionEntry = {
   readonly current: string;
@@ -59,7 +56,7 @@ export function usePlatformVarsModel({
   activeDomain: VarsDomainId;
   addAuditEvent: (event: Omit<AuditEvent, 'id' | 'timestamp'>) => void;
 }) {
-  const [varsState, setVarsState] = React.useState<Record<string, PlatformVarsSessionEntry>>(buildInitialVarsState);
+  const [varsState] = React.useState<Record<string, PlatformVarsSessionEntry>>(buildInitialVarsState);
   const [activeScope, setActiveScope] = React.useState<string>('all');
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [editVal, setEditVal] = React.useState('');
@@ -136,40 +133,24 @@ export function usePlatformVarsModel({
   const isDesign = selectedVar ? isPlatformDesignVar(selectedVar.key) : false;
   const isValidDesignVal = isDesign ? (PLATFORM_VAR_QUICK_PICKS[selectedVar?.key ?? ''] ?? []).includes(editVal) : true;
 
+  // disabled-by-policy: platform var mutations require a real backend API contract.
+  // No local save, no mock API. UI must display read-only state until API is implemented.
   const confirmSaveProposed = React.useCallback(
-    async (selectedRecord: DshPlatformVarRecord, proposedValue: string) => {
-      if (!isPlatformVarMutationAllowed('save-proposed', selectedRecord.key)) {
-        setShowConfirm(null);
-        return;
-      }
-      if (!isPlatformDesignValValid(selectedRecord.key, proposedValue)) return;
-
-      // API Call
-      await platformVarsMockApi.saveProposedValue(selectedRecord.key, proposedValue);
-
-      const prev = varsState[selectedRecord.id] ?? {
-        current: selectedRecord.currentValue,
-        proposed: selectedRecord.proposedValue ?? null,
-        status: selectedRecord.status,
-      };
-
-      setVarsState((s) => ({ ...s, [selectedRecord.id]: { ...prev, proposed: proposedValue || null } }));
-
+    async (_selectedRecord: DshPlatformVarRecord, _proposedValue: string) => {
       addAuditEvent({
-        action: `حفظ مقترح (${selectedRecord.label})`,
+        action: 'حفظ مقترح (محجوب بالسياسة)',
         operator: 'platform-operator',
-        status: 'success',
-        oldValue: prev.proposed ?? '',
-        newValue: proposedValue,
-        reason: 'حفظ قيمة مقترحة (محلي فقط)',
-        scope: selectedRecord.scope,
-        impact: selectedRecord.effectSummary,
+        status: 'blocked',
+        oldValue: '',
+        newValue: '',
+        reason: 'platform vars mutations disabled-by-policy: requires backend API contract',
+        scope: 'platform',
+        impact: 'no change applied',
         rollbackAvailable: false,
       });
-
       setShowConfirm(null);
     },
-    [varsState, addAuditEvent],
+    [addAuditEvent],
   );
 
   return {

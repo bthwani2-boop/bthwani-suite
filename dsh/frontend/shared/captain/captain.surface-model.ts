@@ -8,7 +8,6 @@ import React from 'react';
 import type {
   DshCaptainRoute,
   CaptainSupportRoute,
-  CompactOrderChatMessage,
 } from './captain.contract';
 import type {
   DshCaptainLocationPush,
@@ -20,7 +19,6 @@ import type {
 } from './captain.surface.types';
 import { buildCaptainDerived } from './captain.derived';
 
-// Import type annotations for sub-models
 import type { useCaptainAvailabilityModel } from './captain-availability.model';
 import type { useCaptainGpsModel } from './captain-gps.model';
 import type { useCaptainProfileModel } from './captain-profile.model';
@@ -44,13 +42,11 @@ export type DshCaptainSurfaceSharedProps = {
   command: DshCaptainNavigationCommand;
   captainRuntimeId: string;
 
-  // Pre-instantiated state & setters
   route: DshCaptainRoute;
   setRoute: React.Dispatch<React.SetStateAction<DshCaptainRoute>>;
   selectedSupportScreen: CaptainSupportRoute;
   setSelectedSupportScreen: React.Dispatch<React.SetStateAction<CaptainSupportRoute>>;
 
-  // Pre-instantiated topic models
   availabilityModel: ReturnType<typeof useCaptainAvailabilityModel>;
   gpsModel: ReturnType<typeof useCaptainGpsModel>;
   profileModel: ReturnType<typeof useCaptainProfileModel>;
@@ -65,12 +61,9 @@ export type DshCaptainSurfaceSharedProps = {
 };
 
 export function useDshCaptainSurfaceModel({
-  command,
-  captainRuntimeId,
   route,
   setRoute,
   selectedSupportScreen,
-  setSelectedSupportScreen,
   availabilityModel,
   gpsModel,
   profileModel,
@@ -82,12 +75,7 @@ export function useDshCaptainSurfaceModel({
   serviceModeModel,
   deliveryActions,
   pushLocation,
-}: DshCaptainSurfaceSharedProps): {
-  state: DshCaptainSurfaceState;
-  actions: ReturnType<typeof buildCaptainActions>;
-  derived: DshCaptainSurfaceDerived;
-} {
-  // ── State aggregation for backward compatibility ──────────────────────────────
+}: DshCaptainSurfaceSharedProps) {
   const state: DshCaptainSurfaceState = {
     activeServiceType: profileModel.activeServiceType,
     route,
@@ -113,7 +101,6 @@ export function useDshCaptainSurfaceModel({
     pickupSheetState: lifecycle.pickupSheetState,
   };
 
-  // ── Derived state ─────────────────────────────────────────────────────────────
   const derivedCallbacks = React.useMemo(() => ({
     toggleAvailability: availabilityModel.toggleAvailability,
     goToInbox: navModel.goToInbox,
@@ -126,40 +113,8 @@ export function useDshCaptainSurfaceModel({
     [state, derivedCallbacks],
   );
 
-  const actions = buildCaptainActions({
-    set: <k extends keyof DshCaptainSurfaceState>(
-      key: k,
-      value: DshCaptainSurfaceState[k] | ((current: DshCaptainSurfaceState[k]) => DshCaptainSurfaceState[k]),
-    ) => {
-      const applySetter = (setter: any, val: any) => {
-        if (typeof val === 'function') {
-          setter((cur: any) => val(cur));
-        } else {
-          setter(val);
-        }
-      };
-      if (key === 'route') applySetter(setRoute, value);
-      else if (key === 'inboxState') applySetter(lifecycle.setInboxState, value);
-      else if (key === 'activeOrderId') applySetter(orderModel.setActiveOrderId, value);
-      else if (key === 'selectedSupportScreen') applySetter(setSelectedSupportScreen, value);
-      else if (key === 'isPickupSheetVisible') applySetter(lifecycle.setIsPickupSheetVisible, value);
-      else if (key === 'isDeliverySheetVisible') applySetter(lifecycle.setIsDeliverySheetVisible, value);
-      else if (key === 'captainAvailabilityStatus') applySetter(availabilityModel.setCaptainAvailabilityStatus, value);
-      else if (key === 'gpsStatus') applySetter(gpsModel.setGpsStatus, value);
-      else if (key === 'activeOrderExpanded') applySetter(orderModel.setActiveOrderExpanded, value);
-      else if (key === 'activeOrderPhase') applySetter(lifecycle.setActiveOrderPhase, value);
-      else if (key === 'captainAppMode') applySetter(profileModel.setCaptainAppMode, value);
-      else if (key === 'activeOrderDraft') applySetter(chatModel.setActiveOrderDraft, value);
-      else if (key === 'activeOrderMessages') applySetter(chatModel.setActiveOrderMessages, value);
-      else if (key === 'storeCourierStage') applySetter(lifecycle.setStoreCourierStage, value);
-      else if (key === 'captainPodState') applySetter(podUpload.setCaptainPodState, value);
-      else if (key === 'captainPodPhotoUri') applySetter(podUpload.setCaptainPodPhotoUri, value);
-      else if (key === 'captainPodMediaKey') applySetter(podUpload.setCaptainPodMediaKey, value);
-      else if (key === 'isDeclineSheetVisible') applySetter(lifecycle.setIsDeclineSheetVisible, value);
-      else if (key === 'declineSheetState') applySetter(lifecycle.setDeclineSheetState, value);
-      else if (key === 'declineOrderId') applySetter(lifecycle.setDeclineOrderId, value);
-      else if (key === 'pickupSheetState') applySetter(lifecycle.setPickupSheetState, value);
-    },
+  const actions = {
+    // Navigation
     goBack: navModel.goBack,
     openOrderDetail: navModel.openOrderDetail,
     openCaptainAccount: navModel.openCaptainAccount,
@@ -167,39 +122,43 @@ export function useDshCaptainSurfaceModel({
     openSupportDirectory: navModel.openSupportDirectory,
     openCaptainSupportScreen: navModel.openCaptainSupportScreen,
     goToInbox: navModel.goToInbox,
-    resetInboxState: () => lifecycle.setInboxState('ready'),
+
+    // Route
+    setRoute,
+
+    // Inbox
+    setInboxState: lifecycle.setInboxState,
+    resetInboxState: () => lifecycle.setInboxState('ready' as const),
+
+    // Availability
+    setCaptainAvailabilityStatus: availabilityModel.setCaptainAvailabilityStatus,
+
+    // Lifecycle sheets
+    setIsPickupSheetVisible: lifecycle.setIsPickupSheetVisible,
+    setPickupSheetState: lifecycle.setPickupSheetState,
+    setIsDeliverySheetVisible: lifecycle.setIsDeliverySheetVisible,
+    setIsDeclineSheetVisible: lifecycle.setIsDeclineSheetVisible,
+    setDeclineOrderId: lifecycle.setDeclineOrderId,
+
+    // Pod upload
+    setCaptainPodPhotoUri: podUpload.setCaptainPodPhotoUri,
+    setCaptainPodMediaKey: podUpload.setCaptainPodMediaKey,
+    setCaptainPodState: podUpload.setCaptainPodState,
+
+    // Chat
     sendQuickMessage: chatModel.sendQuickMessage,
+
+    // Service mode
     handleSelectServiceType: serviceModeModel.handleSelectServiceType,
-    openStoreCourierProof: () => podUpload.openStoreCourierProof(profileModel.captainAppMode, setRoute),
     toggleStoreCourierMode: serviceModeModel.toggleStoreCourierMode,
+    openStoreCourierProof: () => podUpload.openStoreCourierProof(profileModel.captainAppMode, setRoute),
+
+    // Location
     pushLocation,
+
+    // Delivery lifecycle actions
     ...deliveryActions,
-  });
+  };
 
   return { state, actions, derived };
-}
-
-function buildCaptainActions(a: {
-  set: <k extends keyof DshCaptainSurfaceState>(key: k, value: DshCaptainSurfaceState[k] | ((c: DshCaptainSurfaceState[k]) => DshCaptainSurfaceState[k])) => void;
-  handleAcceptTask: (orderId: string) => Promise<void>;
-  handleDeclineConfirm: (orderId: string, reason: string) => Promise<void>;
-  confirmPickup: () => Promise<void>;
-  confirmDelivery: () => Promise<void>;
-  confirmPodSubmission: () => Promise<void>;
-  reportPodFailure: () => Promise<void>;
-  goBack: () => boolean;
-  openOrderDetail: (id: string) => void;
-  openCaptainAccount: () => void;
-  openCaptainAccountSection: (r: DshCaptainRoute) => void;
-  openSupportDirectory: () => void;
-  openCaptainSupportScreen: (screenId: CaptainSupportRoute) => void;
-  goToInbox: () => void;
-  resetInboxState: () => void;
-  sendQuickMessage: () => void;
-  handleSelectServiceType: (typeId: string) => void;
-  openStoreCourierProof: () => void;
-  toggleStoreCourierMode: (next: boolean) => void;
-  pushLocation: (push: DshCaptainLocationPush) => void;
-}) {
-  return a;
 }

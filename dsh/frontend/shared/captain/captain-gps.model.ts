@@ -3,9 +3,10 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
+import type { CaptainGpsStatus } from './captain.contract';
 
 export function useCaptainGpsModel() {
-  const [gpsStatus, setGpsStatus] = React.useState<'limited' | 'active' | 'inactive'>('limited');
+  const [gpsStatus, setGpsStatus] = React.useState<CaptainGpsStatus>('limited');
 
   return {
     gpsStatus,

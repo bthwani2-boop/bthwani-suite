@@ -88,6 +88,15 @@ export type DshCaptainOrdersScreenState =
   | 'offer-accepted'
   | 'loading-assignment';
 
+export type DshCaptainOrderDetailSummary = {
+  orderId: DshCaptainOrderId;
+  pickupLabel: string;
+  dropoffLabel: string;
+  etaLabel: string;
+  currentStageLabel: string;
+  nextActionLabel: string;
+};
+
 export type DshPartnerOrderAlertId =
   | 'order_needs_accept'
   | 'order_sla_risk'

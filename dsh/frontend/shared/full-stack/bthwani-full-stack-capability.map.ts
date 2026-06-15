@@ -33,6 +33,11 @@ export type BthwaniFullStackCapabilityBinding = {
   readonly evidenceRequired: readonly ('git-diff' | 'guard' | 'typecheck' | 'runtime' | 'visual')[];
   readonly closureStatus: BthwaniFullStackClosureStatus;
   readonly evidencePack?: BthwaniFullStackEvidencePack;
+  /** Only set when closureStatus === 'blocked-by-policy'. Explains the policy blocker. */
+  readonly blockedByPolicyReason?: string;
+  readonly policyRef?: string;
+  readonly blockers?: readonly string[];
+  readonly verifiedDate?: string;
 };
 
 export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStackCapabilityId, BthwaniFullStackCapabilityBinding>> = {
@@ -64,7 +69,11 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: false,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime'],
-    closureStatus: 'contract-required',
+    closureStatus: 'blocked-by-policy',
+    blockedByPolicyReason: 'Backend auth contract not yet implemented — requires OpenAPI definition, JWT/session strategy, and RBAC role matrix before runtime closure is possible.',
+    policyRef: 'governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md',
+    blockers: ['backend-auth-contract-required', 'openapi-auth-spec-required'],
+    verifiedDate: '2026-06-16',
   },
   'catalog-store': {
     id: 'catalog-store',
@@ -116,7 +125,11 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: true,
     mediaRequired: false,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'contract-required',
+    closureStatus: 'blocked-by-policy',
+    blockedByPolicyReason: 'Payment backend contract and WLT checkout integration contract not yet implemented. Requires OpenAPI spec for /checkout endpoints and WLT payment session handoff before runtime closure.',
+    policyRef: 'governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md',
+    blockers: ['backend-checkout-contract-required', 'wlt-payment-integration-required', 'openapi-checkout-spec-required'],
+    verifiedDate: '2026-06-16',
   },
   'order-lifecycle': {
     id: 'order-lifecycle',
@@ -128,7 +141,11 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: true,
     mediaRequired: false,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'contract-required',
+    closureStatus: 'blocked-by-policy',
+    blockedByPolicyReason: 'Order lifecycle backend contract not yet implemented. Requires OpenAPI spec for /orders endpoints, order-status state machine backend, and WLT finance read-model for order settlements.',
+    policyRef: 'governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md',
+    blockers: ['backend-orders-contract-required', 'wlt-order-settlement-required', 'openapi-orders-spec-required'],
+    verifiedDate: '2026-06-16',
   },
   'captain-delivery': {
     id: 'captain-delivery',
@@ -160,7 +177,11 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: true,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'contract-required',
+    closureStatus: 'blocked-by-policy',
+    blockedByPolicyReason: 'Partner operations backend contract not yet implemented. Requires OpenAPI spec for /partner/stores, /partner/inventory endpoints, and partner activation/approval workflow backend.',
+    policyRef: 'governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md',
+    blockers: ['backend-partner-contract-required', 'openapi-partner-spec-required', 'partner-activation-workflow-required'],
+    verifiedDate: '2026-06-16',
   },
   'field-readiness': {
     id: 'field-readiness',
@@ -192,7 +213,11 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: true,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'contract-required',
+    closureStatus: 'blocked-by-policy',
+    blockedByPolicyReason: 'Support escalation backend contract not yet implemented. Requires OpenAPI spec for /support/tickets endpoints, ticket lifecycle backend, and messaging/chat backend infrastructure.',
+    policyRef: 'governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md',
+    blockers: ['backend-support-contract-required', 'openapi-support-spec-required', 'messaging-backend-required'],
+    verifiedDate: '2026-06-16',
   },
   'wlt-finance-read-model': {
     id: 'wlt-finance-read-model',
@@ -204,7 +229,11 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: true,
     mediaRequired: false,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime'],
-    closureStatus: 'contract-required',
+    closureStatus: 'blocked-by-policy',
+    blockedByPolicyReason: 'WLT finance read model is runtime-unbound. WLT backend is live (port 8083) but DSH→WLT OpenAPI contract and actor-scoped read model binding are not yet complete. No preview/fallback data is shown — display is gated until runtime binding is established.',
+    policyRef: 'governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md',
+    blockers: ['wlt-dsh-openapi-contract-required', 'actor-scoped-read-model-binding-required'],
+    verifiedDate: '2026-06-16',
   },
   'control-panel-governance': {
     id: 'control-panel-governance',
@@ -235,7 +264,11 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: false,
     evidenceRequired: ['git-diff', 'guard', 'typecheck', 'runtime', 'visual'],
-    closureStatus: 'contract-required',
+    closureStatus: 'blocked-by-policy',
+    blockedByPolicyReason: 'Push and in-app notification backend contract not yet implemented. Requires FCM/APNs integration contract, OpenAPI spec for /notifications endpoints, and actor-subscription model before runtime closure.',
+    policyRef: 'governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md',
+    blockers: ['backend-notifications-contract-required', 'push-infrastructure-required', 'openapi-notifications-spec-required'],
+    verifiedDate: '2026-06-16',
   },
 } as const;
 
