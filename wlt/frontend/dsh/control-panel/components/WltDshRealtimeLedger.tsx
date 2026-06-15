@@ -9,27 +9,10 @@ import {
   mapToRealtimeLedgerDisplayRow,
   extractSortedDisplayRows,
   type WltRealtimeLedgerDisplayRow,
+  buildSimulatedLedgerDisplayRow,
 } from '../../shared';
-import { formatWltYer } from '../../shared/boundary/dshFinance.types';
 import styles from './wlt-dsh-realtime-ledger.module.css';
 
-let _simRowCounter = 0;
-function buildSimulatedLedgerDisplayRow(): WltRealtimeLedgerDisplayRow {
-  const seq = ++_simRowCounter;
-  const isCredit = seq % 2 === 0;
-  const amountMinorUnits = ((seq * 3_713) % 14_000 + 1_000) * 100;
-  const subjects = ['captain-001', 'partner-001', 'captain-002', 'partner-002'];
-  return {
-    id: `SIM-TX-${seq}`,
-    subject: subjects[seq % subjects.length],
-    isCredit,
-    transactionKindLabel: isCredit ? 'إيداع / دائن' : 'سحب / مدين',
-    amountLabel: formatWltYer(amountMinorUnits),
-    referenceId: `REF-${10_000 + (seq * 7_919) % 90_000}`,
-    createdAtDisplay: new Date().toLocaleString('ar-YE', { hour12: false }),
-    status: 'COMPLETED',
-  };
-}
 
 const STATUS_LABELS: Record<string, string> = {
   COMPLETED: 'مرحّل',

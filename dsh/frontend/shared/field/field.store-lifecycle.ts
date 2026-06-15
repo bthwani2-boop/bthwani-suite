@@ -18,11 +18,10 @@ import {
   fieldSectionLabels,
 } from './field.types';
 
+let draftIdCounter = 0;
 function generateDraftId(prefix: string): string {
-  const rand = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-    ? crypto.randomUUID().replace(/-/g, '').slice(0, 12)
-    : Math.random().toString(36).slice(2, 14).padEnd(12, '0');
-  return `${prefix}-${rand}`;
+  draftIdCounter += 1;
+  return `${prefix}-${draftIdCounter}`;
 }
 
 function formatNowLabel() {
@@ -250,12 +249,12 @@ function createBaseStore(overrides?: Partial<FieldStoreFile>): FieldStoreFile {
 }
 
 export function createManualFieldStore(): FieldStoreFile {
-  const draftLocalId = generateDraftId('field-store-draft');
+  const draftLocalId = generateDraftId('field-store-local-ui-draft');
   return createBaseStore({
     id: draftLocalId,
-    source: 'local-draft',
+    source: 'local-ui-draft',
     draftLocalId,
-    syncStatus: 'local-draft',
+    syncStatus: 'local-ui-draft',
     draft: createEmptyDraft({ lastSavedLabel: 'مسودة جديدة' }),
   });
 }

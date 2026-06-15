@@ -15,7 +15,7 @@ export type FieldFulfillmentModeAgreement = {
 };
 
 export type FieldStatusTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
-export type FieldLeadSource = 'candidate' | 'manual' | 'local-draft' | 'backend';
+export type FieldLeadSource = 'candidate' | 'manual' | 'local-ui-draft' | 'backend';
 
 export type FieldLeadStatus =
   | 'new-lead'
@@ -72,7 +72,7 @@ export type FieldStoreFile = {
   id: string;
   source: FieldLeadSource;
   draftLocalId?: string;
-  syncStatus?: 'local-draft' | 'backend' | 'syncing' | 'sync-failed';
+  syncStatus?: 'local-ui-draft' | 'backend' | 'syncing' | 'sync-failed';
   name: string;
   category: string;
   location: string;

@@ -15,6 +15,7 @@ import {
 import { useFieldDraftModel } from './field-draft.model';
 import { useFieldVisitModel } from './field-visit.model';
 import { useFieldEscalationModel } from './field-escalation.model';
+import { useFieldReadinessModel } from './field-readiness.model';
 
 export type { DshFieldReadinessEscalationState, DshFieldEscalationTargetModel } from './field-escalation.model';
 
@@ -35,6 +36,8 @@ export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
     return draftModel.stores.find((s) => s.id === (route as { storeId: string }).storeId) ?? null;
   }, [route, draftModel.stores]);
 
+  const readiness = useFieldReadinessModel(activeStore);
+
   // Guard: if current route points to a deleted storeId, fall back to stores list
   React.useEffect(() => {
     if ('storeId' in route && !activeStore) {
@@ -51,6 +54,7 @@ export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
       visitValues: visitModel.visitValues,
       visitErrors: visitModel.visitErrors,
       readinessEscalationStateByStore: escalationModel.readinessEscalationStateByStore,
+      readiness,
       bottomNav: {
         activeId: resolveFieldBottomActiveId(route),
         visible: canFieldShowBottomNav(route),

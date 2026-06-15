@@ -4,13 +4,13 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import {
-  type DshCaptainRoute,
-  type CaptainAvailabilityStatus,
-  type CaptainAppMode,
-  type CaptainSupportRoute,
-  type CompactOrderChatMessage,
-  type CaptainServiceType,
+import type {
+  DshCaptainRoute,
+  CaptainAvailabilityStatus,
+  CaptainAppMode,
+  CaptainSupportRoute,
+  CompactOrderChatMessage,
+  CaptainServiceType,
 } from './captain.contract';
 import {
   type DshCaptainLocationPush,
@@ -22,13 +22,21 @@ import type {
   DshCaptainSurfaceState,
   DshCaptainSurfaceDerived,
 } from './captain.surface.types';
-import { useCaptainDeliveryActions } from './captain.delivery-actions';
 import { buildCaptainDerived } from './captain.derived';
 import { getRouteForCommandTarget } from '../delivery/delivery.policy';
+
+// Topic models
+import { useCaptainAvailabilityModel } from './captain-availability.model';
+import { useCaptainGpsModel } from './captain-gps.model';
+import { useCaptainProfileModel } from './captain-profile.model';
+import { useDeliveryLifecycle } from '../delivery/delivery.lifecycle';
+import { useCaptainDeliveryActions } from '../delivery/delivery.actions';
+import { usePodUploadFlow } from '../media/pod/pod-upload-flow';
+import { useCaptainOrderModel } from '../orders/captain-order.model';
+import { useCaptainChatModel } from '../support/captain-chat.model';
+
 import { useCaptainNavigationModel } from './captain-navigation.model';
-import { useCaptainChatModel } from './captain-chat.model';
 import { useCaptainServiceModeModel } from './captain-service-mode.model';
-import { useCaptainPodModel } from './captain-pod.model';
 
 export type {
   ActiveOrderPhase,
@@ -38,100 +46,114 @@ export type {
   DshCaptainSurfaceDerived,
 } from './captain.surface.types';
 
-
-type ObjectStateAction<S> = { readonly key: keyof S; readonly value: S[keyof S] | ((current: S[keyof S]) => S[keyof S]) };
-
-function useObjectState<S extends Record<string, unknown>>(initialState: S) {
-  const reducer = React.useCallback((state: S, action: ObjectStateAction<S>): S => {
-    const next = typeof action.value === 'function'
-      ? (action.value as (c: S[keyof S]) => S[keyof S])(state[action.key])
-      : action.value;
-    return { ...state, [action.key]: next };
-  }, []);
-  const [state, dispatch] = React.useReducer(reducer, initialState);
-  const set = React.useCallback(<k extends keyof S>(key: k, value: S[k] | ((current: S[k]) => S[k])) => {
-    dispatch({ key, value: value as ObjectStateAction<S>['value'] });
-  }, []);
-  return [state, set] as const;
-}
-
 export function useDshCaptainSurfaceModel(
   command: DshCaptainNavigationCommand,
   captainRuntimeId: string,
 ): { state: DshCaptainSurfaceState; actions: ReturnType<typeof buildCaptainActions>; derived: DshCaptainSurfaceDerived } {
-  const [state, set] = useObjectState<DshCaptainSurfaceState>({
-    activeServiceType: 'dsh',
-    route: getRouteForCommandTarget(command.target),
-    inboxState: 'ready',
-    activeOrderId: '',
-    selectedSupportScreen: 'orders-list',
-    isPickupSheetVisible: false,
-    isDeliverySheetVisible: false,
-    captainAvailabilityStatus: 'available',
-    gpsStatus: 'limited',
-    activeOrderExpanded: false,
-    activeOrderPhase: 'pickup',
-    captainAppMode: 'bthwani_captain_mode',
-    activeOrderDraft: '',
-    activeOrderMessages: [],
-    storeCourierStage: 'ready_for_pickup',
-    captainPodState: 'ready',
-    captainPodPhotoUri: undefined,
-    captainPodMediaKey: undefined,
-    isDeclineSheetVisible: false,
-    declineSheetState: 'ready',
-    declineOrderId: '',
-    pickupSheetState: 'ready',
-  });
+  const [route, setRoute] = React.useState<DshCaptainRoute>(getRouteForCommandTarget(command.target));
+  const [selectedSupportScreen, setSelectedSupportScreen] = React.useState<CaptainSupportRoute>('orders-list');
+
+  // Topic states and actions
+  const availabilityModel = useCaptainAvailabilityModel();
+  const gpsModel = useCaptainGpsModel();
+  const profileModel = useCaptainProfileModel();
+  const lifecycle = useDeliveryLifecycle();
+  const podUpload = usePodUploadFlow();
+  const orderModel = useCaptainOrderModel();
+  const chatModel = useCaptainChatModel();
 
   const captainOrderRuntime = useCaptainOrderRuntime();
   useCaptainActiveLocationPush({
-    activeOrderId: state.activeOrderId,
+    activeOrderId: orderModel.activeOrderId,
     captainId: captainRuntimeId,
-    lifecycleStatus: state.inboxState,
+    lifecycleStatus: lifecycle.inboxState,
   });
 
-  // ── Topic models ─────────────────────────────────────────────────────────────
-  const navModel = useCaptainNavigationModel({ command, route: state.route, set });
-  const chatModel = useCaptainChatModel({ activeOrderDraft: state.activeOrderDraft, set });
-  const serviceModeModel = useCaptainServiceModeModel({ set });
-  const podModel = useCaptainPodModel({ captainAppMode: state.captainAppMode, set });
+  // ── Topic models navigation & mode switching ─────────────────────────────────
+  const navModel = useCaptainNavigationModel({
+    command,
+    route,
+    setRoute,
+    setActiveOrderId: orderModel.setActiveOrderId,
+    setSelectedSupportScreen,
+  });
+
+  const serviceModeModel = useCaptainServiceModeModel({
+    setActiveServiceType: profileModel.setActiveServiceType,
+    setRoute,
+    setInboxState: lifecycle.setInboxState,
+    setActiveOrderId: orderModel.setActiveOrderId,
+    setActiveOrderExpanded: orderModel.setActiveOrderExpanded,
+    setIsPickupSheetVisible: lifecycle.setIsPickupSheetVisible,
+    setIsDeliverySheetVisible: lifecycle.setIsDeliverySheetVisible,
+    setCaptainAppMode: profileModel.setCaptainAppMode,
+  });
 
   // ── Reset helpers shared across delivery + pod ────────────────────────────────
   const resetOrderState = React.useCallback(() => {
-    set('activeOrderExpanded', false);
-    set('activeOrderPhase', 'pickup');
-    set('activeOrderDraft', '');
-    set('activeOrderMessages', []);
-    podModel.resetPodFields();
-  }, [set, podModel]);
+    orderModel.setActiveOrderExpanded(false);
+    lifecycle.setActiveOrderPhase('pickup');
+    chatModel.setActiveOrderDraft('');
+    chatModel.setActiveOrderMessages([]);
+    podUpload.resetPodFields();
+  }, [orderModel, lifecycle, chatModel, podUpload]);
 
   // ── Delivery actions ──────────────────────────────────────────────────────────
   const deliveryActions = useCaptainDeliveryActions({
-    captainOrderRuntime,
     captainRuntimeId,
-    activeOrderId: state.activeOrderId,
-    captainPodPhotoUri: state.captainPodPhotoUri,
-    captainPodMediaKey: state.captainPodMediaKey,
-    captainAppMode: state.captainAppMode,
-    set,
+    activeOrderId: orderModel.activeOrderId,
+    setActiveOrderId: orderModel.setActiveOrderId,
+    captainPodPhotoUri: podUpload.captainPodPhotoUri,
+    captainPodMediaKey: podUpload.captainPodMediaKey,
+    captainAppMode: profileModel.captainAppMode,
+    setRoute,
     resetOrderState,
+    inboxState: lifecycle.inboxState,
+    setInboxState: lifecycle.setInboxState,
+    setStoreCourierStage: lifecycle.setStoreCourierStage,
+    setIsDeclineSheetVisible: lifecycle.setIsDeclineSheetVisible,
+    setDeclineSheetState: lifecycle.setDeclineSheetState,
+    setIsPickupSheetVisible: lifecycle.setIsPickupSheetVisible,
+    setPickupSheetState: lifecycle.setPickupSheetState,
+    setActiveOrderPhase: lifecycle.setActiveOrderPhase,
+    setActiveOrderMessages: chatModel.setActiveOrderMessages,
+    setCaptainPodState: podUpload.setCaptainPodState,
+    setActiveOrderExpanded: orderModel.setActiveOrderExpanded,
   });
 
-  const resetInboxState = React.useCallback(() => set('inboxState', 'ready'), [set]);
-
-  const pushLocation = React.useCallback(
-    (push: DshCaptainLocationPush) => captainOrderRuntime.pushLocation(push),
-    [captainOrderRuntime],
-  );
+  // ── State aggregation for backward compatibility ──────────────────────────────
+  const state: DshCaptainSurfaceState = {
+    activeServiceType: profileModel.activeServiceType,
+    route,
+    inboxState: lifecycle.inboxState,
+    activeOrderId: orderModel.activeOrderId,
+    selectedSupportScreen,
+    isPickupSheetVisible: lifecycle.isPickupSheetVisible,
+    isDeliverySheetVisible: lifecycle.isDeliverySheetVisible,
+    captainAvailabilityStatus: availabilityModel.captainAvailabilityStatus,
+    gpsStatus: gpsModel.gpsStatus,
+    activeOrderExpanded: orderModel.activeOrderExpanded,
+    activeOrderPhase: lifecycle.activeOrderPhase,
+    captainAppMode: profileModel.captainAppMode,
+    activeOrderDraft: chatModel.activeOrderDraft,
+    activeOrderMessages: chatModel.activeOrderMessages,
+    storeCourierStage: lifecycle.storeCourierStage,
+    captainPodState: podUpload.captainPodState,
+    captainPodPhotoUri: podUpload.captainPodPhotoUri,
+    captainPodMediaKey: podUpload.captainPodMediaKey,
+    isDeclineSheetVisible: lifecycle.isDeclineSheetVisible,
+    declineSheetState: lifecycle.declineSheetState,
+    declineOrderId: lifecycle.declineOrderId,
+    pickupSheetState: lifecycle.pickupSheetState,
+  };
 
   // ── Derived state ─────────────────────────────────────────────────────────────
   const derivedCallbacks = React.useMemo(() => ({
-    toggleAvailability: () => set('captainAvailabilityStatus', (c: CaptainAvailabilityStatus) => c === 'available' ? 'unavailable' : 'available'),
+    toggleAvailability: availabilityModel.toggleAvailability,
     goToInbox: navModel.goToInbox,
-    resetInboxState,
-    toggleOrderExpanded: () => set('activeOrderExpanded', (c: boolean) => !c),
-  }), [set, navModel.goToInbox, resetInboxState]);
+    resetInboxState: () => lifecycle.setInboxState('ready'),
+    toggleOrderExpanded: orderModel.toggleOrderExpanded,
+  }), [availabilityModel.toggleAvailability, navModel.goToInbox, lifecycle, orderModel.toggleOrderExpanded]);
 
   const derived: DshCaptainSurfaceDerived = React.useMemo(
     () => buildCaptainDerived(state, derivedCallbacks),
@@ -139,7 +161,39 @@ export function useDshCaptainSurfaceModel(
   );
 
   const actions = buildCaptainActions({
-    set,
+    set: <k extends keyof DshCaptainSurfaceState>(
+      key: k,
+      value: DshCaptainSurfaceState[k] | ((current: DshCaptainSurfaceState[k]) => DshCaptainSurfaceState[k]),
+    ) => {
+      const applySetter = (setter: any, val: any) => {
+        if (typeof val === 'function') {
+          setter((cur: any) => val(cur));
+        } else {
+          setter(val);
+        }
+      };
+      if (key === 'route') applySetter(setRoute, value);
+      else if (key === 'inboxState') applySetter(lifecycle.setInboxState, value);
+      else if (key === 'activeOrderId') applySetter(orderModel.setActiveOrderId, value);
+      else if (key === 'selectedSupportScreen') applySetter(setSelectedSupportScreen, value);
+      else if (key === 'isPickupSheetVisible') applySetter(lifecycle.setIsPickupSheetVisible, value);
+      else if (key === 'isDeliverySheetVisible') applySetter(lifecycle.setIsDeliverySheetVisible, value);
+      else if (key === 'captainAvailabilityStatus') applySetter(availabilityModel.setCaptainAvailabilityStatus, value);
+      else if (key === 'gpsStatus') applySetter(gpsModel.setGpsStatus, value);
+      else if (key === 'activeOrderExpanded') applySetter(orderModel.setActiveOrderExpanded, value);
+      else if (key === 'activeOrderPhase') applySetter(lifecycle.setActiveOrderPhase, value);
+      else if (key === 'captainAppMode') applySetter(profileModel.setCaptainAppMode, value);
+      else if (key === 'activeOrderDraft') applySetter(chatModel.setActiveOrderDraft, value);
+      else if (key === 'activeOrderMessages') applySetter(chatModel.setActiveOrderMessages, value);
+      else if (key === 'storeCourierStage') applySetter(lifecycle.setStoreCourierStage, value);
+      else if (key === 'captainPodState') applySetter(podUpload.setCaptainPodState, value);
+      else if (key === 'captainPodPhotoUri') applySetter(podUpload.setCaptainPodPhotoUri, value);
+      else if (key === 'captainPodMediaKey') applySetter(podUpload.setCaptainPodMediaKey, value);
+      else if (key === 'isDeclineSheetVisible') applySetter(lifecycle.setIsDeclineSheetVisible, value);
+      else if (key === 'declineSheetState') applySetter(lifecycle.setDeclineSheetState, value);
+      else if (key === 'declineOrderId') applySetter(lifecycle.setDeclineOrderId, value);
+      else if (key === 'pickupSheetState') applySetter(lifecycle.setPickupSheetState, value);
+    },
     goBack: navModel.goBack,
     openOrderDetail: navModel.openOrderDetail,
     openCaptainAccount: navModel.openCaptainAccount,
@@ -147,12 +201,12 @@ export function useDshCaptainSurfaceModel(
     openSupportDirectory: navModel.openSupportDirectory,
     openCaptainSupportScreen: navModel.openCaptainSupportScreen,
     goToInbox: navModel.goToInbox,
-    resetInboxState,
+    resetInboxState: () => lifecycle.setInboxState('ready'),
     sendQuickMessage: chatModel.sendQuickMessage,
     handleSelectServiceType: serviceModeModel.handleSelectServiceType,
-    openStoreCourierProof: podModel.openStoreCourierProof,
+    openStoreCourierProof: () => podUpload.openStoreCourierProof(profileModel.captainAppMode, setRoute),
     toggleStoreCourierMode: serviceModeModel.toggleStoreCourierMode,
-    pushLocation,
+    pushLocation: (push: DshCaptainLocationPush) => captainOrderRuntime.pushLocation(push),
     ...deliveryActions,
   });
 

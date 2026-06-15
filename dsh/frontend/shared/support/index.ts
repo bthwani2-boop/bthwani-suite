@@ -8,3 +8,5 @@ export * from './support.captain-escalation';
 export * from './support.partner-policies';
 export * from './support.partner-context';
 export * from './support.types';
+export * from './partner-support.model';
+export * from './captain-chat.model';

@@ -31,3 +31,42 @@ export function createWalletFundingDeepLink(amountMinorUnits: number): WltPaymen
 export function resolveDeepLinkUrl(link: WltPaymentDeepLink): string {
   return link.url;
 }
+
+export function validatePaymentDeepLink(urlStr: string): { orderId: string; amountYer: number; version: string } {
+  const prefix = `${WLT_DEEPLINK_SCHEME}://pay?`;
+  if (!urlStr.startsWith(prefix)) {
+    throw new Error('wlt:deeplink:invalid_scheme_or_host');
+  }
+
+  const queryString = urlStr.slice(prefix.length);
+  const params = new Map<string, string>();
+  for (const part of queryString.split('&')) {
+    const [key, val] = part.split('=');
+    if (key) {
+      params.set(key, decodeURIComponent(val || ''));
+    }
+  }
+
+  const orderId = params.get('order');
+  const amountStr = params.get('amount');
+  const version = params.get('v');
+
+  if (!orderId || !orderId.trim()) {
+    throw new Error('wlt:deeplink:empty_order_id');
+  }
+
+  if (!amountStr) {
+    throw new Error('wlt:deeplink:missing_amount');
+  }
+
+  const amountYer = parseFloat(amountStr);
+  if (isNaN(amountYer) || amountYer <= 0) {
+    throw new Error('wlt:deeplink:non_positive_amount');
+  }
+
+  if (version !== WLT_DEEPLINK_VERSION) {
+    throw new Error('wlt:deeplink:unsupported_version');
+  }
+
+  return { orderId, amountYer, version };
+}

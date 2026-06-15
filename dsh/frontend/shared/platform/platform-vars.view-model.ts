@@ -14,6 +14,15 @@ import type {
 
 export type VarsDomainId = 'dsh' | 'wlt' | 'provider' | 'policy' | 'design';
 
+export const DOMAIN_TABS: readonly { id: VarsDomainId; label: string }[] = [
+  { id: 'dsh',      label: 'عمليات DSH' },
+  { id: 'wlt',      label: 'جسر WLT' },
+  { id: 'provider', label: 'المزودين' },
+  { id: 'design',   label: 'سياسات الهوية' },
+  { id: 'policy',   label: 'الأسبقية' },
+] as const;
+
+
 // Domain record registries — populated when backend contracts are implemented.
 // All mutations MUST go through backend API; no local apply permitted.
 export const DSH_PLATFORM_AUDIT_LOG: DshPlatformAuditEntry[] = [];

@@ -4,3 +4,4 @@ export * from './partner.adapters';
 export * from './partner.journey';
 export * from './partner.workflow';
 export * from './partner.surface-model';
+export * from './partner-profile.model';

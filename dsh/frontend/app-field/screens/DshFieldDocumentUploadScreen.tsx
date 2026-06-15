@@ -21,7 +21,7 @@ import {
 } from '@bthwani/ui-kit';
 import { getDshFlowPolicySummary } from '../../shared/runtime/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/dsh-governance.map';
-import { resolveFieldDocumentDraftMediaKey } from '../../shared/field';
+import { resolveFieldDocumentDraftMediaKey } from '../../shared/media';
 import type { DshFieldDocumentKind } from '../../shared/field/dsh-field-document-client';
 
 export type DshFieldDocumentUploadScreenProps = {

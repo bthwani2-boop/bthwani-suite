@@ -4,41 +4,23 @@ import React from 'react';
 import { Box } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { usePlatformAuditState } from '../usePlatformAuditState';
-import type {
-  DshPlatformVarScope,
-  DshPlatformVarStatus,
-} from './vars.types';
 import {
   PLATFORM_VAR_STATUS_BADGE,
   PLATFORM_VAR_RISK_CSS_CLASS,
   PLATFORM_VAR_RISK_LABEL,
   PLATFORM_VAR_STATUS_LABEL,
-  PLATFORM_VAR_QUICK_PICKS,
-  isPlatformDesignVar,
 } from '../../../shared/platform/platform-vars.policy';
 import {
   DSH_PLATFORM_AUDIT_LOG,
-  DSH_PLATFORM_OPERATIONAL_VARS,
-  DSH_PLATFORM_PROVIDER_CONTROL_VARS,
-  DSH_PLATFORM_SCOPE_PRECEDENCE,
   DSH_PLATFORM_POLICY_SCENARIOS,
-  resolvePlatformVarsDomainRecords,
-  sortPlatformVarsByScope,
+  DSH_PLATFORM_SCOPE_PRECEDENCE,
   resolvePlatformVarsDomainKpis,
-  resolvePlatformVarsFilteredScopes,
   isProviderVarRecord,
   type VarsDomainId,
 } from '../../../shared/platform/platform-vars.view-model';
-import { usePlatformVarsSession } from '../../../shared/platform/platform-vars.session';
+import { usePlatformVarsModel } from '../../../shared/platform/platform-vars.model';
+import type { DshPlatformVarRecord, DshPlatformVarStatus } from '../../../shared/platform/platform.types';
 import styles from './dsh-platform-vars.module.css';
-
-const DOMAIN_TABS: { id: VarsDomainId; label: string }[] = [
-  { id: 'dsh',      label: 'عمليات DSH' },
-  { id: 'wlt',      label: 'جسر WLT' },
-  { id: 'provider', label: 'المزودين' },
-  { id: 'design',   label: 'سياسات الهوية' },
-  { id: 'policy',   label: 'الأسبقية' },
-];
 
 const STATUS_BADGE: Record<DshPlatformVarStatus, { label: string; cls: string }> = {
   'runtime-bound':       { label: PLATFORM_VAR_STATUS_BADGE['runtime-bound'].label,       cls: styles[PLATFORM_VAR_STATUS_BADGE['runtime-bound'].cssClass] },
@@ -57,9 +39,6 @@ const RISK_DOT: Record<DshPlatformVarRecord['risk'], string> = {
 const RISK_LABEL: Record<DshPlatformVarRecord['risk'], string> = PLATFORM_VAR_RISK_LABEL;
 
 const STATUS_LABEL: Record<DshPlatformVarStatus, string> = PLATFORM_VAR_STATUS_LABEL;
-
-
-const QUICK_PICKS = PLATFORM_VAR_QUICK_PICKS;
 
 /* ─── VAR ROW (compact list item) ─── */
 function VarRow({
@@ -108,58 +87,31 @@ function RefCard({ title, desc, footer }: { title: string; desc: string; footer?
 /* ─── MAIN ─── */
 export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainFilter: VarsDomainId }) {
   const { addAuditEvent } = usePlatformAuditState();
-  const { getLive, editVal, setEditVal, showConfirm, setShowConfirm, confirmSaveProposed } =
-    usePlatformVarsSession(addAuditEvent);
+  const {
+    activeScope,
+    setActiveScope,
+    selectedId,
+    setSelectedId,
+    editVal,
+    setEditVal,
+    showConfirm,
+    setShowConfirm,
+    filteredRecords,
+    selectedVar,
+    orderedScopes,
+    linkedScenarios,
+    linkedAudits,
+    quickPicks,
+    hasProposed,
+    isDesignVar,
+    isValidDesignVal,
+    confirmSaveProposed,
+  } = usePlatformVarsModel({ activeDomain: activeDomainFilter, addAuditEvent });
 
   const activeDomain = activeDomainFilter;
-  const [activeScope,  setActiveScope]  = React.useState<string>('all');
-  const [selectedId,   setSelectedId]   = React.useState<string | null>(
-    DSH_PLATFORM_OPERATIONAL_VARS[0]?.id ?? null
-  );
-
-  /* reset on domain change */
-  React.useEffect(() => {
-    setActiveScope('all');
-    setShowConfirm(null);
-    const records = resolvePlatformVarsDomainRecords(activeDomain);
-    const first = records[0] ?? null;
-    setSelectedId(first?.id ?? null);
-    setEditVal(first ? (getLive(first).proposedValue ?? '') : '');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeDomain]);
-
-  /* reset on var change */
-  React.useEffect(() => {
-    setShowConfirm(null);
-    if (!selectedId) return;
-    const all = [
-      ...DSH_PLATFORM_OPERATIONAL_VARS,
-      ...DSH_PLATFORM_PROVIDER_CONTROL_VARS,
-    ];
-    const found = all.find((r) => r.id === selectedId);
-    if (found) setEditVal(getLive(found).proposedValue ?? '');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId]);
-
-  const domainRecords   = sortPlatformVarsByScope(resolvePlatformVarsDomainRecords(activeDomain));
-  const filteredRecords = activeScope === 'all'
-    ? domainRecords
-    : domainRecords.filter((r) => r.scope === (activeScope as DshPlatformVarScope));
-
-  const rawSelected  = filteredRecords.find((r) => r.id === selectedId) ?? filteredRecords[0] ?? domainRecords[0] ?? null;
-  const selectedVar  = rawSelected ? getLive(rawSelected) : null;
-
-  const orderedScopes = resolvePlatformVarsFilteredScopes(domainRecords);
-
-  const linkedScenarios = selectedVar ? DSH_PLATFORM_POLICY_SCENARIOS.filter((s) => s.relatedKeys.includes(selectedVar.key)) : [];
-  const linkedAudits    = selectedVar ? DSH_PLATFORM_AUDIT_LOG.filter((e) => e.targetKey === selectedVar.key) : [];
   const kpiCssClasses = { warning: styles.kpiCellWarning, success: styles.kpiCellSuccess, danger: styles.kpiCellDanger };
-  const kpis          = resolvePlatformVarsDomainKpis(activeDomain, kpiCssClasses);
-  const quickPicks      = selectedVar ? (QUICK_PICKS[selectedVar.key] ?? []) : [];
+  const kpis = resolvePlatformVarsDomainKpis(activeDomain, kpiCssClasses);
 
-  const hasProposed = Boolean(selectedVar?.proposedValue);
-  const isDesignVar = selectedVar ? isPlatformDesignVar(selectedVar.key) : false;
-  const isValidDesignVal = isDesignVar ? (QUICK_PICKS[selectedVar?.key ?? ''] ?? []).includes(editVal) : true;
 
   return (
     <Box gap={4}>

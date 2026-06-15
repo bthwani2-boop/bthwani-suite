@@ -43,3 +43,21 @@ export function extractSortedDisplayRows(
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .map(mapToRealtimeLedgerDisplayRow);
 }
+
+let _simRowCounter = 0;
+export function buildSimulatedLedgerDisplayRow(): WltRealtimeLedgerDisplayRow {
+  const seq = ++_simRowCounter;
+  const isCredit = seq % 2 === 0;
+  const amountMinorUnits = ((seq * 3_713) % 14_000 + 1_000) * 100;
+  const subjects = ['captain-001', 'partner-001', 'captain-002', 'partner-002'];
+  return {
+    id: `SIM-TX-${seq}`,
+    subject: subjects[seq % subjects.length],
+    isCredit,
+    transactionKindLabel: isCredit ? 'إيداع / دائن' : 'سحب / مدين',
+    amountLabel: formatWltYer(amountMinorUnits),
+    referenceId: `REF-${10_000 + (seq * 7_919) % 90_000}`,
+    createdAtDisplay: new Date().toLocaleString('ar-YE', { hour12: false }),
+    status: 'COMPLETED',
+  };
+}

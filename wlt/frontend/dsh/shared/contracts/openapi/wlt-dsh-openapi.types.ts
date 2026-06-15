@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/wlt/dsh/client/wallet/summary": {
+    "/health": {
         parameters: {
             query?: never;
             header?: never;
@@ -12,10 +12,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get client wallet summary
-         * @description WLT-owned. Returns wallet balance and linked state for the authenticated client. Execution is WLT-owned — DSH client surface is a read-only consumer.
+         * Service health probe
+         * @description Liveness probe — returns ok when the WLT service is running and accepting requests.
          */
-        get: operations["getClientWalletSummary"];
+        get: operations["getHealth"];
         put?: never;
         post?: never;
         delete?: never;
@@ -24,7 +24,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/wlt/dsh/client/payment-sessions": {
+    "/payment/sessions": {
         parameters: {
             query?: never;
             header?: never;
@@ -34,29 +34,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create a payment session for a client checkout
-         * @description WLT-owned. DSH submits a payment session candidate from its checkout intent. WLT validates client balance and policy, then returns a sessionId.
-         *     PRIMARY FLOW — callback:
-         *       WLT sends payment decision to DSH via POST /checkout/payment-callback on the DSH backend.
-         *       WLT must include X-WLT-Callback-Token, X-WLT-Event-Id, and Idempotency-Key.
-         *       DSH MUST NOT create the order until it receives a confirmed callback from WLT.
-         *       DSH stores sessionId as wlt_payment_ref_id (operational reference only).
-         *
-         *     FALLBACK — polling:
-         *       DSH MAY poll GET /wlt/dsh/client/payment-sessions/{sessionId} as a fallback
-         *       to verify status if the callback was not received (network failure, retry window).
-         *       Polling is secondary and MUST NOT replace the callback as the primary trigger.
-         *
-         *     Idempotency-Key header is required to prevent duplicate charges. Execution is WLT-owned — DSH is input-only (DSH_PAYMENT_INPUT_ONLY).
+         * Create payment session (DSH checkout handoff to WLT)
+         * @description DSH calls this when the client confirms checkout. WLT creates a payment session and holds the funds.
          */
-        post: operations["createClientPaymentSession"];
+        post: operations["createPaymentSession"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/wlt/dsh/client/payment-sessions/{sessionId}": {
+    "/payment/sessions/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -64,10 +52,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Poll payment session status (fallback only)
-         * @description WLT-owned. FALLBACK verification endpoint — use only if primary callback was not received. Primary flow: WLT sends POST /checkout/payment-callback to DSH after payment decision. DSH uses this endpoint as a retry/reconciliation probe only, not as the primary order trigger. Execution is WLT-owned — DSH reads result only.
+         * Get payment session status
+         * @description Returns the current state and metadata of a payment session by ID.
          */
-        get: operations["getClientPaymentSessionStatus"];
+        get: operations["getPaymentSession"];
         put?: never;
         post?: never;
         delete?: never;
@@ -76,7 +64,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/wlt/dsh/client/top-up-sessions": {
+    "/payment/sessions/{id}/confirm": {
         parameters: {
             query?: never;
             header?: never;
@@ -86,37 +74,19 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create a top-up session for client wallet
-         * @description WLT-owned. Initiates a wallet top-up flow for the client when tied to a DSH checkout/wallet recovery flow. WLT returns a redirectUrl for the hosted top-up flow. DSH displays the redirect — does not process the top-up itself. Idempotency-Key header is required to prevent duplicate top-ups. Execution is WLT-owned — DSH client surface is a read-only consumer.
+         * Confirm payment — provider webhook or operator test-confirm
+         * @description WLT confirms payment and calls DSH POST /checkout/payment-callback:
+         *       X-WLT-Callback-Token, X-WLT-Event-Id, Idempotency-Key headers
+         *       Body: {intent_id, wlt_payment_ref_id, status: "confirmed"}
          */
-        post: operations["createClientTopUpSession"];
+        post: operations["confirmPaymentSession"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/wlt/dsh/captain/eligibility": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get captain eligibility balance
-         * @description WLT-owned. Returns captain wallet eligibility state for order acceptance. Execution is WLT-owned — DSH captain surface is a read-only consumer.
-         */
-        get: operations["getCaptainEligibility"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/captain/top-up-sessions": {
+    "/payment/sessions/{id}/fail": {
         parameters: {
             query?: never;
             header?: never;
@@ -126,141 +96,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create a top-up session for captain wallet
-         * @description WLT-owned. Initiates a wallet top-up flow for the captain. Idempotency-Key header is required to prevent duplicate top-ups. Execution is WLT-owned — DSH captain surface is a read-only consumer.
+         * Fail payment — provider webhook or operator
+         * @description Transitions payment session to FAILED state and notifies DSH via payment callback.
          */
-        post: operations["createCaptainTopUpSession"];
+        post: operations["failPaymentSession"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/wlt/dsh/captain/cod-liabilities": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get captain COD liability summary
-         * @description WLT-owned. Returns outstanding COD liability for the captain. Execution is WLT-owned — DSH captain surface is a read-only consumer.
-         */
-        get: operations["getCaptainCodLiabilities"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/captain/earnings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get captain earnings ledger
-         * @description WLT-owned. Returns captain earnings ledger entries. Execution is WLT-owned — DSH captain surface is a read-only consumer.
-         */
-        get: operations["getCaptainEarnings"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/partner/settlement-cycles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get partner settlement cycles
-         * @description WLT-owned. Returns partner settlement cycle history and pending amounts. Execution is WLT-owned — DSH partner surface is a read-only consumer.
-         */
-        get: operations["getPartnerSettlementCycles"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/field/commissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get field agent commission ledger
-         * @description WLT-owned. Returns field agent commission entries. Execution is WLT-owned — DSH field surface is a read-only consumer.
-         */
-        get: operations["getFieldCommissions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/finance/overview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get finance overview for control panel
-         * @description WLT-owned. Returns aggregate finance metrics for control panel display. Control panel may view and approve; no direct ledger write. Execution is WLT-owned.
-         */
-        get: operations["getControlPanelFinanceOverview"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/reconciliation-runs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List reconciliation runs
-         * @description WLT-owned. Lists reconciliation run history for control panel review. Execution is WLT-owned.
-         */
-        get: operations["listReconciliationRuns"];
-        put?: never;
-        /**
-         * Trigger a new reconciliation run
-         * @description WLT-owned. Triggers a new reconciliation run. Idempotency-Key header is required. Execution is WLT-owned — control panel initiates only.
-         */
-        post: operations["triggerReconciliationRun"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/payout-decisions": {
+    "/refunds": {
         parameters: {
             query?: never;
             header?: never;
@@ -270,17 +116,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Create a payout decision
-         * @description WLT-owned. Records a control panel payout approval or rejection. Idempotency-Key header is required. Execution is WLT-owned — control panel approves/rejects only.
+         * Initiate refund (operator — WLT financial decision)
+         * @description Creates a refund record in PENDING state. WLT is the sole owner of refund authorization and execution.
          */
-        post: operations["createPayoutDecision"];
+        post: operations["createRefund"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/wlt/dsh/control-panel/audit-events": {
+    "/refunds/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -288,10 +134,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List finance audit events
-         * @description WLT-owned. Returns audit event log for finance operations. Execution is WLT-owned — control panel is read-only.
+         * Get refund status
+         * @description Returns the current state of a refund by ID.
          */
-        get: operations["listAuditEvents"];
+        get: operations["getRefund"];
         put?: never;
         post?: never;
         delete?: never;
@@ -300,67 +146,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/wlt/dsh/control-panel/refund-queue": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List refund cases in control panel review queue
-         * @description WLT-owned. Lists pending and processed refund cases for control panel review. Control panel prepares decisions; WLT executes all refund outcomes. CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
-         */
-        get: operations["listControlPanelRefundQueue"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/ledger-entries": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List general ledger entries for control panel
-         * @description WLT-owned. Returns general ledger entries — journal entries, debit/credit records. Control panel is read-only. No ledger write from DSH. CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
-         */
-        get: operations["listControlPanelLedgerEntries"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/store-delivery/finance-summary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get store delivery courier finance summary
-         * @description WLT-owned. Returns finance summary for store delivery couriers (store_courier_mode). Separated from bthwani captain finance. Control panel is read-only consumer. CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
-         */
-        get: operations["getStoreDeliveryFinanceSummary"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/daily-close": {
+    "/refunds/{id}/process": {
         parameters: {
             query?: never;
             header?: never;
@@ -370,17 +156,59 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Submit daily financial close request to WLT
-         * @description WLT-owned. Control panel submits daily close initiation after verifying zero total variance and complete evidence. WLT engine performs the close. Idempotency-Key required. Maker-Checker workflow enforced server-side by WLT. 422 returned if varianceTotalMinorUnits !== 0 or evidence incomplete. CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
+         * Operator approves refund (PENDING → PROCESSING)
+         * @description Operator moves a pending refund to PROCESSING state, authorizing the fund release.
          */
-        post: operations["submitDailyClose"];
+        post: operations["processRefund"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/wlt/dsh/control-panel/reconciliation-close-status": {
+    "/refunds/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm refund (PROCESSING → CONFIRMED) + notify DSH
+         * @description WLT confirms refund and calls DSH POST /orders/{order_id}/refund-callback:
+         *       X-WLT-Callback-Token header
+         *       Body: {refund_ref_id: refund.id, status: "CONFIRMED"}
+         */
+        post: operations["confirmRefund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/refunds/{id}/fail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Fail refund + notify DSH
+         * @description Transitions refund to FAILED state and dispatches a failure callback to DSH.
+         */
+        post: operations["failRefund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settlements": {
         parameters: {
             query?: never;
             header?: never;
@@ -388,10 +216,34 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get daily reconciliation close gate status
-         * @description WLT-owned. Returns current daily close status: total variance, evidence completeness, and whether close gate is open. gateOpen is true only when varianceTotalMinorUnits === 0 AND evidenceComplete === true. Any non-zero variance blocks the gate. CONTRACT_SCAFFOLD_PREVIEW_ONLY — not implemented.
+         * List settlements (operator)
+         * @description Returns a paginated list of settlement records, optionally filtered by status.
          */
-        get: operations["getReconciliationCloseStatus"];
+        get: operations["listSettlements"];
+        put?: never;
+        /**
+         * Create settlement for a delivered order (operator)
+         * @description Creates a settlement record for a delivered order. WLT calculates platform/captain fees and creates the payout record.
+         */
+        post: operations["createSettlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settlements/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get settlement detail
+         * @description Returns the full detail of a single settlement record including fee breakdown.
+         */
+        get: operations["getSettlement"];
         put?: never;
         post?: never;
         delete?: never;
@@ -400,7 +252,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/wlt/dsh/control-panel/finance-center": {
+    "/settlements/{id}/process": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move settlement PENDING → PROCESSING
+         * @description Operator initiates payout processing for a pending settlement.
+         */
+        post: operations["processSettlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settlements/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete settlement PROCESSING → COMPLETED
+         * @description Marks the settlement as fully disbursed. Triggers payout record finalization.
+         */
+        post: operations["completeSettlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/settlements/{id}/fail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Fail settlement
+         * @description Marks the settlement as failed. Records the reason and unlocks retry eligibility.
+         */
+        post: operations["failSettlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/wallets/{subject}/summary": {
         parameters: {
             query?: never;
             header?: never;
@@ -408,10 +320,11 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get WLT finance center preview for DSH control panel
-         * @description WLT-owned. Returns the account-first finance center read model for DSH control-panel display. CONTRACT_SCAFFOLD_PREVIEW_ONLY — no backend, no real balances, no ledger runtime.
+         * Wallet balance and aggregate stats for a subject
+         * @description Operators can query any subject.
+         *     Clients/captains/partners can only query their own subject.
          */
-        get: operations["getControlPanelFinanceCenter"];
+        get: operations["getWalletSummary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -420,7 +333,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/wlt/dsh/control-panel/store-settlement-statements": {
+    "/wallets/{subject}/transactions": {
         parameters: {
             query?: never;
             header?: never;
@@ -428,170 +341,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List WLT store settlement statements for DSH control panel
-         * @description WLT-owned. Lists store settlement statements with biweekly cycles, linked order rows, fees, commissions, discounts, refunds, holds, paid-to-date, and remaining payable. CONTRACT_SCAFFOLD_PREVIEW_ONLY — read-only preview.
+         * Paginated ledger entries for a subject
+         * @description Returns paginated wallet transaction history (debits/credits) for a given subject (client, partner, captain).
          */
-        get: operations["listStoreSettlementStatements"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/account-statements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List WLT account statements for DSH control panel
-         * @description WLT-owned. Returns account statements for store, captain, store courier, field agent, customer wallet, and platform display. CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-         */
-        get: operations["listControlPanelAccountStatements"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/chart-of-accounts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List WLT chart of accounts preview
-         * @description WLT-owned chart of accounts preview. DSH may display account metadata only. CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-         */
-        get: operations["listChartOfAccounts"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/subledger-balances": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List WLT subledger balance previews
-         * @description WLT-owned subledger balance preview mapped to control accounts. CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-         */
-        get: operations["listSubledgerBalances"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/posting-rules": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List WLT posting rule previews
-         * @description WLT-owned double-entry posting rules preview. DSH displays rules only. CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-         */
-        get: operations["listPostingRules"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/trial-balance": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get WLT trial balance preview
-         * @description WLT-owned trial balance preview. Total debit and credit must balance before any future close. CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-         */
-        get: operations["getTrialBalance"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/settlement-calendar": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List WLT settlement calendar previews
-         * @description WLT-owned settlement cycles for store, captain, field, and store courier payout timing. CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-         */
-        get: operations["listSettlementCalendar"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/refund-ledger": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List WLT refund ledger previews
-         * @description WLT-owned refund and dispute ledger. DSH may inspect impact only; current implementation is in-memory core only until durable WLT runtime is proven.
-         */
-        get: operations["listRefundLedger"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/wlt/dsh/control-panel/audit-pack": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get WLT audit pack preview
-         * @description WLT-owned audit pack preview for finance review evidence. CONTRACT_SCAFFOLD_PREVIEW_ONLY.
-         */
-        get: operations["getAuditPack"];
+        get: operations["getWalletTransactions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -604,483 +357,615 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description Monetary amount in minor units (YER minor units — use amountMinorUnits as the canonical field). Currency defaults to YER per x-bthwani-currency-default. */
-        MoneyAmount: {
-            /** @description Amount in minor currency units (YER minor units — not fils/halala; use amountMinorUnits as the canonical field name) */
-            amountMinorUnits: number;
-            /**
-             * @description ISO 4217 currency code. Default is YER (Yemeni Rial).
-             * @default YER
-             */
-            currency: string;
-            /** @description Pre-formatted display string for UI use only */
-            displayLabel?: string;
-        };
-        /** @description WLT-owned ledger entry. Immutable after creation. */
-        LedgerEntry: {
-            /** Format: uuid */
-            id: string;
-            /** @enum {string} */
-            type: "credit" | "debit" | "hold" | "release" | "refund" | "commission" | "settlement";
-            amount: components["schemas"]["MoneyAmount"];
-            /** @description Order or transaction reference */
-            referenceId?: string;
-            note?: string;
-            /** Format: date-time */
-            createdAt: string;
-        };
-        /** @description WLT-owned wallet balance snapshot. */
-        WalletBalance: {
-            /** @description Current wallet balance in minor units */
-            balanceMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            /** @description Whether the wallet is linked to an active account */
-            linked: boolean;
-            /** @description Amount currently on hold */
-            frozenMinorUnits?: number;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        /** @description WLT-owned payment session. DSH submits checkout candidate; WLT decides financial outcome. DSH polls GET /wlt/dsh/client/payment-sessions/{sessionId} until status=confirmed or failed. DSH stores sessionId as wlt_payment_ref_id (operational reference only — no financial mutation in DSH). Requires Idempotency-Key on creation. */
-        PaymentSession: {
-            /**
-             * Format: uuid
-             * @description WLT session reference — DSH stores as wlt_payment_ref_id
-             */
-            sessionId?: string;
-            /** @description DSH operational order/intent identifier */
-            orderId: string;
-            amountMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            /**
-             * @description pending: WLT is processing. confirmed: WLT approved and executed the payment. failed: WLT rejected (insufficient balance, policy, etc). expired: Session timed out.
-             * @enum {string}
-             */
-            status?: "pending" | "confirmed" | "failed" | "expired";
-            /**
-             * Format: date-time
-             * @description Present only when status=confirmed
-             */
-            confirmedAt?: string;
-            /**
-             * @description Present only when status=failed
-             * @enum {string}
-             */
-            failureReason?: "insufficient_balance" | "policy_block" | "fraud_hold" | "expired";
-            /** Format: date-time */
-            expiresAt?: string;
-        };
-        /** @description WLT-owned top-up session. Initiates a wallet funding flow. WLT returns redirectUrl for the hosted top-up flow; DSH displays it only. Requires Idempotency-Key on creation. */
-        TopUpSession: {
-            /** Format: uuid */
-            sessionId?: string;
-            amountMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            /** @enum {string} */
-            status?: "pending" | "processing" | "completed" | "failed";
-            /**
-             * Format: uri
-             * @description WLT-hosted top-up flow URL — DSH displays, does not own
-             */
-            redirectUrl?: string;
-        };
-        /** @description WLT-owned captain eligibility balance for order acceptance. */
-        CaptainEligibilityBalance: {
-            eligible: boolean;
-            balanceMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            minimumRequiredMinorUnits?: number;
-            note?: string;
-        };
-        /** @description WLT-owned COD liability record for a captain. */
-        CodLiability: {
-            /** Format: uuid */
-            id: string;
-            orderId?: string;
-            amountMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            /** @enum {string} */
-            status: "outstanding" | "settled" | "disputed";
-            /** Format: date-time */
-            dueAt?: string;
-        };
-        /** @description WLT-owned partner settlement cycle record. */
-        PartnerSettlementCycle: {
-            /** Format: uuid */
-            id: string;
-            /** Format: date */
-            periodStart: string;
-            /** Format: date */
-            periodEnd: string;
-            netAmountMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            /** @enum {string} */
-            status: "pending" | "processing" | "paid" | "disputed";
-        };
-        /** @description WLT-owned field agent commission entry. */
-        FieldCommission: {
-            /** Format: uuid */
-            id: string;
-            storeId?: string;
-            amountMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            /** @enum {string} */
-            status: "pending" | "approved" | "paid";
-            /** Format: date-time */
-            earnedAt?: string;
-        };
-        /** @description WLT-owned refund case. */
-        RefundCase: {
-            /** Format: uuid */
-            id: string;
-            orderId: string;
-            amountMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            /** @enum {string} */
-            status: "pending" | "approved" | "processed" | "rejected";
-            reason?: string;
-        };
-        /** @description WLT-owned reconciliation run record. Requires Idempotency-Key when triggering. */
-        ReconciliationRun: {
-            /** Format: uuid */
-            id: string;
-            /** @enum {string} */
-            status: "pending" | "running" | "completed" | "failed";
-            /** Format: date */
-            periodStart?: string;
-            /** Format: date */
-            periodEnd?: string;
-            discrepancyCount?: number;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            completedAt?: string;
-        };
-        /** @description WLT-owned payout decision created by control panel. Requires Idempotency-Key on creation. */
-        PayoutDecision: {
-            /** Format: uuid */
-            id: string;
-            recipientId: string;
-            /** @enum {string} */
-            recipientType: "captain" | "partner" | "field";
-            amountMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            /** @enum {string} */
-            decision: "approved" | "rejected" | "held";
-            note?: string;
-        };
-        /** @description WLT-owned immutable audit event. */
-        AuditEvent: {
-            /** Format: uuid */
-            id: string;
-            eventType: string;
-            actorId: string;
-            /** @enum {string} */
-            actorRole?: "system" | "control-panel" | "wlt-service";
-            referenceId?: string;
-            payload?: {
-                [key: string]: unknown;
-            };
-            /** Format: date-time */
-            createdAt: string;
-        };
-        /** @description WLT-owned store delivery courier finance summary (store_courier_mode). */
-        StoreDeliveryFinanceSummary: {
-            /** @description Total courier earnings in minor units */
-            totalEarningsMinorUnits: number;
-            /** @default YER */
-            currency: string;
-            pendingCount?: number;
-            /** Format: date */
-            periodDate: string;
-            deliveries?: components["schemas"]["FieldCommission"][];
-        };
-        /** @description Daily close initiation payload sent from DSH control panel to WLT. WLT engine verifies zero total variance and complete evidence before executing close. DSH initiates only — WLT owns all close logic. */
-        DailyCloseRequest: {
-            /** Format: date */
-            periodDate: string;
-            /** @description ID of the maker who prepared the close decision */
-            makerUserId: string;
-            /** @description ID of the checker who reviewed and approved the close */
-            checkerUserId: string;
-            note?: string;
-        };
-        /** @description WLT-computed daily reconciliation close gate status. gateOpen is true ONLY when varianceTotalMinorUnits === 0 AND evidenceComplete === true. Any non-zero variance or incomplete evidence keeps the gate closed. */
-        ReconciliationCloseStatus: {
-            /** Format: date */
-            periodDate: string;
-            /** @description Sum of all unresolved variances across all rows. Must be 0 for gate to open. */
-            varianceTotalMinorUnits: number;
-            /** @description True only when every row has evidenceStatus === complete. */
-            evidenceComplete: boolean;
-            /** @description True only when varianceTotalMinorUnits === 0 AND evidenceComplete === true. */
-            gateOpen: boolean;
-            /** @default YER */
-            currency: string;
-            /** @description Human-readable list of reasons preventing daily close */
-            blockedReasons?: string[];
-            /** @description Total number of financial rows in the reconciliation set */
-            rowCount?: number;
-            /** @description Number of rows with varianceMinorUnits === 0 and evidenceStatus === complete */
-            resolvedRowCount?: number;
-        };
-        /** @description WLT-owned account-first finance center preview for DSH control panel. */
-        ControlPanelFinanceCenter: {
-            /** Format: date */
-            businessDate: string;
-            /** @default YER */
-            currency: string;
-            sections?: {
-                [key: string]: unknown;
-            }[];
-            /** @enum {string} */
-            contractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY";
-        };
-        /** @description Order row included in a WLT store settlement statement preview. */
-        StoreSettlementOrderRow: {
-            orderId: string;
-            /** Format: date */
-            orderDate: string;
-            /** Format: date */
-            deliveryDate: string;
-            /** @enum {string} */
-            paymentMethod: "wallet" | "cod" | "card" | "manual";
-            orderGross: components["schemas"]["MoneyAmount"];
-            deliveryFee?: components["schemas"]["MoneyAmount"];
-            platformCommission?: components["schemas"]["MoneyAmount"];
-            discount?: components["schemas"]["MoneyAmount"];
-            refundAmount?: components["schemas"]["MoneyAmount"];
-            netSettlementImpact: components["schemas"]["MoneyAmount"];
-            includedInCycle?: boolean;
-            /** @enum {string} */
-            settlementStatus: "included" | "held" | "next_cycle" | "disputed";
-            evidenceRef?: string;
-        };
-        /** @description WLT-owned store settlement statement preview. */
-        StoreSettlementStatement: {
-            statementId: string;
-            storeId: string;
-            storeName: string;
-            settlementCycleId: string;
-            /** @enum {string} */
-            frequency: "biweekly";
-            /** Format: date */
-            periodStart: string;
-            /** Format: date */
-            periodEnd: string;
-            /** Format: date */
-            cutoffDate?: string;
-            /** Format: date */
-            expectedPayoutDate: string;
-            /** @enum {string} */
-            status?: "draft_preview" | "ready_for_review" | "held_by_wlt" | "paid_preview";
-            grossOrdersTotal?: components["schemas"]["MoneyAmount"];
-            deliveryFeesTotal?: components["schemas"]["MoneyAmount"];
-            platformCommissionTotal?: components["schemas"]["MoneyAmount"];
-            discountsTotal?: components["schemas"]["MoneyAmount"];
-            refundsTotal?: components["schemas"]["MoneyAmount"];
-            holdsTotal?: components["schemas"]["MoneyAmount"];
-            netPayable: components["schemas"]["MoneyAmount"];
-            paidToDate?: components["schemas"]["MoneyAmount"];
-            remainingPayable?: components["schemas"]["MoneyAmount"];
-            orders: components["schemas"]["StoreSettlementOrderRow"][];
-            /** @enum {string} */
-            contractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY";
-        };
-        /** @description One WLT account statement line preview. */
-        AccountStatementLine: {
-            lineId: string;
-            /** Format: date */
-            date: string;
-            /** @enum {string} */
-            sourceType: "order" | "settlement" | "refund" | "payout" | "commission" | "wallet" | "adjustment";
-            sourceId: string;
-            description: string;
-            debit?: components["schemas"]["MoneyAmount"];
-            credit?: components["schemas"]["MoneyAmount"];
-            runningBalance: components["schemas"]["MoneyAmount"];
-            /** @enum {string} */
-            status: "posted_preview" | "pending_wlt" | "held" | "disputed";
-            evidenceRef?: string;
-        };
-        /** @description WLT-owned account statement preview for a financial actor. */
-        AccountStatement: {
-            statementId: string;
-            /** @enum {string} */
-            actor: "store" | "captain" | "store_courier" | "field_agent" | "customer_wallet" | "platform";
-            actorId: string;
-            /** Format: date */
-            periodStart: string;
-            /** Format: date */
-            periodEnd: string;
-            openingBalance: components["schemas"]["MoneyAmount"];
-            periodDebit?: components["schemas"]["MoneyAmount"];
-            periodCredit?: components["schemas"]["MoneyAmount"];
-            adjustments?: components["schemas"]["MoneyAmount"];
-            holds?: components["schemas"]["MoneyAmount"];
-            releases?: components["schemas"]["MoneyAmount"];
-            refunds?: components["schemas"]["MoneyAmount"];
-            payouts?: components["schemas"]["MoneyAmount"];
-            closingBalance: components["schemas"]["MoneyAmount"];
-            lines: components["schemas"]["AccountStatementLine"][];
-            /** @enum {string} */
-            contractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY";
-        };
-        /** @description WLT chart of accounts preview row. */
-        ChartOfAccount: {
-            accountCode: string;
-            accountName: string;
-            accountNameEn?: string;
-            /** @enum {string} */
-            accountType: "asset" | "liability" | "revenue" | "expense" | "clearing" | "equity";
-            /** @enum {string} */
-            normalBalance: "debit" | "credit";
-            controlAccount?: boolean;
-            parentAccountId?: string;
-            /** @default YER */
-            currency: string;
-        };
-        /** @description WLT subledger-to-control-account balance preview. */
-        SubledgerBalance: {
-            subledgerId: string;
-            domain?: string;
-            controlAccountCode: string;
-            actorType?: string;
-            sourceEvents?: string[];
-            balance: components["schemas"]["MoneyAmount"];
-            closeGateImpact: string;
-        };
-        /** @description WLT double-entry posting rule preview. */
-        PostingRule: {
-            eventKind: string;
-            debitAccountCode: string;
-            creditAccountCode: string;
-            amountSource?: string;
-            actor?: string;
-            statementImpact: string;
-            settlementImpact: string;
-            reconciliationImpact?: string;
-        };
-        /** @description WLT trial balance preview. */
-        TrialBalance: {
-            /** Format: date */
-            businessDate: string;
-            totalDebit: components["schemas"]["MoneyAmount"];
-            totalCredit: components["schemas"]["MoneyAmount"];
-            isBalanced: boolean;
-            lines?: {
-                [key: string]: unknown;
-            }[];
-            /** @enum {string} */
-            contractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY";
-        };
-        /** @description WLT settlement cycle calendar preview. */
-        SettlementCalendarCycle: {
-            cycleId: string;
-            /** @enum {string} */
-            ownerKind: "store" | "captain" | "field_agent" | "store_courier";
-            /** @enum {string} */
-            frequency: "biweekly" | "weekly" | "monthly";
-            /** Format: date */
-            periodStart: string;
-            /** Format: date */
-            periodEnd: string;
-            /** Format: date */
-            cutoffDate: string;
-            /** Format: date */
-            expectedPayoutDate: string;
-            /** Format: date */
-            actualPayoutDate?: string;
-            /** @enum {string} */
-            status: "open_preview" | "cutoff_locked" | "wlt_review" | "paid_preview" | "held";
-            includedOrderCount?: number;
-            excludedOrderCount?: number;
-            netPayable: components["schemas"]["MoneyAmount"];
-            holdAmount?: components["schemas"]["MoneyAmount"];
-            releasePolicy?: string;
-        };
-        /** @description WLT refund and dispute ledger preview. */
-        RefundLedgerCase: {
-            refundCaseId: string;
-            orderId: string;
-            customerId: string;
-            storeId: string;
-            originalAmount: components["schemas"]["MoneyAmount"];
-            approvedAmount?: components["schemas"]["MoneyAmount"];
-            rejectedAmount?: components["schemas"]["MoneyAmount"];
-            reason?: string;
-            evidence?: string[];
-            /** @enum {string} */
-            status: "pending_wlt_review" | "approved_preview" | "rejected_preview" | "disputed";
-            ledgerImpact: string;
-            walletImpact: string;
-            settlementImpact: string;
-        };
-        /** @description WLT finance audit pack preview. */
-        AuditPack: {
-            auditPackId: string;
-            status: string;
-            events?: components["schemas"]["AuditEvent"][];
-            evidence?: {
-                [key: string]: unknown;
-            }[];
-            approvals?: {
-                [key: string]: unknown;
-            }[];
-            /** @enum {string} */
-            contractState: "CONTRACT_SCAFFOLD_PREVIEW_ONLY";
-        };
-        ErrorResponse: {
-            code: string;
-            message: string;
-            retryable?: boolean;
-            field?: string;
-        };
-    };
-    responses: {
-        /** @description Authentication required */
-        Unauthorized: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Unexpected error */
         Error: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
+            /** @example invalid_parameter */
+            error: string;
+            message?: string;
+        };
+        PaymentSession: {
+            /** @description WLT payment session ID — stored as wlt_payment_ref_id in DSH */
+            id: string;
+            checkout_intent_id: string;
+            client_id: string;
+            /** Format: double */
+            amount: number;
+            /** @example YER */
+            currency: string;
+            /** @enum {string} */
+            status: "PENDING" | "CONFIRMED" | "FAILED" | "EXPIRED" | "CANCELLED";
+            /** @example wallet */
+            payment_method: string;
+            provider_ref?: string | null;
+            failure_reason?: ("insufficient_balance" | "policy_block" | "fraud_hold" | "expired" | "provider_error") | null;
+            idempotency_key: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            expires_at: string;
+            /** Format: date-time */
+            confirmed_at?: string | null;
+            /** Format: date-time */
+            failed_at?: string | null;
+        };
+        Refund: {
+            /** @description WLT refund ID — stored as wlt_refund_ref_id in DSH */
+            id: string;
+            order_id: string;
+            payment_session_id?: string;
+            client_id: string;
+            /** Format: double */
+            amount: number;
+            /** @example YER */
+            currency: string;
+            reason: string;
+            /** @enum {string} */
+            status: "PENDING" | "PROCESSING" | "CONFIRMED" | "FAILED";
+            /** @description WltRefundTriggerRef from DSH delivery-failure event */
+            trigger_ref?: string | null;
+            failure_reason?: string | null;
+            /** Format: date-time */
+            dsh_callback_sent_at?: string | null;
+            idempotency_key: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: date-time */
+            completed_at?: string | null;
+        };
+        Settlement: {
+            /** @description WLT settlement ID — stored as wlt_settlement_ref_id in DSH */
+            id: string;
+            order_id: string;
+            partner_id: string;
+            captain_id?: string | null;
+            /** Format: double */
+            gross_amount: number;
+            /** Format: double */
+            platform_fee: number;
+            /** Format: double */
+            partner_payout: number;
+            /** Format: double */
+            captain_payout: number;
+            /** @example YER */
+            currency: string;
+            /** @enum {string} */
+            status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+            failure_reason?: string | null;
+            idempotency_key: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: date-time */
+            completed_at?: string | null;
+        };
+        WalletSummary: {
+            subject: string;
+            /** @enum {string} */
+            actor_type: "client" | "captain" | "partner" | "field" | "operator";
+            /** Format: double */
+            balance: number;
+            /** @example YER */
+            currency: string;
+            /** Format: double */
+            total_credit: number;
+            /** Format: double */
+            total_debit: number;
+            /** Format: double */
+            pending_credit: number;
+            /** Format: double */
+            pending_debit: number;
+            transaction_count: number;
+        };
+        LedgerEntry: {
+            id: string;
+            wallet_id: string;
+            subject: string;
+            /** @enum {string} */
+            transaction_type: "CREDIT" | "DEBIT";
+            /** Format: double */
+            amount: number;
+            currency: string;
+            /** @enum {string} */
+            reference_type: "payment_session" | "refund" | "settlement";
+            reference_id: string;
+            order_id?: string | null;
+            description: string;
+            /** @enum {string} */
+            status: "PENDING" | "COMPLETED" | "FAILED" | "REVERSED";
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            completed_at?: string | null;
         };
     };
-    parameters: {
-        /** @description Client-generated unique key (UUID v4 recommended) to prevent duplicate mutations. Required on all POST endpoints that mutate financial state. */
-        IdempotencyKey: string;
-    };
+    responses: never;
+    parameters: never;
     requestBodies: never;
     headers: never;
     pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    getClientWalletSummary: {
+    getHealth: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Healthy */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example ok */
+                        status?: string;
+                        /** @example wlt-api */
+                        service?: string;
+                    };
+                };
+            };
+        };
+    };
+    createPaymentSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    checkout_intent_id: string;
+                    client_id: string;
+                    /** Format: double */
+                    amount: number;
+                    /** @default YER */
+                    currency?: string;
+                    /** @default wallet */
+                    payment_method?: string;
+                    /** @description DSH base URL for callback; uses WLT_DSH_BASE_URL env if omitted */
+                    dsh_base_url?: string;
+                    idempotency_key: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment session created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentSession"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getPaymentSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment session */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentSession"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    confirmPaymentSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    provider_ref?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Confirmed; DSH payment callback dispatched */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentSession"];
+                };
+            };
+            /** @description Forbidden — operator or system role required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Session not in PENDING state */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    failPaymentSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    failure_reason?: "insufficient_balance" | "policy_block" | "fraud_hold" | "expired" | "provider_error";
+                };
+            };
+        };
+        responses: {
+            /** @description Failed; DSH payment callback dispatched */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentSession"];
+                };
+            };
+        };
+    };
+    createRefund: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    order_id: string;
+                    payment_session_id?: string;
+                    client_id: string;
+                    /** Format: double */
+                    amount: number;
+                    /** @default YER */
+                    currency?: string;
+                    reason?: string;
+                    /** @description WltRefundTriggerRef bridged from DSH delivery-failure */
+                    trigger_ref?: string | null;
+                    dsh_base_url?: string;
+                    idempotency_key: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Refund created in PENDING state */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Refund"];
+                };
+            };
+        };
+    };
+    getRefund: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refund */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Refund"];
+                };
+            };
+        };
+    };
+    processRefund: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refund now PROCESSING */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Refund"];
+                };
+            };
+        };
+    };
+    confirmRefund: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refund confirmed; DSH callback dispatched */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Refund"];
+                };
+            };
+        };
+    };
+    failRefund: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    reason?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Refund failed; DSH callback dispatched */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Refund"];
+                };
+            };
+        };
+    };
+    listSettlements: {
+        parameters: {
+            query?: {
+                status?: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settlements list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        settlements?: components["schemas"]["Settlement"][];
+                        total?: number;
+                    };
+                };
+            };
+        };
+    };
+    createSettlement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    order_id: string;
+                    partner_id: string;
+                    captain_id?: string | null;
+                    /** Format: double */
+                    gross_amount: number;
+                    /**
+                     * Format: double
+                     * @default 0.1
+                     */
+                    platform_fee_rate?: number;
+                    /**
+                     * Format: double
+                     * @default 0.15
+                     */
+                    captain_fee_rate?: number;
+                    /** @default YER */
+                    currency?: string;
+                    idempotency_key: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Settlement created in PENDING state */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settlement"];
+                };
+            };
+        };
+    };
+    getSettlement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settlement */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settlement"];
+                };
+            };
+        };
+    };
+    processSettlement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settlement now PROCESSING */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settlement"];
+                };
+            };
+        };
+    };
+    completeSettlement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settlement completed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settlement"];
+                };
+            };
+        };
+    };
+    failSettlement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    reason?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Settlement failed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Settlement"];
+                };
+            };
+        };
+    };
+    getWalletSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                subject: string;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -1091,432 +976,30 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WalletBalance"];
+                    "application/json": components["schemas"]["WalletSummary"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    createClientPaymentSession: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Client-generated unique key (UUID v4 recommended) to prevent duplicate mutations. Required on all POST endpoints that mutate financial state. */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PaymentSession"];
-            };
-        };
-        responses: {
-            /** @description Payment session created — poll for status */
-            201: {
+            /** @description Cannot view another subject's wallet */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PaymentSession"];
+                    "application/json": components["schemas"]["Error"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            /** @description Insufficient balance */
-            402: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Duplicate idempotency key */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            default: components["responses"]["Error"];
         };
     };
-    getClientPaymentSessionStatus: {
+    getWalletTransactions: {
         parameters: {
-            query?: never;
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
             header?: never;
             path: {
-                sessionId: string;
+                subject: string;
             };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Payment session status */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PaymentSession"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            /** @description Session not found or expired */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    createClientTopUpSession: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Client-generated unique key (UUID v4 recommended) to prevent duplicate mutations. Required on all POST endpoints that mutate financial state. */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TopUpSession"];
-            };
-        };
-        responses: {
-            /** @description Top-up session created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TopUpSession"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            /** @description Duplicate idempotency key */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    getCaptainEligibility: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Captain eligibility balance */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CaptainEligibilityBalance"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    createCaptainTopUpSession: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Client-generated unique key (UUID v4 recommended) to prevent duplicate mutations. Required on all POST endpoints that mutate financial state. */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["TopUpSession"];
-            };
-        };
-        responses: {
-            /** @description Top-up session created */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: components["responses"]["Unauthorized"];
-            /** @description Duplicate idempotency key */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    getCaptainCodLiabilities: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description COD liability list */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CodLiability"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    getCaptainEarnings: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Earnings ledger entries */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LedgerEntry"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    getPartnerSettlementCycles: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Settlement cycles */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PartnerSettlementCycle"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    getFieldCommissions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Commission entries */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FieldCommission"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    getControlPanelFinanceOverview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Finance overview */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MoneyAmount"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    listReconciliationRuns: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Reconciliation runs */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReconciliationRun"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    triggerReconciliationRun: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Client-generated unique key (UUID v4 recommended) to prevent duplicate mutations. Required on all POST endpoints that mutate financial state. */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReconciliationRun"];
-            };
-        };
-        responses: {
-            /** @description Reconciliation run triggered */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: components["responses"]["Unauthorized"];
-            /** @description Duplicate idempotency key */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    createPayoutDecision: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Client-generated unique key (UUID v4 recommended) to prevent duplicate mutations. Required on all POST endpoints that mutate financial state. */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PayoutDecision"];
-            };
-        };
-        responses: {
-            /** @description Payout decision recorded */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: components["responses"]["Unauthorized"];
-            /** @description Duplicate idempotency key */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    listAuditEvents: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Audit events */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AuditEvent"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    listControlPanelRefundQueue: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Refund case queue */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RefundCase"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    listControlPanelLedgerEntries: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -1527,316 +1010,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LedgerEntry"][];
+                    "application/json": {
+                        entries?: components["schemas"]["LedgerEntry"][];
+                        total?: number;
+                    };
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    getStoreDeliveryFinanceSummary: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Store delivery finance summary */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StoreDeliveryFinanceSummary"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    submitDailyClose: {
-        parameters: {
-            query?: never;
-            header: {
-                /** @description Client-generated unique key (UUID v4 recommended) to prevent duplicate mutations. Required on all POST endpoints that mutate financial state. */
-                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DailyCloseRequest"];
-            };
-        };
-        responses: {
-            /** @description Daily close submitted — WLT engine will process */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            401: components["responses"]["Unauthorized"];
-            /** @description Duplicate idempotency key */
-            409: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Unresolved variance or incomplete evidence — close blocked by WLT */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            default: components["responses"]["Error"];
-        };
-    };
-    getReconciliationCloseStatus: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Reconciliation close status */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ReconciliationCloseStatus"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    getControlPanelFinanceCenter: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Finance center preview */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ControlPanelFinanceCenter"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    listStoreSettlementStatements: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Store settlement statement previews */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StoreSettlementStatement"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    listControlPanelAccountStatements: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Account statement previews */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AccountStatement"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    listChartOfAccounts: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Chart of accounts preview */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChartOfAccount"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    listSubledgerBalances: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Subledger balance previews */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SubledgerBalance"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    listPostingRules: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Posting rule previews */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PostingRule"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    getTrialBalance: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Trial balance preview */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TrialBalance"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    listSettlementCalendar: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Settlement calendar previews */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SettlementCalendarCycle"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    listRefundLedger: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Refund ledger previews */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RefundLedgerCase"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
-        };
-    };
-    getAuditPack: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Audit pack preview */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AuditPack"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            default: components["responses"]["Error"];
         };
     };
 }

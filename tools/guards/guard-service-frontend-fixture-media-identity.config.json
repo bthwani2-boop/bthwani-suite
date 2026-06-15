@@ -414,7 +414,7 @@
     "dsh/frontend/app-client/contracts/dsh-openapi.types.ts",
     "dsh/frontend/app-client/contracts/dsh-store-screen-props.ts",
     "dsh/frontend/app-captain/screens/DshCaptainMapScreen.tsx",
-    "wlt/frontend/contracts/wlt-dsh-client.ts",
+    "wlt/frontend/dsh/contracts/wlt-dsh-client.ts",
     "wlt/frontend/dsh/app-client/wlt-dsh-client.parts.tsx",
     "wlt/frontend/dsh/app-partner/wlt-dsh-partner.adapter.ts",
     "wlt/frontend/dsh/app-partner/wlt-dsh-partner.parts.tsx",
