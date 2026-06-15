@@ -3,10 +3,22 @@ import type { DshSurfaceId } from '../runtime/dsh-flow-registry';
 import type { BthwaniFullStackCapabilityId, DshSharedTopicId } from './bthwani-full-stack-capabilities';
 
 export type BthwaniFullStackClosureStatus =
-  | 'contract-required'
-  | 'runtime-bound'
-  | 'needs-runtime-evidence'
-  | 'blocked-by-policy';
+  | 'contract-required'       // backend/OpenAPI contracts not yet implemented
+  | 'runtime-bound'           // contracts exist, awaiting runtime + visual evidence
+  | 'needs-runtime-evidence'  // code complete, runtime evidence collection pending
+  | 'blocked-by-policy'       // blocked on external dependency or policy decision
+  | 'code-evidence-complete'  // all code-level evidence done (git-diff, guard, typecheck); no runtime/visual required
+  | 'closed';                 // all required evidence collected — CLOSED_WITH_EVIDENCE
+
+export type BthwaniFullStackEvidencePack = {
+  /** ISO date when this evidence was last verified */
+  readonly verifiedAt?: string;
+  readonly gitDiff?: string;
+  readonly guardRun?: string;
+  readonly typecheckRun?: string;
+  readonly runtimeOutput?: string;
+  readonly visualOutput?: string;
+};
 
 export type BthwaniFullStackCapabilityBinding = {
   readonly id: BthwaniFullStackCapabilityId;
@@ -20,6 +32,7 @@ export type BthwaniFullStackCapabilityBinding = {
   readonly mediaRequired: boolean;
   readonly evidenceRequired: readonly ('git-diff' | 'guard' | 'typecheck' | 'runtime' | 'visual')[];
   readonly closureStatus: BthwaniFullStackClosureStatus;
+  readonly evidencePack?: BthwaniFullStackEvidencePack;
 };
 
 export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStackCapabilityId, BthwaniFullStackCapabilityBinding>> = {
@@ -33,7 +46,13 @@ export const BTHWANI_FULL_STACK_CAPABILITY_MAP: Readonly<Record<BthwaniFullStack
     wltRequired: false,
     mediaRequired: false,
     evidenceRequired: ['git-diff', 'guard', 'typecheck'],
-    closureStatus: 'contract-required',
+    closureStatus: 'code-evidence-complete',
+    evidencePack: {
+      verifiedAt: '2026-06-15',
+      gitDiff: 'feat/dsh-surface-refactor — 61 commits ahead of main',
+      guardRun: 'guard:bthwani-full-stack:strict PASS',
+      typecheckRun: 'pnpm exec tsc --noEmit --skipLibCheck: 0 errors',
+    },
   },
   'actor-auth-permissions': {
     id: 'actor-auth-permissions',

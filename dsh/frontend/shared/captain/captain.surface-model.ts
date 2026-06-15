@@ -1,4 +1,6 @@
 // Canonical location: dsh/frontend/shared/captain/captain.surface-model.ts
+// Authority: dsh/frontend/shared/captain — thin orchestration shell for captain surface.
+// Wires topic models (navigation, chat, service-mode, pod, delivery) around shared state.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
@@ -15,7 +17,6 @@ import {
   useCaptainOrderRuntime,
   useCaptainActiveLocationPush,
 } from './use-captain-order-runtime';
-import { getCaptainLifecycleForOrderStage, getRouteForCommandTarget } from '../delivery/delivery.policy';
 import type {
   DshCaptainNavigationCommand,
   DshCaptainSurfaceState,
@@ -23,6 +24,11 @@ import type {
 } from './captain.surface.types';
 import { useCaptainDeliveryActions } from './captain.delivery-actions';
 import { buildCaptainDerived } from './captain.derived';
+import { getRouteForCommandTarget } from '../delivery/delivery.policy';
+import { useCaptainNavigationModel } from './captain-navigation.model';
+import { useCaptainChatModel } from './captain-chat.model';
+import { useCaptainServiceModeModel } from './captain-service-mode.model';
+import { useCaptainPodModel } from './captain-pod.model';
 
 export type {
   ActiveOrderPhase,
@@ -85,52 +91,22 @@ export function useDshCaptainSurfaceModel(
     lifecycleStatus: state.inboxState,
   });
 
+  // ── Topic models ─────────────────────────────────────────────────────────────
+  const navModel = useCaptainNavigationModel({ command, route: state.route, set });
+  const chatModel = useCaptainChatModel({ activeOrderDraft: state.activeOrderDraft, set });
+  const serviceModeModel = useCaptainServiceModeModel({ set });
+  const podModel = useCaptainPodModel({ captainAppMode: state.captainAppMode, set });
+
+  // ── Reset helpers shared across delivery + pod ────────────────────────────────
   const resetOrderState = React.useCallback(() => {
     set('activeOrderExpanded', false);
     set('activeOrderPhase', 'pickup');
     set('activeOrderDraft', '');
     set('activeOrderMessages', []);
-    set('captainPodState', 'ready');
-    set('captainPodPhotoUri', undefined);
-    set('captainPodMediaKey', undefined);
-  }, [set]);
+    podModel.resetPodFields();
+  }, [set, podModel]);
 
-  const routeHistoryRef = React.useRef<DshCaptainRoute[]>(['home']);
-  const routeTransitionFromBackRef = React.useRef(false);
-  const commandKeyRef = React.useRef(`${command.target}:${command.token ?? ''}`);
-
-  const goBack = React.useCallback(() => {
-    if (routeHistoryRef.current.length > 1) {
-      routeTransitionFromBackRef.current = true;
-      routeHistoryRef.current.pop();
-      const prev = routeHistoryRef.current[routeHistoryRef.current.length - 1] ?? 'home';
-      set('route', prev);
-      return true;
-    }
-    if (state.route !== 'home') { set('route', 'home'); return true; }
-    return false;
-  }, [state.route, set]);
-
-  React.useEffect(() => {
-    const commandKey = `${command.target}:${command.token ?? ''}`;
-    if (commandKey !== commandKeyRef.current) {
-      commandKeyRef.current = commandKey;
-      const nextRoute = getRouteForCommandTarget(command.target);
-      routeHistoryRef.current = [nextRoute];
-      routeTransitionFromBackRef.current = false;
-      set('route', nextRoute);
-      return;
-    }
-    const previousRoute = routeHistoryRef.current[routeHistoryRef.current.length - 1];
-    if (state.route !== previousRoute) {
-      if (routeTransitionFromBackRef.current) {
-        routeTransitionFromBackRef.current = false;
-      } else {
-        routeHistoryRef.current.push(state.route);
-      }
-    }
-  }, [command.target, command.token, state.route, set]);
-
+  // ── Delivery actions ──────────────────────────────────────────────────────────
   const deliveryActions = useCaptainDeliveryActions({
     captainOrderRuntime,
     captainRuntimeId,
@@ -142,56 +118,20 @@ export function useDshCaptainSurfaceModel(
     resetOrderState,
   });
 
-  const goToInbox = React.useCallback(() => set('route', 'inbox'), [set]);
   const resetInboxState = React.useCallback(() => set('inboxState', 'ready'), [set]);
-  const openOrderDetail = React.useCallback((id: string) => { set('activeOrderId', id); set('route', 'detail'); }, [set]);
-  const openCaptainAccount = React.useCallback(() => set('route', 'account'), [set]);
-  const openCaptainAccountSection = React.useCallback((r: DshCaptainRoute) => set('route', r), [set]);
-  const openSupportDirectory = React.useCallback(() => set('route', 'support-directory'), [set]);
-  const openCaptainSupportScreen = React.useCallback((screenId: CaptainSupportRoute) => { set('selectedSupportScreen', screenId); set('route', 'support-screen'); }, [set]);
-
-  const sendQuickMessage = React.useCallback(() => {
-    const text = state.activeOrderDraft.trim();
-    if (!text) return;
-    set('activeOrderMessages', (cur: CompactOrderChatMessage[]) => [
-      ...cur,
-      { id: `msg-${cur.length + 1}`, sender: 'الكابتن', text, time: 'الآن', side: 'end' },
-    ]);
-    set('activeOrderDraft', '');
-  }, [state.activeOrderDraft, set]);
-
-  const handleSelectServiceType = React.useCallback((typeId: string) => {
-    set('activeServiceType', typeId === 'amn' ? 'amn' : ('dsh' as CaptainServiceType));
-    set('route', 'home');
-    set('inboxState', 'ready');
-    set('activeOrderId', '');
-    set('activeOrderExpanded', false);
-    set('isPickupSheetVisible', false);
-    set('isDeliverySheetVisible', false);
-  }, [set]);
-
-  const openStoreCourierProof = React.useCallback(() => {
-    set('captainPodState', 'ready');
-    set('route', getCaptainLifecycleForOrderStage('proof', state.captainAppMode === 'store_courier_mode').captainRoute);
-  }, [state.captainAppMode, set]);
-
-  const toggleStoreCourierMode = React.useCallback((next: boolean) => {
-    set('captainAppMode', next ? 'store_courier_mode' : ('bthwani_captain_mode' as CaptainAppMode));
-    set('route', 'home');
-  }, [set]);
 
   const pushLocation = React.useCallback(
     (push: DshCaptainLocationPush) => captainOrderRuntime.pushLocation(push),
     [captainOrderRuntime],
   );
 
-  // ── Derived state — delegated to captain.derived (pure functions) ──────────────
+  // ── Derived state ─────────────────────────────────────────────────────────────
   const derivedCallbacks = React.useMemo(() => ({
     toggleAvailability: () => set('captainAvailabilityStatus', (c: CaptainAvailabilityStatus) => c === 'available' ? 'unavailable' : 'available'),
-    goToInbox,
+    goToInbox: navModel.goToInbox,
     resetInboxState,
     toggleOrderExpanded: () => set('activeOrderExpanded', (c: boolean) => !c),
-  }), [set, goToInbox, resetInboxState]);
+  }), [set, navModel.goToInbox, resetInboxState]);
 
   const derived: DshCaptainSurfaceDerived = React.useMemo(
     () => buildCaptainDerived(state, derivedCallbacks),
@@ -200,9 +140,19 @@ export function useDshCaptainSurfaceModel(
 
   const actions = buildCaptainActions({
     set,
-    goBack, openOrderDetail, openCaptainAccount, openCaptainAccountSection,
-    openSupportDirectory, openCaptainSupportScreen, goToInbox, resetInboxState,
-    sendQuickMessage, handleSelectServiceType, openStoreCourierProof, toggleStoreCourierMode, pushLocation,
+    goBack: navModel.goBack,
+    openOrderDetail: navModel.openOrderDetail,
+    openCaptainAccount: navModel.openCaptainAccount,
+    openCaptainAccountSection: navModel.openCaptainAccountSection,
+    openSupportDirectory: navModel.openSupportDirectory,
+    openCaptainSupportScreen: navModel.openCaptainSupportScreen,
+    goToInbox: navModel.goToInbox,
+    resetInboxState,
+    sendQuickMessage: chatModel.sendQuickMessage,
+    handleSelectServiceType: serviceModeModel.handleSelectServiceType,
+    openStoreCourierProof: podModel.openStoreCourierProof,
+    toggleStoreCourierMode: serviceModeModel.toggleStoreCourierMode,
+    pushLocation,
     ...deliveryActions,
   });
 

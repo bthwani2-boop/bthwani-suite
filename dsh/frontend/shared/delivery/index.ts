@@ -3,3 +3,4 @@
 
 export * from './delivery.contract';
 export * from './delivery.policy';
+export * from './fulfillment';

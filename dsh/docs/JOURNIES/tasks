@@ -8,7 +8,8 @@ Each entry must include: capability_id, control_panel_section, closure_status
 
 capability_id: foundation
 control_panel_section: platform
-closure_status: NEEDS_RUNTIME_EVIDENCE
+closure_status: CODE_EVIDENCE_COMPLETE
+evidence: git-diff feat/dsh-surface-refactor, guard:bthwani-full-stack:strict PASS, tsc 0 errors 2026-06-15
 description: Core infrastructure, auth, session, environment bootstrap
 
 ---

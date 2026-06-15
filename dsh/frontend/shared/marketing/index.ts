@@ -8,3 +8,4 @@ export * from './marketing.visibility';
 export * from './marketing.adapters';
 export * from './marketing.client-state';
 export * from './marketing.permissions';
+export * from './client-marketing.model';

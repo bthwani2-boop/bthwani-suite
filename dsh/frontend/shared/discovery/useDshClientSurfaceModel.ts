@@ -1,26 +1,20 @@
 // Canonical location: dsh/frontend/shared/discovery/useDshClientSurfaceModel.ts
-// Authority: dsh/frontend/shared/discovery — surface state model for DshClientSurface.
+// Authority: dsh/frontend/shared/discovery — thin orchestration shell for DshClientSurface.
+// Calls topic-level models and wires cross-topic dependencies. No business state.
 // Appearance is injected by the app-client shell (useAppClientAppearance is shell-specific).
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import { useDshClientRuntimeStores } from '../checkout/useDshClientRuntimeStores';
-import { useDshClientHomeCategories } from './useDshClientHomeCategories';
+import { useDshClientHomeComposition } from './client-home.composition';
 import { useDshClientNavigation } from './useDshClientNavigation';
-import {
-  useDshClientStoreState,
-  mapStoreDetailToScreenStore,
-  buildStoreCategories,
-  buildStoreDeliveryModes,
-  buildStoreTags,
-} from '../stores';
+import { useDshClientHomeActions } from './useDshClientHomeActions';
+import { useDshClientStoreModel } from '../stores/client-store.model';
 import { useDshClientCartState } from '../cart';
 import { useDshOrderTracking } from '../orders';
 import { useWltDshWalletSession } from '../../../../wlt/frontend/dsh/shared';
 import { useDshClientOrderExecution } from '../checkout';
-import { useDshClientMarketingState } from '../marketing/useDshClientMarketingState';
-import { useDshClientBellState } from './useDshClientBellState';
-import { useDshClientHomeActions } from './useDshClientHomeActions';
+import { useDshClientNotificationsModel } from '../notifications/client-notifications.model';
+import { useDshClientMarketingModel } from '../marketing/client-marketing.model';
 import { useCheckoutAuth } from '../checkout/useCheckoutAuth';
 import type {
   DshNavigationCommand,
@@ -63,21 +57,20 @@ export function useDshClientSurfaceModel({
 }: DshClientSurfaceSharedProps) {
   const { hydrated: appearanceHydrated, mode: appearanceMode, setMode: setAppearanceMode } = appearance;
 
+  // ── Home + discovery stores ───────────────────────────────────────────────────
+  const homeComposition = useDshClientHomeComposition();
   const {
-    runtimeBridge,
-    setRuntimeBridge,
-    homeRetryToken,
-    setHomeRetryToken,
     clientDiscoveryStoresBridge,
     clientVisibleDiscoveryStores,
     clientVisibleHomeStores,
-  } = useDshClientRuntimeStores();
+    homeRetryToken,
+    setHomeRetryToken,
+    homeScreenState,
+    homeCategories,
+    homeRecentOrders,
+  } = homeComposition;
 
-  const {
-    state: homeScreenState,
-    categories: homeCategories,
-  } = useDshClientHomeCategories(clientVisibleHomeStores, clientDiscoveryStoresBridge.state, homeRetryToken);
-
+  // ── Navigation ────────────────────────────────────────────────────────────────
   const {
     route, setRoute,
     sheinInlineOpen, setSheinInlineOpen,
@@ -86,20 +79,10 @@ export function useDshClientSurfaceModel({
     handleRegisterBackHandler,
   } = useDshClientNavigation({ command, onExit });
 
-  const {
-    activeStoreId, setActiveStoreId,
-    activeStoreDetail, setActiveStoreDetail,
-    storeDetailState, setStoreDetailState,
-    activeStoreItemsState, setActiveStoreItemsState,
-    activeCanonicalStoreId, setActiveCanonicalStoreId,
-    activeCanonicalProductId, setActiveCanonicalProductId,
-    selectedItemId, setSelectedItemId,
-    favoriteOverrides, setFavoriteOverrides,
-    itemsQuery, setItemsQuery,
-    itemsCategory, setItemsCategory,
-    activeStore, fetchStoreDetail,
-  } = useDshClientStoreState({ route, clientVisibleDiscoveryStores });
+  // ── Store topic model ─────────────────────────────────────────────────────────
+  const storeModel = useDshClientStoreModel({ route, clientVisibleDiscoveryStores });
 
+  // ── Cart ──────────────────────────────────────────────────────────────────────
   const defaultFulfillmentMode: DshFulfillmentDeliveryMode = 'bthwani_delivery';
   const {
     selectedFulfillmentMode, setSelectedFulfillmentMode,
@@ -109,13 +92,22 @@ export function useDshClientSurfaceModel({
     storeItemsEntryOrigin, setStoreItemsEntryOrigin,
     addItemToHostCart, handleReorderClick, openCreateOrderJourney,
   } = useDshClientCartState({
-    activeStore, activeCanonicalStoreId, setActiveCanonicalStoreId,
-    activeCanonicalProductId, setActiveCanonicalProductId,
-    setActiveStoreId, setRoute, clientVisibleDiscoveryStores, defaultFulfillmentMode,
+    activeStore: storeModel.activeStore,
+    activeCanonicalStoreId: storeModel.activeCanonicalStoreId,
+    setActiveCanonicalStoreId: storeModel.setActiveCanonicalStoreId,
+    activeCanonicalProductId: storeModel.activeCanonicalProductId,
+    setActiveCanonicalProductId: storeModel.setActiveCanonicalProductId,
+    setActiveStoreId: storeModel.setActiveStoreId,
+    setRoute,
+    clientVisibleDiscoveryStores,
+    defaultFulfillmentMode,
   });
 
+  // ── Auth + WLT wallet ─────────────────────────────────────────────────────────
   const checkoutAuth = useCheckoutAuth({ authToken, dshAuthBearerToken, devClientId, dshClientId });
+  const walletSession = useWltDshWalletSession(checkoutAuth.clientId, checkoutAuth.bearerToken);
 
+  // ── Orders tracking ───────────────────────────────────────────────────────────
   const {
     selectedOrderId, setSelectedOrderId,
     ordersListState, setOrdersListState,
@@ -133,40 +125,50 @@ export function useDshClientSurfaceModel({
     setRoute, setSelectedFulfillmentMode, setCreateOrderValues,
   });
 
-  const walletSession = useWltDshWalletSession(checkoutAuth.clientId, checkoutAuth.bearerToken);
-
+  // ── Checkout execution ────────────────────────────────────────────────────────
   const {
     handleConfirmedOrderExecution, selectedPaymentMethod, setSelectedPaymentMethod,
     checkoutState, setCheckoutState, paymentErrorMessage, checkoutIntentId,
     setCheckoutIntentId, checkoutClientMemo, handleConfirmCheckout,
   } = useDshClientOrderExecution({
-    cartItems, setCartItems, activeStore, selectedFulfillmentMode, setSelectedFulfillmentMode,
+    cartItems, setCartItems, activeStore: storeModel.activeStore,
+    selectedFulfillmentMode, setSelectedFulfillmentMode,
     checkoutAuth, walletSession, createOrderValues, setCreateOrderValues, setRoute,
     openTrackedOrder, setOrdersListState, setSelectedOrderId, setTrackingClientState, setTrackingOrderOverride,
   });
 
-  const hasStoreTarget = React.useCallback((storeId?: string): boolean =>
-    typeof storeId === 'string' && clientVisibleDiscoveryStores.some((s) => s.id === storeId),
-  [clientVisibleDiscoveryStores]);
+  // ── Cross-topic predicates (used by marketing model) ─────────────────────────
+  const hasStoreTarget = React.useCallback(
+    (storeId?: string): boolean =>
+      typeof storeId === 'string' && clientVisibleDiscoveryStores.some((s) => s.id === storeId),
+    [clientVisibleDiscoveryStores],
+  );
+  const hasStoreCategoryTarget = React.useCallback(
+    (storeId?: string, categoryId?: string): boolean => {
+      if (!hasStoreTarget(storeId) || typeof categoryId !== 'string') return false;
+      return storeModel.activeStoreItems.some((item) => item.categoryId === categoryId);
+    },
+    [hasStoreTarget, storeModel.activeStoreItems],
+  );
+  const hasProductTarget = React.useCallback(
+    (storeId?: string, productId?: string): boolean => {
+      if (!hasStoreTarget(storeId) || typeof productId !== 'string') return false;
+      return storeModel.activeStoreItems.some((item) => item.id === productId);
+    },
+    [hasStoreTarget, storeModel.activeStoreItems],
+  );
 
-  const hasStoreCategoryTarget = React.useCallback((storeId?: string, categoryId?: string): boolean => {
-    if (!hasStoreTarget(storeId) || typeof categoryId !== 'string') return false;
-    return activeStoreItemsState.some((item) => item.categoryId === categoryId);
-  }, [hasStoreTarget, activeStoreItemsState]);
-
-  const hasProductTarget = React.useCallback((storeId?: string, productId?: string): boolean => {
-    if (!hasStoreTarget(storeId) || typeof productId !== 'string') return false;
-    return activeStoreItemsState.some((item) => item.id === productId);
-  }, [hasStoreTarget, activeStoreItemsState]);
-
+  // ── Marketing topic model ─────────────────────────────────────────────────────
   const { isMarketingGrowthRouteValid, liveMarketingPrograms, liveMarketingShorts, homeMarketingPromos, homePromos } =
-    useDshClientMarketingState({ hasStoreTarget, hasStoreCategoryTarget, hasProductTarget });
+    useDshClientMarketingModel({ hasStoreTarget, hasStoreCategoryTarget, hasProductTarget });
 
+  // ── Notifications topic model ─────────────────────────────────────────────────
   const {
     bellSignalEvents, selectedOperationScreen, setSelectedOperationScreen,
     serviceDialTrigger, handleServiceLauncherPress, handleOpenHomeBenefits, openSupportFlow,
-  } = useDshClientBellState({ route, dshApiBaseUrl, checkoutAuth, setRoute });
+  } = useDshClientNotificationsModel({ route, dshApiBaseUrl, checkoutAuth, setRoute });
 
+  // ── Home actions (cross-topic) ────────────────────────────────────────────────
   const {
     handleOpenActiveStoreItems, handleOpenActiveStoreCart, handleToggleHomeFavorite,
     handleOpenHomeCategory, handleOpenHomeStoreCategory, handleOpenHomeProduct,
@@ -175,12 +177,17 @@ export function useDshClientSurfaceModel({
     recordMarketingGrowthClick, recordMarketingGrowthImpression,
   } = useDshClientHomeActions({
     setRoute, clientVisibleDiscoveryStores, clientVisibleHomeStores, isAwnakEnabled,
-    setSheinInlineOpen, setAwnakInlineOpen, activeStore, selectedFulfillmentMode,
-    setSelectedFulfillmentMode, setCreateOrderValues, setActiveStoreId, setActiveCanonicalStoreId,
-    setActiveCanonicalProductId, setItemsQuery, setItemsCategory, setSelectedItemId,
-    setStoreItemsEntryOrigin, favoriteOverrides, setFavoriteOverrides, hasStoreTarget,
+    setSheinInlineOpen, setAwnakInlineOpen, activeStore: storeModel.activeStore, selectedFulfillmentMode,
+    setSelectedFulfillmentMode, setCreateOrderValues, setActiveStoreId: storeModel.setActiveStoreId,
+    setActiveCanonicalStoreId: storeModel.setActiveCanonicalStoreId,
+    setActiveCanonicalProductId: storeModel.setActiveCanonicalProductId,
+    setItemsQuery: storeModel.setItemsQuery, setItemsCategory: storeModel.setItemsCategory,
+    setSelectedItemId: storeModel.setSelectedItemId,
+    setStoreItemsEntryOrigin, favoriteOverrides: storeModel.favoriteOverrides,
+    setFavoriteOverrides: storeModel.setFavoriteOverrides, hasStoreTarget,
   });
 
+  // ── Command target effect ─────────────────────────────────────────────────────
   React.useEffect(() => {
     if (commandTargetToRoute(command.target) === 'tracking') {
       if (defaultTrackingOrderId) {
@@ -190,9 +197,7 @@ export function useDshClientSurfaceModel({
     }
   }, [command, setSelectedOrderId, setTrackingClientState]);
 
-  // Suppress unused variable warnings for vars consumed only by setters
-  void runtimeBridge;
-  void setRuntimeBridge;
+  // Suppress unused variable lint warnings for internal-only refs
   void reorderAlertMessage;
   void setReorderAlertMessage;
   void storeItemsEntryOrigin;
@@ -205,27 +210,6 @@ export function useDshClientSurfaceModel({
   void setCheckoutIntentId;
   void checkoutIntentId;
   void isMarketingGrowthRouteValid;
-  void setActiveStoreDetail;
-  void setStoreDetailState;
-  void setActiveStoreItemsState;
-  void selectedItemId;
-
-  const activeStoreItems = activeStoreItemsState;
-  const activeStoreCategories = React.useMemo(() => buildStoreCategories(activeStoreItems), [activeStoreItems]);
-  const activeStoreDeliveryModes = React.useMemo(() => buildStoreDeliveryModes(activeStore), [activeStore]);
-  const activeStoreTags = React.useMemo(() => buildStoreTags(activeStore), [activeStore]);
-  const activeStoreScreenStore = React.useMemo(() =>
-    mapStoreDetailToScreenStore(activeStoreDetail, activeStore, activeStoreTags, activeStoreDeliveryModes, activeStoreCategories),
-  [activeStoreDetail, activeStore, activeStoreTags, activeStoreDeliveryModes, activeStoreCategories]);
-
-  const homeRecentOrders = React.useMemo(() => clientVisibleHomeStores.slice(0, 2).map((store, index) => ({
-    id: `home-recent-order-${store.id}`,
-    storeId: store.id,
-    title: index === 0 ? 'الطلب النشط' : 'آخر طلب',
-    subtitle: store.name,
-    meta: `${store.distanceLabel ?? 'غير محدد'} · ${store.deliveryLabel ?? store.serviceLabel ?? 'غير محدد'}`,
-    statusLabel: store.statusTone === 'open' ? 'مباشر' : 'مغلق',
-  })), [clientVisibleHomeStores]);
 
   return {
     session: { dshAuthBearerToken, dshClientId, appearanceHydrated, appearanceMode, setAppearanceMode, bellSignalEvents, walletSession },
@@ -236,16 +220,28 @@ export function useDshClientSurfaceModel({
     },
     home: {
       categories: homeCategories, homeScreenState, homeMarketingPromos, homePromos, liveMarketingShorts,
-      clientVisibleHomeStores, homeRecentOrders, homeSearchAutoOpenToken, favoriteOverrides,
+      clientVisibleHomeStores, homeRecentOrders, homeSearchAutoOpenToken, favoriteOverrides: storeModel.favoriteOverrides,
       handleToggleFavorite: handleToggleHomeFavorite,
       handleOpenHomeCategory, handleOpenHomeStoreCategory, handleOpenHomeProduct, handleOpenHomeBenefits,
       openHomeInlineSearch, handleOpenHomeStore, setHomeRetryToken, sheinInlineOpen, setSheinInlineOpen,
       awnakInlineOpen, setAwnakInlineOpen, clientDiscoveryStoresBridge,
     },
     store: {
-      storeDetailState, activeStoreScreenStore, activeStoreItems, activeStoreId, activeStore, itemsQuery,
-      setItemsQuery, itemsCategory, setItemsCategory, storeItemsEntryOrigin, setSelectedItemId,
-      addItemToHostCart, handleOpenActiveStoreItems, handleOpenActiveStoreCart, fetchStoreDetail,
+      storeDetailState: storeModel.storeDetailState,
+      activeStoreScreenStore: storeModel.activeStoreScreenStore,
+      activeStoreItems: storeModel.activeStoreItems,
+      activeStoreId: storeModel.activeStoreId,
+      activeStore: storeModel.activeStore,
+      itemsQuery: storeModel.itemsQuery,
+      setItemsQuery: storeModel.setItemsQuery,
+      itemsCategory: storeModel.itemsCategory,
+      setItemsCategory: storeModel.setItemsCategory,
+      storeItemsEntryOrigin,
+      setSelectedItemId: storeModel.setSelectedItemId,
+      addItemToHostCart,
+      handleOpenActiveStoreItems,
+      handleOpenActiveStoreCart,
+      fetchStoreDetail: storeModel.fetchStoreDetail,
     },
     checkout: {
       cartItems, selectedFulfillmentMode, selectedPaymentMethod, setSelectedPaymentMethod, paymentErrorMessage,

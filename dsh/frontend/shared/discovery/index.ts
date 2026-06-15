@@ -17,4 +17,5 @@ export * from './home-promo-mappers';
 export * from './client.navigation-bridge';
 export * from './useDshClientNavigation';
 export * from './useDshClientBellState';
+export * from './client-home.composition';
 export * from './useDshClientSurfaceModel';

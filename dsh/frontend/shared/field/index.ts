@@ -3,3 +3,7 @@ export * from './field.store-lifecycle';
 export * from './field.surface-model';
 export * from './field.draft-utils';
 export * from './field.visit-policy';
+export * from './field-navigation.model';
+export * from './field-draft.model';
+export * from './field-visit.model';
+export * from './field-escalation.model';

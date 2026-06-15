@@ -6,3 +6,4 @@
 
 export * from './notifications.types';
 export * from './notifications.api';
+export * from './client-notifications.model';

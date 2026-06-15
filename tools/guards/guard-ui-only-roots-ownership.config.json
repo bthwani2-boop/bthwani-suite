@@ -1,5 +1,6 @@
 {
-  "version": "2.0.0",
+  "version": "2.1.0",
+  "_comment": "Per-file allowlist only. Blanket directory entries (screens/, parts/, control-panel/, wlt/frontend/dsh/) removed 2026-06-15. Each entry covers only the rules that file actually triggers.",
   "uiOnlyRoots": [
     "dsh/frontend/app-captain",
     "dsh/frontend/app-client",
@@ -14,26 +15,6 @@
   ],
   "globalAllowRules": [],
   "allowlist": {
-    "screens/": [
-      "ui_only_runtime_mutation_or_query_function",
-      "ui_only_non_deterministic_runtime_id",
-      "ui_only_runtime_adapter_policy",
-      "ui_only_state_machine_or_lifecycle",
-      "ui_only_media_upload_logic",
-      "ui_only_finance_runtime_logic",
-      "ui_only_preview_demo_mock_fallback_runtime"
-    ],
-    "parts/": [
-      "ui_only_runtime_mutation_or_query_function",
-      "ui_only_runtime_adapter_policy",
-      "ui_only_state_machine_or_lifecycle",
-      "ui_only_media_upload_logic",
-      "ui_only_finance_runtime_logic",
-      "ui_only_preview_demo_mock_fallback_runtime"
-    ],
-    "sheets/": [
-      "ui_only_runtime_mutation_or_query_function"
-    ],
     "dsh-partner.screen-registry.ts": [
       "ui_only_runtime_adapter_policy",
       "ui_only_finance_runtime_logic",
@@ -57,26 +38,422 @@
       "ui_only_runtime_adapter_policy",
       "ui_only_forbidden_functions"
     ],
-    "control-panel/": [
-      "ui_only_runtime_mutation_or_query_function",
-      "ui_only_media_upload_logic",
-      "ui_only_runtime_adapter_policy",
-      "ui_only_state_machine_or_lifecycle",
-      "ui_only_status_or_next_action_map",
-      "ui_only_preview_demo_mock_fallback_runtime",
+    "useHomeFilterRail.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/app-captain/screens/DshCaptainFinanceScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-captain/screens/DshCaptainOrdersScreen.tsx": [
+      "ui_only_non_deterministic_runtime_id",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-client/parts/ApprovedVideoReelsViewer.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-client/parts/CartDetails.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-client/parts/home/HomeOrbitSections.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/app-client/parts/LoyaltyRewardsScreen.tsx": [
       "ui_only_finance_runtime_logic"
     ],
-    "wlt/frontend/dsh/": [
-      "ui_only_runtime_mutation_or_query_function",
-      "ui_only_media_upload_logic",
-      "ui_only_runtime_adapter_policy",
-      "ui_only_state_machine_or_lifecycle",
-      "ui_only_status_or_next_action_map",
+    "dsh/frontend/app-client/parts/store/StoreImageViewerSheet.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-client/parts/SubscriptionsScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-client/screens/AddressLocationScreen.tsx": [
+      "ui_only_non_deterministic_runtime_id"
+    ],
+    "dsh/frontend/app-client/screens/BenefitsScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-client/screens/CartScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-client/screens/DshOrderIssueHubScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-client/screens/MySpaceScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-client/screens/NotificationsScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_non_deterministic_runtime_id"
+    ],
+    "dsh/frontend/app-client/screens/parts/OperationScreenView.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-client/screens/StoreItemsScreen.tsx": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/app-partner/parts/PartnerOrderIssuePanel.tsx": [
       "ui_only_finance_runtime_logic",
       "ui_only_preview_demo_mock_fallback_runtime"
     ],
-    "useHomeFilterRail.tsx": [
+    "dsh/frontend/app-partner/screens/CategoryManagementScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/DshPartnerRouteRenderer.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/app-partner/screens/InventoryCatalogScreen.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/PartnerHubScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-partner/screens/ProductEditScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/ProductMediaScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/ProductOverridesScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/PromotionsScreen.tsx": [
+      "ui_only_non_deterministic_runtime_id"
+    ],
+    "dsh/frontend/control-panel/administration/ControlPanelDshAdministrationScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/catalogs.approvals.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/catalogs.listing-governance.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/catalogs.parts.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/catalogs.screen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/audit-trail.drawer.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/catalog-workspace-router.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/duplicate-resolution.drawer.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/item-detail.drawer.tsx": [
       "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/media-governance.drawer.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/publication-readiness.drawer.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/quick-entry-draft.drawer.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/products/catalog-products-table.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/products/mapping-workspace.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/catalogs/products/product-edit-modal.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/control-panel/catalogs/products/product-inspector-panel.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/control-panel/catalogs/products/publishing-gate-checklist.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/taxonomy/taxonomy-node-inspector.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/taxonomy/taxonomy-tree-nodes.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/dashboard/ControlPanelDshClosureDashboardScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/hr/ControlPanelHrScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/marketing/banner-target-utils.ts": [
+      "ui_only_media_upload_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/BannerEditorSection.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/BannersCommandDeckScreen.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/BannerViewer.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/CampaignsCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/commercial-parity-viewer.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/ControlPanelDshMarketingScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/marketing/GrowthCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/marketing/LoyaltyCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/marketing/MarketingMediaReviewCommandDeckScreen.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/PartnerOffersCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_status_or_next_action_map"
+    ],
+    "dsh/frontend/control-panel/marketing/PromosCommandDeckScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/SmartSignalLayerScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/marketing/TickerCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/VideosCommandDeckScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/VisibilityCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/operations/AssistedOrderDeskScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/operations/AuditTrailDetailWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/operations/DispatchAssignmentScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/operations/ExceptionsEscalationsScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/control-panel/operations/GeoHeatmapScreen.tsx": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/operations/LiveOrdersScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/operations/OperationsHubScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/operations/OrderRescueScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/control-panel/operations/PartnerStoresScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/ControlPanelDshPartnerApprovalsScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/DshPartnerPromotionEligibilityScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerActivationWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerCatalogOverridesWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerComplaintsWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerDocumentReviewWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerModificationsWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerPerformanceWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/ReadinessApprovalsWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/ReadinessEscalationsWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/platform/Audit/DshPlatformAuditWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/platform/ControlPanelDshPlatformScreen.tsx": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/platform/Health/DshPlatformHealthWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/platform/Providers/DshPlatformProvidersWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/platform/Rollouts/DshPlatformRolloutsWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/platform/Services/DshPlatformServicesWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/platform/Vars/DshPlatformVarsWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/shared/dsh-control-panel-display.ts": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/support/Customer360Workspace.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/control-panel/support/SupportHubScreens.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/support/SupportTicketDetailWorkspace.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/app-captain/WltDshCaptainFinanceSummary.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/app-client/CustomerWalletScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "wlt/frontend/dsh/app-client/wlt-dsh-client.parts.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/app-client/WltDshClientPaymentSelector.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/app-partner/wlt-dsh-partner.parts.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/app-partner/wlt-dsh-partner.ui-copy.ts": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "wlt/frontend/dsh/control-panel/components/LedgerEntriesTable.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltBoundaryBanner.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshAccountStatement.tsx": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshCaptainStatement.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshFinanceControlPanelSummary.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshRealtimeLedger.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshRefundLedger.tsx": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshSettlementCalendar.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshStoreSettlementStatement.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshWalletControlCenter.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/AuditCloseScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/CaptainPayoutWorkspace.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/DailyReconciliationWorkbench.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/FinancialCenterScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/LedgerScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_state_machine_or_lifecycle"
     ]
   }
 }

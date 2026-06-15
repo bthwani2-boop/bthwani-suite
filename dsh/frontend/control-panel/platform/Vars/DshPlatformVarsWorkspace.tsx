@@ -5,7 +5,6 @@ import { Box } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { usePlatformAuditState } from '../usePlatformAuditState';
 import type {
-  DshPlatformVarRecord,
   DshPlatformVarScope,
   DshPlatformVarStatus,
 } from './vars.types';
@@ -15,10 +14,7 @@ import {
   PLATFORM_VAR_RISK_LABEL,
   PLATFORM_VAR_STATUS_LABEL,
   PLATFORM_VAR_QUICK_PICKS,
-  isPlatformVarMutationAllowed,
   isPlatformDesignVar,
-  isPlatformDesignValValid,
-  type PlatformVarMutationAction,
 } from '../../../shared/platform/platform-vars.policy';
 import {
   DSH_PLATFORM_AUDIT_LOG,
@@ -26,8 +22,6 @@ import {
   DSH_PLATFORM_PROVIDER_CONTROL_VARS,
   DSH_PLATFORM_SCOPE_PRECEDENCE,
   DSH_PLATFORM_POLICY_SCENARIOS,
-  DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
-  DSH_PLATFORM_DESIGN_POLICY_VARS,
   resolvePlatformVarsDomainRecords,
   sortPlatformVarsByScope,
   resolvePlatformVarsDomainKpis,
@@ -35,6 +29,7 @@ import {
   isProviderVarRecord,
   type VarsDomainId,
 } from '../../../shared/platform/platform-vars.view-model';
+import { usePlatformVarsSession } from '../../../shared/platform/platform-vars.session';
 import styles from './dsh-platform-vars.module.css';
 
 const DOMAIN_TABS: { id: VarsDomainId; label: string }[] = [
@@ -113,41 +108,14 @@ function RefCard({ title, desc, footer }: { title: string; desc: string; footer?
 /* ─── MAIN ─── */
 export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainFilter: VarsDomainId }) {
   const { addAuditEvent } = usePlatformAuditState();
+  const { getLive, editVal, setEditVal, showConfirm, setShowConfirm, confirmSaveProposed } =
+    usePlatformVarsSession(addAuditEvent);
 
   const activeDomain = activeDomainFilter;
   const [activeScope,  setActiveScope]  = React.useState<string>('all');
   const [selectedId,   setSelectedId]   = React.useState<string | null>(
     DSH_PLATFORM_OPERATIONAL_VARS[0]?.id ?? null
   );
-
-  const [varsState, setVarsState] = React.useState<
-    Record<string, { current: string; proposed: string | null; status: DshPlatformVarStatus }>
-  >(() => {
-    const init: Record<string, any> = {};
-    const all = [
-      ...DSH_PLATFORM_OPERATIONAL_VARS,
-      ...DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
-      ...DSH_PLATFORM_PROVIDER_CONTROL_VARS,
-      ...DSH_PLATFORM_DESIGN_POLICY_VARS,
-    ];
-    for (const v of all) {
-      init[v.id] = {
-        current:  v.currentValue,
-        proposed: v.proposedValue ?? null,
-        status:   v.status,
-      };
-    }
-    return init;
-  });
-
-  const [editVal,     setEditVal]     = React.useState('');
-  const [showConfirm, setShowConfirm] = React.useState<PlatformVarMutationAction | null>(null);
-
-  const getLive = (v: DshPlatformVarRecord) => {
-    const s = varsState[v.id];
-    if (!s) return { ...v, currentValue: v.currentValue, proposedValue: v.proposedValue ?? null };
-    return { ...v, currentValue: s.current, proposedValue: s.proposed };
-  };
 
   /* reset on domain change */
   React.useEffect(() => {
@@ -156,12 +124,7 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
     const records = resolvePlatformVarsDomainRecords(activeDomain);
     const first = records[0] ?? null;
     setSelectedId(first?.id ?? null);
-    if (first) {
-      const live = getLive(first);
-      setEditVal(live.proposedValue ?? '');
-    } else {
-      setEditVal('');
-    }
+    setEditVal(first ? (getLive(first).proposedValue ?? '') : '');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeDomain]);
 
@@ -171,15 +134,10 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
     if (!selectedId) return;
     const all = [
       ...DSH_PLATFORM_OPERATIONAL_VARS,
-      ...DSH_PLATFORM_WLT_FINANCIAL_BRIDGE_VARS,
       ...DSH_PLATFORM_PROVIDER_CONTROL_VARS,
-      ...DSH_PLATFORM_DESIGN_POLICY_VARS,
     ];
     const found = all.find((r) => r.id === selectedId);
-    if (found) {
-      const live = getLive(found);
-      setEditVal(live.proposedValue ?? '');
-    }
+    if (found) setEditVal(getLive(found).proposedValue ?? '');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
@@ -199,38 +157,9 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
   const kpis          = resolvePlatformVarsDomainKpis(activeDomain, kpiCssClasses);
   const quickPicks      = selectedVar ? (QUICK_PICKS[selectedVar.key] ?? []) : [];
 
-  const handleConfirm = (action: PlatformVarMutationAction) => {
-    if (!selectedVar) return;
-    if (!isPlatformVarMutationAllowed(action, selectedVar.key)) {
-      setShowConfirm(null);
-      return;
-    }
-    const prev = varsState[selectedVar.id] ?? {
-      current: selectedVar.currentValue, proposed: selectedVar.proposedValue ?? null, status: selectedVar.status,
-    };
-
-    if (action === 'save-proposed') {
-      if (!isPlatformDesignValValid(selectedVar.key, editVal)) return;
-      setVarsState((s) => ({ ...s, [selectedVar.id]: { ...prev, proposed: editVal || null } }));
-      addAuditEvent({
-        action: `حفظ مقترح (${selectedVar.label})`,
-        operator: 'platform-operator',
-        status: 'success',
-        oldValue: prev.proposed ?? '',
-        newValue: editVal,
-        reason: 'حفظ قيمة مقترحة (محلي فقط)',
-        scope: selectedVar.scope,
-        impact: selectedVar.effectSummary,
-        rollbackAvailable: false,
-      });
-    }
-
-    setShowConfirm(null);
-  };
-
-  const hasProposed = Boolean(selectedVar?.proposedValue ?? varsState[selectedVar?.id ?? '']?.proposed);
+  const hasProposed = Boolean(selectedVar?.proposedValue);
   const isDesignVar = selectedVar ? isPlatformDesignVar(selectedVar.key) : false;
-  const isValidDesignVal = selectedVar ? isPlatformDesignValValid(selectedVar.key, editVal) : true;
+  const isValidDesignVal = isDesignVar ? (QUICK_PICKS[selectedVar?.key ?? ''] ?? []).includes(editVal) : true;
 
   return (
     <Box gap={4}>
@@ -460,7 +389,7 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
                       {'حفظ القيمة المقترحة بانتظار اعتماد عقد التشغيل (محلي فقط — لا يُطبَّق على الخوادم).'}
                     </div>
                     <div className={styles.confirmActions}>
-                      <button type="button" className={styles.btnPrimary} onClick={() => handleConfirm(showConfirm)}>
+                      <button type="button" className={styles.btnPrimary} onClick={() => selectedVar && confirmSaveProposed(selectedVar, editVal)}>
                         تأكيد
                       </button>
                       <button type="button" className={styles.btnSecondary} onClick={() => setShowConfirm(null)}>
