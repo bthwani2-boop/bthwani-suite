@@ -21,6 +21,14 @@ export type PartnerCreateStoreResponse = {
   readonly created_at: string;
 };
 
+export type PartnerPendingReviewStore = {
+  readonly id: string;
+  readonly name: string;
+  readonly address: string;
+  readonly category_id?: string;
+  readonly created_at?: string;
+};
+
 export type PartnerStoreOnboardingFetchFn = (input: string, init?: RequestInit) => Promise<Response>;
 
 export type PartnerStoreOnboardingOfflineError = { readonly kind: 'offline' };
@@ -35,6 +43,7 @@ export type PartnerStoreOnboardingError =
 
 export interface PartnerStoreOnboardingClient {
   createStore(req: PartnerCreateStoreRequest): Promise<PartnerCreateStoreResponse>;
+  getPendingReviewStores(): Promise<readonly PartnerPendingReviewStore[]>;
 }
 
 export function isPartnerStoreOnboardingOfflineError(
@@ -80,6 +89,30 @@ export function createPartnerStoreOnboardingHttpClient(
       }
 
       return response.json() as Promise<PartnerCreateStoreResponse>;
+    },
+    getPendingReviewStores: async () => {
+      const transport = fetchFn ?? globalThis.fetch?.bind(globalThis);
+
+      if (!baseUrl || !transport) {
+        throw { kind: 'offline' } satisfies PartnerStoreOnboardingOfflineError;
+      }
+
+      const response = await transport(`${baseUrl.replace(/\/$/, '')}/stores/pending-review`, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw {
+          kind: 'http',
+          status: response.status,
+          body: await response.text(),
+        } satisfies PartnerStoreOnboardingHttpError;
+      }
+
+      return response.json() as Promise<readonly PartnerPendingReviewStore[]>;
     },
   };
 }

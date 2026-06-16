@@ -188,7 +188,7 @@ export function usePartnerOnboardingDraftModel({
             console.error('[partner-onboarding:sync-docs] Failed to submit interior photo:', e);
           }
         }
-        pushRoute({ kind: 'visit', backendStoreId: res.id });
+        pushRoute({ kind: 'stores' });
       }).catch((err) => {
         console.error('[partner-onboarding:submit-review] Error creating store from draft:', err);
         patchStore(store.id, (s) => ({

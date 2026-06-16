@@ -2,7 +2,7 @@ import {
   DSH_DELIVERY_MODE_DEFINITIONS,
   getDshDeliveryModeDefinition,
   type DshFulfillmentDeliveryMode,
-} from '../delivery';
+} from '../delivery/delivery.contract';
 import type { DshControlPanelSectionId } from '../control-panel/dsh-governance.map';
 import type { DshOnDemandPolicy, DshSurfaceId } from '../runtime/dsh-flow-registry';
 import {

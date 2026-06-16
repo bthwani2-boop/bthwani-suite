@@ -7,6 +7,8 @@ import {
   createPartnerDocumentHttpClient,
   resolvePartnerDocumentBaseUrl,
   type PartnerDocumentKind,
+} from '../shared/partner/documents';
+import {
   createPartnerStoreOnboardingHttpClient,
   resolvePartnerStoreOnboardingBaseUrl,
   resolveOnboardingStoreStatus,
@@ -24,9 +26,11 @@ import {
   createManualOnboardingStore,
   matchesOnboardingStoreFilter,
   type PartnerOnboardingFilter,
+} from '../shared/partner/onboarding';
+import {
   createDshFieldVisitHttpClient,
   resolveDshFieldVisitBaseUrl,
-} from '../shared';
+} from '../shared/dsh-field-visit-client';
 import type {
   FieldStoreFile,
   DshFieldNavigationCommand,
@@ -52,7 +56,6 @@ export {
 export function validateVisitFields(values: DshFieldStoreVisitValues): DshFieldStoreVisitErrors {
   const errors: DshFieldStoreVisitErrors = {};
   if (!values.visitSummary.trim()) errors.visitSummary = 'اكتب ملخص الزيارة قبل الإرسال.';
-  if (!values.followUpAction.trim()) errors.followUpAction = 'حدد خطوة المتابعة قبل الإرسال.';
   return errors;
 }
 
@@ -229,7 +232,7 @@ export function useFieldRuntimeActions() {
     (storeId: string, values: DshFieldVisitDraftValues) =>
       fieldVisitClient.createFieldVisit(storeId, {
         visit_summary: values.visitSummary.trim(),
-        follow_up_action: values.followUpAction.trim(),
+        follow_up_action: values.followUpAction.trim() || 'متابعة',
         evidence_media_keys: [],
         location_confidence: 'manual_confirmed',
       }),

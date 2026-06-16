@@ -123,8 +123,8 @@ export function DshFieldStoreVisitScreen({
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
       <TopBar
         variant="surface"
-        title="زيارة المتجر"
-        subtitle="سجّل ملخص الزيارة وخطوة المتابعة للمتجر"
+        title="متابعة المتجر"
+        subtitle="سجّل ملخص المتابعة للمتجر"
         trailingAction={
           onRetry
             ? {
@@ -139,157 +139,27 @@ export function DshFieldStoreVisitScreen({
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 120 }}>
         <Box padding={4} gap={4}>
-          {/* Section 1: سياسة الزيارة من السجل */}
-          <Box gap={2} paddingY={2}>
-            <SectionHeader
-              title="سياسة الزيارة من السجل"
-              subtitle="الأدلة والوثائق تبقى on-demand، ولا تتحول الشاشة إلى معرض دائم."
-            />
-            <KeyValueList
-              dense
-              items={[
-                { label: 'المالك', value: visitFlowSummary?.ownerSurface ?? 'app-field', tone: 'brand' },
-                { label: 'سياسة الفتح', value: visitFlowSummary?.onDemandPolicy ?? 'evidence-on-open' },
-                { label: 'مالك التصعيد', value: resolveDshControlPanelSectionLabel('support') },
-              ]}
-            />
-            <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-              {visitFlowSummary?.nextPolicyActionPreview ?? 'كل دليل يفتح فقط عند اختياره من القائمة.'}
-            </Text>
-          </Box>
-
-          <Divider />
-
-          {/* Section 2: سياق الزيارة الميدانية */}
+          {/* Section: ملخص المتابعة */}
           <Box gap={3} paddingY={2}>
             <SectionHeader
-              title="سياق الزيارة الميدانية"
-              subtitle="Checklist الجاهزية ودرجة الأدلة ومسودة offline وثقة الموقع تبقى داخل الزيارة نفسها."
-            />
-            <KeyValueList
-              dense
-              items={[
-                { label: 'visit checklist', value: 'الواجهة · المالك · ساعات العمل · نقطة الاستلام' },
-                { label: 'evidence score', value: `${evidenceItems.length}/4`, tone: evidenceItems.length >= 2 ? 'success' : 'warning' },
-                { label: 'offline draft', value: 'غير نشط', tone: 'default' as const },
-                { label: 'location confidence', value: 'manual confirmation required', tone: 'brand' },
-              ]}
-            />
-          </Box>
-
-          <Divider />
-
-          {/* Section 3: ملخص الزيارة */}
-          <Box gap={3} paddingY={2}>
-            <SectionHeader
-              title="ملخص الزيارة"
-              subtitle="الملخص يجب أن يوضح ما تم التحقق منه وما الذي بقي مفتوحًا."
+              title="ملاحظات المتابعة"
+              subtitle="اكتب ملخصًا لما تم خلال هذه المتابعة."
             />
             <TextField
-              label="ملخص الزيارة"
+              label="ملخص المتابعة"
               value={values.visitSummary}
               onChangeText={(value) => onChange('visitSummary', value)}
               editable={!isDisabled}
               error={errors?.visitSummary}
-              hint="مثال: تم تأكيد الواجهة والملاك، والمتابعة تنتظر خطوة الاعتماد."
-            />
-            <TextField
-              label="خطوة المتابعة"
-              value={values.followUpAction}
-              onChangeText={(value) => onChange('followUpAction', value)}
-              editable={!isDisabled}
-              error={errors?.followUpAction}
-              hint="مثال: انتظار اعتماد العرض، أو العودة للتثبيت النهائي، أو تفعيل الاستلام."
+              hint="مثال: تم التنسيق مع الشريك وبانتظار الموافقة النهائية."
             />
           </Box>
 
           <Divider />
 
-          {/* Section 4: أدلة الزيارة */}
+          {/* Section: حفظ المتابعة */}
           <Box gap={3} paddingY={2}>
-            <SectionHeader
-              title="أدلة الزيارة"
-              subtitle="كل دليل يبقى قابلًا للفتح دون تحويل الصفحة إلى معرض."
-            />
-            <Box gap={0}>
-              {evidenceItems.map((item, index) => (
-                <View key={item.id}>
-                  {index > 0 && <Divider style={{ marginVertical: 8 }} />}
-                  <Pressable
-                    onPress={() => {
-                      setSelectedEvidenceId((current) => (current === item.id ? null : item.id));
-                      onOpenEvidence?.(item.id);
-                    }}
-                  >
-                    <Box gap={1} paddingY={2}>
-                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
-                          <Text role="bodyStrong" style={{ textAlign: 'right' }}>{item.title}</Text>
-                          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{item.subtitle}</Text>
-                          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{`تم الالتقاط ${item.capturedAtLabel}`}</Text>
-                        </View>
-                        {item.statusLabel ? (
-                          <Badge label={item.statusLabel} tone="brand" />
-                        ) : null}
-                      </View>
-                    </Box>
-                  </Pressable>
-                </View>
-              ))}
-            </Box>
-          </Box>
-
-          {selectedEvidenceItem ? (
-            <>
-              <Divider />
-              <Box gap={2} paddingY={2}>
-                <SectionHeader
-                  title="تفاصيل الدليل المفتوح"
-                  subtitle="هذا الجزء يظهر فقط بعد اختيار دليل محدد من القائمة."
-                />
-                <KeyValueList
-                  dense
-                  items={[
-                    { label: 'العنصر', value: selectedEvidenceItem.title, tone: 'brand' },
-                    { label: 'الحالة', value: selectedEvidenceItem.statusLabel },
-                    { label: 'وقت الالتقاط', value: selectedEvidenceItem.capturedAtLabel },
-                  ]}
-                />
-                <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                  {selectedEvidenceItem.subtitle}
-                </Text>
-                <Button label="إغلاق الدليل" tone="secondary" onPress={() => setSelectedEvidenceId(null)} />
-              </Box>
-            </>
-          ) : null}
-
-          <Divider />
-
-          {/* Section 5: التقاط أدلة الزيارة */}
-          <Box gap={3} paddingY={2}>
-            <SectionHeader
-              title="التقاط أدلة الزيارة"
-              subtitle="رفع الصور معلق حتى تُثبَت واجهة برمجة رفع الملفات. الأزرار ستصبح نشطة عند توفر العقد."
-            />
-            <VisitEvidenceSection sectionState="ready" />
-          </Box>
-
-          <Divider />
-
-          {/* Section 6: إغلاق الزيارة */}
-          <Box gap={3} paddingY={2}>
-            <SectionHeader
-              title="إغلاق الزيارة"
-              subtitle="يجب أن تبقى الخطوة التالية واضحة وقابلة للمساءلة."
-            />
-            <KeyValueList
-              items={[
-                { label: 'CTA الأساسي', value: 'إرسال الزيارة' },
-                { label: 'عدد الأدلة', value: String(evidenceItems.length) },
-                { label: 'الخطوة التالية', value: values.followUpAction || 'قيد التحديد', tone: 'brand' },
-              ]}
-            />
-            <Button label="إرسال الزيارة" onPress={onSubmit} disabled={isDisabled} />
+            <Button label="حفظ المتابعة" onPress={onSubmit} disabled={isDisabled} />
           </Box>
         </Box>
       </MobileScrollView>

@@ -959,6 +959,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /stores/pending-review:
+    get:
+      tags:
+        - Store Discovery
+      summary: List stores pending review
+      description: Retrieve all stores in the pending_review stage for control panel review queue.
+      operationId: listPendingStores
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreateFieldStoreResponse'
         '500':
           description: Internal Server Error
           content:

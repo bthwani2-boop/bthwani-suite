@@ -35,6 +35,7 @@ func NewStoresHandler(repository StoreFieldRepository) *StoresHandler {
 
 	// Register internal routes for dispatching
 	handler.mux.HandleFunc("GET /stores", handler.ListStores)
+	handler.mux.HandleFunc("GET /stores/pending-review", handler.ListPendingStores)
 	handler.mux.HandleFunc("GET /stores/{id}", handler.GetStore)
 	handler.mux.HandleFunc("POST /stores", handler.CreateFieldStore)
 	handler.mux.HandleFunc("POST /stores/{id}/field-visits", handler.CreateFieldVisit)
@@ -49,6 +50,7 @@ func NewStoresHandler(repository StoreFieldRepository) *StoresHandler {
 func RegisterRoutes(mux *http.ServeMux, repository StoreFieldRepository) {
 	handler := NewStoresHandler(repository)
 	mux.Handle("GET /stores", handler)
+	mux.Handle("GET /stores/pending-review", handler)
 	mux.Handle("GET /stores/{id}", handler)
 	mux.Handle("POST /stores", handler)
 	mux.Handle("POST /stores/{id}/field-visits", handler)
@@ -87,6 +89,22 @@ func (handler *StoresHandler) ListStores(writer http.ResponseWriter, request *ht
 	response, err := handler.repository.ListStores(request.Context(), query)
 	if err != nil {
 		writeError(writer, http.StatusInternalServerError, domain.ErrorCodeInternalError, "unable to list stores")
+		return
+	}
+
+	writeJSON(writer, http.StatusOK, response)
+}
+
+func (handler *StoresHandler) ListPendingStores(writer http.ResponseWriter, request *http.Request) {
+	log.Printf("dsh-api: received GET /stores/pending-review request")
+	if request.Method != http.MethodGet {
+		writeError(writer, http.StatusMethodNotAllowed, domain.ErrorCodeInvalidParameter, "method not allowed")
+		return
+	}
+
+	response, err := handler.repository.ListPendingStores(request.Context())
+	if err != nil {
+		writeError(writer, http.StatusInternalServerError, domain.ErrorCodeInternalError, "unable to list pending stores")
 		return
 	}
 

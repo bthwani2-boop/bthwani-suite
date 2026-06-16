@@ -6,6 +6,11 @@ import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../p
 import { createDshStoreVisibilityHttpClient, resolveDshStoreVisibilityBaseUrl } from '../stores/dsh-store-visibility-transport';
 import { resolveDshAuthBaseUrl } from '../runtime/dsh-auth-client';
 import { createDshDiscoveryStoresClient, type DshDiscoveryStoresRuntimeConfig } from '../stores';
+import { createPartnerStoreOnboardingHttpClient, resolvePartnerStoreOnboardingBaseUrl } from '../partner/onboarding/partner-store-onboarding.client';
+
+export function getPartnerStoreOnboardingRuntimeClient() {
+  return createPartnerStoreOnboardingHttpClient(resolvePartnerStoreOnboardingBaseUrl());
+}
 
 export function getDshProductRuntimeClient() {
   return createDshProductApiHttpClient(resolveDshProductApiBaseUrl());

@@ -2,8 +2,10 @@ import React from 'react';
 import {
   EMPTY_PARTNER_FINANCE_SNAPSHOT,
   getPartnerSnapshot,
+} from './partner-finance-runtime.adapter';
+import {
   mapWltDshPartnerTransactions,
-} from '..';
+} from './partner-finance.adapter';
 
 export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerToken?: string | null) {
   const [partnerPreview, setPartnerPreview] = React.useState(EMPTY_PARTNER_FINANCE_SNAPSHOT);

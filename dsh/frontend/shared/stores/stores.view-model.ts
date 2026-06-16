@@ -6,7 +6,7 @@ import {
   createDshDiscoveryStoresClient,
   type DshGetDiscoveryStoreResponse,
 } from './stores.api';
-import { getDshProductRuntimeClient } from '../runtime/ui-only-runtime-clients';
+import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../products/dsh-product-api.transport';
 import {
   mapProductRecordToItem,
   buildStoreSearchCategories,
@@ -76,7 +76,8 @@ export function useDshClientStoreState({
 
     // Use runtime configs to build a fresh runtime client instance
     const client = createDshDiscoveryStoresClient(config);
-    const prodClient = getDshProductRuntimeClient();
+    const productBaseUrl = resolveDshProductApiBaseUrl();
+    const prodClient = createDshProductApiHttpClient(productBaseUrl);
 
     Promise.all([
       client.getDiscoveryStore(storeId),

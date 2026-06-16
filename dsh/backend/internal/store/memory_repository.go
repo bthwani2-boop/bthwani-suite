@@ -236,6 +236,10 @@ func (repo *MemoryRepository) ListStores(ctx context.Context, query domain.Store
 	}, nil
 }
 
+func (repo *MemoryRepository) ListPendingStores(_ context.Context) ([]domain.CreateFieldStoreResponse, error) {
+	return nil, nil
+}
+
 func clientVisible(store memoryStore) bool {
 	return domain.VisibilityServiceabilityInput{
 		PublishStage:              store.summary.PublishStage,

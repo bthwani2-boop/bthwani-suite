@@ -15,7 +15,8 @@ import {
   initialCreateOrderValues,
   resolveStorePickupAddress,
 } from '../checkout/dsh-client-binding.contracts';
-import { performReorderMapping, initialOrders } from '../orders';
+import { performReorderMapping } from '../orders/orders.adapters';
+import { initialOrders } from '../orders/orders-seed-or-runtime.model';
 import type { DshDiscoveryStore } from '../stores';
 
 type UseDshClientCartStateOptions = {

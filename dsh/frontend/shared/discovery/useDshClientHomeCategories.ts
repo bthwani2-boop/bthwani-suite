@@ -1,7 +1,7 @@
 import React from 'react';
 import type { DshHomeCategory, DshHomeGetStore } from '../discovery/dsh-home-types';
 import { isDshProductApiOfflineError } from '../products/dsh-product-api.transport';
-import { getDshProductRuntimeClient } from '../../shared';
+import { getDshProductRuntimeClient } from '../runtime/ui-only-runtime-clients';
 import { resolveDshDiscoveryStoresRuntimeConfig } from '../stores';
 
 export type CategoriesBridgeResult = {

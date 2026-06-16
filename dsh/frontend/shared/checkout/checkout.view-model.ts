@@ -2,9 +2,8 @@
 // Authority: dsh/frontend/shared/checkout — checkout view-model hook logic.
 
 import React from 'react';
-import { getDshCheckoutRuntimeClient, getDshOrderLifecycleRuntimeClient } from '../runtime/ui-only-runtime-clients';
-import type { DshCheckoutAuthContext, DshCheckoutClient } from './checkout.api';
-import type { DshOrderItemInput } from '../orders/dsh-order-lifecycle-client';
+import { createDshCheckoutHttpClient, type DshCheckoutAuthContext, type DshCheckoutClient } from './checkout.api';
+import { createDshOrderLifecycleHttpClient, resolveDshOrderApiBaseUrl, type DshOrderItemInput } from '../orders/dsh-order-lifecycle-client';
 import { resolveDshDiscoveryStoresRuntimeConfig, parseCartItemPrice } from '../stores';
 import type {
   CreateOrderValues,
@@ -76,7 +75,7 @@ export function useDshCheckout({
 
   const checkoutClientMemo = React.useMemo(() => {
     const apiConfig = resolveDshDiscoveryStoresRuntimeConfig();
-    return apiConfig ? getDshCheckoutRuntimeClient(apiConfig.baseUrl, checkoutAuth) : undefined;
+    return apiConfig ? createDshCheckoutHttpClient(apiConfig.baseUrl, globalThis.fetch, checkoutAuth) : undefined;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkoutAuth]);
 
@@ -89,7 +88,7 @@ export function useDshCheckout({
 
     if (apiConfig && !resolvedIntentId) {
       try {
-        const client: DshCheckoutClient = getDshCheckoutRuntimeClient(apiConfig.baseUrl, checkoutAuth);
+        const client: DshCheckoutClient = createDshCheckoutHttpClient(apiConfig.baseUrl, globalThis.fetch, checkoutAuth);
         const intentResp = await client.createCheckoutIntent(
           {
             store_id: activeStore.id,
@@ -215,7 +214,8 @@ export function useDshClientOrderExecution({
         price: parseCartItemPrice(item.priceLabel),
       }));
 
-      const orderClient = getDshOrderLifecycleRuntimeClient(checkoutAuth);
+      const orderBaseUrl = resolveDshOrderApiBaseUrl();
+      const orderClient = orderBaseUrl ? createDshOrderLifecycleHttpClient(orderBaseUrl, undefined, checkoutAuth) : null;
       if (!orderClient) return;
       orderClient.createOrder({
         store_id: activeStore.id,

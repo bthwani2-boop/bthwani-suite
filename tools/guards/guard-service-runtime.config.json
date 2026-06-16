@@ -164,6 +164,7 @@
         "DSH-LIVE-BACKEND": {
           "allowedRoutes": [
             "GET /stores",
+            "GET /stores/pending-review",
             "GET /stores/{id}",
             "POST /stores",
             "POST /stores/{id}/field-visits",

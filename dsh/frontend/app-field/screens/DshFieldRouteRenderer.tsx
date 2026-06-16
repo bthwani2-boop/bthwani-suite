@@ -46,6 +46,7 @@ export function DshFieldRouteRenderer({
         onSubmitReview={() => actions.handleSubmitReview(activeStore)}
         onEscalate={() => actions.pushRoute({ kind: 'readiness-escalation', storeId: activeStore.id })}
         onGoToProducts={() => actions.pushRoute({ kind: 'products-upload', storeId: activeStore.id })}
+        onGoToVisit={() => actions.pushRoute({ kind: 'visit', backendStoreId: activeStore.backendStoreId! })}
       />
     );
   }

@@ -107,6 +107,7 @@ type DshFieldStoreOnboardingScreenProps = {
   onEscalate?: () => void;
   onUploadDocument?: (storeId: string, kind: PartnerDocumentKind) => void;
   onGoToProducts?: () => void;
+  onGoToVisit?: () => void;
 };
 
 export function DshFieldStoreOnboardingScreen({
@@ -120,6 +121,7 @@ export function DshFieldStoreOnboardingScreen({
   onEscalate,
   onUploadDocument,
   onGoToProducts,
+  onGoToVisit,
 }: DshFieldStoreOnboardingScreenProps) {
   const { theme } = useTheme();
 
@@ -597,13 +599,32 @@ export function DshFieldStoreOnboardingScreen({
             </Text>
           </Button>
         )}
-        <Button
-          label={isLastGroup ? 'إرسال للمراجعة' : `التالي: ${onboardingGroupLabels[onboardingGroupOrder[activeGroupIndex + 1]]}`}
-          tone={canSubmit && isLastGroup ? 'success' : 'brand'}
-          disabled={isLastGroup ? !canSubmit : false}
-          onPress={goToNextGroup}
-          style={{ flex: 2 }}
-        />
+        {readOnly ? (
+          <Box layoutDirection="row" gap={2} style={{ flex: 2 }}>
+            <Button
+              label="العودة للمتاجر"
+              tone="secondary"
+              onPress={onBack}
+              style={{ flex: 1 }}
+            />
+            {store.backendStoreId && onGoToVisit && (
+              <Button
+                label="متابعة اختيارية (زيارة)"
+                tone="success"
+                onPress={onGoToVisit}
+                style={{ flex: 1 }}
+              />
+            )}
+          </Box>
+        ) : (
+          <Button
+            label={isLastGroup ? 'إرسال للمراجعة' : `التالي: ${onboardingGroupLabels[onboardingGroupOrder[activeGroupIndex + 1]]}`}
+            tone={canSubmit && isLastGroup ? 'success' : 'brand'}
+            disabled={isLastGroup ? !canSubmit : false}
+            onPress={goToNextGroup}
+            style={{ flex: 2 }}
+          />
+        )}
       </Box>
     </View>
   );

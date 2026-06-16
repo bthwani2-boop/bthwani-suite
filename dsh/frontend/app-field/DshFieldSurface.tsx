@@ -5,10 +5,8 @@ import { BottomNavBar, useTheme } from '@bthwani/ui-kit';
 import {
   useDshFieldSurfaceModel,
 } from './field.surface-model';
-import {
-  PlatformVarsProvider,
-  FeatureFlagProvider,
-} from '../shared';
+import { PlatformVarsProvider } from '../shared/platform/PlatformVarsProvider';
+import { FeatureFlagProvider } from '../shared/platform/FeatureFlagProvider';
 import type { DshFieldSurfaceProps } from './dsh-field.routes';
 import { DshFieldRouteRenderer } from './screens/DshFieldRouteRenderer';
 

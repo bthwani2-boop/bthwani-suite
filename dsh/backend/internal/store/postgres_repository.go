@@ -616,6 +616,40 @@ RETURNING id, name, address, category_id, publish_stage, created_at`
 	return res, nil
 }
 
+// ListPendingStores returns all stores in the pending_review stage for control panel review queue.
+func (repo *PostgresRepository) ListPendingStores(ctx context.Context) ([]domain.CreateFieldStoreResponse, error) {
+	query := `
+SELECT id, name, address, category_id, publish_stage, created_at
+FROM dsh_store_discovery_stores
+WHERE publish_stage = 'pending_review'
+ORDER BY created_at DESC`
+
+	rows, err := repo.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []domain.CreateFieldStoreResponse
+	for rows.Next() {
+		var res domain.CreateFieldStoreResponse
+		var catID sql.NullString
+		err := rows.Scan(&res.ID, &res.Name, &res.Address, &catID, &res.PublishStage, &res.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		if catID.Valid {
+			res.CategoryID = catID.String
+		}
+		result = append(result, res)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+
 // CreateFieldVisit — field agent submits visit notes and evidence media references (J-006B).
 // Raw media upload/document handling remains J-006C; this stores references only.
 func (repo *PostgresRepository) CreateFieldVisit(ctx context.Context, storeID string, req domain.CreateFieldVisitRequest) (domain.CreateFieldVisitResponse, error) {

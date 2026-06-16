@@ -16,6 +16,8 @@ import {
   moveApprovalRecordToStage,
   translateStage,
   translateEntityType,
+  PlatformVarsRegistry,
+  getPartnerStoreOnboardingRuntimeClient,
 } from '../../shared';
 import {
   mapApprovalStageToPartnerActivationStatus,
@@ -237,7 +239,38 @@ export function ControlPanelDshPartnerHubScreen() {
   const [activeSubTab, setActiveSubTab] = React.useState<string>('registration');
   const [items, setItems] = React.useState<ApprovalRecord[]>([]);
 
-  const refresh = () => setItems(getPartnerIntakeItems());
+  const refresh = React.useCallback(() => {
+    const staticItems = getPartnerIntakeItems();
+    const client = getPartnerStoreOnboardingRuntimeClient();
+
+    client.getPendingReviewStores()
+      .then(data => {
+        if (Array.isArray(data)) {
+          const liveItems: ApprovalRecord[] = data.map(store => {
+            const existing = staticItems.find(item => item.id === store.id);
+            return {
+              id: store.id,
+              entityType: 'store',
+              source: 'app-field',
+              stage: existing ? existing.stage : 'field-submitted',
+              title: store.name,
+              submittedAt: store.created_at || new Date().toISOString(),
+              auditTrail: existing ? existing.auditTrail : [],
+              metadata: {
+                address: store.address,
+                categoryId: store.category_id,
+              }
+            };
+          });
+
+          setItems(liveItems);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch pending review stores from backend:', err);
+        setItems([]);
+      });
+  }, []);
 
   const pendingCount = React.useMemo(
     () => items.filter(i => ['partner-submitted', 'field-submitted', 'partner-review', 'marketing-review'].includes(i.stage)).length,

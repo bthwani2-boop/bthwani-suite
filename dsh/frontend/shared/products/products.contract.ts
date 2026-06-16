@@ -290,7 +290,7 @@ export function getDshProductApprovalStateMetadata(
   return DSH_PRODUCT_APPROVAL_PIPELINE.find((s) => s.status === status) as DshProductApprovalStateMetadata;
 }
 
-export * from './products.policy';
+
 
 /**
  * Resolves the Arabic label for a barcode search state.
