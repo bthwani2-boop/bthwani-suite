@@ -12,10 +12,10 @@ import {
   resolveFieldStoreNextActionLabel,
   resolveFieldStoreStatusLabel,
   resolveFieldStoreStatusTone,
-} from '../field.store-lifecycle';
+} from '../field.surface-model';
 import type {
   FieldStoreFile,
-} from '../dsh-field.types';
+} from '../dsh-field.routes';
 
 type FieldStoreCardProps = {
   store: FieldStoreFile;

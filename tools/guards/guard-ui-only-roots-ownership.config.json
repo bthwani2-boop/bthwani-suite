@@ -455,21 +455,17 @@
       "ui_only_runtime_adapter_policy",
       "ui_only_state_machine_or_lifecycle"
     ],
-    "dsh/frontend/app-field/dsh-field-visit-client.ts": [
-      "ui_only_creates_runtime_client",
-      "ui_only_runtime_mutation_or_query_function",
-      "ui_only_resolves_runtime_base_url"
-    ],
-    "dsh/frontend/app-field/field-visit.model.ts": [
-      "ui_only_runtime_mutation_or_query_function",
-      "ui_only_forbidden_hooks"
-    ],
-    "dsh/frontend/app-field/field.store-lifecycle.ts": [
-      "ui_only_runtime_mutation_or_query_function",
-      "ui_only_forbidden_functions"
+    "dsh/frontend/app-field/dsh-field.routes.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy"
     ],
     "dsh/frontend/app-field/field.surface-model.ts": [
-      "ui_only_forbidden_hooks"
+      "ui_only_creates_runtime_client",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_resolves_runtime_base_url",
+      "ui_only_forbidden_hooks",
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_forbidden_functions"
     ],
     "dsh/frontend/app-field/parts/FieldStoreCard.tsx": [
       "ui_only_state_machine_or_lifecycle"
@@ -491,12 +487,6 @@
     ],
     "dsh/frontend/app-field/screens/DshFieldStoresScreen.tsx": [
       "ui_only_state_machine_or_lifecycle"
-    ],
-    "dsh/frontend/app-field/use-field-runtime-actions.ts": [
-      "ui_only_creates_runtime_client",
-      "ui_only_runtime_mutation_or_query_function",
-      "ui_only_resolves_runtime_base_url",
-      "ui_only_forbidden_hooks"
     ]
   },
   "_allowlistMetaAuditedAt": "2026-06-16",
@@ -1363,30 +1353,16 @@
       "removalStep": "blocked-by-policy:wlt-finance-read-model — remove allowlist once WLT runtime binding complete",
       "blocksClosure": false
     },
-    "dsh/frontend/app-field/dsh-field-visit-client.ts": {
+    "dsh/frontend/app-field/dsh-field.routes.ts": {
       "owner": "dsh-stores",
-      "reason": "Relocated field client makes HTTP calls and resolves base URL for store visits.",
-      "expiry": "2026-12-01",
-      "removalStep": "Relocated client as requested by surface-level integration.",
-      "blocksClosure": false
-    },
-    "dsh/frontend/app-field/field-visit.model.ts": {
-      "owner": "dsh-stores",
-      "reason": "Relocated field visit model calls forbidden actions hook.",
-      "expiry": "2026-12-01",
-      "removalStep": "Relocated model as requested by surface-level integration.",
-      "blocksClosure": false
-    },
-    "dsh/frontend/app-field/field.store-lifecycle.ts": {
-      "owner": "dsh-stores",
-      "reason": "Relocated field store lifecycle handles onboarding lifecycle states and functions.",
+      "reason": "Consolidated route definitions, screen registry, and policies.",
       "expiry": "2026-12-01",
       "removalStep": "Relocated model as requested by surface-level integration.",
       "blocksClosure": false
     },
     "dsh/frontend/app-field/field.surface-model.ts": {
       "owner": "dsh-stores",
-      "reason": "Relocated field surface model coordinates field surface views and state.",
+      "reason": "Relocated field surface model coordinates field surface views, state, and handles API requests and client creation.",
       "expiry": "2026-12-01",
       "removalStep": "Relocated model as requested by surface-level integration.",
       "blocksClosure": false
@@ -1431,13 +1407,6 @@
       "reason": "Stores screen imports lifecycle display labels.",
       "expiry": "2026-12-01",
       "removalStep": "Relocated model as requested by surface-level integration.",
-      "blocksClosure": false
-    },
-    "dsh/frontend/app-field/use-field-runtime-actions.ts": {
-      "owner": "dsh-stores",
-      "reason": "Relocated actions hook creates clients, resolves base URLs, and triggers mutations/queries.",
-      "expiry": "2026-12-01",
-      "removalStep": "Relocated actions hook as requested by surface-level integration.",
       "blocksClosure": false
     }
   }

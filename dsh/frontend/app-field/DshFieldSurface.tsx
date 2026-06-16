@@ -9,7 +9,7 @@ import {
   PlatformVarsProvider,
   FeatureFlagProvider,
 } from '../shared';
-import type { DshFieldSurfaceProps } from './dsh-field.types';
+import type { DshFieldSurfaceProps } from './dsh-field.routes';
 import { DshFieldRouteRenderer } from './screens/DshFieldRouteRenderer';
 
 export function DshFieldSurface(props: DshFieldSurfaceProps) {

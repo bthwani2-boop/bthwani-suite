@@ -11,3 +11,4 @@ export * from './dsh-partner-activation.model';
 export * from './onboarding';
 export * from './documents';
 export * from './readiness';
+export * from './visits';

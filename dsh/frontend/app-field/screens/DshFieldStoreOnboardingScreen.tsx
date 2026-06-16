@@ -29,14 +29,14 @@ import {
   type FieldOnboardingSectionId,
   type FieldStoreFile,
   type FieldDocumentStatus,
-} from '../dsh-field.types';
+} from '../dsh-field.routes';
 import {
   isFieldStoreReadOnly,
   resolveFieldStoreLifecycleLabel,
   resolveFieldStoreStatusLabel,
   resolveFieldStoreStatusTone,
   touchFieldStoreDraft,
-} from '../field.store-lifecycle';
+} from '../field.surface-model';
 import {
   // Partner rehome imports
   validatePartnerOnboarding,
@@ -52,10 +52,7 @@ import {
   type PartnerDocumentKind,
   getDshMediaRuntimeClient,
 } from '../../shared';
-import {
-  simulateCameraCapture,
-} from '../utils/onboarding-simulation';
-import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
+
 import { getOperationsSupportFlowsForSurface } from '../../shared';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/dsh-governance.map';
@@ -987,3 +984,144 @@ export function DshFieldStoreOnboardingScreen({
 }
 
 export default DshFieldStoreOnboardingScreen;
+
+type DocumentItem = {
+  id: PartnerDocumentKind;
+  label: string;
+  required: boolean;
+  status: FieldDocumentStatus;
+  referenceLabel?: string;
+};
+
+const defaultDocuments: readonly DocumentItem[] = [
+  { id: 'commercial_registration', label: 'السجل التجاري', required: true, status: 'missing' },
+  { id: 'identity_proof', label: 'إثبات هوية المالك', required: true, status: 'missing' },
+];
+
+export type DocumentVerificationSectionProps = {
+  state?: 'ready' | 'loading' | 'complete' | 'error';
+  documents?: readonly DocumentItem[];
+  onUploadDocument?: (kind: PartnerDocumentKind) => void;
+  onConfirm?: () => void;
+};
+
+export function DocumentVerificationSection({
+  state = 'ready',
+  documents = defaultDocuments,
+  onUploadDocument,
+  onConfirm,
+}: DocumentVerificationSectionProps) {
+  const { theme } = useTheme();
+
+  if (state === 'loading') {
+    return <StateView stateId="loading" title="جاري التحقق من المستندات..." description="" />;
+  }
+
+  if (state === 'complete') {
+    return (
+      <StateView
+        stateId="success"
+        title="تم التحقق من جميع المستندات"
+        description="يمكن المتابعة لإكمال تسجيل المتجر."
+        actionLabel="التالي"
+        onActionPress={onConfirm}
+      />
+    );
+  }
+
+  const allRequired = documents
+    .filter((d) => d.required)
+    .every((d) => d.status === 'uploaded' || d.status === 'approved');
+
+  const resolveStatusTone = (status: FieldDocumentStatus) => {
+    if (status === 'approved') return 'success' as const;
+    if (status === 'uploaded') return 'brand' as const;
+    if (status === 'needs_reupload') return 'warning' as const;
+    if (status === 'rejected') return 'danger' as const;
+    return 'muted' as const;
+  };
+
+  const resolveStatusLabel = (status: FieldDocumentStatus) => {
+    if (status === 'approved') return 'معتمد';
+    if (status === 'uploaded') return 'مرفوع';
+    if (status === 'needs_reupload') return 'يحتاج إعادة رفع';
+    if (status === 'rejected') return 'مرفوض';
+    return 'مفقود';
+  };
+
+  return (
+    <Box gap={4}>
+      <Text role="titleSm" style={{ textAlign: 'right' }}>التحقق من المستندات</Text>
+      <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>حالة المستندات المرفقة للمراجعة.</Text>
+      <Box gap={0}>
+        {documents.map((doc) => (
+          <Box
+            key={doc.id}
+            paddingY={3}
+            style={{
+              flexDirection: 'row-reverse',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              borderBottomWidth: 1,
+              borderBottomColor: theme.line,
+            }}
+          >
+            <Box gap={0} style={{ alignItems: 'flex-end' }}>
+              <Text role="bodyMd" style={{ textAlign: 'right' }}>{doc.label}</Text>
+              {doc.required && <Text role="bodySm" tone="danger" style={{ textAlign: 'right' }}>مطلوب</Text>}
+              {doc.referenceLabel ? <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{doc.referenceLabel}</Text> : null}
+            </Box>
+            <Box gap={1} style={{ alignItems: 'flex-start' }}>
+              <Text role="bodySm" tone={resolveStatusTone(doc.status)} style={{ textAlign: 'left' }}>{resolveStatusLabel(doc.status)}</Text>
+              <Button
+                label={doc.status === 'missing' ? 'رفع' : 'تحديث'}
+                size="sm"
+                fullWidth={false}
+                disabled={!onUploadDocument}
+                onPress={() => onUploadDocument?.(doc.id)}
+              />
+            </Box>
+          </Box>
+        ))}
+      </Box>
+      <Button
+        label="تأكيد المستندات"
+        disabled={!allRequired}
+        onPress={onConfirm}
+      />
+    </Box>
+  );
+}
+
+// ─── Onboarding Simulation Helpers ───────────────────────────────────────────
+
+export type OnboardingLocationAutofill = {
+  city: string;
+  zone: string;
+  latitude: string;
+  longitude: string;
+  landmark: string;
+  addressLine: string;
+  coverageSummary: string;
+};
+
+export function simulateGPSAutofill(): OnboardingLocationAutofill {
+  return {
+    city: 'الرياض',
+    zone: 'حي العليا',
+    latitude: '24.71358',
+    longitude: '46.67529',
+    landmark: 'برج المملكة - البوابة الشرقية',
+    addressLine: 'طريق الملك فهد، حي العليا',
+    coverageSummary: 'نطاق التغطية يغطي كامل مربع العليا وحطين',
+  };
+}
+
+export function simulateOwnerNameOCR(): string {
+  return 'عبدالرحمن بن ثنيان';
+}
+
+export function simulateCameraCapture(photoKey: string): string {
+  const randomSuffix = Math.floor(100 + Math.random() * 900);
+  return `img_${photoKey.replace('PhotoRef', '')}_upload_${randomSuffix}.jpg`;
+}

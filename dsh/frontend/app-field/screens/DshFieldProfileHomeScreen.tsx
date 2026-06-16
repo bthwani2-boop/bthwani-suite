@@ -5,8 +5,8 @@ import { Badge, borders, Box, Button, Divider, Icon, MobileScrollView, Text, Top
   spacing,
 } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
-import { resolveFieldFilterCounts } from '../field.store-lifecycle';
-import type { FieldStoreFile } from '../dsh-field.types';
+import { resolveFieldFilterCounts } from '../field.surface-model';
+import type { FieldStoreFile } from '../dsh-field.routes';
 
 type DshFieldProfileHomeScreenProps = {
   stores: readonly FieldStoreFile[];

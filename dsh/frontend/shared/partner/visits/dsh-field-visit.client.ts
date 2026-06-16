@@ -1,4 +1,8 @@
-import { PlatformVarsRegistry } from '../shared';
+// dsh/frontend/shared/partner/visits/dsh-field-visit.client.ts
+// Authority: shared/partner/visits — HTTP client for field agent visits backend API.
+// No JSX. No ui-kit. No Tamagui.
+
+import { PlatformVarsRegistry } from '../../platform/platform-vars';
 
 export type DshCreateFieldVisitRequest = {
   readonly field_agent_id?: string;
