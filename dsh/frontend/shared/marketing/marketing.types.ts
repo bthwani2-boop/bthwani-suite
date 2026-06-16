@@ -190,6 +190,21 @@ export type MarketingGrowthRecord = {
 
 // ── Control-Panel Editor Types ─────────────────────────────────────────────
 
+export type MarketingControlView =
+  | 'visibility'
+  | 'ticker'
+  | 'banners'
+  | 'promos'
+  | 'video'
+  | 'campaigns'
+  | 'partners'
+  | 'media-review'
+  | 'loyalty'
+  | 'growth'
+  | 'signals'
+  | 'approval-queue'
+  | 'video-review';
+
 export type MarketingCommandDeckTab =
   | 'ticker'
   | 'banners'
@@ -221,14 +236,18 @@ export type SmartBannerTargetType =
   | 'orders' | 'loyalty' | 'custom';
 
 export type SmartTargetSummary = {
-  type: SmartBannerTargetType;
+  type?: SmartBannerTargetType;
   id?: string;
   label: string;
+  targetId?: string;
+  targetLabel?: string;
+  finalRoute?: string;
 };
 
 export type BannerImageFit = 'cover' | 'contain';
 export type BannerLogoPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 export type EditorTab = 'content' | 'media' | 'target' | 'publish';
+export type SmartTargetStoreFilter = 'all' | 'offers' | 'favorites' | 'available';
 
 export type BannerDraft = Record<
   | 'title'
@@ -238,16 +257,38 @@ export type BannerDraft = Record<
   | 'highlight'
   | 'targetId'
   | 'targetExtra'
+  | 'actionTarget'
+  | 'actionExtra'
+  | 'partnerName'
+  | 'position'
+  | 'templateId'
+  | 'offerBadgeText'
+  | 'offerBadgeColor'
+  | 'offerBadgePosition'
+  | 'partnerLogoUrl'
+  | 'partnerLogoPosition'
+  | 'overlayImageUrl'
+  | 'overlayPosition'
+  | 'titlePlacement'
+  | 'motionStyle'
+  | 'autoplayIntervalMs'
   | 'order',
   string
 > & {
   id?: string;
-  status: 'published' | 'draft' | 'review' | 'paused';
-  audience: 'all' | 'client' | 'operations';
+  mediaKey?: string;
+  accentColor?: string;
+  actionType?: MarketingBannerRecord['actionType'];
+  status: MarketingBannerStatus;
+  audience: MarketingBannerAudience;
   targetType: SmartBannerTargetType;
   motion: MarketingBannerMotionStyle;
   imageFit: BannerImageFit;
   logoPosition: BannerLogoPosition;
+  partnerLogoPosition: BannerLogoPosition;
+  overlayImageUrl?: string;
+  autoplayEnabled?: boolean;
+  pauseOnInteraction?: boolean;
   reviewState: 'none' | 'pending' | 'approved' | 'rejected';
   subscriptionId?: string;
 };

@@ -11,7 +11,7 @@ import type {
   CampaignRecord,
   CampaignStatus,
   CampaignTargetType,
-} from '../../shared/dsh-marketing-types';
+} from '../../shared/marketing';
 import type {
   PartnerOfferRecord,
   PartnerOfferStatus,

@@ -9,3 +9,6 @@ export * from './marketing.adapters';
 export * from './marketing.client-state';
 export * from './marketing.permissions';
 export * from './client-marketing.model';
+export * from './marketing.preview-state';
+export * from './banner-target-utils';
+export * from './store-card-commercial-map';

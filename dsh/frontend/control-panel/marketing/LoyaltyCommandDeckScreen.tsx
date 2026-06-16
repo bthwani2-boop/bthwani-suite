@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -13,21 +13,22 @@ import {
   useTheme,
   radius,
 } from '@bthwani/ui-kit';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LoyaltyProgram = Record<string, any>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LoyaltyTier = Record<string, any>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type LoyaltyReward = Record<string, any>;
-type SubscriptionPlan = { id: (string); name: (string); monthlyFee: (number); features: string[]; status: (string) };
-type Entitlement = { id: string; type: string; referenceId: string; status: string; source: string };
-function getEntitlements(): Entitlement[] { return []; }
-function getLoyaltyKpis() { return { total: 0, active: 0, subscriptions: 0, points: 0, impressions: 0, clicks: 0 }; }
-function getLoyaltyPrograms(): LoyaltyProgram[] { return []; }
-function getLoyaltyRewards(): LoyaltyReward[] { return []; }
-function getLoyaltyTiers(): LoyaltyTier[] { return []; }
-function getSubscriptionPlans(): SubscriptionPlan[] { return []; }
-import { mapStoreCommercialFeatures } from '../../shared/marketing/store-card-commercial-map';
+import {
+  getEntitlements,
+  getLoyaltyKpis,
+  getLoyaltyPrograms,
+  getLoyaltyRewards,
+  getLoyaltyTiers,
+  getSubscriptionPlans,
+  mapStoreCommercialFeatures,
+} from '../../shared/marketing';
+import type {
+  Entitlement,
+  LoyaltyProgram,
+  LoyaltyReward,
+  LoyaltyTier,
+  SubscriptionPlan,
+} from '../../shared/marketing';
 import { CommercialParityPreview } from './commercial-parity-viewer';
 
 

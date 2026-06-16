@@ -1,17 +1,27 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import { useRouter } from 'next/navigation';
-type GrowthRecommendation = { id: string; type: string; severity: string; [key: string]: unknown };
-import { mapStoreCommercialFeatures } from '../../shared/marketing/store-card-commercial-map';
+type GrowthRecommendation = {
+  id: string;
+  type: string;
+  severity: string;
+  title: string;
+  description: string;
+  owner: string;
+  source: string;
+  affectedSurface: string;
+  confidence: string;
+  nextAction: string;
+  actionTargetTab: string;
+};
+import { mapStoreCommercialFeatures } from '../../shared/marketing';
 import { CommercialParityPreview } from './commercial-parity-viewer';
-import type { CampaignRecord } from '../../shared/dsh-marketing-types';
+import type { CampaignRecord, SubscriptionPlan, Entitlement } from '../../shared/marketing';
 import type { PartnerOfferRecord } from '../../shared/partner/dsh-partner-offer-types';
-type SubscriptionPlan = { id: (string); name: (string); monthlyFee: (number); features: string[]; status: (string) };
-type Entitlement = { id: string; type: string; referenceId: string; status: string; source: string };
 
 
 

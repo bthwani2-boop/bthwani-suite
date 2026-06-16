@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { StyleSheet, View, Pressable } from 'react-native';
@@ -6,28 +6,32 @@ import { Box, Button, Surface, Tabs, Text, TextField, useTheme,
   radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import type { CampaignAudience, CampaignTargetType } from '../../shared/dsh-marketing-types';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type CampaignRecord = Record<string, any>;
-type CampaignStatus = 'draft' | 'pending' | 'published' | 'paused' | 'archived';
-type CampaignGoal = 'awareness' | 'conversion' | 'retention' | 'acquisition';
-type CampaignChannel = 'banner' | 'promo' | 'video' | 'ticker' | 'store-card';
-type CampaignPriority = 'low' | 'normal' | 'high' | 'critical';
-type CampaignSummary = { id: (string); title: (string); status: (CampaignStatus); impressions: (number) };
-function getCampaignItems(): CampaignRecord[] { return []; }
-function getCampaignSummaries(_opts?: unknown): { items: CampaignSummary[]; total: number; page: number; pageSize: number } { return { items: [], total: 0, page: 1, pageSize: 20 }; }
-function getCampaignDetail(_id: string): CampaignRecord | null { return null; }
-function getCampaignKpis() { return { total: { value: 0 }, live: { value: 0 }, pending: { value: 0 }, impressions: { value: 0 } }; }
-function upsertCampaignItem(_item: unknown): void {}
-function toggleCampaignStatus(_id: string): void {}
-function duplicateCampaignItem(_id: string): void {}
-function removeCampaignItem(_id: string): void {}
-const dshCategoryData: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
-const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
-const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
-import { mapStoreCommercialFeatures } from '../../shared/marketing/store-card-commercial-map';
+import {
+  getCampaignItems,
+  getCampaignSummaries,
+  getCampaignDetail,
+  getCampaignKpis,
+  upsertCampaignItem,
+  toggleCampaignStatus,
+  duplicateCampaignItem,
+  removeCampaignItem,
+  dshCategoryData,
+  dshDiscoveryStores,
+  storeItemsByStoreId,
+} from '../../shared/marketing';
+import type {
+  CampaignRecord,
+  CampaignStatus,
+  CampaignGoal,
+  CampaignChannel,
+  CampaignPriority,
+  CampaignAudience,
+  CampaignTargetType,
+  CampaignSummary,
+  Entitlement,
+} from '../../shared/marketing';
+import { mapStoreCommercialFeatures } from '../../shared/marketing';
 import { CommercialParityPreview } from './commercial-parity-viewer';
-type Entitlement = { id: string; type: string; referenceId: string; status: string; source: string };
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
 /**

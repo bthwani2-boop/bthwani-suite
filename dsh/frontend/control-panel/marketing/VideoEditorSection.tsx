@@ -3,16 +3,19 @@ import { View } from 'react-native';
 import { Box, Button, SelectField, Surface, Tabs, Text, TextField } from '@bthwani/ui-kit';
 import type { VideoDraft, EditorWorkspaceTab } from './video-types';
 import { TARGET_TYPE_OPTIONS } from './video-types';
-const dshCategoryFixtures: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
-const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
-const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
-type MarketingVideoStatus = 'published' | 'draft' | 'review' | 'paused';
-type MarketingVideoAudience = 'all' | 'client' | 'operations';
-type MarketingVideoSource = 'marketing' | 'partner';
-type MarketingVideoTargetType = 'home' | 'stores' | 'store' | 'category' | 'subcategory' | 'product' | 'offer' | 'campaign' | 'search' | 'custom' | 'loyalty';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MarketingVideoRecord = Record<string, any>;
-function upsertMarketingVideoItem(_item: unknown): void {}
+import {
+  dshCategoryData as dshCategoryFixtures,
+  dshDiscoveryStores,
+  storeItemsByStoreId,
+  upsertMarketingVideoItem,
+} from '../../shared/marketing';
+import type {
+  MarketingVideoStatus,
+  MarketingVideoAudience,
+  MarketingVideoSource,
+  MarketingVideoTargetType,
+  MarketingVideoRecord,
+} from '../../shared/marketing';
 import type { MarketingPermission } from './marketing-permissions.contract';
 
 interface VideoEditorSectionProps {

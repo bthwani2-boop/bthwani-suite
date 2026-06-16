@@ -300,86 +300,189 @@
       }
     },
     "wlt": {
-    "displayName": "Wallet & Ledger",
-    "backendPath": "wlt/backend",
-    "goModPath": "wlt/backend/go.mod",
-    "mainPath": "wlt/backend/cmd/wlt-api/main.go",
-    "repositoryInterfacePath": "wlt/backend/internal/store/repository.go",
-    "postgresRepositoryPath": "wlt/backend/internal/store/postgres_repository.go",
-    "routeRegistrationPaths": [
-      "wlt/backend/internal/http/wallet_handler.go",
-      "wlt/backend/internal/http/payment_handler.go",
-      "wlt/backend/internal/http/refund_handler.go",
-      "wlt/backend/internal/http/settlement_handler.go",
-      "wlt/backend/internal/http/reporting_handler.go",
-      "wlt/backend/internal/http/operator_handler.go"
-    ],
-    "repositoryRequiredMethods": [
-      "CreatePaymentSession",
-      "GetPaymentSession",
-      "ConfirmPaymentSession",
-      "CreateRefund",
-      "GetRefund",
-      "ProcessRefund",
-      "CreateSettlement",
-      "GetSettlement",
-      "ProcessSettlement",
-      "GetOrCreateWallet",
-      "GetWalletSummary",
-      "CreateLedgerEntry",
-      "ListLedger",
-      "RunReconciliation"
-    ],
-    "postgresRequiredPatterns": [
-      "pgx",
-      "NewPostgresRepository",
-      "CreatePaymentSession",
-      "CreateRefund",
-      "CreateSettlement",
-      "GetOrCreateWallet"
-    ],
-    "composePath": "wlt/backend/docker-compose.local.yml",
-    "allowedComposeServices": [
-      "wlt-postgres",
-      "wlt-api",
-      "wlt-postgres-data",
-      "bthwani-local"
-    ],
-    "forbiddenComposeTerms": [
-      "redis",
-      "kafka",
-      "rabbit",
-      "rabbitmq",
-      "kubernetes"
-    ],
-    "migrationFiles": [
-      "wlt/backend/migrations/001_wallets.sql",
-      "wlt/backend/migrations/002_payment_sessions.sql",
-      "wlt/backend/migrations/003_ledger.sql",
-      "wlt/backend/migrations/004_refunds.sql",
-      "wlt/backend/migrations/005_settlements.sql",
-      "wlt/backend/migrations/006_settlement_dsh_callback.sql",
-      "wlt/backend/migrations/007_operator_features.sql"
-    ],
-    "seedFiles": [],
-    "allowedTables": [
-      "wlt_wallets",
-      "wlt_payment_sessions",
-      "wlt_ledger",
-      "wlt_refunds",
-      "wlt_settlements",
-      "wlt_callback_events",
-      "wlt_reconciliation_runs",
-      "wlt_payout_decisions",
-      "wlt_finance_close",
-      "wlt_operator_rbac_grants"
-    ],
-    "requiredTableColumns": [
-      "id",
-      "status",
-      "created_at"
-    ],
-    "slices": {}
-  }
+      "displayName": "Wallet & Ledger",
+      "backendPath": "wlt/backend",
+      "goModPath": "wlt/backend/go.mod",
+      "mainPath": "wlt/backend/cmd/wlt-api/main.go",
+      "repositoryInterfacePath": "wlt/backend/internal/store/repository.go",
+      "postgresRepositoryPath": "wlt/backend/internal/store/postgres_repository.go",
+      "routeRegistrationPaths": [
+        "wlt/backend/internal/http/wallet_handler.go",
+        "wlt/backend/internal/http/payment_handler.go",
+        "wlt/backend/internal/http/refund_handler.go",
+        "wlt/backend/internal/http/settlement_handler.go",
+        "wlt/backend/internal/http/reporting_handler.go",
+        "wlt/backend/internal/http/operator_handler.go"
+      ],
+      "repositoryRequiredMethods": [
+        "CreatePaymentSession",
+        "GetPaymentSession",
+        "ConfirmPaymentSession",
+        "CreateRefund",
+        "GetRefund",
+        "ProcessRefund",
+        "CreateSettlement",
+        "GetSettlement",
+        "ProcessSettlement",
+        "GetOrCreateWallet",
+        "GetWalletSummary",
+        "CreateLedgerEntry",
+        "ListLedger",
+        "RunReconciliation"
+      ],
+      "postgresRequiredPatterns": [
+        "pgx",
+        "NewPostgresRepository",
+        "CreatePaymentSession",
+        "CreateRefund",
+        "CreateSettlement",
+        "GetOrCreateWallet"
+      ],
+      "composePath": "wlt/backend/docker-compose.local.yml",
+      "allowedComposeServices": [
+        "wlt-postgres",
+        "wlt-api",
+        "wlt-postgres-data",
+        "bthwani-local"
+      ],
+      "forbiddenComposeTerms": [
+        "redis",
+        "kafka",
+        "rabbit",
+        "rabbitmq",
+        "kubernetes"
+      ],
+      "migrationFiles": [
+        "wlt/backend/migrations/001_wallets.sql",
+        "wlt/backend/migrations/002_payment_sessions.sql",
+        "wlt/backend/migrations/003_ledger.sql",
+        "wlt/backend/migrations/004_refunds.sql",
+        "wlt/backend/migrations/005_settlements.sql",
+        "wlt/backend/migrations/006_settlement_dsh_callback.sql",
+        "wlt/backend/migrations/007_operator_features.sql"
+      ],
+      "seedFiles": [],
+      "allowedTables": [
+        "wlt_wallets",
+        "wlt_payment_sessions",
+        "wlt_ledger",
+        "wlt_refunds",
+        "wlt_settlements",
+        "wlt_callback_events",
+        "wlt_reconciliation_runs",
+        "wlt_payout_decisions",
+        "wlt_finance_close",
+        "wlt_operator_rbac_grants"
+      ],
+      "requiredTableColumns": [
+        "id",
+        "status",
+        "created_at"
+      ],
+      "slices": {
+        "WLT-LIVE-WALLET-LEDGER": {
+          "allowedRoutes": [
+            "GET /wallets/{subject}/summary",
+            "GET /wallets/{subject}/transactions",
+            "GET /ledger"
+          ],
+          "evidenceFolderPrefix": "WLT_LIVE_WALLET_LEDGER_RUNTIME-",
+          "requiredEvidenceFiles": [],
+          "requiredEvidenceText": [],
+          "requiredChainTokens": [],
+          "requiresScreenshot": false
+        },
+        "WLT-LIVE-PAYMENT-SESSIONS": {
+          "allowedRoutes": [
+            "POST /payment/sessions",
+            "GET /payment/sessions/{id}",
+            "GET /payment/sessions/{id}/ws",
+            "POST /payment/sessions/{id}/confirm",
+            "POST /payment/sessions/{id}/fail"
+          ],
+          "evidenceFolderPrefix": "WLT_LIVE_PAYMENT_SESSIONS_RUNTIME-",
+          "requiredEvidenceFiles": [],
+          "requiredEvidenceText": [],
+          "requiredChainTokens": [],
+          "requiresScreenshot": false
+        },
+        "WLT-LIVE-REFUNDS": {
+          "allowedRoutes": [
+            "GET /refunds",
+            "POST /refunds",
+            "GET /refunds/{id}",
+            "POST /refunds/{id}/process",
+            "POST /refunds/{id}/confirm",
+            "POST /refunds/{id}/fail"
+          ],
+          "evidenceFolderPrefix": "WLT_LIVE_REFUNDS_RUNTIME-",
+          "requiredEvidenceFiles": [],
+          "requiredEvidenceText": [],
+          "requiredChainTokens": [],
+          "requiresScreenshot": false
+        },
+        "WLT-LIVE-SETTLEMENTS": {
+          "allowedRoutes": [
+            "POST /settlements",
+            "GET /settlements",
+            "GET /settlements/{id}",
+            "POST /settlements/{id}/process",
+            "POST /settlements/{id}/complete",
+            "POST /settlements/{id}/fail"
+          ],
+          "evidenceFolderPrefix": "WLT_LIVE_SETTLEMENTS_RUNTIME-",
+          "requiredEvidenceFiles": [],
+          "requiredEvidenceText": [],
+          "requiredChainTokens": [],
+          "requiresScreenshot": false
+        },
+        "WLT-LIVE-CONTROL-PANEL-FINANCE-REPORTING": {
+          "allowedRoutes": [
+            "GET /control-panel/finance-center",
+            "GET /wlt/dsh/control-panel/finance-center",
+            "GET /control-panel/store-settlement-statements",
+            "GET /wlt/dsh/control-panel/store-settlement-statements",
+            "GET /control-panel/account-statements",
+            "GET /wlt/dsh/control-panel/account-statements",
+            "GET /control-panel/chart-of-accounts",
+            "GET /wlt/dsh/control-panel/chart-of-accounts",
+            "GET /control-panel/subledger-balances",
+            "GET /wlt/dsh/control-panel/subledger-balances",
+            "GET /control-panel/posting-rules",
+            "GET /wlt/dsh/control-panel/posting-rules",
+            "GET /control-panel/trial-balance",
+            "GET /wlt/dsh/control-panel/trial-balance",
+            "GET /control-panel/settlement-calendar",
+            "GET /wlt/dsh/control-panel/settlement-calendar",
+            "GET /control-panel/refund-ledger",
+            "GET /wlt/dsh/control-panel/refund-ledger",
+            "GET /control-panel/audit-pack",
+            "GET /wlt/dsh/control-panel/audit-pack",
+            "GET /store-delivery/finance-summary",
+            "GET /wlt/dsh/store-delivery/finance-summary"
+          ],
+          "evidenceFolderPrefix": "WLT_LIVE_CONTROL_PANEL_FINANCE_REPORTING_RUNTIME-",
+          "requiredEvidenceFiles": [],
+          "requiredEvidenceText": [],
+          "requiredChainTokens": [],
+          "requiresScreenshot": false
+        },
+        "WLT-LIVE-OPERATOR-FINANCE": {
+          "allowedRoutes": [
+            "GET /control-panel/reconciliation-runs",
+            "POST /control-panel/reconciliation-runs",
+            "POST /control-panel/payout-decisions",
+            "GET /control-panel/reconciliation-close-status",
+            "GET /control-panel/audit-events",
+            "POST /control-panel/daily-close"
+          ],
+          "evidenceFolderPrefix": "WLT_LIVE_OPERATOR_FINANCE_RUNTIME-",
+          "requiredEvidenceFiles": [],
+          "requiredEvidenceText": [],
+          "requiredChainTokens": [],
+          "requiresScreenshot": false
+        }
+      }
+    }
   }
 }

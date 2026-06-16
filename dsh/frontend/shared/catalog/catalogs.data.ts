@@ -160,8 +160,9 @@ import type { StoreItemsByStoreId } from '../products';
 
 type DshCategorySubcategory = { id: string; label: string; subtitle: string; mediaKey?: string; imageUri?: string };
 type DshCategoryData = { id: string; label: string; subtitle: string; emojiFallback?: string; mediaKey?: string; imageUri?: string; renderMode?: 'stores' | 'manual-order'; isManualLike?: boolean; subcategories: DshCategorySubcategory[] };
+export type DshCommonMediaKeyOption = { readonly value: string; readonly label: string };
 const dshCategoryData: DshCategoryData[] = [];
-const dshCommonMediaKeyOptions: string[] = [];
+const dshCommonMediaKeyOptions: DshCommonMediaKeyOption[] = [];
 const storeItemsByStoreId: StoreItemsByStoreId = {};
 export const dshCatalogMetrics: { id: string; label: string; value: number; description: string }[] = [];
 export const dshCatalogSmartFilters: CatalogSmartFilter[] = [];

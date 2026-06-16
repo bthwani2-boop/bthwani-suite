@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, KeyValueList, useTheme,
@@ -6,19 +6,21 @@ import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, Key
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType, PartnerOfferSource } from '../../shared/partner/dsh-partner-offer-types';
-type PartnerOfferSummary = { id: (string); title: (string); status: (PartnerOfferStatus) };
-function getPartnerOfferItems(): PartnerOfferRecord[] { return []; }
-function getPartnerOfferSummaries(_opts?: unknown): { items: PartnerOfferSummary[]; total: number; page: number; pageSize: number } { return { items: [], total: 0, page: 1, pageSize: 20 }; }
-function getPartnerOfferDetail(_id: string): PartnerOfferRecord | null { return null; }
-function getPartnerOfferKpis() { return { total: 0, inbound: 0, review: 0, marketingReady: 0, published: 0, rejected: 0 }; }
-function upsertPartnerOfferItem(_item: unknown): void {}
-function approvePartnerOfferItem(_id: string): void {}
-function publishPartnerOfferItem(_id: string): void {}
-function pausePartnerOfferItem(_id: string): void {}
-function rejectPartnerOfferItem(_id: string, _reason: string): void {}
-function archivePartnerOfferItem(_id: string): void {}
-function removePartnerOfferItem(_id: string): void {}
-import { mapStoreCommercialFeatures } from '../../shared/marketing/store-card-commercial-map';
+import {
+  getPartnerOfferItems,
+  getPartnerOfferSummaries,
+  getPartnerOfferDetail,
+  getPartnerOfferKpis,
+  upsertPartnerOfferItem,
+  approvePartnerOfferItem,
+  publishPartnerOfferItem,
+  pausePartnerOfferItem,
+  rejectPartnerOfferItem,
+  archivePartnerOfferItem,
+  removePartnerOfferItem,
+} from '../../shared/marketing';
+import type { PartnerOfferSummary } from '../../shared/marketing';
+import { mapStoreCommercialFeatures } from '../../shared/marketing';
 import { validatePartnerOfferForPublish } from '../../shared/marketing/commercial-contract';
 import { CommercialParityPreview } from './commercial-parity-viewer';
 import { useMarketingPermissions } from './marketing-permissions.contract';

@@ -4,13 +4,13 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
+import { useDshClientStoreState } from './stores.view-model';
 import {
-  useDshClientStoreState,
   buildStoreCategories,
   buildStoreDeliveryModes,
   buildStoreTags,
   mapStoreDetailToScreenStore,
-} from './stores.view-model';
+} from './stores.adapters';
 import type { DshDiscoveryStore } from './stores.presentation';
 import type { DshRoute } from '../checkout/dsh-client-binding.contracts';
 

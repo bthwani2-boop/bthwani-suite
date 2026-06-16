@@ -19,13 +19,6 @@ import {
   useTheme,
   radius,
 } from '@bthwani/ui-kit';
-type MarketingBannerAudience = 'home' | 'stores' | 'client' | 'all';
-type MarketingBannerStatus = 'draft' | 'published';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MarketingBannerRecord = Record<string, any>;
-const dshCategoryData: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
-const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
-const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
 import type { MarketingPermission } from './marketing-permissions.contract';
 import {
   BANNER_TEMPLATES,
@@ -34,7 +27,19 @@ import {
   SMART_TARGET_OPTIONS,
   SUBSCRIPTION_OPTIONS,
 } from './banner-types';
-import { normalizeSearchText, getProductsForStore, resolveSmartTargetSummary } from './banner-target-utils';
+import {
+  normalizeSearchText,
+  getProductsForStore,
+  resolveSmartTargetSummary,
+  dshCategoryData,
+  dshDiscoveryStores,
+  storeItemsByStoreId,
+} from '../../shared/marketing';
+import type {
+  MarketingBannerRecord,
+  MarketingBannerAudience,
+  MarketingBannerStatus,
+} from '../../shared/marketing';
 import type {
   BannerDraft,
   BannerImageFit,

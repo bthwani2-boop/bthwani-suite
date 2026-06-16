@@ -28,6 +28,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all products (operator view)
+         * @description Returns all product records across all stores. Operator role required. Supports filtering by approval_status for the catalog review queue.
+         */
+        get: operations["listAllProducts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/products/{id}": {
         parameters: {
             query?: never;
@@ -111,20 +131,104 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
         /**
-         * Upload product media record
-         * @description Creates/attaches a new product media record validated against the local media manifest.
+         * List media assets
+         * @description Filter by owner_type, owner_id, purpose, status. Max 100 per page.
          */
-        post: operations["uploadProductMedia"];
+        get: operations["listMediaAssets"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/media/{id}": {
+    "/media/upload-intents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create media upload intent (runtime)
+         * @description Creates a dsh_media_assets record in pending_upload status and returns a presigned PUT URL for direct-to-MinIO upload. No binary is stored in PostgreSQL. WLT boundary: WLT does not call this endpoint; it stores media_id references only.
+         */
+        post: operations["createMediaUploadIntent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/media/{media_id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Complete media upload
+         * @description Call after successfully uploading to the presigned URL. Transitions dsh_media_assets status from pending_upload → uploaded and sets public_url.
+         */
+        post: operations["completeMediaUpload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/media/{media_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get media asset by ID
+         * @description Retrieve a single media asset record by its DSH-assigned media_id.
+         */
+        get: operations["getMediaAsset"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete media asset (runtime soft-delete)
+         * @description Soft-deletes a dsh_media_assets record. Sets status=deleted and deleted_at. No binary is deleted from MinIO — object lifecycle managed separately. Requires operator role. WLT boundary: WLT stores media_id references only.
+         */
+        delete: operations["deleteMediaAsset"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dev-fixtures/product-media": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Attach dev-fixture product media (manifest key)
+         * @description DEV_ONLY. Creates a product media record using a manifest media_key. Only active when DSH_ENABLE_DEV_FIXTURE_MEDIA=true. Not for runtime upload. Runtime upload goes to POST /media/upload-intents.
+         */
+        post: operations["devFixtureAttachProductMedia"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dev-fixtures/product-media/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -135,10 +239,10 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Delete product media
-         * @description Deletes/removes a product media record.
+         * Delete dev-fixture product media record
+         * @description DEV_ONLY. Removes a fixture media record from dsh_catalog_product_media. Only active when DSH_ENABLE_DEV_FIXTURE_MEDIA=true.
          */
-        delete: operations["deleteProductMedia"];
+        delete: operations["devFixtureDeleteProductMedia"];
         options?: never;
         head?: never;
         patch?: never;
@@ -481,10 +585,8 @@ export interface paths {
          *     Client auth required — cart must be associated with authenticated client identity.
          *     WLT boundary: no financial data. Serviceability is operational only.
          *
-         *     Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
-         *     Production: BearerAuth token verified against auth service GET /auth/session.
-         *     DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
-         *     x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
+         *     Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_ROLE_MATRIX_V3).
+         *     BearerAuth token verified against auth service GET /auth/session.
          */
         get: operations["getCartServiceability"];
         put?: never;
@@ -512,10 +614,8 @@ export interface paths {
          *     WLT boundary: no financial mutation at this step. Creates operational session only.
          *     DSH stores the intent; WLT receives session_token to associate the payment.
          *
-         *     Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_MINIMAL_FOR_DSH_CHECKOUT).
-         *     Production: BearerAuth token verified against auth service GET /auth/session.
-         *     DEV_ONLY: X-Client-Id header accepted as temporary identity until auth runtime is live.
-         *     x-bthwani-auth-status: DEV_ONLY_X_CLIENT_ID — must be replaced by BearerAuth before PASS.
+         *     Auth contract: auth.openapi.yaml GET /auth/session (AUTH_CONTRACT_ROLE_MATRIX_V3).
+         *     BearerAuth token verified against auth service GET /auth/session.
          */
         post: operations["createCheckoutIntent"];
         delete?: never;
@@ -595,8 +695,7 @@ export interface paths {
         /**
          * Create a new order
          * @description Creates a new order in CREATED status.
-         *     Production: BearerAuth token supplies the client identity.
-         *     DEV_ONLY: X-Client-Id header supplies temporary client identity until auth runtime is live.
+         *     BearerAuth token supplies the client identity.
          *     The request body's client_id is optional compatibility input and is never the trusted identity source.
          *     WLT boundary: local order creation is enabled to unblock testing order states and cancellations, but does NOT perform any external financial callback/WLT balance deduction.
          */
@@ -885,6 +984,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List notifications for the authenticated actor (J-013)
+         * @description Returns paginated notification events for the authenticated actor.
+         *     The `actor_type` filter is optional — defaults to the role from the session token.
+         *     Used by DSH bell screen to show live notification events.
+         */
+        get: operations["listNotifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark a notification as read
+         * @description Marks the specified notification as read for the authenticated actor. Idempotent.
+         */
+        post: operations["markNotificationRead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1091,6 +1232,29 @@ export interface components {
             code: string;
             message: string;
         };
+        DshNotificationRecord: {
+            id: string;
+            /** @description Maps to DshSignalEventKind in the frontend signal layer model */
+            kind: string;
+            title: string;
+            subtitle?: string;
+            /** @description Related entity ID (order_id, store_id, etc.) */
+            entity_id?: string;
+            entity_type?: string;
+            /**
+             * @default normal
+             * @enum {string}
+             */
+            priority: "normal" | "important" | "urgent";
+            is_read: boolean;
+            /** Format: date-time */
+            created_at: string;
+            recipient_id: string;
+            /** @enum {string} */
+            recipient_role: "client" | "partner" | "captain" | "field" | "operator";
+            /** @description Frontend route to navigate to when the notification is pressed */
+            action_route?: string;
+        };
         ProductRecord: {
             id: string;
             store_id: string;
@@ -1269,13 +1433,13 @@ export interface components {
             captain_longitude?: number;
             captain_lifecycle_status?: string;
             /** @description Proof-of-delivery media key reference (set on DELIVERED). DSH stores reference only, not the raw binary. */
-            pod_media_key?: string | null;
+            pod_media_key?: string;
             /** @description Reason delivery failed (set on FAILED_DELIVERY or RETURNING_TO_STORE). */
-            delivery_failure_reason?: string | null;
+            delivery_failure_reason?: string;
             /** @description WLT bridge reference ID. DSH stores only — WLT (004E) owns refund execution independently. */
-            wlt_refund_trigger_ref?: string | null;
+            wlt_refund_trigger_ref?: string;
             /** @description WLT settlement transaction reference. */
-            wlt_settlement_ref_id?: string | null;
+            wlt_settlement_ref_id?: string;
             /**
              * @default NOT_SETTLED
              * @enum {string}
@@ -1450,6 +1614,66 @@ export interface components {
              */
             status: "CONFIRMED" | "FAILED";
         };
+        /** @description Canonical runtime media record from dsh_media_assets. Binary files live in MinIO/S3 — only metadata + object reference stored in PostgreSQL. WLT boundary: WLT stores media_id references only, never copies this record. */
+        MediaAsset: {
+            id?: string;
+            owner_service?: string;
+            /** @enum {string} */
+            owner_type?: "product" | "store" | "banner" | "campaign" | "order" | "field_visit" | "support_ticket" | "dispute";
+            owner_id?: string;
+            /** @enum {string} */
+            media_type?: "image" | "video" | "document";
+            purpose?: string;
+            storage_provider?: string;
+            bucket?: string;
+            storage_key?: string;
+            public_url?: string;
+            thumbnail_url?: string;
+            mime_type?: string;
+            /** Format: int64 */
+            file_size_bytes?: number;
+            width?: number;
+            height?: number;
+            duration_seconds?: number;
+            checksum_sha256?: string;
+            /** @enum {string} */
+            status?: "pending_upload" | "uploaded" | "processing" | "active" | "rejected" | "deleted";
+            uploaded_by?: string;
+            approved_by?: string;
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        CreateMediaUploadIntentRequest: {
+            /** @default dsh */
+            owner_service: string;
+            /** @enum {string} */
+            owner_type: "product" | "store" | "banner" | "campaign" | "order" | "field_visit" | "support_ticket" | "dispute";
+            owner_id: string;
+            /** @enum {string} */
+            media_type: "image" | "video" | "document";
+            purpose: string;
+            filename: string;
+            mime_type?: string;
+            /** Format: int64 */
+            file_size_bytes?: number;
+            checksum_sha256?: string;
+            width?: number;
+            height?: number;
+            duration_seconds?: number;
+            actor_id?: string;
+        };
+        MediaUploadIntentResponse: {
+            asset?: components["schemas"]["MediaAsset"];
+            intent?: {
+                media_id?: string;
+                /** @description Presigned S3 PUT URL — client uploads binary directly here. */
+                upload_url?: string;
+                storage_key?: string;
+                expires_in_seconds?: number;
+            };
+        };
     };
     responses: never;
     parameters: never;
@@ -1530,6 +1754,40 @@ export interface operations {
             };
             /** @description Internal error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listAllProducts: {
+        parameters: {
+            query?: {
+                /** @description Filter by approval status (e.g. partner_submitted) */
+                approval_status?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Products list */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ListProductsResponse"];
+                };
+            };
+            /** @description Operator role required */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1796,7 +2054,213 @@ export interface operations {
             };
         };
     };
-    uploadProductMedia: {
+    listMediaAssets: {
+        parameters: {
+            query?: {
+                owner_type?: "product" | "store" | "banner" | "campaign" | "order" | "field_visit" | "support_ticket" | "dispute";
+                owner_id?: string;
+                purpose?: string;
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description List of media assets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items?: components["schemas"]["MediaAsset"][];
+                        total?: number;
+                    };
+                };
+            };
+        };
+    };
+    createMediaUploadIntent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateMediaUploadIntentRequest"];
+            };
+        };
+        responses: {
+            /** @description Upload intent created — presigned URL returned */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaUploadIntentResponse"];
+                };
+            };
+            /** @description Validation error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Scope not allowed for actor role */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Internal error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Media storage unavailable — MinIO/S3 not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    completeMediaUpload: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                media_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media upload completed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaAsset"];
+                };
+            };
+            /** @description Media asset not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Cannot complete media in current status */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getMediaAsset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                media_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media asset record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MediaAsset"];
+                };
+            };
+            /** @description Media asset not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteMediaAsset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                media_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media asset soft-deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Operator role required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Media asset not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    devFixtureAttachProductMedia: {
         parameters: {
             query?: never;
             header?: never;
@@ -1809,7 +2273,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Media created */
+            /** @description Media record created */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -1836,18 +2300,9 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Internal error */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
         };
     };
-    deleteProductMedia: {
+    devFixtureDeleteProductMedia: {
         parameters: {
             query?: never;
             header?: never;
@@ -1858,7 +2313,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Media deleted */
+            /** @description Media record deleted */
             204: {
                 headers: {
                     [name: string]: unknown;
@@ -1867,15 +2322,6 @@ export interface operations {
             };
             /** @description Media record not found */
             404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Internal error */
-            500: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3572,7 +4018,7 @@ export interface operations {
                     /** @description ID of the assigned captain submitting the proof. */
                     captain_id: string;
                     /** @description Media-fixtures key referencing the proof-of-delivery photo. DSH stores only the key reference, never the raw binary. */
-                    pod_media_key?: string | null;
+                    pod_media_key?: string;
                 };
             };
         };
@@ -3649,7 +4095,7 @@ export interface operations {
                     /** @description Reason for failure: CLIENT_UNREACHABLE, WRONG_ADDRESS, REFUSED, OTHER */
                     failure_reason: string;
                     /** @description WLT bridge reference ID. DSH stores only — WLT executes refund independently. */
-                    wlt_refund_trigger_ref?: string | null;
+                    wlt_refund_trigger_ref?: string;
                     /**
                      * @description If true, captain must return item to store (transitions to RETURNING_TO_STORE).
                      * @default false
@@ -3729,7 +4175,7 @@ export interface operations {
                 "application/json": {
                     captain_id: string;
                     /** @description Optional note about the return. */
-                    note?: string | null;
+                    note?: string;
                 };
             };
         };
@@ -3832,6 +4278,74 @@ export interface operations {
             };
             /** @description Internal error */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    listNotifications: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                unread_only?: boolean;
+                /** @description Filter by notification kind (matches DshSignalEventKind) */
+                kind?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notification list returned */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        notifications: components["schemas"]["DshNotificationRecord"][];
+                        total: number;
+                        unread_count?: number;
+                    };
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    markNotificationRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notification marked as read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Notification not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

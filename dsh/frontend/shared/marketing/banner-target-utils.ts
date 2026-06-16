@@ -1,5 +1,5 @@
-// Authority: control-panel/marketing - banner domain pure utility functions.
-// Extracted from BannersCommandDeckScreen as part of Giant Screen split.
+// Authority: shared/marketing - banner domain pure utility functions.
+// Moved from control-panel/marketing to shared/marketing as part of the full-stack consolidation.
 // No React dependency - all functions are pure or data-driven only.
 
 import type {
@@ -7,17 +7,51 @@ import type {
   SmartBannerTargetType,
   SmartTargetSummary,
   BannerDraft,
-} from '../../shared/marketing';
+} from './marketing.types';
 import {
   SMART_TARGET_OPTIONS,
   SUBSCRIPTION_OPTIONS,
-} from '../../shared/marketing';
+} from './marketing.types';
 
-const dshCategoryData: { id: string; label: string; subcategories: { id: string; label: string }[] }[] = [];
-const dshDiscoveryStores: { id: string; name: string }[] = [];
-const storeItemsByStoreId: Record<string, { id: string; name: string }[]> = {};
+export interface DshCategorySubcategory {
+  id: string;
+  label: string;
+  subtitle?: string;
+}
 
-export function normalizeSearchText(value: string): string {
+export interface DshCategoryData {
+  id: string;
+  label: string;
+  subtitle?: string;
+  subcategories: DshCategorySubcategory[];
+}
+
+export interface DshDiscoveryStore {
+  id: string;
+  name: string;
+  subtitle?: string;
+  statusLabel?: string;
+  deliveryLabel?: string;
+  serviceLabel?: string;
+  offerLabel?: string;
+  isOffer?: boolean;
+  isFavorite?: boolean;
+}
+
+export interface StoreItem {
+  id: string;
+  name: string;
+  subtitle?: string;
+  categoryId?: string;
+  categoryLabel?: string;
+  priceLabel?: string;
+}
+
+export const dshCategoryData: DshCategoryData[] = [];
+export const dshDiscoveryStores: DshDiscoveryStore[] = [];
+export const storeItemsByStoreId: Record<string, StoreItem[]> = {};
+
+function normalizeSearchText(value: string): string {
   return value.trim().toLowerCase();
 }
 
@@ -134,7 +168,7 @@ export function resolveSmartTargetSummary(
     return { label: 'تتبع', finalRoute: 'tracking', targetLabel: 'التتبع', targetId: 'tracking' };
   }
   if (targetType === 'orders') {
-    return { label: 'طلبات', finalRoute: 'orders-list', targetLabel: 'الطلبات', targetId: 'orders-list' };
+    return { label: 'طلبات', finalRoute: 'orders-list', targetLabel: 'الالتباس', targetId: 'orders-list' };
   }
   if (targetType === 'loyalty') {
     return {
@@ -152,7 +186,7 @@ export function resolveSmartTargetSummary(
   };
 }
 
-export function createDraft(
+export function createBannerDraft(
   item: MarketingBannerRecord | null | undefined,
   defaults: { accentColor: string; offerBadgeColor: string },
 ): BannerDraft {
@@ -162,16 +196,20 @@ export function createDraft(
     title: item?.title ?? '',
     subtitle: item?.subtitle ?? '',
     mediaKey: item?.mediaKey ?? '',
+    highlight: '',
     accentColor: item?.accentColor ?? defaults.accentColor,
     audience: item?.audience ?? 'all',
     status: item?.status ?? 'draft',
     actionType: item?.actionType ?? 'store',
     actionTarget: item?.actionTarget ?? 'store-1001',
     actionExtra: item?.actionExtra ?? '',
+    targetId: item?.actionTarget ?? '',
+    targetExtra: item?.actionExtra ?? '',
     ctaLabel: item?.ctaLabel ?? 'اكتشف الآن',
     partnerName: item?.partnerName ?? '',
     imageUrl: item?.imageUrl ?? '',
     position: String(item?.position ?? ''),
+    order: String(item?.position ?? ''),
     templateId: item?.templateId ?? 'default',
     offerBadgeText: item?.offerBadgeText ?? '',
     offerBadgeColor: item?.offerBadgeColor ?? defaults.offerBadgeColor,
@@ -182,6 +220,9 @@ export function createDraft(
     overlayPosition: item?.overlayPosition ?? 'center',
     titlePlacement: item?.titlePlacement ?? 'bottom',
     imageFit: item?.imageFit ?? 'cover',
+    logoPosition: item?.partnerLogoPosition ?? 'top-left',
+    motion: item?.motionStyle ?? 'slide',
+    reviewState: 'none',
     motionStyle: item?.motionStyle ?? 'slide',
     autoplayEnabled: item?.autoplayEnabled ?? true,
     autoplayIntervalMs: String(item?.autoplayIntervalMs ?? 4500),

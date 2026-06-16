@@ -3,31 +3,34 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import marketingStyles from './control-panel-marketing.module.css';
-type MarketingNewsTickerKind = 'platform' | 'order' | 'promo' | 'partner';
-type MarketingNewsTickerStatus = 'draft' | 'published' | 'paused' | 'scheduled';
-type MarketingNewsTickerSource = 'operations' | 'customer' | 'marketing' | 'system' | 'partner';
-type MarketingNewsTickerAudience = 'all' | 'home' | 'order' | 'stores' | 'client' | 'operations';
-type MarketingNewsTickerDeliveryMode = 'auto' | 'manual' | 'pinned';
-type MarketingNewsTickerPriority = 'critical' | 'high' | 'normal' | 'low';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MarketingNewsTickerItem = Record<string, any>;
-function getMarketingTickerItems(): MarketingNewsTickerItem[] { return []; }
-function upsertMarketingTickerItem(_item: unknown): void {}
-function toggleMarketingTickerStatus(_id: string): void {}
-function removeMarketingTickerItem(_id: string): void {}
-function createMarketingTickerDraft(): MarketingNewsTickerItem { return {} as MarketingNewsTickerItem; }
-function resolveMarketingTickerPreviewForItem(_item: unknown) { return { isOpen: false, statusLabel: '—', deliveryLabel: '—' }; }
-function buildMarketingTickerPlan() { return { activeEntry: null, activeItem: null, queued: [], suppressed: [] }; }
-function resolveMarketingTickerSourceLabel(_v: string): string { return '—'; }
-function resolveMarketingTickerAudienceLabel(_v: string): string { return '—'; }
-function resolveMarketingTickerPriorityLabel(_v: string): string { return '—'; }
-function resolveMarketingTickerDeliveryLabel(_v: string): string { return '—'; }
-function resolveMarketingTickerPlanReasonLabel(_v: string): string { return '—'; }
-function resolveMarketingTickerStatusLabel(_v: string): string { return '—'; }
-function resolveMarketingTickerKindLabel(_v: string): string { return '—'; }
-function resolveMarketingTickerTargetLabel(_v: string): string { return '—'; }
-function pauseAllMarketingTickers(): void {}
-function toggleMarketingTickerPinned(_id: string): void {}
+import {
+  getMarketingTickerItems,
+  upsertMarketingTickerItem,
+  toggleMarketingTickerStatus,
+  removeMarketingTickerItem,
+  createMarketingTickerDraft,
+  resolveMarketingTickerPreviewForItem,
+  buildMarketingTickerPlan,
+  resolveMarketingTickerSourceLabel,
+  resolveMarketingTickerAudienceLabel,
+  resolveMarketingTickerPriorityLabel,
+  resolveMarketingTickerDeliveryLabel,
+  resolveMarketingTickerPlanReasonLabel,
+  resolveMarketingTickerStatusLabel,
+  resolveMarketingTickerKindLabel,
+  resolveMarketingTickerTargetLabel,
+  pauseAllMarketingTickers,
+  toggleMarketingTickerPinned,
+} from '../../shared/marketing';
+import type {
+  MarketingNewsTickerKind,
+  MarketingNewsTickerStatus,
+  MarketingNewsTickerSource,
+  MarketingNewsTickerAudience,
+  MarketingNewsTickerDeliveryMode,
+  MarketingNewsTickerPriority,
+  MarketingNewsTickerItem,
+} from '../../shared/marketing';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
 /**

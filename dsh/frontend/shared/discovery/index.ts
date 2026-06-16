@@ -14,7 +14,20 @@ export type {
 
 export * from './home-search-helpers';
 export * from './home-promo-mappers';
-export * from './client.navigation-bridge';
+export type {
+  CreateOrderValues as DiscoveryCreateOrderValues,
+  HostOrderSummary as DiscoveryHostOrderSummary,
+  HostCartItem as DiscoveryHostCartItem,
+  HostCanonicalMetadata as DiscoveryHostCanonicalMetadata,
+} from './client.navigation-bridge';
+export {
+  hostClientStates as discoveryHostClientStates,
+  publishedPromoCategoryIds as discoveryPublishedPromoCategoryIds,
+  clientVisibleDiscoveryStores,
+  clientVisibleHomeStores,
+  resolveStorePickupAddress as discoveryResolveStorePickupAddress,
+  commandTargetToRoute as discoveryCommandTargetToRoute,
+} from './client.navigation-bridge';
 export * from './useDshClientNavigation';
 export * from './useDshClientBellState';
 export * from './client-home.composition';

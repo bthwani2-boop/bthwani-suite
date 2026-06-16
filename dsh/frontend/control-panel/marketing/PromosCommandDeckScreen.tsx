@@ -6,18 +6,18 @@ import { Box, Button, SelectField, Surface, Tabs, Text, TextField, useTheme,
   radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type HomePromoRecord = Record<string, any>;
-type HomePromoSummary = { id: (string); title: (string); status: (string); order: (number) };
-function getHomePromoItems(): HomePromoRecord[] { return []; }
-function getHomePromoSummaries(_opts?: unknown): { items: HomePromoSummary[]; total: number; page: number; pageSize: number } { return { items: [], total: 0, page: 1, pageSize: 20 }; }
-function getHomePromoDetail(_id: string): HomePromoRecord | null { return null; }
-function upsertHomePromoItem(_item: unknown): void {}
-function removeHomePromoItem(_id: string): void {}
-function toggleHomePromoStatus(_id: string): void {}
-const dshCategoryFixtures: { id: (string); label: (string); subcategories: { id: (string); label: (string) }[] }[] = [];
-const dshDiscoveryStores: { id: (string); name: (string) }[] = [];
-const storeItemsByStoreId: Record<string, { id: (string); name: (string) }[]> = {};
+import {
+  getHomePromoItems,
+  getHomePromoSummaries,
+  getHomePromoDetail,
+  upsertHomePromoItem,
+  removeHomePromoItem,
+  toggleHomePromoStatus,
+  dshCategoryData as dshCategoryFixtures,
+  dshDiscoveryStores,
+  storeItemsByStoreId,
+} from '../../shared/marketing';
+import type { HomePromoRecord, HomePromoSummary } from '../../shared/marketing';
 import { resolveDshImageSource } from '../../shared/media/resolve-dsh-image-source';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 

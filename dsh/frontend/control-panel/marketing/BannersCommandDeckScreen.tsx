@@ -22,21 +22,20 @@ import {
   radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-type MarketingBannerMotionStyle = 'slide' | 'soft-parallax' | 'subtle-fade' | 'snap-focus';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type MarketingBannerRecord = Record<string, any>;
-type MarketingBannerSummary = { id: (string); title: (string); subtitle: (string); imageUrl?: string; status: (string); actionType: (string); impressions: (number); clicks: (number); position: (number) };
-function computeMarketingBannerQuality(_item: unknown): number { return 0; }
-function duplicateMarketingBannerItem(_id: string): void {}
-function getMarketingBannerItems(): MarketingBannerRecord[] { return []; }
-function getMarketingBannerSummaries(_opts?: unknown): { items: MarketingBannerSummary[]; total: number; page: number; pageSize: number } { return { items: [], total: 0, page: 1, pageSize: 20 }; }
-function getMarketingBannerDetail(_id: string): MarketingBannerRecord | null { return null; }
-function getMarketingBannerKpis() { return { total: { value: 0 }, published: { value: 0 }, drafts: { value: 0 }, live: { value: 0 }, impressions: { value: 0 }, clicks: { value: 0 }, ctr: { value: '0%' } }; }
-function removeMarketingBannerItem(_id: string): void {}
-function toggleMarketingBannerStatus(_id: string): void {}
-function upsertMarketingBannerItem(_item: unknown): void {}
+import {
+  computeMarketingBannerQuality,
+  duplicateMarketingBannerItem,
+  getMarketingBannerItems,
+  getMarketingBannerSummaries,
+  getMarketingBannerDetail,
+  getMarketingBannerKpis,
+  removeMarketingBannerItem,
+  toggleMarketingBannerStatus,
+  upsertMarketingBannerItem,
+} from '../../shared/marketing';
+import type { MarketingBannerRecord, MarketingBannerMotionStyle, MarketingBannerSummary } from '../../shared/marketing';
 import { useMarketingPermissions } from './marketing-permissions.contract';
-import { createDraft, bannerActionTypeLabel } from './banner-target-utils';
+import { createBannerDraft, bannerActionTypeLabel } from '../../shared/marketing';
 import { BANNER_MOTION_OPTIONS, BANNER_TEMPLATES } from './banner-types';
 import type { BannerDraft, EditorWorkspaceTab } from './banner-types';
 import { BannerViewer } from './BannerViewer';
@@ -178,12 +177,12 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
     () => ({ accentColor: 'brandStrong', offerBadgeColor: 'brand' }),
     [],
   );
-  const [draft, setDraft] = React.useState<BannerDraft>(() => createDraft(selected, bannerDefaults));
+  const [draft, setDraft] = React.useState<BannerDraft>(() => createBannerDraft(selected, bannerDefaults));
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
   const [saveError, setSaveError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    if (selected) setDraft(createDraft(selected, bannerDefaults));
+    if (selected) setDraft(createBannerDraft(selected, bannerDefaults));
   }, [bannerDefaults, selected]);
 
   // --- Derived data ---
@@ -214,7 +213,7 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
 
   function handleCreateNew() {
     setSelectedId(null);
-    setDraft(createDraft(null, bannerDefaults));
+    setDraft(createBannerDraft(null, bannerDefaults));
   }
 
   function handleSave() {
@@ -402,7 +401,7 @@ export function BannersCommandDeckScreen({ hubHref, operationsHref }: BannersCom
               </Text>
               <SelectField<MarketingBannerMotionStyle>
                 label="نمط الحركة"
-                value={draft.motionStyle}
+                value={draft.motionStyle as MarketingBannerMotionStyle}
                 options={BANNER_MOTION_OPTIONS}
                 onValueChange={(value) => setDraft((current) => ({ ...current, motionStyle: value }))}
               />

@@ -4,16 +4,15 @@ import React from 'react';
 import { Box, Button, Surface, Text } from '@bthwani/ui-kit';
 import { WebControlPanelRecommendation } from '@bthwani/ui-kit/web';
 import { ControlPanelDshActionQueue, ControlPanelDshWorkspaceFrame } from '../../shared';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getCampaignItems(): Record<string, any>[] { return []; }
-function upsertCampaignItem(_item: unknown): void {}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getMarketingVideoItems(): Record<string, any>[] { return []; }
-function upsertMarketingVideoItem(_item: unknown): void {}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getPartnerOfferItems(): Record<string, any>[] { return []; }
-function approvePartnerOfferItem(_id: string): void {}
-function rejectPartnerOfferItem(_id: string): void {}
+import {
+  getCampaignItems,
+  upsertCampaignItem,
+  getMarketingVideoItems,
+  upsertMarketingVideoItem,
+  getPartnerOfferItems,
+  approvePartnerOfferItem,
+  rejectPartnerOfferItem,
+} from '../../../shared/marketing';
 import { useMarketingPermissions } from '../marketing-permissions.contract';
 
 export type MarketingReviewKind = 'approval' | 'video';

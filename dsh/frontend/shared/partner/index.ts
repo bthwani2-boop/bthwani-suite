@@ -5,3 +5,4 @@ export * from './partner.journey';
 export * from './partner.workflow';
 export * from './partner.surface-model';
 export * from './partner-profile.model';
+export * from './dsh-partner-activation.model';
