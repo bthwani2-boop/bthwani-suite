@@ -1,7 +1,6 @@
 // Canonical location: dsh/frontend/shared/field/field.surface-model.ts
 // Authority: dsh/frontend/shared/field — thin orchestration shell for field surface.
-// Wires topic models (navigation, draft, visit, escalation) together.
-// activeStore and storeId-guard effect live here to break navModel←→draftModel circular dep.
+// Wires topic models (navigation from field, draft/visit/escalation from partner) together.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
@@ -12,12 +11,12 @@ import {
   resolveFieldBottomActiveId,
   canFieldShowBottomNav,
 } from './field-navigation.model';
-import { useFieldDraftModel } from './field-draft.model';
+import { usePartnerOnboardingDraftModel } from '../partner/onboarding/partner-onboarding-draft.model';
 import { useFieldVisitModel } from './field-visit.model';
-import { useFieldEscalationModel } from './field-escalation.model';
-import { useFieldReadinessModel } from './field-readiness.model';
+import { usePartnerReadinessEscalationModel } from '../partner/readiness/partner-readiness-escalation.model';
+import { usePartnerReadinessModel } from '../partner/readiness/partner-readiness.model';
 
-export type { DshFieldReadinessEscalationState, DshFieldEscalationTargetModel } from './field-escalation.model';
+export type { PartnerReadinessEscalationState, PartnerEscalationTargetModel } from '../partner/readiness';
 
 export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
   const fieldRuntime = useFieldRuntimeActions();
@@ -26,9 +25,9 @@ export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
   const { route, routeStack, pushRoute, popRoute, resetToStores } = useFieldNavigationModel({ command });
 
   // draftModel receives stable pushRoute from navModel
-  const draftModel = useFieldDraftModel({ fieldRuntime, pushRoute });
+  const draftModel = usePartnerOnboardingDraftModel({ onboardingRuntime: fieldRuntime, pushRoute });
   const visitModel = useFieldVisitModel({ fieldRuntime, patchStore: draftModel.patchStore, pushRoute });
-  const escalationModel = useFieldEscalationModel({ patchStore: draftModel.patchStore });
+  const escalationModel = usePartnerReadinessEscalationModel({ patchStore: draftModel.patchStore });
 
   // activeStore derived in shell — avoids circular dep (navModel used to take stores)
   const activeStore = React.useMemo(() => {
@@ -39,7 +38,7 @@ export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
     return draftModel.stores.find((s) => s.id === route.storeId) ?? null;
   }, [route, draftModel.stores]);
 
-  const readiness = useFieldReadinessModel(activeStore);
+  const readiness = usePartnerReadinessModel(activeStore);
 
   // Guard: if current route points to a deleted storeId, fall back to stores list
   React.useEffect(() => {

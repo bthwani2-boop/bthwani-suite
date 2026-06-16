@@ -5,4 +5,4 @@ export type {
   DshFieldRouteState,
   DshFieldSurfaceHostProps,
   DshFieldSurfaceProps,
-} from '../shared/field-surface-model';
+} from '../shared/field';

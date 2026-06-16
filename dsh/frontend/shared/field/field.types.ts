@@ -1,18 +1,18 @@
-// DSH Field App — store lifecycle types, onboarding drafts, visit contracts, surface routing.
+// DSH Field App — store routing, navigation, and visit contracts.
 // No JSX. No ui-kit. No Tamagui.
 
 import type { DshFulfillmentDeliveryMode } from '../delivery';
+import type {
+  PartnerFulfillmentModeAgreement,
+  PartnerOnboardingSectionId,
+  PartnerDocumentRuntimeStatus,
+  PartnerOnboardingDraft,
+  OnboardingStoreFile,
+  PartnerSectionSummary,
+} from '../partner/onboarding';
 
 export type FieldFulfillmentMode = DshFulfillmentDeliveryMode;
-
-export type FieldFulfillmentModeAgreement = {
-  mode: FieldFulfillmentMode;
-  modeLabel: string;
-  enabled: boolean;
-  commissionRatePreview: string;
-  settlementBasis: string;
-  operationalReadiness: 'ready' | 'pending' | 'unavailable';
-};
+export type FieldFulfillmentModeAgreement = PartnerFulfillmentModeAgreement;
 
 export type FieldStatusTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
 export type FieldLeadSource = 'candidate' | 'manual' | 'local-ui-draft' | 'backend';
@@ -32,70 +32,15 @@ export type FieldLeadFilter = 'all' | 'today' | 'ready' | 'follow-up' | 'pending
 
 export type DshFieldSurfaceId = 'stores' | 'onboarding' | 'visits' | 'finance' | 'profile';
 
-export type FieldOnboardingSectionId =
-  | 'basics'
-  | 'classification'
-  | 'location'
-  | 'photos'
-  | 'documents'
-  | 'products'
-  | 'offer'
-  | 'review';
-
-export type FieldDocumentRuntimeStatus = 'missing' | 'uploaded' | 'approved' | 'needs_reupload' | 'rejected';
+export type FieldOnboardingSectionId = PartnerOnboardingSectionId;
+export type FieldDocumentRuntimeStatus = PartnerDocumentRuntimeStatus;
 /** @deprecated Use FieldDocumentRuntimeStatus */
 export type FieldDocumentPreviewStatus = FieldDocumentRuntimeStatus;
 export type FieldDocumentStatus = FieldDocumentRuntimeStatus;
 
-export type FieldOnboardingDraft = {
-  activeSectionId: FieldOnboardingSectionId;
-  basics: { storeName: string; ownerName: string; ownerPhone: string; managerName: string };
-  classification: { storeType: string; mainCategory: string; subCategory: string };
-  location: { city: string; zone: string; addressLine: string; coverageSummary: string; latitude: string; longitude: string; landmark: string };
-  photos: { storefrontPhotoRef: string; interiorPhotoRef: string; signagePhotoRef: string };
-  documents: {
-    commercialRegistrationRef: string;
-    ownerIdRef: string;
-    tradeLicenseRef: string;
-    commercialRegistrationStatus: FieldDocumentRuntimeStatus;
-    ownerIdStatus: FieldDocumentRuntimeStatus;
-    tradeLicenseStatus: FieldDocumentRuntimeStatus;
-  };
-  products: { featuredProductName: string; featuredProductPrice: string; sampleCatalogNote: string };
-  offer: { preliminaryOffer: string; operatingHours: string; deliveryReadiness: string; financeNote: string };
-  review: { fieldNotes: string; partnerReviewNote: string };
-  lastSavedLabel: string;
-  submittedAt?: string;
-};
-
-export type FieldStoreFile = {
-  id: string;
-  source: FieldLeadSource;
-  draftLocalId?: string;
-  backendStoreId?: string;
-  syncStatus?: 'local-ui-draft' | 'backend' | 'syncing' | 'sync-failed';
-  name: string;
-  category: string;
-  location: string;
-  nextVisitLabel: string;
-  assignedFieldMember: string;
-  lastUpdatedLabel: string;
-  lockedStatus?: FieldLeadStatus;
-  stageLabelOverride?: string;
-  statusNoteOverride?: string;
-  lifecycleNote?: string;
-  financeLabel: string;
-  reviewFeedback?: string;
-  draft: FieldOnboardingDraft;
-  fulfillmentAgreements?: readonly FieldFulfillmentModeAgreement[];
-};
-
-export type FieldSectionSummary = {
-  id: FieldOnboardingSectionId;
-  label: string;
-  complete: boolean;
-  missingCount: number;
-};
+export type FieldOnboardingDraft = PartnerOnboardingDraft;
+export type FieldStoreFile = OnboardingStoreFile;
+export type FieldSectionSummary = PartnerSectionSummary;
 
 // ── Surface routing types ──────────────────────────────────────────────────
 
@@ -169,30 +114,37 @@ export type DshFieldStoreVisitValues = {
 
 export type DshFieldStoreVisitErrors = Partial<Record<keyof DshFieldStoreVisitValues, string>>;
 
-// ── Labels and constants ───────────────────────────────────────────────────
+// ── Labels and constants (delegated or mapped to partner) ───────────────────
+
+import {
+  onboardingStatusLabels,
+  onboardingStatusTones,
+  partnerSectionOrder,
+  partnerSectionLabels,
+} from '../partner/onboarding';
 
 export const fieldStatusLabels: Record<FieldLeadStatus, string> = {
-  'new-lead': 'فرصة جديدة',
+  'new-lead': onboardingStatusLabels['new-lead'],
   'visit-planned': 'زيارة مخططة',
-  'offer-pending-approval': 'بانتظار اعتماد العرض',
-  'offer-approved': 'العرض معتمد',
+  'offer-pending-approval': onboardingStatusLabels['offer-pending-approval'],
+  'offer-approved': onboardingStatusLabels['offer-approved'],
   'appointment-scheduled': 'جاهز للزيارة',
   visited: 'بانتظار تسجيل النتيجة',
-  'follow-up-required': 'تحتاج متابعة',
-  'ready-for-onboarding': 'جاهز للإضافة',
-  submitted: 'مرسل للمراجعة',
+  'follow-up-required': onboardingStatusLabels['follow-up-required'],
+  'ready-for-onboarding': onboardingStatusLabels['ready-for-onboarding'],
+  submitted: onboardingStatusLabels['submitted'],
 };
 
 export const fieldStatusTones: Record<FieldLeadStatus, FieldStatusTone> = {
-  'new-lead': 'default',
+  'new-lead': onboardingStatusTones['new-lead'],
   'visit-planned': 'info',
-  'offer-pending-approval': 'warning',
-  'offer-approved': 'success',
+  'offer-pending-approval': onboardingStatusTones['offer-pending-approval'],
+  'offer-approved': onboardingStatusTones['offer-approved'],
   'appointment-scheduled': 'brand',
   visited: 'info',
-  'follow-up-required': 'warning',
-  'ready-for-onboarding': 'success',
-  submitted: 'brand',
+  'follow-up-required': onboardingStatusTones['follow-up-required'],
+  'ready-for-onboarding': onboardingStatusTones['ready-for-onboarding'],
+  submitted: onboardingStatusTones['submitted'],
 };
 
 export const fieldFilterOptions: readonly { id: FieldLeadFilter; label: string; tone: FieldStatusTone }[] = [
@@ -205,17 +157,5 @@ export const fieldFilterOptions: readonly { id: FieldLeadFilter; label: string; 
   { id: 'done', label: 'منتهٍ للميداني', tone: 'success' },
 ] as const;
 
-export const fieldSectionOrder: readonly FieldOnboardingSectionId[] = [
-  'basics', 'classification', 'location', 'photos', 'documents', 'products', 'offer', 'review',
-] as const;
-
-export const fieldSectionLabels: Record<FieldOnboardingSectionId, string> = {
-  basics: 'البيانات الأساسية',
-  classification: 'النوع والتصنيف',
-  location: 'الموقع والتغطية',
-  photos: 'الصور',
-  documents: 'التحقق من المستندات',
-  products: 'المنتجات الأولية',
-  offer: 'العرض والاتفاق',
-  review: 'المراجعة والإرسال',
-};
+export const fieldSectionOrder = partnerSectionOrder;
+export const fieldSectionLabels = partnerSectionLabels;

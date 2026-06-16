@@ -129,7 +129,7 @@ function ControlPanelDshPartnerDeactivationTab() {
   }, []);
 
   const currentStatus = partnerStatuses[selectedPartnerId] ?? getPartnerActivationStatus(selectedPartnerId);
-  const currentPartner = PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === selectedPartnerId) || PARTNER_FULFILLMENT_AGREEMENTS[0];
+  const currentPartner = PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === selectedPartnerId) || PARTNER_FULFILLMENT_AGREEMENTS[0] || { partnerId: selectedPartnerId, storeName: 'شريك غير معروف', categoryLabel: '', modes: [] };
 
   const handleDeactivateConfirm = (partnerId: string, reason: string, note: string) => {
     updatePartnerActivationStatus(partnerId, 'partner_deactivated');

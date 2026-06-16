@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Pressable, View } from 'react-native';
 import {
   Badge,
@@ -22,7 +22,7 @@ import type {
   DshFieldStoreVisitState,
   DshFieldStoreVisitValues,
   DshFieldVisitEvidenceItem,
-} from '../types/DshFieldStoreVisitTypes';
+} from '../../shared';
 import { VisitEvidenceSection } from '../sections/VisitEvidenceSection';
 import { getDshFlowPolicySummary } from '../../shared/runtime/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/dsh-governance.map';
@@ -32,7 +32,7 @@ export type {
   DshFieldStoreVisitState,
   DshFieldStoreVisitValues,
   DshFieldVisitEvidenceItem,
-} from '../types/DshFieldStoreVisitTypes';
+};
 
 export type DshFieldStoreVisitScreenProps = {
   state?: DshFieldStoreVisitState;

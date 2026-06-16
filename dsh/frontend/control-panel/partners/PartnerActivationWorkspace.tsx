@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Text, Surface, KeyValueList } from '@bthwani/ui-kit';
@@ -59,7 +59,8 @@ export function ControlPanelDshPartnerActivationScreen() {
 
   const currentPartner =
     PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === selectedPartnerId) ||
-    PARTNER_FULFILLMENT_AGREEMENTS[0];
+    PARTNER_FULFILLMENT_AGREEMENTS[0] ||
+    { partnerId: selectedPartnerId, storeName: 'شريك غير معروف', categoryLabel: '', modes: [] };
 
   const handlePartnerSelect = (id: string) => {
     setSelectedPartnerId(id);

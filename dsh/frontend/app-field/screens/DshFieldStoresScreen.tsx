@@ -5,7 +5,14 @@ import { Badge, Box, Button, Divider, colorPalette, Icon, MobileScrollView, Mode
 } from '@bthwani/ui-kit';
 import { FieldStoreCard } from '../parts/FieldStoreCard';
 import { DSH_FIELD_BINDING_CONTRACTS } from '../contracts/dsh-field-binding.contracts';
-import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from '../../shared/field';
+import {
+  fieldFilterOptions,
+  resolveFieldFilterCounts,
+  type FieldLeadFilter,
+  type FieldStoreFile,
+  resolveFilteredOnboardingStores,
+  resolvePriorityOnboardingStore,
+} from '../../shared';
 
 function resolveStoresBindingLabel() {
   return 'جسر قائمة المتاجر';
@@ -28,27 +35,11 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
   const counts = React.useMemo(() => resolveFieldFilterCounts(stores), [stores]);
 
   const filteredStores = React.useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-
-    return stores.filter((store) => {
-      if (!matchesFieldStoreFilter(store, activeFilter)) {
-        return false;
-      }
-
-      if (!query) {
-        return true;
-      }
-
-      const haystack = `${store.name} ${store.category} ${store.location}`.toLowerCase();
-      return haystack.includes(query);
-    });
+    return resolveFilteredOnboardingStores(stores, activeFilter, searchQuery);
   }, [activeFilter, searchQuery, stores]);
 
   const priorityStore = React.useMemo(() => {
-    return filteredStores.find((store) => matchesFieldStoreFilter(store, 'ready'))
-      ?? filteredStores[0]
-      ?? stores.find((store) => matchesFieldStoreFilter(store, 'today'))
-      ?? stores[0];
+    return resolvePriorityOnboardingStore(filteredStores, stores);
   }, [filteredStores, stores]);
 
   const storesBinding = DSH_FIELD_BINDING_CONTRACTS.find((contract) => contract.surfaceId === 'stores');

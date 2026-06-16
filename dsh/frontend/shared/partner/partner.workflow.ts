@@ -16,11 +16,52 @@ export type PartnerModificationRequest = {
 export type PartnerDispute = {
   id: string; partnerId: string; status: string; type: string; date: string; sla: string;
 };
-type DshPartnerFulfillmentAgreementEntry = { partnerId: string; storeName: string };
+import type { DshPartnerFulfillmentAgreement } from './partner.types';
 const PARTNER_COMPLAINTS_DATA: PartnerComplaint[] = [];
 const PARTNER_MODIFICATION_REQUESTS: PartnerModificationRequest[] = [];
 const PARTNER_DISPUTES_DATA: PartnerDispute[] = [];
-const PARTNER_FULFILLMENT_AGREEMENTS_BASE: DshPartnerFulfillmentAgreementEntry[] = [];
+const PARTNER_FULFILLMENT_AGREEMENTS_BASE: DshPartnerFulfillmentAgreement[] = [
+  {
+    partnerId: 'partner-saha',
+    storeName: 'محمصة الساحة',
+    categoryLabel: 'مقاهٍ ومحمصات',
+    modes: [
+      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري', negotiationNote: 'الاتفاق الافتراضي' },
+      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable', validityLabel: 'غير مفعّل' },
+      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+    ],
+  },
+  {
+    partnerId: 'partner-shorouq',
+    storeName: 'بوفيه الشروق',
+    categoryLabel: 'بوفيهات',
+    modes: [
+      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'pending', validityLabel: 'قيد التفعيل', negotiationNote: 'يحتاج تأكيد جاهزية موصل المتجر' },
+      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: false, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable', validityLabel: 'غير مفعّل' },
+    ],
+  },
+  {
+    partnerId: 'partner-zawya',
+    storeName: 'مخبز الزاوية',
+    categoryLabel: 'مخابز',
+    modes: [
+      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري', negotiationNote: 'موصل المتجر جاهز' },
+      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري', negotiationNote: 'الاتفاق الكامل للأوضاع الثلاثة' },
+    ],
+  },
+  {
+    partnerId: 'partner-nokhba',
+    storeName: 'تمور النخبة',
+    categoryLabel: 'مواد غذائية',
+    modes: [
+      { mode: 'bthwani_delivery', modeLabel: 'توصيل بثواني', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+      { mode: 'partner_delivery', modeLabel: 'توصيل المتجر', enabled: false, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'غير مفعّل', operationalReadiness: 'unavailable', validityLabel: 'غير مفعّل' },
+      { mode: 'pickup', modeLabel: 'استلام بنفسي', enabled: true, commissionRatePreview: 'RATE_NOT_SET', settlementBasis: 'لكل طلب عبر WLT', operationalReadiness: 'ready', validityLabel: 'ساري' },
+    ],
+  },
+];
 
 
 export type DshPartnerIntakeSource = 'app-field' | 'app-partner';

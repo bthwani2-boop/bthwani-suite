@@ -1,14 +1,14 @@
-// Canonical location: dsh/frontend/shared/field/field-escalation.model.ts
-// Authority: dsh/frontend/shared/field — readiness escalation target selection and submission.
+// dsh/frontend/shared/partner/readiness/partner-readiness-escalation.model.ts
+// Authority: shared/partner/readiness — onboarding readiness escalations state and actions.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { FieldStoreFile } from './field.types';
-import { touchFieldStoreDraft } from './field.store-lifecycle';
+import type { OnboardingStoreFile } from '../onboarding/partner-onboarding-draft.model';
+import { touchOnboardingStoreDraft } from '../onboarding/partner-onboarding.lifecycle';
 
-export type DshFieldReadinessEscalationState = 'ready' | 'loading' | 'pending-response' | 'error' | 'offline';
+export type PartnerReadinessEscalationState = 'ready' | 'loading' | 'pending-response' | 'error' | 'offline';
 
-export type DshFieldEscalationTargetModel = {
+export type PartnerEscalationTargetModel = {
   readonly id: string;
   readonly label: string;
   readonly isSelected: boolean;
@@ -21,16 +21,16 @@ const ESCALATION_TARGETS = [
   { id: 'marketing', label: 'فريق التسويق (Marketing)' },
 ] as const;
 
-type PatchStore = (storeId: string, updater: (store: FieldStoreFile) => FieldStoreFile) => void;
+type PatchStore = (storeId: string, updater: (store: OnboardingStoreFile) => OnboardingStoreFile) => void;
 
-export function useFieldEscalationModel({ patchStore }: { patchStore: PatchStore }) {
+export function usePartnerReadinessEscalationModel({ patchStore }: { patchStore: PatchStore }) {
   const [selectedEscalationTargetByStore, setSelectedEscalationTargetByStore] =
     React.useState<Record<string, string>>({});
   const [readinessEscalationStateByStore, setReadinessEscalationStateByStore] =
-    React.useState<Record<string, DshFieldReadinessEscalationState>>({});
+    React.useState<Record<string, PartnerReadinessEscalationState>>({});
 
   const resolveEscalationTargets = React.useCallback(
-    (storeId: string): readonly DshFieldEscalationTargetModel[] => {
+    (storeId: string): readonly PartnerEscalationTargetModel[] => {
       const selectedTargetId = selectedEscalationTargetByStore[storeId] ?? DEFAULT_ESCALATION_TARGET;
       return ESCALATION_TARGETS.map((t) => ({ ...t, isSelected: t.id === selectedTargetId }));
     },
@@ -42,13 +42,13 @@ export function useFieldEscalationModel({ patchStore }: { patchStore: PatchStore
   }, []);
 
   const handleEscalationSubmit = React.useCallback(
-    (store: FieldStoreFile, reason: string) => {
+    (store: OnboardingStoreFile, reason: string) => {
       const targets = resolveEscalationTargets(store.id);
       const selectedTargetId = selectedEscalationTargetByStore[store.id] ?? DEFAULT_ESCALATION_TARGET;
       const target = targets.find((t) => t.id === selectedTargetId);
       const label = target?.label ?? 'قسم الشركاء (Partner Management)';
       patchStore(store.id, (current) =>
-        touchFieldStoreDraft(
+        touchOnboardingStoreDraft(
           {
             ...current,
             lockedStatus: 'follow-up-required',

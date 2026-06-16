@@ -22,48 +22,19 @@ import {
 import { getDshFlowPolicySummary } from '../../shared/runtime/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/dsh-governance.map';
 import { resolveFieldDocumentDraftMediaKey } from '../../shared/media';
-import type { DshFieldDocumentKind } from '../../shared/field/dsh-field-document-client';
+import {
+  PARTNER_DOCUMENT_DISPLAY_ITEMS,
+  parseDocumentUploadError,
+  type PartnerDocumentKind,
+} from '../../shared';
 
 export type DshFieldDocumentUploadScreenProps = {
   storeId: string;
   onBack: () => void;
-  onSubmit: (documentKind: DshFieldDocumentKind, documentRef: string) => Promise<void>;
+  onSubmit: (documentKind: PartnerDocumentKind, documentRef: string) => Promise<void>;
   state?: 'ready' | 'loading' | 'success' | 'error' | 'offline' | 'disabled';
   onRetry?: () => void;
 };
-
-const documentKinds: { id: DshFieldDocumentKind; label: string; description: string; icon: string }[] = [
-  {
-    id: 'commercial_registration',
-    label: 'السجل التجاري',
-    description: 'نسخة سارية وصالحة من السجل التجاري الرسمي.',
-    icon: 'assignment',
-  },
-  {
-    id: 'tax_certificate',
-    label: 'الشهادة الضريبية',
-    description: 'الرقم الضريبي الموحد للمتجر.',
-    icon: 'text-snippet',
-  },
-  {
-    id: 'identity_proof',
-    label: 'إثبات هوية المالك',
-    description: 'بطاقة الهوية الوطنية أو جواز السفر للمالك.',
-    icon: 'badge',
-  },
-  {
-    id: 'storefront_photo',
-    label: 'صورة واجهة المتجر',
-    description: 'صورة خارجية واضحة تُظهر اللوحة والمدخل الرئيسي.',
-    icon: 'photo-camera',
-  },
-  {
-    id: 'interior_photo',
-    label: 'صورة المتجر من الداخل',
-    description: 'صورة توضح الأقسام الرئيسية وتنسيق المنتجات.',
-    icon: 'image',
-  },
-];
 
 export function DshFieldDocumentUploadScreen({
   storeId,
@@ -76,7 +47,7 @@ export function DshFieldDocumentUploadScreen({
   const { direction } = useDirection();
   const isRtl = direction === 'rtl';
 
-  const [selectedKind, setSelectedKind] = React.useState<DshFieldDocumentKind>('commercial_registration');
+  const [selectedKind, setSelectedKind] = React.useState<PartnerDocumentKind>('commercial_registration');
   const [documentRef, setDocumentRef] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [successDocId, setSuccessDocId] = React.useState<string | null>(null);
@@ -96,12 +67,8 @@ export function DshFieldDocumentUploadScreen({
     try {
       await onSubmit(selectedKind, documentRef.trim());
       setSuccessDocId(documentRef);
-    } catch (err: any) {
-      if (err && err.kind === 'offline') {
-        setErrorMessage('تعذر الاتصال بالخادم. أنت غير متصل بالإنترنت حاليًا.');
-      } else {
-        setErrorMessage(err?.body || 'فشل إرسال المستند، يرجى المحاولة لاحقًا.');
-      }
+    } catch (err: unknown) {
+      setErrorMessage(parseDocumentUploadError(err));
     }
   };
 
@@ -175,7 +142,7 @@ export function DshFieldDocumentUploadScreen({
               subtitle="اختر نوع المرفق أو الصورة لإضافتها كإثبات."
             />
             <Box gap={2}>
-              {documentKinds.map((kind) => {
+              {PARTNER_DOCUMENT_DISPLAY_ITEMS.map((kind) => {
                 const isSelected = selectedKind === kind.id;
                 return (
                   <Pressable
@@ -233,7 +200,7 @@ export function DshFieldDocumentUploadScreen({
             <KeyValueList
               dense
               items={[
-                { label: 'النوع المحدد', value: documentKinds.find((d) => d.id === selectedKind)?.label ?? '' },
+                { label: 'النوع المحدد', value: PARTNER_DOCUMENT_DISPLAY_ITEMS.find((d) => d.id === selectedKind)?.label ?? '' },
                 { label: 'رمز الملف المعين', value: documentRef || '—', tone: 'brand' },
                 { label: 'حالة الاعتماد الأولية', value: 'قيد الانتظار (Pending)' },
               ]}

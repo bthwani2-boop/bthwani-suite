@@ -1,13 +1,16 @@
+// dsh/frontend/shared/field/use-field-runtime-actions.ts
+// Authority: shared/field — API action binders utilizing partner and documents clients.
+// No JSX. No ui-kit. No Tamagui.
+
 import React from 'react';
 import {
-  createDshFieldDocumentHttpClient,
-  resolveDshFieldDocumentBaseUrl,
-  type DshFieldDocumentKind,
-} from './dsh-field-document-client';
+  createPartnerDocumentHttpClient,
+  resolvePartnerDocumentBaseUrl,
+} from '../partner/documents';
 import {
-  createDshFieldStoreOnboardingHttpClient,
-  resolveDshFieldStoreOnboardingBaseUrl,
-} from './dsh-field-store-onboarding-client';
+  createPartnerStoreOnboardingHttpClient,
+  resolvePartnerStoreOnboardingBaseUrl,
+} from '../partner/onboarding';
 import {
   createDshFieldVisitHttpClient,
   resolveDshFieldVisitBaseUrl,
@@ -21,7 +24,7 @@ export type DshFieldVisitDraftValues = {
 
 export function applyFieldDocumentUploadToStore(
   store: FieldStoreFile,
-  kind: DshFieldDocumentKind,
+  kind: string,
   uploadedRef: string,
 ): FieldStoreFile {
   const docs = { ...store.draft.documents };
@@ -30,10 +33,10 @@ export function applyFieldDocumentUploadToStore(
   if (kind === 'commercial_registration') {
     docs.commercialRegistrationStatus = 'uploaded';
     docs.commercialRegistrationRef = uploadedRef;
-  } else if (kind === 'identity_proof') {
+  } else if (kind === 'identity_proof' || kind === 'id_card') {
     docs.ownerIdStatus = 'uploaded';
     docs.ownerIdRef = uploadedRef;
-  } else if (kind === 'tax_certificate') {
+  } else if (kind === 'tax_certificate' || kind === 'trade_license') {
     docs.tradeLicenseStatus = 'uploaded';
     docs.tradeLicenseRef = uploadedRef;
   } else if (kind === 'storefront_photo') {
@@ -47,23 +50,23 @@ export function applyFieldDocumentUploadToStore(
     lastUpdatedLabel: 'الآن',
     draft: {
       ...store.draft,
-      documents: docs,
+      documents: docs as any,
       photos,
     },
   };
 }
 
 export function useFieldRuntimeActions() {
-  const fieldStoreOnboardingClient = React.useMemo(
-    () => createDshFieldStoreOnboardingHttpClient(resolveDshFieldStoreOnboardingBaseUrl()),
+  const partnerStoreOnboardingClient = React.useMemo(
+    () => createPartnerStoreOnboardingHttpClient(resolvePartnerStoreOnboardingBaseUrl()),
     [],
   );
   const fieldVisitClient = React.useMemo(
     () => createDshFieldVisitHttpClient(resolveDshFieldVisitBaseUrl()),
     [],
   );
-  const fieldDocumentClient = React.useMemo(
-    () => createDshFieldDocumentHttpClient(resolveDshFieldDocumentBaseUrl()),
+  const partnerDocumentClient = React.useMemo(
+    () => createPartnerDocumentHttpClient(resolvePartnerDocumentBaseUrl()),
     [],
   );
 
@@ -73,7 +76,7 @@ export function useFieldRuntimeActions() {
       const address = (store.draft.location.addressLine || store.location).trim();
       const categoryId = (store.draft.classification.mainCategory || store.category).trim();
 
-      return fieldStoreOnboardingClient.createFieldStore({
+      return partnerStoreOnboardingClient.createStore({
         name: name || store.name,
         address: address || store.location,
         category_id: categoryId || undefined,
@@ -81,7 +84,7 @@ export function useFieldRuntimeActions() {
         supports_partner_delivery: true,
       });
     },
-    [fieldStoreOnboardingClient],
+    [partnerStoreOnboardingClient],
   );
 
   const submitVisit = React.useCallback(
@@ -96,12 +99,12 @@ export function useFieldRuntimeActions() {
   );
 
   const submitDocument = React.useCallback(
-    (storeId: string, kind: DshFieldDocumentKind, uploadedRef: string) =>
-      fieldDocumentClient.createFieldDocument(storeId, {
+    (storeId: string, kind: any, uploadedRef: string) =>
+      partnerDocumentClient.createDocument(storeId, {
         document_kind: kind,
         media_key: uploadedRef,
       }),
-    [fieldDocumentClient],
+    [partnerDocumentClient],
   );
 
   return {

@@ -1,5 +1,5 @@
 import { createDshCheckoutHttpClient, type DshCheckoutAuthContext } from '../checkout';
-import { createDshFieldReadinessHttpClient, resolveDshFieldReadinessBaseUrl } from '../field/dsh-field-readiness-client';
+import { createPartnerReadinessHttpClient, resolvePartnerReadinessBaseUrl } from '../partner/readiness/partner-readiness.client';
 import { createDshMediaApiHttpClient } from '../media/dsh-media-api.client';
 import { createDshOrderLifecycleHttpClient, resolveDshOrderApiBaseUrl } from '../orders/dsh-order-lifecycle-client';
 import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../products/dsh-product-api.transport';
@@ -43,7 +43,7 @@ export function getDshDiscoveryStoresRuntimeClient(config: DshDiscoveryStoresRun
 }
 
 export function getDshFieldReadinessRuntimeClient() {
-  return createDshFieldReadinessHttpClient(resolveDshFieldReadinessBaseUrl());
+  return createPartnerReadinessHttpClient(resolvePartnerReadinessBaseUrl());
 }
 
 export function getDshAuthRuntimeBaseUrl() {

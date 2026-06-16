@@ -1,12 +1,16 @@
-import { PlatformVarsRegistry } from '../platform/platform-vars';
+// dsh/frontend/shared/partner/readiness/partner-readiness.client.ts
+// Authority: shared/partner/readiness — HTTP client for store readiness approvals/escalations API.
+// No JSX. No ui-kit. No Tamagui.
 
-export type CreateFieldReadinessEscalationRequest = {
+import { PlatformVarsRegistry } from '../../platform/platform-vars';
+
+export type CreatePartnerReadinessEscalationRequest = {
   readonly field_agent_id?: string;
   readonly reason: string;
   readonly target_team: 'partner-management' | 'control-panel' | 'marketing';
 };
 
-export type FieldReadinessEscalationRecord = {
+export type PartnerReadinessEscalationRecord = {
   readonly id: string;
   readonly store_id: string;
   readonly field_agent_id?: string;
@@ -18,13 +22,13 @@ export type FieldReadinessEscalationRecord = {
   readonly updated_at: string;
 };
 
-export type UpdateFieldReadinessEscalationRequest = {
+export type UpdatePartnerReadinessEscalationRequest = {
   readonly status: 'info_requested' | 'resolved' | 'rejected';
   readonly operator_note?: string;
 };
 
-export type ListFieldReadinessEscalationsResponse = {
-  readonly escalations: readonly FieldReadinessEscalationRecord[];
+export type ListPartnerReadinessEscalationsResponse = {
+  readonly escalations: readonly PartnerReadinessEscalationRecord[];
   readonly pagination: {
     readonly limit: number;
     readonly offset: number;
@@ -32,13 +36,13 @@ export type ListFieldReadinessEscalationsResponse = {
   };
 };
 
-export type CreateFieldReadinessApprovalRequest = {
+export type CreatePartnerReadinessApprovalRequest = {
   readonly operator_id?: string;
   readonly decision: 'approved' | 'rejected';
   readonly reason?: string;
 };
 
-export type FieldReadinessApprovalRecord = {
+export type PartnerReadinessApprovalRecord = {
   readonly id: string;
   readonly store_id: string;
   readonly operator_id?: string;
@@ -47,25 +51,32 @@ export type FieldReadinessApprovalRecord = {
   readonly created_at: string;
 };
 
-export interface DshFieldReadinessClient {
-  createFieldReadinessEscalation(storeId: string, req: CreateFieldReadinessEscalationRequest): Promise<FieldReadinessEscalationRecord>;
-  listFieldReadinessEscalations(status?: string, limit?: number, offset?: number): Promise<ListFieldReadinessEscalationsResponse>;
-  updateFieldReadinessEscalation(id: string, req: UpdateFieldReadinessEscalationRequest): Promise<FieldReadinessEscalationRecord>;
-  createFieldReadinessApproval(storeId: string, req: CreateFieldReadinessApprovalRequest): Promise<FieldReadinessApprovalRecord>;
-  getLatestFieldReadinessApproval(storeId: string): Promise<FieldReadinessApprovalRecord>;
+export interface PartnerReadinessClient {
+  createReadinessEscalation(storeId: string, req: CreatePartnerReadinessEscalationRequest): Promise<PartnerReadinessEscalationRecord>;
+  listReadinessEscalations(status?: string, limit?: number, offset?: number): Promise<ListPartnerReadinessEscalationsResponse>;
+  updateReadinessEscalation(id: string, req: UpdatePartnerReadinessEscalationRequest): Promise<PartnerReadinessEscalationRecord>;
+  createReadinessApproval(storeId: string, req: CreatePartnerReadinessApprovalRequest): Promise<PartnerReadinessApprovalRecord>;
+  getLatestReadinessApproval(storeId: string): Promise<PartnerReadinessApprovalRecord>;
+
+  // Deprecated/Legacy compatibility mappings
+  createFieldReadinessEscalation(storeId: string, req: CreatePartnerReadinessEscalationRequest): Promise<PartnerReadinessEscalationRecord>;
+  listFieldReadinessEscalations(status?: string, limit?: number, offset?: number): Promise<ListPartnerReadinessEscalationsResponse>;
+  updateFieldReadinessEscalation(id: string, req: UpdatePartnerReadinessEscalationRequest): Promise<PartnerReadinessEscalationRecord>;
+  createFieldReadinessApproval(storeId: string, req: CreatePartnerReadinessApprovalRequest): Promise<PartnerReadinessApprovalRecord>;
+  getLatestFieldReadinessApproval(storeId: string): Promise<PartnerReadinessApprovalRecord>;
 }
 
-export function resolveDshFieldReadinessBaseUrl(): string | null {
+export function resolvePartnerReadinessBaseUrl(): string | null {
   return PlatformVarsRegistry.get('dshApiBaseUrl');
 }
 
-export function createDshFieldReadinessHttpClient(
+export function createPartnerReadinessHttpClient(
   baseUrl: string | null,
   fetchFn?: (input: string, init?: RequestInit) => Promise<Response>,
-): DshFieldReadinessClient {
-  return {
-    createFieldReadinessEscalation: async (storeId, req) => {
-      const transport = fetchFn ?? globalThis.fetch?.bind(globalThis);
+): PartnerReadinessClient {
+  const transport = fetchFn ?? globalThis.fetch?.bind(globalThis);
+  const client: PartnerReadinessClient = {
+    createReadinessEscalation: async (storeId, req) => {
       if (!baseUrl || !transport) throw new Error('offline');
       const cleanUrl = baseUrl.replace(/\/$/, '');
       const response = await transport(`${cleanUrl}/stores/${encodeURIComponent(storeId)}/readiness-escalations`, {
@@ -78,8 +89,7 @@ export function createDshFieldReadinessHttpClient(
       }
       return response.json();
     },
-    listFieldReadinessEscalations: async (status, limit = 20, offset = 0) => {
-      const transport = fetchFn ?? globalThis.fetch?.bind(globalThis);
+    listReadinessEscalations: async (status, limit = 20, offset = 0) => {
       if (!baseUrl || !transport) throw new Error('offline');
       const cleanUrl = baseUrl.replace(/\/$/, '');
       let url = `${cleanUrl}/readiness-escalations?limit=${limit}&offset=${offset}`;
@@ -92,8 +102,7 @@ export function createDshFieldReadinessHttpClient(
       }
       return response.json();
     },
-    updateFieldReadinessEscalation: async (id, req) => {
-      const transport = fetchFn ?? globalThis.fetch?.bind(globalThis);
+    updateReadinessEscalation: async (id, req) => {
       if (!baseUrl || !transport) throw new Error('offline');
       const cleanUrl = baseUrl.replace(/\/$/, '');
       const response = await transport(`${cleanUrl}/readiness-escalations/${encodeURIComponent(id)}`, {
@@ -106,8 +115,7 @@ export function createDshFieldReadinessHttpClient(
       }
       return response.json();
     },
-    createFieldReadinessApproval: async (storeId, req) => {
-      const transport = fetchFn ?? globalThis.fetch?.bind(globalThis);
+    createReadinessApproval: async (storeId, req) => {
       if (!baseUrl || !transport) throw new Error('offline');
       const cleanUrl = baseUrl.replace(/\/$/, '');
       const response = await transport(`${cleanUrl}/stores/${encodeURIComponent(storeId)}/readiness-approvals`, {
@@ -120,8 +128,7 @@ export function createDshFieldReadinessHttpClient(
       }
       return response.json();
     },
-    getLatestFieldReadinessApproval: async (storeId) => {
-      const transport = fetchFn ?? globalThis.fetch?.bind(globalThis);
+    getLatestReadinessApproval: async (storeId) => {
       if (!baseUrl || !transport) throw new Error('offline');
       const cleanUrl = baseUrl.replace(/\/$/, '');
       const response = await transport(`${cleanUrl}/stores/${encodeURIComponent(storeId)}/readiness-approvals/latest`);
@@ -130,5 +137,21 @@ export function createDshFieldReadinessHttpClient(
       }
       return response.json();
     },
+
+    // Legacy delegators
+    createFieldReadinessEscalation: (storeId, req) => client.createReadinessEscalation(storeId, req),
+    listFieldReadinessEscalations: (status, limit, offset) => client.listReadinessEscalations(status, limit, offset),
+    updateFieldReadinessEscalation: (id, req) => client.updateReadinessEscalation(id, req),
+    createFieldReadinessApproval: (storeId, req) => client.createReadinessApproval(storeId, req),
+    getLatestFieldReadinessApproval: (storeId) => client.getLatestReadinessApproval(storeId),
   };
+  return client;
 }
+
+// Legacy/Deprecated backwards-compatibility aliases
+export type FieldReadinessEscalationRecord = PartnerReadinessEscalationRecord;
+export type FieldReadinessApprovalRecord = PartnerReadinessApprovalRecord;
+export type CreateFieldReadinessEscalationRequest = CreatePartnerReadinessEscalationRequest;
+export type UpdateFieldReadinessEscalationRequest = UpdatePartnerReadinessEscalationRequest;
+export type ListFieldReadinessEscalationsResponse = ListPartnerReadinessEscalationsResponse;
+export type CreateFieldReadinessApprovalRequest = CreatePartnerReadinessApprovalRequest;

@@ -37,6 +37,16 @@ import {
   type FieldOnboardingSectionId,
   type FieldStoreFile,
   type FieldDocumentStatus,
+  // Partner rehome imports
+  validatePartnerOnboarding,
+  PARTNER_STORE_TYPE_OPTIONS,
+  PARTNER_MAIN_CATEGORY_OPTIONS,
+  PARTNER_SUB_CATEGORY_OPTIONS,
+  getOptionsWithFallback,
+  resolvePartnerSectionSummaryLabel,
+  simulateGPSAutofill,
+  simulateOwnerNameOCR,
+  simulateCameraCapture,
 } from '../../shared';
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
 import { getOperationsSupportFlowsForSurface } from '../../shared';
@@ -71,13 +81,6 @@ function updateDraftSection<T extends keyof FieldOnboardingDraft>(draft: FieldOn
     [key]: value,
   };
 }
-
-const getOptionsWithFallback = (defaultOpts: { value: string; label: string }[], currentValue: string) => {
-  if (!currentValue) return defaultOpts;
-  const exists = defaultOpts.some((opt) => opt.value === currentValue);
-  if (exists) return defaultOpts;
-  return [...defaultOpts, { value: currentValue, label: currentValue }];
-};
 
 export function DshFieldStoreOnboardingScreen({
   store,
@@ -213,147 +216,39 @@ export function DshFieldStoreOnboardingScreen({
     setActiveSection(fieldSectionOrder[activeIndex - 1]);
   }, [activeIndex, onBack, setActiveSection]);
 
-  const errors = React.useMemo(() => {
-    const errs: Record<string, string | undefined> = {};
-
-    // Basics
-    if (!draft.basics.storeName.trim()) {
-      errs.storeName = 'اسم المتجر مطلوب لتحديد الهوية الميدانية';
-    }
-    if (!draft.basics.ownerName.trim()) {
-      errs.ownerName = 'اسم المالك مطلوب للمطابقة القانونية';
-    }
-    if (!draft.basics.ownerPhone.trim()) {
-      errs.ownerPhone = 'رقم جوال المالك مطلوب للتواصل المباشر';
-    } else {
-      const phone = draft.basics.ownerPhone.trim();
-      const isValidYemen = /^(77|73|71|70|78)[0-9]{7}$/.test(phone);
-      const isValidSaudi = /^(05|5)[0-9]{8}$/.test(phone);
-      if (!isValidYemen && !isValidSaudi) {
-        errs.ownerPhone = 'صيغة الجوال غير صحيحة (٩ أرقام تبدأ بـ 7 لليمن أو 05/5 للسعودية)';
-      }
-    }
-
-    // Location
-    if (!draft.location.city.trim()) {
-      errs.city = 'المدينة مطلوبة لتوزيع التغطية';
-    }
-    if (!draft.location.zone.trim()) {
-      errs.zone = 'النطاق الجغرافي مطلوب لتنسيق العمليات الميدانية';
-    }
-    if (!draft.location.latitude.trim()) {
-      errs.latitude = 'خط العرض مطلوب';
-    } else if (isNaN(Number(draft.location.latitude))) {
-      errs.latitude = 'قيمة خط العرض غير صحيحة';
-    }
-    if (!draft.location.longitude.trim()) {
-      errs.longitude = 'خط الطول مطلوب';
-    } else if (isNaN(Number(draft.location.longitude))) {
-      errs.longitude = 'قيمة خط الطول غير صحيحة';
-    }
-    if (!draft.location.landmark.trim()) {
-      errs.landmark = 'المعلم المميز مطلوب لمساعدة الكابتن في الوصول';
-    }
-
-    // Products
-    if (!draft.products.featuredProductName.trim()) {
-      errs.featuredProductName = 'اسم المنتج الافتتاحي مطلوب لإطلاق الكتالوج';
-    }
-    if (!draft.products.featuredProductPrice.trim()) {
-      errs.featuredProductPrice = 'سعر المنتج مطلوب';
-    } else if (isNaN(Number(draft.products.featuredProductPrice)) || Number(draft.products.featuredProductPrice) <= 0) {
-      errs.featuredProductPrice = 'سعر المنتج يجب أن يكون قيمة موجبة';
-    }
-
-    // Offer
-    if (!draft.offer.preliminaryOffer.trim()) {
-      errs.preliminaryOffer = 'الاتفاق أو العمولة المبدئية مطلوبة للتفعيل';
-    }
-    if (!draft.offer.operatingHours.trim()) {
-      errs.operatingHours = 'ساعات العمل مطلوبة لجدولة التوصيل الميداني';
-    }
-
-    return errs;
-  }, [draft]);
+  const errors = React.useMemo(() => validatePartnerOnboarding(draft), [draft]);
 
   const canImportOwnerName = draft.documents.commercialRegistrationRef.trim().length > 0;
 
   const handleImportOwnerName = () => {
     setOcrLoading(true);
-    setTimeout(() => {
-      changeDraftField('basics', 'ownerName', 'عبدالرحمن بن ثنيان');
-      setOcrLoading(false);
-    }, 600);
+    changeDraftField('basics', 'ownerName', simulateOwnerNameOCR());
+    setOcrLoading(false);
   };
 
   const handleGPSAutofill = () => {
     setGpsLoading(true);
-    setTimeout(() => {
-      changeDraftField('location', 'city', 'الرياض');
-      changeDraftField('location', 'zone', 'حي العليا');
-      changeDraftField('location', 'latitude', '24.71358');
-      changeDraftField('location', 'longitude', '46.67529');
-      changeDraftField('location', 'landmark', 'برج المملكة - البوابة الشرقية');
-      changeDraftField('location', 'addressLine', 'طريق الملك فهد، حي العليا');
-      changeDraftField('location', 'coverageSummary', 'نطاق التغطية يغطي كامل مربع العليا وحطين');
-      setGpsLoading(false);
-    }, 800);
+    const autofill = simulateGPSAutofill();
+    changeDraftField('location', 'city', autofill.city);
+    changeDraftField('location', 'zone', autofill.zone);
+    changeDraftField('location', 'latitude', autofill.latitude);
+    changeDraftField('location', 'longitude', autofill.longitude);
+    changeDraftField('location', 'landmark', autofill.landmark);
+    changeDraftField('location', 'addressLine', autofill.addressLine);
+    changeDraftField('location', 'coverageSummary', autofill.coverageSummary);
+    setGpsLoading(false);
   };
 
   const handleCameraCapture = (field: 'storefrontPhotoRef' | 'interiorPhotoRef' | 'signagePhotoRef') => {
     setCameraLoading((prev) => ({ ...prev, [field]: true }));
-    setTimeout(() => {
-      const randomSuffix = Math.floor(100 + Math.random() * 900);
-      const mockPhotoRef = `img_${field.replace('PhotoRef', '')}_upload_${randomSuffix}.jpg`;
-      changeDraftField('photos', field, mockPhotoRef);
-      setCameraLoading((prev) => ({ ...prev, [field]: false }));
-    }, 700);
+    changeDraftField('photos', field, simulateCameraCapture(field));
+    setCameraLoading((prev) => ({ ...prev, [field]: false }));
   };
 
   const resolveSectionSummary = (sectionId: FieldOnboardingSectionId): string => {
-    if (sectionId === 'basics') {
-      const storeName = draft.basics.storeName.trim();
-      const ownerName = draft.basics.ownerName.trim();
-      return `المتجر: ${storeName || 'غير محدد'} · المالك: ${ownerName || 'غير محدد'}`;
-    }
-    if (sectionId === 'classification') {
-      const main = draft.classification.mainCategory.trim();
-      const sub = draft.classification.subCategory.trim();
-      return `التصنيف: ${main || 'غير محدد'} · ${sub || 'غير محدد'}`;
-    }
-    if (sectionId === 'location') {
-      const city = draft.location.city.trim();
-      const zone = draft.location.zone.trim();
-      const lat = draft.location.latitude.trim();
-      const lng = draft.location.longitude.trim();
-      return `الموقع: ${city || 'غير محدد'}، ${zone || 'غير محدد'} (${lat || '0'}, ${lng || '0'})`;
-    }
-    if (sectionId === 'photos') {
-      const storefront = draft.photos.storefrontPhotoRef.trim();
-      const interior = draft.photos.interiorPhotoRef.trim();
-      return storefront || interior ? 'تم إرفاق صور الواجهة والتجهيزات الداخلية' : 'لم يتم رفع صور بعد';
-    }
-    if (sectionId === 'documents') {
-      const cr = draft.documents.commercialRegistrationRef.trim();
-      const id = draft.documents.ownerIdRef.trim();
-      return cr || id ? 'تم إرفاق وثائق السجل التجاري والهوية للمراجعة' : 'لم ترفع أي مستندات';
-    }
-    if (sectionId === 'products') {
-      const name = draft.products.featuredProductName.trim();
-      const price = draft.products.featuredProductPrice.trim();
-      return `المنتج: ${name || 'غير محدد'} · السعر: ${price || '0'} ر.ي`;
-    }
-    if (sectionId === 'offer') {
-      const offer = draft.offer.preliminaryOffer.trim();
-      const hours = draft.offer.operatingHours.trim();
-      return `العمولة: ${offer || 'غير محدد'} · ساعات العمل: ${hours || 'غير محدد'}`;
-    }
-    if (sectionId === 'review') {
-      const notes = draft.review.fieldNotes.trim();
-      return `ملاحظات الزيارة: ${notes || 'لا توجد ملاحظات إضافية'}`;
-    }
-    return '';
+    return resolvePartnerSectionSummaryLabel(draft, sectionId);
   };
+
 
   const renderSectionContent = () => {
     if (activeSectionId === 'basics') {
@@ -423,27 +318,6 @@ export function DshFieldStoreOnboardingScreen({
     }
 
     if (activeSectionId === 'classification') {
-      const typeOptions = [
-        { value: 'بقالة ومواد غذائية', label: 'بقالة ومواد غذائية' },
-        { value: 'مطعم', label: 'مطعم / وجبات' },
-        { value: 'مخبز وحلويات', label: 'مخبز وحلويات' },
-        { value: 'صيدلية', label: 'صيدلية ومستحضرات تجميل' },
-      ];
-
-      const mainCatOptions = [
-        { value: 'مطاعم', label: 'مأكولات ووجبات' },
-        { value: 'بقالة ومواد غذائية', label: 'طازج وفواكه ومواد استهلاكية' },
-        { value: 'مخابز', label: 'مخبوزات ومعجنات' },
-        { value: 'حلويات ومشروبات', label: 'حلويات ومشروبات' },
-      ];
-
-      const subCatOptions = [
-        { value: 'وجبات سريعة', label: 'وجبات سريعة' },
-        { value: 'شعبي ويمني', label: 'شعبي ويمني' },
-        { value: 'سوبرماركت', label: 'سوبرماركت / هايبر' },
-        { value: 'معجنات وفطائر', label: 'معجنات وفطائر' },
-      ];
-
       return (
         <Box gap={4}>
           <SectionHeader
@@ -455,7 +329,7 @@ export function DshFieldStoreOnboardingScreen({
             label="نوع المتجر"
             value={draft.classification.storeType}
             disabled={readOnly}
-            options={getOptionsWithFallback(typeOptions, draft.classification.storeType)}
+            options={getOptionsWithFallback(PARTNER_STORE_TYPE_OPTIONS, draft.classification.storeType)}
             placeholder="اختر نوع المنفذ الميداني"
             onValueChange={(value) => changeDraftField('classification', 'storeType', value)}
           />
@@ -464,7 +338,7 @@ export function DshFieldStoreOnboardingScreen({
             label="التصنيف الرئيسي"
             value={draft.classification.mainCategory}
             disabled={readOnly}
-            options={getOptionsWithFallback(mainCatOptions, draft.classification.mainCategory)}
+            options={getOptionsWithFallback(PARTNER_MAIN_CATEGORY_OPTIONS, draft.classification.mainCategory)}
             placeholder="اختر الفئة الرئيسية في بثواني"
             onValueChange={(value) => changeDraftField('classification', 'mainCategory', value)}
           />
@@ -473,7 +347,7 @@ export function DshFieldStoreOnboardingScreen({
             label="التصنيف الفرعي للمتجر"
             value={draft.classification.subCategory}
             disabled={readOnly}
-            options={getOptionsWithFallback(subCatOptions, draft.classification.subCategory)}
+            options={getOptionsWithFallback(PARTNER_SUB_CATEGORY_OPTIONS, draft.classification.subCategory)}
             placeholder="اختر التصنيف الأكثر دقة للفرع"
             onValueChange={(value) => changeDraftField('classification', 'subCategory', value)}
           />
