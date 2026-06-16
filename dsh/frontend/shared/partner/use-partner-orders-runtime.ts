@@ -7,26 +7,28 @@ import {
   fetchDshRuntimeOrders,
 } from '../operations/dsh-operational-runtime-adapter';
 import { mapRuntimeRowToPartnerOrderItem } from './partner.adapters';
-
-
+import { usePlatformVars } from '../platform/PlatformVarsProvider';
 
 type PartnerOrderItemLike = ReturnType<typeof mapRuntimeRowToPartnerOrderItem>;
 type PartnerOrdersState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled' | 'partial';
 
 export function usePartnerOrdersRuntime(route: string) {
+  const { dshClientId } = usePlatformVars();
+  const partnerClientId = dshClientId || 'partner-dev-001';
+
   const [orders, setOrders] = React.useState<readonly PartnerOrderItemLike[]>([]);
   const [state, setState] = React.useState<PartnerOrdersState>('loading');
 
   const orderLifecycleClient = React.useMemo(
-    () => createDshOrderLifecycleHttpClient(resolveDshOrderApiBaseUrl()),
-    [],
+    () => createDshOrderLifecycleHttpClient(resolveDshOrderApiBaseUrl(), globalThis.fetch, { clientId: partnerClientId }),
+    [partnerClientId],
   );
 
   React.useEffect(() => {
     if (route !== 'inbox') return;
     let cancelled = false;
     setState('loading');
-    fetchDshRuntimeOrders({ limit: 100 }).then((result) => {
+    fetchDshRuntimeOrders({ limit: 100 }, partnerClientId).then((result) => {
       if (cancelled) return;
       if (result.kind === 'ok') {
         const nextOrders = result.orders.map(mapRuntimeRowToPartnerOrderItem);

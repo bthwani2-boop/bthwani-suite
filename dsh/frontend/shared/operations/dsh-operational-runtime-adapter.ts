@@ -55,13 +55,14 @@ function toRuntimeRow(o: DshOrderRecord): DshRuntimeOrderRow {
 }
 
 export async function fetchDshRuntimeOrders(
-  query: DshListOrdersQuery = {}
+  query: DshListOrdersQuery = {},
+  clientId?: string
 ): Promise<DshRuntimeOrdersResult> {
   const baseUrl = resolveDshOrderApiBaseUrl();
   if (!baseUrl) {
     return { kind: 'offline' };
   }
-  const client = createDshOrderLifecycleHttpClient(baseUrl);
+  const client = createDshOrderLifecycleHttpClient(baseUrl, globalThis.fetch, clientId ? { clientId } : {});
   try {
     const resp = await client.listOrders(query);
     return {
