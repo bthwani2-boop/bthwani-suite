@@ -4,7 +4,7 @@
 
 import React from 'react';
 import type { OnboardingStoreFile } from '../onboarding/partner-onboarding-draft.model';
-import { touchOnboardingStoreDraft } from '../onboarding/partner-onboarding.lifecycle';
+import { touchOnboardingStoreDraft } from '../onboarding/partner-onboarding-draft.model';
 
 export type PartnerReadinessEscalationState = 'ready' | 'loading' | 'pending-response' | 'error' | 'offline';
 

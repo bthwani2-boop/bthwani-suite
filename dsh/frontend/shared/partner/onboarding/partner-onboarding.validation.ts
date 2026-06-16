@@ -4,6 +4,12 @@
 
 import type { PartnerOnboardingDraft } from './partner-onboarding.types';
 
+export function normalizeDigits(str: string): string {
+  return str
+    .replace(/[٠-٩]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 1632))
+    .replace(/[۰-۹]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 1776));
+}
+
 export function validatePartnerOnboarding(draft: PartnerOnboardingDraft): Record<string, string | undefined> {
   const errs: Record<string, string | undefined> = {};
 
@@ -17,7 +23,7 @@ export function validatePartnerOnboarding(draft: PartnerOnboardingDraft): Record
   if (!draft.basics.ownerPhone.trim()) {
     errs.ownerPhone = 'رقم جوال المالك مطلوب للتواصل المباشر';
   } else {
-    const phone = draft.basics.ownerPhone.trim();
+    const phone = normalizeDigits(draft.basics.ownerPhone.trim());
     const isValidYemen = /^(77|73|71|70|78)[0-9]{7}$/.test(phone);
     const isValidSaudi = /^(05|5)[0-9]{8}$/.test(phone);
     if (!isValidYemen && !isValidSaudi) {
@@ -30,24 +36,41 @@ export function validatePartnerOnboarding(draft: PartnerOnboardingDraft): Record
     errs.city = 'المدينة مطلوبة لتوزيع التغطية';
   }
 
-
-  // Products
-  if (!draft.products.featuredProductName.trim()) {
-    errs.featuredProductName = 'اسم المنتج الافتتاحي مطلوب لإطلاق الكتالوج';
-  }
-  if (!draft.products.featuredProductPrice.trim()) {
-    errs.featuredProductPrice = 'سعر المنتج مطلوب';
-  } else if (isNaN(Number(draft.products.featuredProductPrice)) || Number(draft.products.featuredProductPrice) <= 0) {
-    errs.featuredProductPrice = 'سعر المنتج يجب أن يكون قيمة موجبة';
-  }
-
   // Offer
   if (!draft.offer.preliminaryOffer.trim()) {
     errs.preliminaryOffer = 'الاتفاق أو العمولة المبدئية مطلوبة للتفعيل';
+  } else {
+    const rawOffer = normalizeDigits(draft.offer.preliminaryOffer.trim());
+    const numericOffer = parseFloat(rawOffer.replace(/%/g, ''));
+    if (isNaN(numericOffer) || numericOffer <= 0 || numericOffer > 100) {
+      errs.preliminaryOffer = 'نسبة العمولة المبدئية يجب أن تكون قيمة صالحة بين 1% و 100%';
+    }
   }
+
   if (!draft.offer.operatingHours.trim()) {
     errs.operatingHours = 'ساعات العمل مطلوبة لجدولة التوصيل الميداني';
+  } else {
+    const rawHours = normalizeDigits(draft.offer.operatingHours.trim());
+    const numericHours = parseInt(rawHours, 10);
+    if (!isNaN(numericHours) && String(numericHours) === rawHours && (numericHours <= 0 || numericHours > 24)) {
+      errs.operatingHours = 'ساعات العمل اليومية يجب أن تكون قيمة صالحة بين 1 و 24 ساعة';
+    }
   }
 
   return errs;
+}
+
+export function validateOnboardingProduct(name: string, price: string): string | undefined {
+  if (!name.trim()) {
+    return 'اسم المنتج مطلوب';
+  }
+  const cleanPrice = normalizeDigits(price.trim());
+  if (!cleanPrice) {
+    return 'سعر المنتج مطلوب';
+  }
+  const numericPrice = parseFloat(cleanPrice);
+  if (isNaN(numericPrice) || numericPrice <= 0) {
+    return 'سعر المنتج يجب أن يكون قيمة موجبة';
+  }
+  return undefined;
 }

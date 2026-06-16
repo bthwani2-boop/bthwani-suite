@@ -143,7 +143,7 @@ function resolveCommandRoute(command?: DshFieldNavigationCommand): DshFieldRoute
   if (command.target === 'visit') {
     return command.storeId ? { kind: 'visit', backendStoreId: command.storeId } : { kind: 'stores' };
   }
-  if (command.target === 'onboarding' || command.target === 'readiness-escalation' || command.target === 'document-upload') {
+  if (command.target === 'onboarding' || command.target === 'readiness-escalation' || command.target === 'document-upload' || command.target === 'products-upload') {
     return command.storeId ? { kind: command.target, storeId: command.storeId } : { kind: 'stores' };
   }
   return { kind: command.target };
@@ -153,7 +153,7 @@ export function resolveFieldBottomActiveId(route: DshFieldRouteState): string {
   if (route.kind === 'stores') return 'tasks';
   if (route.kind === 'history') return 'history';
   if (route.kind === 'finance') return 'finance';
-  if (['account', 'profile', 'onboarding', 'visit', 'readiness-escalation'].includes(route.kind)) return 'profile';
+  if (['account', 'profile', 'onboarding', 'visit', 'readiness-escalation', 'products-upload'].includes(route.kind)) return 'profile';
   return '';
 }
 

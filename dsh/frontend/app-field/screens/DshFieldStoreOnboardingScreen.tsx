@@ -49,11 +49,9 @@ import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/d
 import { useOnboardingMedia } from './useOnboardingMedia';
 import {
   OnboardingBasicsStep,
-  OnboardingClassificationStep,
   OnboardingLocationStep,
   OnboardingPhotosStep,
   OnboardingDocumentsStep,
-  OnboardingProductsStep,
   OnboardingOfferStep,
   OnboardingReviewStep,
 } from './DshFieldStoreOnboardingSteps';
@@ -79,7 +77,7 @@ export const onboardingGroupOrder: readonly OnboardingGroupSectionId[] = [
 ];
 
 export const onboardingGroupLabels: Record<OnboardingGroupSectionId, string> = {
-  basics_profile: 'بيانات وتصنيف المتجر',
+  basics_profile: 'بيانات المتجر الأساسية',
   location_media: 'الموقع والصور الميدانية',
   documents: 'المستندات والتراخيص الرسمية',
   agreement_review: 'الاتفاق والمراجعة النهائية',
@@ -108,6 +106,7 @@ type DshFieldStoreOnboardingScreenProps = {
   onActivationComplete?: () => void;
   onEscalate?: () => void;
   onUploadDocument?: (storeId: string, kind: PartnerDocumentKind) => void;
+  onGoToProducts?: () => void;
 };
 
 export function DshFieldStoreOnboardingScreen({
@@ -120,6 +119,7 @@ export function DshFieldStoreOnboardingScreen({
   onActivationComplete,
   onEscalate,
   onUploadDocument,
+  onGoToProducts,
 }: DshFieldStoreOnboardingScreenProps) {
   const { theme } = useTheme();
 
@@ -187,7 +187,7 @@ export function DshFieldStoreOnboardingScreen({
         ? 'location'
         : groupId === 'documents'
         ? 'documents'
-        : 'products';
+        : 'offer';
     setActiveSection(firstSubSectionId);
   }, [setActiveSection]);
 
@@ -243,17 +243,16 @@ export function DshFieldStoreOnboardingScreen({
     const locationSummary = sections.find((s) => s.id === 'location') || { complete: false, missingCount: 0 };
     const photosSummary = sections.find((s) => s.id === 'photos') || { complete: false, missingCount: 0 };
     const documentsSummary = sections.find((s) => s.id === 'documents') || { complete: false, missingCount: 0 };
-    const productsSummary = sections.find((s) => s.id === 'products') || { complete: false, missingCount: 0 };
     const offerSummary = sections.find((s) => s.id === 'offer') || { complete: false, missingCount: 0 };
     const reviewSummary = sections.find((s) => s.id === 'review') || { complete: false, missingCount: 0 };
 
     return [
       {
         id: 'basics_profile' as const,
-        label: 'بيانات وتصنيف المتجر',
-        complete: basicsSummary.complete && classificationSummary.complete,
-        missingCount: basicsSummary.missingCount + classificationSummary.missingCount,
-        subSectionIds: ['basics', 'classification'] as FieldOnboardingSectionId[],
+        label: 'بيانات المتجر الأساسية',
+        complete: basicsSummary.complete,
+        missingCount: basicsSummary.missingCount,
+        subSectionIds: ['basics'] as FieldOnboardingSectionId[],
       },
       {
         id: 'location_media' as const,
@@ -272,9 +271,9 @@ export function DshFieldStoreOnboardingScreen({
       {
         id: 'agreement_review' as const,
         label: 'الاتفاق والمراجعة النهائية',
-        complete: productsSummary.complete && offerSummary.complete && reviewSummary.complete,
-        missingCount: productsSummary.missingCount + offerSummary.missingCount + reviewSummary.missingCount,
-        subSectionIds: ['products', 'offer', 'review'] as FieldOnboardingSectionId[],
+        complete: offerSummary.complete && reviewSummary.complete,
+        missingCount: offerSummary.missingCount + reviewSummary.missingCount,
+        subSectionIds: ['offer', 'review'] as FieldOnboardingSectionId[],
       },
     ];
   }, [sections]);
@@ -282,8 +281,8 @@ export function DshFieldStoreOnboardingScreen({
   const resolveGroupDescription = (groupId: OnboardingGroupSectionId, complete: boolean): string => {
     if (groupId === 'basics_profile') {
       return complete
-        ? `${draft.basics.ownerName || 'المالك'} · ${draft.classification.mainCategory || 'غير مصنف'}`
-        : 'يتطلب استكمال البيانات الأساسية والتصنيف';
+        ? `${draft.basics.ownerName || 'المالك'}`
+        : 'يتطلب استكمال البيانات الأساسية للمتجر';
     }
     if (groupId === 'location_media') {
       return complete
@@ -298,7 +297,7 @@ export function DshFieldStoreOnboardingScreen({
     if (groupId === 'agreement_review') {
       return complete
         ? 'تمت صياغة العرض والاتفاق ومراجعة الميدان'
-        : 'يتطلب إكمال تفاصيل المنتجات والاتفاق النهائي';
+        : 'يتطلب إكمال العرض والاتفاق النهائي والمراجعة';
     }
     return '';
   };
@@ -311,12 +310,6 @@ export function DshFieldStoreOnboardingScreen({
             draft={draft}
             readOnly={readOnly}
             errors={errors}
-            changeDraftField={changeDraftField as any}
-          />
-          <Divider style={{ marginVertical: spacing[2] }} />
-          <OnboardingClassificationStep
-            draft={draft}
-            readOnly={readOnly}
             changeDraftField={changeDraftField as any}
           />
         </Box>
@@ -359,13 +352,6 @@ export function DshFieldStoreOnboardingScreen({
     if (groupId === 'agreement_review') {
       return (
         <Box gap={4}>
-          <OnboardingProductsStep
-            draft={draft}
-            readOnly={readOnly}
-            errors={errors}
-            changeDraftField={changeDraftField as any}
-          />
-          <Divider style={{ marginVertical: spacing[2] }} />
           <OnboardingOfferStep
             draft={draft}
             readOnly={readOnly}
@@ -424,6 +410,39 @@ export function DshFieldStoreOnboardingScreen({
           </Box>
 
           <Divider />
+
+          {/* Products upload callout for missing products */}
+          {(!draft.products.items || draft.products.items.length === 0) && onGoToProducts && (
+            <Card
+              padding={3}
+              style={{
+                borderColor: theme.warning,
+                borderWidth: 1.5,
+                backgroundColor: theme.surfaceSecondary,
+                marginBottom: spacing[2],
+                borderRadius: radius.md,
+              }}
+            >
+              <Box gap={2} style={{ alignItems: 'flex-end' }}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+                  <Icon name="alert-circle-outline" size={20} tone="warning" />
+                  <Text role="bodyStrong" weight="black" style={{ color: theme.warning, textAlign: 'right', fontSize: 16 }}>
+                    بانتظار رفع المنتجات الابتدائية
+                  </Text>
+                </View>
+                <Text role="bodySm" tone="muted" style={{ textAlign: 'right', marginTop: spacing[1] }}>
+                  تم استكمال البيانات الأساسية والتراخيص، ولكن المتجر لا يعتبر جاهزاً للتفعيل حتى يتم رفع المنتجات الابتدائية للكتالوج.
+                </Text>
+                <Button
+                  label="رفع المنتجات الابتدائية الآن"
+                  tone="warning"
+                  size="sm"
+                  onPress={onGoToProducts}
+                  style={{ marginTop: spacing[2], alignSelf: 'flex-start' }}
+                />
+              </Box>
+            </Card>
+          )}
 
           {/* Section 2: Stepped Vertical Timeline Accordion */}
           <Box gap={2}>

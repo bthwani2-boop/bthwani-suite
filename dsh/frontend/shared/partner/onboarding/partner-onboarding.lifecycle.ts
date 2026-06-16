@@ -28,7 +28,7 @@ export function createEmptyDraft(overrides?: Partial<PartnerOnboardingDraft>): P
       identityProofStatus: 'missing',
       taxCertificateStatus: 'missing',
     },
-    products: { featuredProductName: '', featuredProductPrice: '', sampleCatalogNote: '' },
+    products: { items: [], sampleCatalogNote: '' },
     offer: { preliminaryOffer: '', operatingHours: '', deliveryReadiness: '', financeNote: '' },
     review: { fieldNotes: '', partnerReviewNote: '' },
     lastSavedLabel: 'لم تحفظ بعد',
@@ -51,7 +51,6 @@ export function getPartnerRequiredMissingItems(draft: PartnerOnboardingDraft): s
   if (draft.documents.taxCertificateRef.trim() && (draft.documents.taxCertificateStatus === 'needs_reupload' || draft.documents.taxCertificateStatus === 'rejected')) {
     missing.push('رخصة التجارة تحتاج معالجة');
   }
-  if (!draft.products.featuredProductName.trim()) missing.push('منتج افتتاحي واحد');
   if (!draft.offer.preliminaryOffer.trim()) missing.push('العرض أو الاتفاق المبدئي');
   if (!draft.offer.operatingHours.trim()) missing.push('ساعات العمل');
   return missing;
@@ -80,7 +79,7 @@ export function resolvePartnerSectionSummaries(draft: PartnerOnboardingDraft): P
     location: [draft.location.city, draft.location.addressLine].filter((v) => !v.trim()).length,
     photos: [draft.photos.storefrontPhotoRef, draft.photos.interiorPhotoRef].filter((v) => !v.trim()).length,
     documents: documentsMissing,
-    products: [draft.products.featuredProductName, draft.products.featuredProductPrice].filter((v) => !v.trim()).length,
+    products: !draft.products.items || draft.products.items.length === 0 ? 1 : 0,
     offer: [draft.offer.preliminaryOffer, draft.offer.operatingHours].filter((v) => !v.trim()).length,
     review: getPartnerRequiredMissingItems(draft).length,
   };
@@ -128,7 +127,14 @@ export function resolveOnboardingStoreStatus(store: OnboardingStoreFile): Onboar
     store.draft.review.fieldNotes,
   ].some((v) => v.trim().length > 0);
 
-  if (missing.length === 0) return 'ready-for-onboarding';
+  if (missing.length === 0) {
+    const hasProducts = store.draft.products.items && store.draft.products.items.length > 0;
+    const hasClassification = store.draft.classification.storeType.trim() && store.draft.classification.mainCategory.trim();
+    if (!hasProducts || !hasClassification) {
+      return 'follow-up-required';
+    }
+    return 'ready-for-onboarding';
+  }
   if (store.reviewFeedback) return 'follow-up-required';
   if (store.draft.offer.preliminaryOffer.trim() && store.draft.basics.storeName.trim() && store.draft.location.city.trim()) {
     return 'offer-pending-approval';
@@ -169,7 +175,17 @@ export function resolveOnboardingStoreLifecycleLabel(store: OnboardingStoreFile)
   if (status === 'offer-approved') return 'منتهٍ للميداني';
   if (status === 'submitted') return 'بانتظار مراجعة الشركاء';
   if (status === 'ready-for-onboarding') return 'الملف مكتمل وجاهز للإرسال';
-  if (status === 'follow-up-required') return 'هناك نواقص عملية قبل الإرسال';
+  if (status === 'follow-up-required') {
+    const missing = getPartnerRequiredMissingItems(store.draft);
+    if (missing.length === 0) {
+      const hasProducts = store.draft.products.items && store.draft.products.items.length > 0;
+      const hasClassification = store.draft.classification.storeType.trim() && store.draft.classification.mainCategory.trim();
+      if (!hasProducts || !hasClassification) {
+        return 'بانتظار تحديد تصنيف المتجر ورفع المنتجات الابتدائية لتفعيله';
+      }
+    }
+    return 'هناك نواقص عملية قبل الإرسال';
+  }
   if (status === 'offer-pending-approval') return 'العرض ما زال تحت المراجعة';
   return 'ملف انضمام قيد البناء';
 }
@@ -179,7 +195,17 @@ export function resolveOnboardingStoreNextActionLabel(store: OnboardingStoreFile
   if (status === 'offer-approved') return 'عرض السجل والعمولة';
   if (status === 'submitted') return 'انتظار قرار المراجعة';
   if (status === 'ready-for-onboarding') return 'إرسال للمراجعة';
-  if (status === 'follow-up-required') return 'إكمال النواقص';
+  if (status === 'follow-up-required') {
+    const missing = getPartnerRequiredMissingItems(store.draft);
+    if (missing.length === 0) {
+      const hasProducts = store.draft.products.items && store.draft.products.items.length > 0;
+      const hasClassification = store.draft.classification.storeType.trim() && store.draft.classification.mainCategory.trim();
+      if (!hasProducts || !hasClassification) {
+        return 'تصنيف المتجر والمنتجات';
+      }
+    }
+    return 'إكمال النواقص';
+  }
   if (status === 'offer-pending-approval') return 'مراجعة العرض';
   return 'بدء ملف الانضمام';
 }

@@ -13,6 +13,7 @@ import { DshFieldFinanceScreen } from './DshFieldFinanceScreen';
 import { DshFieldDocumentUploadScreen } from './DshFieldDocumentUploadScreen';
 import { DshFieldReadinessEscalationScreen } from './DshFieldReadinessEscalationScreen';
 import { DshFieldStoresScreen } from './DshFieldStoresScreen';
+import { DshFieldStoreProductsUploadScreen } from './DshFieldStoreProductsUploadScreen';
 import type { useDshFieldSurfaceModel } from '../field.surface-model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 
@@ -44,6 +45,7 @@ export function DshFieldRouteRenderer({
         onSaveDraft={() => actions.handleSaveDraft(activeStore.id)}
         onSubmitReview={() => actions.handleSubmitReview(activeStore)}
         onEscalate={() => actions.pushRoute({ kind: 'readiness-escalation', storeId: activeStore.id })}
+        onGoToProducts={() => actions.pushRoute({ kind: 'products-upload', storeId: activeStore.id })}
       />
     );
   }
@@ -88,6 +90,17 @@ export function DshFieldRouteRenderer({
         docKind={route.docKind}
         onBack={actions.popRoute}
         onSubmit={(kind, uploadedRef) => actions.handleDocumentUpload(activeStore, kind, uploadedRef)}
+      />
+    );
+  }
+
+  if (route.kind === 'products-upload' && activeStore) {
+    return (
+      <DshFieldStoreProductsUploadScreen
+        store={activeStore}
+        onBack={actions.popRoute}
+        onStoreChange={(updater) => actions.patchStore(activeStore.id, updater)}
+        onSaveDraft={() => actions.handleSaveDraft(activeStore.id)}
       />
     );
   }

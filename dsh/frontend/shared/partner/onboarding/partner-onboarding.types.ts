@@ -29,6 +29,13 @@ export type PartnerDocumentRuntimeStatus = 'missing' | 'uploaded' | 'approved' |
 
 export type PartnerOnboardingFilter = 'all' | 'today' | 'ready' | 'follow-up' | 'pending' | 'submitted' | 'done';
 
+export type OnboardingProductItem = {
+  readonly id: string;
+  readonly name: string;
+  readonly price: string;
+  readonly category?: string;
+};
+
 export type PartnerOnboardingDraft = {
   activeSectionId: PartnerOnboardingSectionId;
   basics: { storeName: string; ownerName: string; ownerPhone: string; managerName: string };
@@ -43,7 +50,10 @@ export type PartnerOnboardingDraft = {
     identityProofStatus: PartnerDocumentRuntimeStatus;
     taxCertificateStatus: PartnerDocumentRuntimeStatus;
   };
-  products: { featuredProductName: string; featuredProductPrice: string; sampleCatalogNote: string };
+  products: {
+    items: OnboardingProductItem[];
+    sampleCatalogNote: string;
+  };
   offer: { preliminaryOffer: string; operatingHours: string; deliveryReadiness: string; financeNote: string };
   review: { fieldNotes: string; partnerReviewNote: string };
   lastSavedLabel: string;
@@ -52,11 +62,9 @@ export type PartnerOnboardingDraft = {
 
 export const partnerSectionOrder: readonly PartnerOnboardingSectionId[] = [
   'basics',
-  'classification',
   'location',
   'photos',
   'documents',
-  'products',
   'offer',
   'review',
 ] as const;

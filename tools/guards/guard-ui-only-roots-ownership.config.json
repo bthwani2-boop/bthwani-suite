@@ -482,10 +482,24 @@
       "ui_only_state_machine_or_lifecycle",
       "ui_only_media_upload_logic"
     ],
+    "dsh/frontend/app-field/screens/DshFieldStoreOnboardingSteps.tsx": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/app-field/screens/useOnboardingMedia.ts": [
+      "ui_only_creates_runtime_client",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_direct_network_fetch",
+      "ui_only_media_upload_logic",
+      "ui_only_forbidden_hooks"
+    ],
     "dsh/frontend/app-field/screens/DshFieldStoresHistoryScreen.tsx": [
       "ui_only_state_machine_or_lifecycle"
     ],
     "dsh/frontend/app-field/screens/DshFieldStoresScreen.tsx": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-field/screens/DshFieldStoreProductsUploadScreen.tsx": [
       "ui_only_state_machine_or_lifecycle"
     ]
   },
@@ -1395,6 +1409,20 @@
       "removalStep": "Relocated model as requested by surface-level integration.",
       "blocksClosure": false
     },
+    "dsh/frontend/app-field/screens/DshFieldStoreOnboardingSteps.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Onboarding step subcomponents.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/screens/useOnboardingMedia.ts": {
+      "owner": "dsh-stores",
+      "reason": "Onboarding image picker and presigned upload custom hook.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
     "dsh/frontend/app-field/screens/DshFieldStoresHistoryScreen.tsx": {
       "owner": "dsh-stores",
       "reason": "Stores history screen imports lifecycle display labels.",
@@ -1405,6 +1433,13 @@
     "dsh/frontend/app-field/screens/DshFieldStoresScreen.tsx": {
       "owner": "dsh-stores",
       "reason": "Stores screen imports lifecycle display labels.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/screens/DshFieldStoreProductsUploadScreen.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Smart products upload and classification screen.",
       "expiry": "2026-12-01",
       "removalStep": "Relocated model as requested by surface-level integration.",
       "blocksClosure": false

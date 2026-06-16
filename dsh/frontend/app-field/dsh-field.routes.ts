@@ -68,7 +68,8 @@ export type DshFieldRoute =
   | 'history'
   | 'finance'
   | 'readiness-escalation'
-  | 'document-upload';
+  | 'document-upload'
+  | 'products-upload';
 
 export type DshFieldRouteState =
   | { kind: 'stores' }
@@ -79,7 +80,8 @@ export type DshFieldRouteState =
   | { kind: 'history' }
   | { kind: 'finance' }
   | { kind: 'readiness-escalation'; storeId: string }
-  | { kind: 'document-upload'; storeId: string; docKind?: PartnerDocumentKind };
+  | { kind: 'document-upload'; storeId: string; docKind?: PartnerDocumentKind }
+  | { kind: 'products-upload'; storeId: string };
 
 export type DshFieldCommandTarget = DshFieldRoute;
 
@@ -179,7 +181,8 @@ export type DshFieldRouteId =
   | 'dsh-field-history'
   | 'dsh-field-finance'
   | 'dsh-field-readiness-escalation'
-  | 'dsh-field-document-upload';
+  | 'dsh-field-document-upload'
+  | 'dsh-field-products-upload';
 
 export type DshFieldLegacyRoute = DshFieldRoute;
 
@@ -244,6 +247,12 @@ export const dshFieldRoutes = [
     legacyRoute: 'document-upload',
     screenId: 'field.dsh.store.document-upload',
     ownerPath: 'dsh/frontend/app-field/screens/DshFieldDocumentUploadScreen.tsx',
+  },
+  {
+    routeId: 'dsh-field-products-upload',
+    legacyRoute: 'products-upload',
+    screenId: 'field.dsh.store.products-upload',
+    ownerPath: 'dsh/frontend/app-field/screens/DshFieldStoreProductsUploadScreen.tsx',
   },
 ] as const satisfies readonly DshFieldRouteRecord[];
 
@@ -452,6 +461,23 @@ export const dshFieldScreenRegistry = [
     flowId: 'dsh.field.stores',
     requiredStates: ['loading', 'empty', 'error', 'success', 'offline', 'disabled'],
     analytics: { screenView: 'field_dsh_store_document_upload_view' },
+    fallbackRouteId: 'dsh-field-stores',
+    releaseCriticality: 'P1',
+    status: 'READY_FOR_REVIEW',
+  },
+  {
+    screenId: 'field.dsh.store.products-upload',
+    routeId: 'dsh-field-products-upload',
+    surfaceId: 'app-field',
+    ownerKind: 'service',
+    ownerId: 'dsh',
+    serviceId: 'dsh',
+    ownerPath: 'dsh/frontend/app-field/screens/DshFieldStoreProductsUploadScreen.tsx',
+    componentName: 'DshFieldStoreProductsUploadScreen',
+    screenKind: 'FLOW_STEP',
+    flowId: 'dsh.field.stores',
+    requiredStates: ['loading', 'empty', 'error', 'success', 'offline', 'disabled'],
+    analytics: { screenView: 'field_dsh_store_products_upload_view' },
     fallbackRouteId: 'dsh-field-stores',
     releaseCriticality: 'P1',
     status: 'READY_FOR_REVIEW',

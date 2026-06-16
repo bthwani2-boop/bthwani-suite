@@ -25,10 +25,10 @@ import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/d
 
 export type DshFieldReadinessEscalationScreenProps = {
   // ML-004: added pending-response / approved / rejected states for ops response tracking
-  state?: 'ready' | 'loading' | 'success' | 'error' | 'blocked' | 'pending-response' | 'approved' | 'rejected';
+  state?: 'ready' | 'loading' | 'success' | 'error' | 'blocked' | 'pending-response' | 'approved' | 'rejected' | 'offline';
   storeName: string;
   missingRequirements: string[];
-  escalationTargets: Array<{ id: string; label: string; isSelected: boolean }>;
+  escalationTargets: readonly { id: string; label: string; isSelected: boolean }[];
   onSelectTarget: (id: string) => void;
   onSubmit: (reason: string) => void;
   onBack?: () => void;
@@ -106,6 +106,23 @@ export function DshFieldReadinessEscalationScreen({
             title="تم رفض التصعيد"
             description="لم يتم قبول بلاغ عدم الجاهزية. يُرجى مراجعة المتطلبات وإعادة المحاولة."
             actionLabel="إعادة التصعيد"
+            onActionPress={onRetry}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  if (state === 'offline') {
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.surface }}>
+        <TopBar variant="surface" title="تصعيد عدم الجاهزية" />
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <StateView
+            stateId="offline"
+            title="وضع عدم الاتصال"
+            description="تعذر إرسال البلاغ لعدم توفر اتصال بالشبكة. يرجى التحقق من الاتصال وإعادة المحاولة."
+            actionLabel="إعادة المحاولة"
             onActionPress={onRetry}
           />
         </View>

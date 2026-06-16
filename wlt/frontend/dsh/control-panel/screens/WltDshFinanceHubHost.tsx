@@ -525,7 +525,7 @@ export function WltDshFinanceHubHost({
             <div className={wltStyles.readinessColumns}>
               <div className={wltStyles.readinessCol}>
                 <span className={wltStyles.readinessDesc}>⚠️ <strong>الخطر المالي:</strong></span>
-                <span className={`${wltStyles.readinessVal} ${wltStyles.readinessValBold} ${center.blockingVariances.length > 0 ? wltStyles.readinessValDanger : ''}`}>
+                <span className={`${wltStyles.readinessVal} ${wltStyles.readinessValBold} ${(center?.blockingVariances.length ?? 0) > 0 ? wltStyles.readinessValDanger : ''}`}>
                   {operationalRisk}
                 </span>
               </div>

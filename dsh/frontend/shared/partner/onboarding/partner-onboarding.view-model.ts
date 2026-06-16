@@ -62,9 +62,8 @@ export function resolvePartnerSectionSummaryLabel(draft: PartnerOnboardingDraft,
     return cr || id ? 'تم إرفاق وثائق السجل التجاري والهوية للمراجعة' : 'لم ترفع أي مستندات';
   }
   if (sectionId === 'products') {
-    const name = draft.products.featuredProductName.trim();
-    const price = draft.products.featuredProductPrice.trim();
-    return `المنتج: ${name || 'غير محدد'} · السعر: ${price || '0'} ر.ي`;
+    const count = draft.products.items?.length ?? 0;
+    return `عدد المنتجات المرفوعة: ${count}`;
   }
   if (sectionId === 'offer') {
     const offer = draft.offer.preliminaryOffer.trim();

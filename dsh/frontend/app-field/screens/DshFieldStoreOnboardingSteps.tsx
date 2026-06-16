@@ -81,44 +81,7 @@ export function OnboardingBasicsStep({ draft, readOnly, errors, changeDraftField
   );
 }
 
-// ─── Step 2: Classification ──────────────────────────────────────────────────
-
-export function OnboardingClassificationStep({ draft, readOnly, changeDraftField }: Omit<StepProps, 'errors'>) {
-  return (
-    <Box gap={4}>
-      <SectionHeader
-        title="النوع والتصنيف التشغيلي"
-      />
-
-      <SelectField
-        label="نوع المتجر"
-        value={draft.classification.storeType}
-        disabled={readOnly}
-        options={getOptionsWithFallback(PARTNER_STORE_TYPE_OPTIONS, draft.classification.storeType)}
-        placeholder="اختر نوع المنفذ الميداني"
-        onValueChange={(value) => changeDraftField('classification', 'storeType', value)}
-      />
-
-      <SelectField
-        label="التصنيف الرئيسي"
-        value={draft.classification.mainCategory}
-        disabled={readOnly}
-        options={getOptionsWithFallback(PARTNER_MAIN_CATEGORY_OPTIONS, draft.classification.mainCategory)}
-        placeholder="اختر الفئة الرئيسية في بثواني"
-        onValueChange={(value) => changeDraftField('classification', 'mainCategory', value)}
-      />
-
-      <SelectField
-        label="التصنيف الفرعي للمتجر"
-        value={draft.classification.subCategory}
-        disabled={readOnly}
-        options={getOptionsWithFallback(PARTNER_SUB_CATEGORY_OPTIONS, draft.classification.subCategory)}
-        placeholder="اختر التصنيف الأكثر دقة للفرع"
-        onValueChange={(value) => changeDraftField('classification', 'subCategory', value)}
-      />
-    </Box>
-  );
-}
+// ─── Step 2: Classification (Moved to Dedicated Products & Classification Screen) ───
 
 // ─── Step 3: Location ────────────────────────────────────────────────────────
 
@@ -321,44 +284,7 @@ export function OnboardingDocumentsStep({ store, documentItems, onUploadDocument
   );
 }
 
-// ─── Step 6: Products ────────────────────────────────────────────────────────
-
-export function OnboardingProductsStep({ draft, readOnly, errors, changeDraftField }: StepProps) {
-  return (
-    <Box gap={4}>
-      <SectionHeader
-        title="الكتالوج والمنتج الافتتاحي"
-      />
-
-      <TextField
-        label="اسم المنتج الافتتاحي المميز"
-        value={draft.products.featuredProductName}
-        editable={!readOnly}
-        error={errors.featuredProductName}
-        onChangeText={(value) => changeDraftField('products', 'featuredProductName', value)}
-        placeholder="مثال: برجر دجاج كلاسيك"
-      />
-
-      <TextField
-        label="سعر المنتج الافتتاحي"
-        value={draft.products.featuredProductPrice}
-        editable={!readOnly}
-        keyboardType="decimal-pad"
-        error={errors.featuredProductPrice}
-        onChangeText={(value) => changeDraftField('products', 'featuredProductPrice', value)}
-        placeholder="السعر بالعملة المحلية شامل الضريبة"
-      />
-
-      <TextField
-        label="ملاحظات وتفاصيل الكتالوج المختصرة"
-        value={draft.products.sampleCatalogNote}
-        editable={!readOnly}
-        onChangeText={(value) => changeDraftField('products', 'sampleCatalogNote', value)}
-        placeholder="تفاصيل إضافية للكتالوج الأولي للمتجر"
-      />
-    </Box>
-  );
-}
+// ─── Step 6: Products (Separated to Dedicated Form Screen) ───────────────────
 
 // ─── Step 7: Offer ───────────────────────────────────────────────────────────
 
