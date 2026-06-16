@@ -1,4 +1,4 @@
-import { PlatformVarsRegistry } from '../platform/platform-vars';
+import { PlatformVarsRegistry } from '../shared';
 
 export type DshCreateFieldVisitRequest = {
   readonly field_agent_id?: string;

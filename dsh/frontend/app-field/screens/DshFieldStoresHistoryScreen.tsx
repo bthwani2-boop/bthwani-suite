@@ -3,7 +3,8 @@ import { View } from 'react-native';
 import { Badge, Box, Divider, Icon, MobileScrollView, Text, TopBar, useTheme,
   spacing,
 } from '@bthwani/ui-kit';
-import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from '../../shared/field';
+import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel } from '../field.store-lifecycle';
+import type { FieldStoreFile } from '../dsh-field.types';
 
 type DshFieldStoresHistoryScreenProps = {
   stores: readonly FieldStoreFile[];

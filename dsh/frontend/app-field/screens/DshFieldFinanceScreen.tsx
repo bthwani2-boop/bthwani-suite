@@ -1,7 +1,8 @@
 import React from 'react';
 import { StateView } from '@bthwani/ui-kit';
 import { WltDshFieldBridge } from '../../../../wlt/frontend/dsh/app-field';
-import { resolveFieldStoreStatus, type FieldStoreFile } from '../../shared/field';
+import { resolveFieldStoreStatus } from '../field.store-lifecycle';
+import type { FieldStoreFile } from '../dsh-field.types';
 
 type DshFieldFinanceScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'offline';

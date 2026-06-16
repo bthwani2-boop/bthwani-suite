@@ -7,16 +7,14 @@ import {
   createPartnerDocumentHttpClient,
   resolvePartnerDocumentBaseUrl,
   type PartnerDocumentKind,
-} from '../partner/documents';
-import {
   createPartnerStoreOnboardingHttpClient,
   resolvePartnerStoreOnboardingBaseUrl,
-} from '../partner/onboarding';
+} from '../shared';
 import {
   createDshFieldVisitHttpClient,
   resolveDshFieldVisitBaseUrl,
 } from './dsh-field-visit-client';
-import type { FieldStoreFile } from './field.types';
+import type { FieldStoreFile } from './dsh-field.types';
 
 export type DshFieldVisitDraftValues = {
   readonly visitSummary: string;

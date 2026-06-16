@@ -13,10 +13,10 @@
  * No API calls, no backend mutations. All WLT interaction is display-only.
  */
 
-import type { DshFieldRoute } from '../contracts/field-surface-model';
-import type { DshSignalEventKind } from '../marketing/dsh-signal-layer.model';
-import type { DshPartnerIntakeStage } from '../partner/partner.workflow';
-import { getHandoffsForSurface, type DshOrderLifecycleHandoff } from '../orders/dsh-order-lifecycle-handoffs';
+import type { DshFieldRoute } from './dsh-field.types';
+import type { DshSignalEventKind } from '../shared';
+import type { DshPartnerIntakeStage } from '../shared';
+import { getHandoffsForSurface, type DshOrderLifecycleHandoff } from '../shared';
 
 // ─── Field agent lifecycle state ──────────────────────────────────────────────
 

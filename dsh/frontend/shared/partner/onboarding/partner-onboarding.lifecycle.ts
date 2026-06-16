@@ -45,8 +45,6 @@ export function getPartnerRequiredMissingItems(draft: PartnerOnboardingDraft): s
   if (!draft.basics.ownerName.trim()) missing.push('اسم المالك');
   if (!draft.basics.ownerPhone.trim()) missing.push('جوال المالك');
   if (!draft.location.city.trim()) missing.push('المدينة');
-  if (!draft.location.zone.trim()) missing.push('النطاق');
-  if (!draft.location.latitude.trim() || !draft.location.longitude.trim() || !draft.location.landmark.trim()) missing.push('الإحداثية GPS');
   if (!draft.photos.storefrontPhotoRef.trim()) missing.push('صورة الواجهة');
   if (!documentIsResolved(draft.documents.commercialRegistrationRef, draft.documents.commercialRegistrationStatus)) missing.push('السجل التجاري');
   if (!documentIsResolved(draft.documents.identityProofRef, draft.documents.identityProofStatus)) missing.push('هوية المالك');
@@ -79,7 +77,7 @@ export function resolvePartnerSectionSummaries(draft: PartnerOnboardingDraft): P
   const sectionMissing: Record<PartnerOnboardingSectionId, number> = {
     basics: [draft.basics.storeName, draft.basics.ownerName, draft.basics.ownerPhone].filter((v) => !v.trim()).length,
     classification: [draft.classification.storeType, draft.classification.mainCategory].filter((v) => !v.trim()).length,
-    location: [draft.location.city, draft.location.zone, draft.location.addressLine, draft.location.latitude, draft.location.longitude, draft.location.landmark].filter((v) => !v.trim()).length,
+    location: [draft.location.city, draft.location.addressLine].filter((v) => !v.trim()).length,
     photos: [draft.photos.storefrontPhotoRef, draft.photos.interiorPhotoRef].filter((v) => !v.trim()).length,
     documents: documentsMissing,
     products: [draft.products.featuredProductName, draft.products.featuredProductPrice].filter((v) => !v.trim()).length,

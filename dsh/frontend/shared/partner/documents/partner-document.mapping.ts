@@ -112,13 +112,13 @@ export function applyFieldDocumentUploadToStore(
   };
 }
 
-import type { PartnerOnboardingDraft } from '../onboarding/partner-onboarding.types';
+import type { PartnerOnboardingDraft, PartnerDocumentRuntimeStatus } from '../onboarding/partner-onboarding.types';
 
 export type PartnerDocumentItemSummary = {
   id: PartnerDocumentKind;
   label: string;
   required: boolean;
-  status: string;
+  status: PartnerDocumentRuntimeStatus;
   referenceLabel: string;
 };
 
@@ -137,13 +137,6 @@ export function resolvePartnerDocumentItems(draft: PartnerOnboardingDraft): Part
       required: true,
       status: draft.documents.identityProofStatus,
       referenceLabel: draft.documents.identityProofRef || 'لا يوجد مرجع مرفوع بعد',
-    },
-    {
-      id: 'tax_certificate',
-      label: 'الشهادة الضريبية',
-      required: false,
-      status: draft.documents.taxCertificateStatus,
-      referenceLabel: draft.documents.taxCertificateRef || 'اختياري — غير مرفوع',
     },
   ];
 }

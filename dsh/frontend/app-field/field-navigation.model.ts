@@ -3,7 +3,7 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { DshFieldNavigationCommand, DshFieldRouteState } from './field.types';
+import type { DshFieldNavigationCommand, DshFieldRouteState } from './dsh-field.types';
 
 function isSameRoute(left: DshFieldRouteState, right: DshFieldRouteState): boolean {
   if (left.kind !== right.kind) return false;

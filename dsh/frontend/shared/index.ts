@@ -11,7 +11,6 @@ export * from './catalog';
 export * from './marketing';
 export * from './notifications';
 export * from './support';
-export * from './field';
 export * from './partner';
 export * from './operations';
 export * from './products';

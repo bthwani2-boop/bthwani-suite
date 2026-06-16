@@ -22,7 +22,6 @@ type DocumentItem = {
 const defaultDocuments: readonly DocumentItem[] = [
   { id: 'commercial_registration', label: 'السجل التجاري', required: true, status: 'missing' },
   { id: 'identity_proof', label: 'إثبات هوية المالك', required: true, status: 'missing' },
-  { id: 'tax_certificate', label: 'الشهادة الضريبية', required: false, status: 'missing' },
 ];
 
 export type DocumentVerificationSectionProps = {
@@ -81,7 +80,7 @@ export function DocumentVerificationSection({
   return (
     <Box gap={4}>
       <Text role="titleSm" style={{ textAlign: isRtl ? 'right' : 'left' }}>التحقق من المستندات</Text>
-      <Text role="caption" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>المراجع والحالات هنا read-only؛ قرار الاعتماد النهائي يبقى لدى control-panel/partners.</Text>
+      <Text role="caption" tone="muted" style={{ textAlign: isRtl ? 'right' : 'left' }}>حالة المستندات المرفقة للمراجعة.</Text>
       <Box gap={0}>
         {documents.map((doc) => (
           <Box

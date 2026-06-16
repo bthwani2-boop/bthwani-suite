@@ -13,7 +13,7 @@ import { DshFieldFinanceScreen } from './DshFieldFinanceScreen';
 import { DshFieldDocumentUploadScreen } from './DshFieldDocumentUploadScreen';
 import { DshFieldReadinessEscalationScreen } from './DshFieldReadinessEscalationScreen';
 import { DshFieldStoresScreen } from './DshFieldStoresScreen';
-import type { useDshFieldSurfaceModel } from '../../shared/field';
+import type { useDshFieldSurfaceModel } from '../field.surface-model';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 
 type FieldSurfaceBinding = ReturnType<typeof useDshFieldSurfaceModel>;
@@ -39,7 +39,7 @@ export function DshFieldRouteRenderer({
       <DshFieldStoreOnboardingScreen
         store={activeStore}
         onBack={actions.popRoute}
-        onUploadDocument={(storeId) => actions.pushRoute({ kind: 'document-upload', storeId })}
+        onUploadDocument={(storeId, kind) => actions.pushRoute({ kind: 'document-upload', storeId, docKind: kind })}
         onStoreChange={(updater) => actions.patchStore(activeStore.id, updater)}
         onSaveDraft={() => actions.handleSaveDraft(activeStore.id)}
         onSubmitReview={() => actions.handleSubmitReview(activeStore)}
@@ -85,6 +85,7 @@ export function DshFieldRouteRenderer({
     return (
       <DshFieldDocumentUploadScreen
         storeId={activeStore.id}
+        docKind={route.docKind}
         onBack={actions.popRoute}
         onSubmit={(kind, uploadedRef) => actions.handleDocumentUpload(activeStore, kind, uploadedRef)}
       />

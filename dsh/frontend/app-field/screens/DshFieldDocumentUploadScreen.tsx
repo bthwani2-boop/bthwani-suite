@@ -30,6 +30,7 @@ import {
 
 export type DshFieldDocumentUploadScreenProps = {
   storeId: string;
+  docKind?: PartnerDocumentKind;
   onBack: () => void;
   onSubmit: (documentKind: PartnerDocumentKind, documentRef: string) => Promise<void>;
   state?: 'ready' | 'loading' | 'success' | 'error' | 'offline' | 'disabled';
@@ -38,6 +39,7 @@ export type DshFieldDocumentUploadScreenProps = {
 
 export function DshFieldDocumentUploadScreen({
   storeId,
+  docKind,
   onBack,
   onSubmit,
   state = 'ready',
@@ -47,7 +49,7 @@ export function DshFieldDocumentUploadScreen({
   const { direction } = useDirection();
   const isRtl = direction === 'rtl';
 
-  const [selectedKind, setSelectedKind] = React.useState<PartnerDocumentKind>('commercial_registration');
+  const [selectedKind, setSelectedKind] = React.useState<PartnerDocumentKind>(docKind ?? 'commercial_registration');
   const [documentRef, setDocumentRef] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [successDocId, setSuccessDocId] = React.useState<string | null>(null);

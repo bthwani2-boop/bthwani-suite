@@ -1,4 +1,4 @@
-import type { DshFieldStoreVisitErrors, DshFieldStoreVisitValues } from './field.types';
+import type { DshFieldStoreVisitErrors, DshFieldStoreVisitValues } from './dsh-field.types';
 
 export function validateVisitFields(values: DshFieldStoreVisitValues): DshFieldStoreVisitErrors {
   const errors: DshFieldStoreVisitErrors = {};

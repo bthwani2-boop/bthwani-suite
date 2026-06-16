@@ -29,22 +29,7 @@ export function validatePartnerOnboarding(draft: PartnerOnboardingDraft): Record
   if (!draft.location.city.trim()) {
     errs.city = 'المدينة مطلوبة لتوزيع التغطية';
   }
-  if (!draft.location.zone.trim()) {
-    errs.zone = 'النطاق الجغرافي مطلوب لتنسيق العمليات الميدانية';
-  }
-  if (!draft.location.latitude.trim()) {
-    errs.latitude = 'خط العرض مطلوب';
-  } else if (isNaN(Number(draft.location.latitude))) {
-    errs.latitude = 'قيمة خط العرض غير صحيحة';
-  }
-  if (!draft.location.longitude.trim()) {
-    errs.longitude = 'خط الطول مطلوب';
-  } else if (isNaN(Number(draft.location.longitude))) {
-    errs.longitude = 'قيمة خط الطول غير صحيحة';
-  }
-  if (!draft.location.landmark.trim()) {
-    errs.landmark = 'المعلم المميز مطلوب لمساعدة الكابتن في الوصول';
-  }
+
 
   // Products
   if (!draft.products.featuredProductName.trim()) {

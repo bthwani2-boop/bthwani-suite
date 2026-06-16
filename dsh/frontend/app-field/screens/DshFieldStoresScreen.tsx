@@ -7,10 +7,14 @@ import { FieldStoreCard } from '../parts/FieldStoreCard';
 import { DSH_FIELD_BINDING_CONTRACTS } from '../contracts/dsh-field-binding.contracts';
 import {
   fieldFilterOptions,
+} from '../dsh-field.types';
+import {
   resolveFieldFilterCounts,
-  type FieldLeadFilter,
-  type FieldStoreFile,
-} from '../../shared/field';
+} from '../field.store-lifecycle';
+import type {
+  FieldLeadFilter,
+  FieldStoreFile,
+} from '../dsh-field.types';
 import {
   resolveFilteredOnboardingStores,
   resolvePriorityOnboardingStore,

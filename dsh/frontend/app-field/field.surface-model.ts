@@ -5,18 +5,18 @@
 
 import React from 'react';
 import { useFieldRuntimeActions } from './use-field-runtime-actions';
-import type { DshFieldNavigationCommand } from './field.types';
+import type { DshFieldNavigationCommand } from './dsh-field.types';
 import {
   useFieldNavigationModel,
   resolveFieldBottomActiveId,
   canFieldShowBottomNav,
 } from './field-navigation.model';
-import { usePartnerOnboardingDraftModel } from '../partner/onboarding/partner-onboarding-draft.model';
+import { usePartnerOnboardingDraftModel } from '../shared/partner/onboarding/partner-onboarding-draft.model';
 import { useFieldVisitModel } from './field-visit.model';
-import { usePartnerReadinessEscalationModel } from '../partner/readiness/partner-readiness-escalation.model';
-import { usePartnerReadinessModel } from '../partner/readiness/partner-readiness.model';
+import { usePartnerReadinessEscalationModel } from '../shared/partner/readiness/partner-readiness-escalation.model';
+import { usePartnerReadinessModel } from '../shared/partner/readiness/partner-readiness.model';
 
-export type { PartnerReadinessEscalationState, PartnerEscalationTargetModel } from '../partner/readiness';
+export type { PartnerReadinessEscalationState, PartnerEscalationTargetModel } from '../shared/partner/readiness';
 
 export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
   const fieldRuntime = useFieldRuntimeActions();

@@ -6,12 +6,16 @@ import { Badge, Box, colorPalette, Icon, Text, useDirection, useTheme, withAlpha
 } from '@bthwani/ui-kit';
 import {
   resolvePartnerCompletionPercent,
+} from '../../shared';
+import {
   resolveFieldStoreLifecycleLabel,
   resolveFieldStoreNextActionLabel,
   resolveFieldStoreStatusLabel,
   resolveFieldStoreStatusTone,
-  type FieldStoreFile,
-} from '../../shared';
+} from '../field.store-lifecycle';
+import type {
+  FieldStoreFile,
+} from '../dsh-field.types';
 
 type FieldStoreCardProps = {
   store: FieldStoreFile;

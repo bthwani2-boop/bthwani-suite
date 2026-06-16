@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View, Pressable } from 'react-native';
+import { ScrollView, View, Pressable, Platform, Image, ActivityIndicator } from 'react-native';
 import {
   Badge,
   Box,
@@ -25,15 +25,19 @@ import {
 import {
   fieldSectionLabels,
   fieldSectionOrder,
+  type FieldOnboardingDraft,
+  type FieldOnboardingSectionId,
+  type FieldStoreFile,
+  type FieldDocumentStatus,
+} from '../dsh-field.types';
+import {
   isFieldStoreReadOnly,
   resolveFieldStoreLifecycleLabel,
   resolveFieldStoreStatusLabel,
   resolveFieldStoreStatusTone,
   touchFieldStoreDraft,
-  type FieldOnboardingDraft,
-  type FieldOnboardingSectionId,
-  type FieldStoreFile,
-  type FieldDocumentStatus,
+} from '../field.store-lifecycle';
+import {
   // Partner rehome imports
   validatePartnerOnboarding,
   PARTNER_STORE_TYPE_OPTIONS,
@@ -45,10 +49,10 @@ import {
   resolvePartnerCompletionPercent,
   resolvePartnerSectionSummaries,
   resolvePartnerDocumentItems,
+  type PartnerDocumentKind,
+  getDshMediaRuntimeClient,
 } from '../../shared';
 import {
-  simulateGPSAutofill,
-  simulateOwnerNameOCR,
   simulateCameraCapture,
 } from '../utils/onboarding-simulation';
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
@@ -75,7 +79,7 @@ type DshFieldStoreOnboardingScreenProps = {
   onSubmitReview: () => void;
   onActivationComplete?: () => void;
   onEscalate?: () => void;
-  onUploadDocument?: (storeId: string) => void;
+  onUploadDocument?: (storeId: string, kind: PartnerDocumentKind) => void;
 };
 
 function updateDraftSection<T extends keyof FieldOnboardingDraft>(draft: FieldOnboardingDraft, key: T, value: FieldOnboardingDraft[T]) {
@@ -98,9 +102,17 @@ export function DshFieldStoreOnboardingScreen({
 }: DshFieldStoreOnboardingScreenProps) {
   const { theme } = useTheme();
   const [policyExpanded, setPolicyExpanded] = React.useState(false);
-  const [gpsLoading, setGpsLoading] = React.useState(false);
-  const [ocrLoading, setOcrLoading] = React.useState(false);
   const [cameraLoading, setCameraLoading] = React.useState<Record<string, boolean>>({});
+
+  const isNativePickerAvailable = React.useMemo(() => {
+    if (Platform.OS === 'web') return false;
+    try {
+      const expoModules = (global as any).ExpoModules || (globalThis as any).ExpoModules;
+      return !!(expoModules && expoModules.ExponentImagePicker);
+    } catch {
+      return false;
+    }
+  }, []);
 
   if (screenState === 'activated') {
     return (
@@ -199,26 +211,6 @@ export function DshFieldStoreOnboardingScreen({
 
   const errors = React.useMemo(() => validatePartnerOnboarding(draft), [draft]);
 
-  const canImportOwnerName = draft.documents.commercialRegistrationRef.trim().length > 0;
-
-  const handleImportOwnerName = () => {
-    setOcrLoading(true);
-    changeDraftField('basics', 'ownerName', simulateOwnerNameOCR());
-    setOcrLoading(false);
-  };
-
-  const handleGPSAutofill = () => {
-    setGpsLoading(true);
-    const autofill = simulateGPSAutofill();
-    changeDraftField('location', 'city', autofill.city);
-    changeDraftField('location', 'zone', autofill.zone);
-    changeDraftField('location', 'latitude', autofill.latitude);
-    changeDraftField('location', 'longitude', autofill.longitude);
-    changeDraftField('location', 'landmark', autofill.landmark);
-    changeDraftField('location', 'addressLine', autofill.addressLine);
-    changeDraftField('location', 'coverageSummary', autofill.coverageSummary);
-    setGpsLoading(false);
-  };
 
   const handleCameraCapture = (field: 'storefrontPhotoRef' | 'interiorPhotoRef' | 'signagePhotoRef') => {
     setCameraLoading((prev) => ({ ...prev, [field]: true }));
@@ -230,6 +222,248 @@ export function DshFieldStoreOnboardingScreen({
     return resolvePartnerSectionSummaryLabel(draft, sectionId);
   };
 
+  const renderPhotoField = (photoKey: 'storefrontPhotoRef' | 'interiorPhotoRef' | 'signagePhotoRef', label: string) => {
+    const value = draft.photos[photoKey];
+    const photoErr = photoKey === 'storefrontPhotoRef' ? errors.storefrontPhotoRef : undefined;
+    const isCapturing = cameraLoading[photoKey];
+    const hasRealImage = value && (
+      value.startsWith('http') ||
+      value.startsWith('blob:') ||
+      value.startsWith('data:') ||
+      value.startsWith('file:') ||
+      value.startsWith('ph:')
+    );
+
+    const handlePickFile = async () => {
+      if (Platform.OS !== 'web') {
+        if (!isNativePickerAvailable) {
+          console.warn('Native ExponentImagePicker module is not available in this build. Falling back to simulation.');
+          handleCameraCapture(photoKey);
+          return;
+        }
+
+        try {
+          const ImagePicker = require('expo-image-picker');
+          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (status !== 'granted') {
+            console.warn('Media library permission was not granted');
+            return;
+          }
+
+          const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            quality: 0.8,
+          });
+
+          if (!result.canceled && result.assets && result.assets.length > 0) {
+            const localUri = result.assets[0].uri;
+            setCameraLoading((prev) => ({ ...prev, [photoKey]: true }));
+
+            try {
+              const client = getDshMediaRuntimeClient();
+              if (client) {
+                const response = await globalThis['fetch'](localUri);
+                const blob = await response.blob();
+
+                const intentResp = await client.createUploadIntent(
+                  {
+                    owner_type: 'store',
+                    owner_id: store.id,
+                    media_type: 'image',
+                    purpose: 'inspection',
+                    filename: localUri.split('/').pop() || 'photo.jpg',
+                    mime_type: blob.type || 'image/jpeg',
+                    file_size_bytes: blob.size,
+                  },
+                  {},
+                );
+
+                await client.putToPresignedUrl(intentResp.intent.upload_url, blob, blob.type);
+                const completedAsset = await client.completeUpload(intentResp.intent.media_id, {}, {});
+
+                if (completedAsset && completedAsset.public_url) {
+                  changeDraftField('photos', photoKey, completedAsset.public_url);
+                  setCameraLoading((prev) => ({ ...prev, [photoKey]: false }));
+                  return;
+                }
+              }
+            } catch (err) {
+              console.warn('Native upload failed, using local URI:', err);
+            }
+
+            changeDraftField('photos', photoKey, localUri);
+            setCameraLoading((prev) => ({ ...prev, [photoKey]: false }));
+          }
+        } catch (e) {
+          console.error('Failed to launch native expo-image-picker:', e);
+          handleCameraCapture(photoKey);
+        }
+        return;
+      }
+
+      // Web: Hidden file input
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.style.position = 'absolute';
+      input.style.opacity = '0';
+      input.style.width = '0';
+      input.style.height = '0';
+      input.style.left = '0';
+      input.style.top = '0';
+      document.body.appendChild(input);
+
+      input.onchange = async () => {
+        const file = input.files?.[0];
+        if (file) {
+          setCameraLoading((prev) => ({ ...prev, [photoKey]: true }));
+          try {
+            const client = getDshMediaRuntimeClient();
+            if (client) {
+              const intentResp = await client.createUploadIntent(
+                {
+                  owner_type: 'store',
+                  owner_id: store.id,
+                  media_type: 'image',
+                  purpose: 'inspection',
+                  filename: file.name,
+                  mime_type: file.type,
+                  file_size_bytes: file.size,
+                },
+                {},
+              );
+
+              await client.putToPresignedUrl(intentResp.intent.upload_url, file, file.type);
+              const completedAsset = await client.completeUpload(intentResp.intent.media_id, {}, {});
+
+              if (completedAsset && completedAsset.public_url) {
+                changeDraftField('photos', photoKey, completedAsset.public_url);
+                setCameraLoading((prev) => ({ ...prev, [photoKey]: false }));
+                if (document.body.contains(input)) {
+                  document.body.removeChild(input);
+                }
+                return;
+              }
+            }
+          } catch (err) {
+            console.warn('MinIO upload failed, falling back to local Blob URL:', err);
+          }
+
+          const localUrl = URL.createObjectURL(file);
+          changeDraftField('photos', photoKey, localUrl);
+          setCameraLoading((prev) => ({ ...prev, [photoKey]: false }));
+        }
+        if (document.body.contains(input)) {
+          document.body.removeChild(input);
+        }
+      };
+
+      const handleFocus = () => {
+        window.removeEventListener('focus', handleFocus);
+        setTimeout(() => {
+          if (document.body.contains(input)) {
+            document.body.removeChild(input);
+          }
+        }, 1000);
+      };
+      window.addEventListener('focus', handleFocus);
+
+      input.click();
+    };
+
+    return (
+      <View key={photoKey} style={{ gap: spacing[1], marginVertical: 6 }}>
+        <Pressable
+          onPress={readOnly ? undefined : handlePickFile}
+          style={{
+            borderWidth: 1.5,
+            borderStyle: hasRealImage ? 'solid' : 'dashed',
+            borderColor: photoErr ? theme.danger : hasRealImage ? theme.success : theme.line,
+            borderRadius: radius.md,
+            backgroundColor: theme.surface,
+            padding: spacing[3],
+            flexDirection: 'row-reverse',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            minHeight: 80,
+            overflow: 'hidden',
+          }}
+        >
+          {/* Right: Image Preview / Icon */}
+          <View style={{ flexDirection: 'row-reverse', alignItems: 'center', flex: 1, gap: spacing[3] }}>
+            {isCapturing ? (
+              <View style={{ width: 56, height: 56, borderRadius: radius.xs, backgroundColor: theme.surfaceSecondary, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: theme.line }}>
+                <ActivityIndicator size="small" color={theme.brand} />
+              </View>
+            ) : hasRealImage ? (
+              <Image
+                source={{ uri: value }}
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: radius.xs,
+                  backgroundColor: theme.line + '20',
+                  borderWidth: 1,
+                  borderColor: theme.line,
+                }}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={{ width: 56, height: 56, borderRadius: radius.xs, backgroundColor: theme.surfaceSecondary, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: theme.line }}>
+                <Icon name="image-outline" size={24} tone={photoErr ? 'danger' : 'brand'} />
+              </View>
+            )}
+
+            {/* Center: Info text */}
+            <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+              <Text role="bodyStrong" weight="black" style={{ color: theme.text, fontSize: 14 }}>
+                {label}
+              </Text>
+              {isCapturing ? (
+                <Text role="caption" tone="brand">جاري رفع الملف...</Text>
+              ) : hasRealImage ? (
+                <Text role="caption" tone="success">جاهز للتدقيق ✓</Text>
+              ) : (
+                <Text role="caption" tone={value ? 'brand' : 'muted'} numberOfLines={1} style={{ maxWidth: 200, textAlign: 'right' }}>
+                  {value ? value : 'اضغط للرفع أو التقاط صورة'}
+                </Text>
+              )}
+            </Box>
+          </View>
+
+          {/* Left: Action Icon / Button */}
+          {!readOnly && (
+            <View style={{ paddingStart: spacing[2] }}>
+              <Box
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: radius.xs2,
+                  backgroundColor: theme.surfaceSecondary,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: theme.line,
+                }}
+              >
+                <Icon name={hasRealImage ? 'create-outline' : 'camera-outline'} size={18} tone="brand" />
+              </Box>
+            </View>
+          )}
+        </Pressable>
+        {photoErr ? (
+          <Text role="caption" tone="danger" style={{ textAlign: 'right', paddingHorizontal: spacing[1] }}>
+            {photoErr}
+          </Text>
+        ) : (Platform.OS !== 'web' && !isNativePickerAvailable) ? (
+          <Text role="caption" tone="warning" style={{ textAlign: 'right', paddingHorizontal: spacing[1], fontSize: 10 }}>
+            * يرجى استخدام المتصفح (Web) لرفع صور حقيقية في بيئة المحاكاة الحالية.
+          </Text>
+        ) : null}
+      </View>
+    );
+  };
 
   const renderSectionContent = () => {
     if (activeSectionId === 'basics') {
@@ -249,32 +483,14 @@ export function DshFieldStoreOnboardingScreen({
             placeholder="مثال: أسواق العليا الطازجة"
           />
 
-          <View style={{ gap: spacing[2] }}>
-            <TextField
-              label="اسم المالك الثنائي/الثلاثي"
-              value={draft.basics.ownerName}
-              editable={!readOnly}
-              error={errors.ownerName}
-              onChangeText={(value) => changeDraftField('basics', 'ownerName', value)}
-              placeholder="الاسم مطابق للهوية أو السجل التجاري"
-            />
-            {!readOnly && (
-              <Button
-                label={ocrLoading ? 'جاري استيراد الاسم...' : 'استيراد اسم المالك من السجل التجاري'}
-                size="sm"
-                tone="secondary"
-                disabled={ocrLoading || !canImportOwnerName}
-                icon={<Icon name="cloud-download-outline" size={16} tone={canImportOwnerName ? 'brand' : 'muted'} />}
-                onPress={handleImportOwnerName}
-                style={{ alignSelf: 'flex-start' }}
-              />
-            )}
-            {!canImportOwnerName && !readOnly && (
-              <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-                * ارفع السجل التجاري أولًا لتفعيل الاستيراد التلقائي لاسم المالك
-              </Text>
-            )}
-          </View>
+          <TextField
+            label="اسم المالك الثنائي/الثلاثي"
+            value={draft.basics.ownerName}
+            editable={!readOnly}
+            error={errors.ownerName}
+            onChangeText={(value) => changeDraftField('basics', 'ownerName', value)}
+            placeholder="الاسم مطابق للهوية أو السجل التجاري"
+          />
 
           <TextField
             label="رقم جوال المالك"
@@ -285,14 +501,6 @@ export function DshFieldStoreOnboardingScreen({
             onChangeText={(value) => changeDraftField('basics', 'ownerPhone', value)}
             placeholder="مثال: 777123456 أو 0551234567"
             hint="يستخدم لإرسال كود التفعيل والاتفاق النهائي"
-          />
-
-          <TextField
-            label="المسؤول الميداني في المتجر"
-            value={draft.basics.managerName}
-            editable={!readOnly}
-            onChangeText={(value) => changeDraftField('basics', 'managerName', value)}
-            placeholder="اسم الشخص المتواجد في الموقع حاليًا"
           />
         </Box>
       );
@@ -344,18 +552,6 @@ export function DshFieldStoreOnboardingScreen({
             subtitle="التقاط دقيق لإحداثيات GPS يضمن توزيعًا فعالًا لطلبات التوصيل الميدانية."
           />
 
-          {!readOnly && (
-            <Button
-              label={gpsLoading ? 'جاري الاتصال بالأقمار الصناعية...' : 'تحديد الموقع الحالي بدقة (GPS)'}
-              tone="brand"
-              size="md"
-              disabled={gpsLoading}
-              icon={<Icon name="locate-outline" size={18} color={theme.brandContrast} />}
-              onPress={handleGPSAutofill}
-              style={{ paddingVertical: spacing[3] }}
-            />
-          )}
-
           <TextField
             label="المدينة"
             value={draft.location.city}
@@ -366,56 +562,12 @@ export function DshFieldStoreOnboardingScreen({
           />
 
           <TextField
-            label="النطاق / الحي الجغرافي"
-            value={draft.location.zone}
-            editable={!readOnly}
-            error={errors.zone}
-            onChangeText={(value) => changeDraftField('location', 'zone', value)}
-            placeholder="مثال: حي العليا"
-          />
-
-          <TextField
             label="العنوان المختصر ووصف الشارع"
             value={draft.location.addressLine}
             editable={!readOnly}
             onChangeText={(value) => changeDraftField('location', 'addressLine', value)}
             placeholder="مثال: طريق الملك فهد، بجانب البنك الأهلي"
           />
-
-          <View style={{ flexDirection: 'row-reverse', gap: spacing[3] }}>
-            <View style={{ flex: 1 }}>
-              <TextField
-                label="Latitude (خط العرض)"
-                value={draft.location.latitude}
-                editable={!readOnly}
-                keyboardType="decimal-pad"
-                error={errors.latitude}
-                onChangeText={(value) => changeDraftField('location', 'latitude', value)}
-                placeholder="24.71358"
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              <TextField
-                label="Longitude (خط الطول)"
-                value={draft.location.longitude}
-                editable={!readOnly}
-                keyboardType="decimal-pad"
-                error={errors.longitude}
-                onChangeText={(value) => changeDraftField('location', 'longitude', value)}
-                placeholder="46.67529"
-              />
-            </View>
-          </View>
-
-          <TextField
-            label="أقرب معلم مميز (Landmark)"
-            value={draft.location.landmark}
-            editable={!readOnly}
-            error={errors.landmark}
-            onChangeText={(value) => changeDraftField('location', 'landmark', value)}
-            placeholder="مثال: أمام برج المملكة"
-          />
-
           <TextField
             label="ملخص التغطية الجغرافية"
             value={draft.location.coverageSummary}
@@ -435,39 +587,9 @@ export function DshFieldStoreOnboardingScreen({
             subtitle="التقاط صور حية للمتجر يساعد الشركاء في التحقق وعملاء التطبيق في التعرف على واجهتك."
           />
 
-          {(['storefrontPhotoRef', 'interiorPhotoRef', 'signagePhotoRef'] as const).map((photoKey) => {
-            const labels = {
-              storefrontPhotoRef: 'صورة الواجهة الخارجية للمحل',
-              interiorPhotoRef: 'صورة المتجر من الداخل والرفوف',
-              signagePhotoRef: 'صورة اللوحة التجارية المطابقة للترخيص',
-            };
-            const photoErr = photoKey === 'storefrontPhotoRef' ? errors.storefrontPhotoRef : undefined;
-            const isCapturing = cameraLoading[photoKey];
-
-            return (
-              <View key={photoKey} style={{ gap: spacing[2] }}>
-                <TextField
-                  label={labels[photoKey]}
-                  value={draft.photos[photoKey]}
-                  editable={!readOnly}
-                  error={photoErr}
-                  placeholder="لم يتم إرفاق مرجع الصورة بعد"
-                  onChangeText={(value) => changeDraftField('photos', photoKey, value)}
-                />
-                {!readOnly && (
-                  <Button
-                    label={isCapturing ? 'جاري فتح الكاميرا والالتقاط...' : 'فتح الكاميرا والتقاط الصورة'}
-                    size="sm"
-                    tone="secondary"
-                    disabled={isCapturing}
-                    icon={<Icon name="camera-outline" size={16} tone="brand" />}
-                    onPress={() => handleCameraCapture(photoKey)}
-                    style={{ alignSelf: 'flex-start' }}
-                  />
-                )}
-              </View>
-            );
-          })}
+          {renderPhotoField('storefrontPhotoRef', 'صورة الواجهة الخارجية للمحل')}
+          {renderPhotoField('interiorPhotoRef', 'صورة المتجر من الداخل والرفوف')}
+          {renderPhotoField('signagePhotoRef', 'صورة اللوحة التجارية المطابقة للترخيص')}
         </Box>
       );
     }
@@ -477,20 +599,16 @@ export function DshFieldStoreOnboardingScreen({
         <Box gap={3}>
           <SectionHeader
             title="المستندات والتراخيص الرسمية"
-            subtitle="حالات المستندات تعكس الواقع القانوني. التفعيل النهائي والاعتماد يملكه مدير العمليات عبر لوحة التحكم."
+            subtitle="الرجاء إرفاق المستندات الرسمية المطلوبة للتحقق من الحساب."
           />
           <DocumentVerificationSection
             state="ready"
             documents={documentItems}
-            onUploadDocument={() => onUploadDocument?.(store.id)}
+            onUploadDocument={(kind) => onUploadDocument?.(store.id, kind)}
           />
-          <Text role="caption" tone="soft" style={{ textAlign: 'right', marginTop: spacing[2] }}>
-            تم ربط رفع المستندات مباشرة بنظام معالجة وتدقيق التراخيص المركزي في بثواني.
-          </Text>
         </Box>
       );
     }
-
     if (activeSectionId === 'products') {
       return (
         <Box gap={4}>
@@ -526,30 +644,7 @@ export function DshFieldStoreOnboardingScreen({
             placeholder="تفاصيل إضافية للكتالوج الأولي للمتجر"
           />
 
-          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-            {`سياسة كتالوج المنتجات: ${resolveDshOnDemandPolicyLabel(onboardingFlowSummary?.onDemandPolicy)} · المستندات المرفقة لا تراجع إلا عند اكتمال هذا القسم.`}
-          </Text>
 
-          <Divider style={{ marginVertical: 8 }} />
-
-          <Box gap={2}>
-            <Text role="bodyStrong" style={{ textAlign: 'right' }}>المشاكل والباركود المكتشف</Text>
-            <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-              المشاكل التشغيلية والباركود الميداني تعالج داخل هذا الملف لتفادي نقلها لنظام دعم شركاء بثواني.
-            </Text>
-            <Box gap={3} style={{ marginTop: spacing[2] }}>
-              {FIELD_PRODUCT_OPERATION_FLOWS.map((flow, index) => (
-                <View key={flow.flowId}>
-                  {index > 0 && <Divider style={{ marginVertical: 8 }} />}
-                  <Box gap={1}>
-                    <Text role="bodyStrong" style={{ textAlign: 'right' }}>{flow.title}</Text>
-                    <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{flow.description}</Text>
-                    <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{`التالي: ${flow.nextAction}`}</Text>
-                  </Box>
-                </View>
-              ))}
-            </Box>
-          </Box>
         </Box>
       );
     }
@@ -596,56 +691,7 @@ export function DshFieldStoreOnboardingScreen({
             placeholder="ملاحظات مرجعية للحسابات والعمولات"
           />
 
-          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-            * ملاحظة: الملاحظات المالية تشغيلية فقط. الربط المالي الفعلي والتسويات تدار حصرياً عبر المحفظة WLT.
-          </Text>
 
-          {store.fulfillmentAgreements && store.fulfillmentAgreements.length > 0 && (
-            <>
-              <Divider style={{ marginVertical: 8 }} />
-              <Box gap={2}>
-                <Text role="bodyStrong" style={{ textAlign: 'right' }}>أنماط التشغيل والتسوية المتفق عليها</Text>
-                <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-                  بيانات مرجعية للعرض فقط — نسب العمولات الفعلية وأرقام التسوية يتم إدارتها وتعديلها من قِبل WLT وليس للميداني صلاحية تعديلها.
-                </Text>
-                <Box gap={3} style={{ marginTop: spacing[2] }}>
-                  {store.fulfillmentAgreements.map((agreement, index) => (
-                    <View key={agreement.mode}>
-                      {index > 0 && <Divider style={{ marginVertical: 8 }} />}
-                      <Box layoutDirection="row" justify="space-between" align="center" gap={2}>
-                        <Box gap={0} style={{ flex: 1 }}>
-                          <Text role="bodyStrong" style={{ textAlign: 'right' }}>{agreement.modeLabel}</Text>
-                          <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{agreement.settlementBasis}</Text>
-                        </Box>
-                        <Box layoutDirection="row" gap={2}>
-                          <Badge
-                            label={
-                              agreement.operationalReadiness === 'ready'
-                                ? 'جاهز'
-                                : agreement.operationalReadiness === 'pending'
-                                ? 'قيد التفعيل'
-                                : 'غير مفعّل'
-                            }
-                            tone={
-                              agreement.operationalReadiness === 'ready'
-                                ? 'success'
-                                : agreement.operationalReadiness === 'pending'
-                                ? 'warning'
-                                : 'default'
-                            }
-                          />
-                          <Badge
-                            label={agreement.enabled ? 'مفعّل' : 'معطّل'}
-                            tone={agreement.enabled ? 'success' : 'default'}
-                          />
-                        </Box>
-                      </Box>
-                    </View>
-                  ))}
-                </Box>
-              </Box>
-            </>
-          )}
         </Box>
       );
     }
@@ -657,10 +703,6 @@ export function DshFieldStoreOnboardingScreen({
             title="مراجعة الملف الميداني وإرساله"
             subtitle="حفظ الملف كمسودة متاح دائماً. إرسال الملف للمراجعة يظل معطلاً حتى استيفاء النواقص."
           />
-
-          <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-            {`مدير تصعيد الملفات والجاهزية: قسم الشركاء (${resolveDshControlPanelSectionLabel('partners')}) · الإجراءات المحظورة ميدانيًا: التفعيل النهائي بدون تدقيق التراخيص`}
-          </Text>
 
           <TextField
             label="ملاحظات الميداني الشخصية"
@@ -715,27 +757,6 @@ export function DshFieldStoreOnboardingScreen({
               </Box>
             </>
           ) : null}
-
-          <Divider style={{ marginVertical: 8 }} />
-
-          <Box gap={2}>
-            <Text role="bodyStrong" style={{ textAlign: 'right' }}>مسارات التصعيد والتحقق الإداري</Text>
-            <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
-              {`في حالة تعذر استيفاء بعض النواقص ميدانيًا، يمكنك تصعيد الملف لطلب استثناء تشغيلي من قسم الشركاء (${resolveDshControlPanelSectionLabel('partners')})`}
-            </Text>
-            <Box gap={3} style={{ marginTop: spacing[2] }}>
-              {FIELD_REVIEW_OPERATION_FLOWS.map((flow, index) => (
-                <View key={flow.flowId}>
-                  {index > 0 && <Divider style={{ marginVertical: 8 }} />}
-                  <Box gap={1}>
-                    <Text role="bodyStrong" style={{ textAlign: 'right' }}>{flow.title}</Text>
-                    <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{flow.description}</Text>
-                    <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>{`التالي: ${flow.nextAction}`}</Text>
-                  </Box>
-                </View>
-              ))}
-            </Box>
-          </Box>
         </Box>
       );
     }
@@ -763,7 +784,6 @@ export function DshFieldStoreOnboardingScreen({
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 148 }}>
         <Box padding={4} gap={4}>
 
-          {/* Section 1: Store Metadata Header Card */}
           <Card padding={4} gap={3}>
             <Box gap={2} style={{ alignItems: 'flex-end' }}>
               <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing[2] }}>
@@ -783,53 +803,10 @@ export function DshFieldStoreOnboardingScreen({
                   {store.location}
                 </Text>
               </View>
-            </Box>
-
-            <Divider style={{ marginVertical: 4 }} />
-
-            <Box gap={1} style={{ alignItems: 'flex-end' }}>
-              <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
+              <Text role="caption" tone="muted" style={{ textAlign: 'right', marginTop: spacing[1] }}>
                 {`آخر تحديث للملف: ${store.lastUpdatedLabel} · موعد الزيارة التالي: ${store.nextVisitLabel}`}
               </Text>
             </Box>
-
-            <Divider style={{ marginVertical: 4 }} />
-
-            <Pressable
-              onPress={() => setPolicyExpanded(!policyExpanded)}
-              style={{
-                flexDirection: 'row-reverse',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingVertical: 2,
-              }}
-            >
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6 }}>
-                <Icon name="information-circle-outline" size={16} tone="brand" />
-                <Text role="bodyStrong" style={{ color: theme.brand }}>
-                  سياسة الإضافة والربط للمحل
-                </Text>
-              </View>
-              <Text role="label" tone="brand">
-                {policyExpanded ? 'إخفاء ▲' : 'تفاصيل السياسة ▾'}
-              </Text>
-            </Pressable>
-
-            {policyExpanded ? (
-              <Box gap={2} style={{ padding: 10, backgroundColor: theme.surfaceSecondary, borderRadius: radius.xs2, marginTop: spacing[1] }}>
-                <KeyValueList
-                  dense
-                  items={[
-                    { label: 'المالك التشغيلي', value: onboardingFlowSummary?.ownerSurface ?? 'app-field', tone: 'brand' },
-                    { label: 'سياسة التحميل والفتح', value: resolveDshOnDemandPolicyLabel(onboardingFlowSummary?.onDemandPolicy) },
-                    { label: 'مالك قرار التصعيد والاعتماد', value: resolveDshControlPanelSectionLabel('partners') },
-                  ]}
-                />
-                <Text role="caption" tone="soft" style={{ textAlign: 'right', marginTop: spacing[1] }}>
-                  {onboardingFlowSummary?.nextPolicyActionPreview ?? 'افتح التفاصيل أو الوثائق عند الحاجة فقط، ولا تعتمد أي قرار مالي من هذه الشاشة.'}
-                </Text>
-              </Box>
-            ) : null}
           </Card>
 
           <Divider />
@@ -909,52 +886,51 @@ export function DshFieldStoreOnboardingScreen({
                   </View>
 
                   {/* Content Column */}
-                  <View style={{ flex: 1, gap: spacing[2] }}>
+                  <View style={{ flex: 1 }}>
                     <Pressable
                       onPress={() => setActiveSection(section.id)}
                       style={{
-                        padding: spacing[3],
-                        borderRadius: radius.sm2,
-                        backgroundColor: isActive ? theme.brandSurface : theme.surface,
-                        borderWidth: borders.hairline,
-                        borderColor: isActive ? theme.brand : theme.line,
-                        gap: spacing[1],
-                        alignItems: 'flex-end',
+                        paddingVertical: spacing[3],
+                        paddingHorizontal: spacing[2],
+                        flexDirection: 'row-reverse',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
                       }}
                     >
-                      <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                      <Box gap={1} style={{ alignItems: 'flex-end', flex: 1 }}>
                         <Text
                           role="bodyStrong"
                           weight="black"
                           style={{
                             color: isActive ? theme.brand : theme.text,
+                            fontSize: 16,
                           }}
                         >
                           {section.label}
                         </Text>
-                        {isActive ? (
-                          <Badge label="قيد التعديل" tone="brand" />
-                        ) : isComplete ? (
-                          <Text role="caption" weight="bold" style={{ color: theme.success }}>مكتمل ✓</Text>
+                        {!isActive && (
+                          <Text
+                            role="caption"
+                            tone={isComplete ? 'muted' : 'danger'}
+                            style={{ textAlign: 'right' }}
+                          >
+                            {isComplete ? resolveSectionSummary(section.id) : 'يتطلب استكمال الحقول الإلزامية للمرحلة'}
+                          </Text>
+                        )}
+                      </Box>
+                      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+                        {isComplete ? (
+                          <Icon name="checkmark-circle" size={18} tone="success" />
                         ) : sectionMissing > 0 ? (
-                          <Badge label={`${sectionMissing} ناقص`} tone="danger" />
+                          <Badge label={`${sectionMissing} ناقص`} tone="danger" size="sm" />
                         ) : null}
                       </View>
-                      {!isActive && (
-                        <Text
-                          role="caption"
-                          tone={isComplete ? 'muted' : 'danger'}
-                          style={{ textAlign: 'right', marginTop: 2 }}
-                        >
-                          {isComplete ? resolveSectionSummary(section.id) : 'يتطلب استكمال الحقول الإلزامية للمرحلة'}
-                        </Text>
-                      )}
                     </Pressable>
 
                     {isActive && (
-                      <Card padding={4} gap={4} style={{ marginTop: spacing[1], borderRadius: radius.sm2 }}>
+                      <Box padding={4} gap={4} style={{ backgroundColor: theme.surfaceSecondary, borderRadius: radius.sm, marginTop: spacing[1], marginBottom: spacing[3] }}>
                         {renderSectionContent()}
-                      </Card>
+                      </Box>
                     )}
                   </View>
                 </View>
@@ -962,49 +938,50 @@ export function DshFieldStoreOnboardingScreen({
             })}
           </Box>
 
-          <Divider />
-
-          {/* Section 4: Scrollable Form Footer buttons */}
-          <View style={{ flexDirection: 'row-reverse', gap: spacing[3] }}>
-            <Button
-              label="الخطوة السابقة"
-              tone="secondary"
-              fullWidth={false}
-              style={{ flex: 1 }}
-              onPress={goToPreviousSection}
-            />
-            <Button
-              label="حفظ مسودة"
-              tone="secondary"
-              fullWidth={false}
-              style={{ flex: 1 }}
-              onPress={onSaveDraft}
-            />
+          <View style={{ flexDirection: 'row-reverse', gap: spacing[3], marginTop: spacing[4], justifyContent: 'center' }}>
+            <Pressable onPress={onSaveDraft}>
+              <Text role="bodyStrong" style={{ color: theme.brand, padding: spacing[2] }}>
+                حفظ المسودة
+              </Text>
+            </Pressable>
+            <Pressable onPress={goToPreviousSection}>
+              <Text role="body" style={{ color: theme.textMuted, padding: spacing[2] }}>
+                الرجوع للسابق
+              </Text>
+            </Pressable>
           </View>
         </Box>
       </MobileScrollView>
 
-      {/* Sticky Bottom Action Controller */}
-      <StickyActionBar
-        note={stickyNote}
-        primaryAction={{
-          label: isLastSection
-            ? 'إرسال للمراجعة'
-            : `التالي: ${fieldSectionLabels[fieldSectionOrder[activeIndex + 1]]}`,
-          tone: canSubmit && isLastSection ? 'success' : 'primary',
-          disabled: isLastSection ? !canSubmit : false,
-          onPress: goToNextSection,
+      {/* Sleek Modern Bottom Navigation Bar */}
+      <Box
+        padding={3}
+        layoutDirection="row-reverse"
+        justify="space-between"
+        align="center"
+        style={{
+          borderTopWidth: 1,
+          borderTopColor: theme.line,
+          backgroundColor: theme.surface,
+          paddingBottom: spacing[4] + 8,
         }}
-        secondaryAction={
-          onEscalate && missingItems.length > 0 && !readOnly
-            ? {
-                label: 'تصعيد عائق الميدان',
-                tone: 'secondary' as const,
-                onPress: onEscalate,
-              }
-            : undefined
-        }
-      />
+      >
+        <Button
+          label={isLastSection ? 'إرسال للمراجعة' : `التالي: ${fieldSectionLabels[fieldSectionOrder[activeIndex + 1]]}`}
+          tone={canSubmit && isLastSection ? 'success' : 'brand'}
+          disabled={isLastSection ? !canSubmit : false}
+          onPress={goToNextSection}
+          style={{ flex: 2, marginStart: spacing[2] }}
+        />
+        {onEscalate && missingItems.length > 0 && !readOnly && (
+          <Button
+            label="تصعيد عائق"
+            tone="secondary"
+            onPress={onEscalate}
+            style={{ flex: 1 }}
+          />
+        )}
+      </Box>
     </View>
   );
 }

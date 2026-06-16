@@ -6,7 +6,7 @@ import type {
   FieldStoreFile,
   FieldLeadStatus,
   FieldLeadFilter,
-} from './field.types';
+} from './dsh-field.types';
 import {
   resolveOnboardingStoreStatus,
   resolveOnboardingStoreStatusLabel,
@@ -23,7 +23,7 @@ import {
   createManualOnboardingStore,
   matchesOnboardingStoreFilter,
   type PartnerOnboardingFilter,
-} from '../partner/onboarding';
+} from '../shared';
 
 export {
   createEmptyDraft,
