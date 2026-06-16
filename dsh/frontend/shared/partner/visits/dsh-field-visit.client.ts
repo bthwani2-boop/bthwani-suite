@@ -59,9 +59,15 @@ export function createDshFieldVisitHttpClient(
         throw { kind: 'offline' } satisfies DshFieldVisitOfflineError;
       }
 
+      const clientId = (PlatformVarsRegistry.get('dshClientId') ?? 'field-agent-dev').trim() || 'field-agent-dev';
       const response = await transport(`${baseUrl.replace(/\/$/, '')}/stores/${encodeURIComponent(cleanStoreId)}/field-visits`, {
         method: 'POST',
-        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-Client-Id': clientId,
+          'X-Actor-Type': 'field',
+        },
         body: JSON.stringify(req),
       });
 

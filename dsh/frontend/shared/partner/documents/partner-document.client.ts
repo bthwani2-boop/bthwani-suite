@@ -37,9 +37,15 @@ export function createPartnerDocumentHttpClient(
         throw { kind: 'offline' } satisfies PartnerDocumentOfflineError;
       }
 
+      const clientId = (PlatformVarsRegistry.get('dshClientId') ?? 'field-agent-dev').trim() || 'field-agent-dev';
       const response = await transport(`${baseUrl.replace(/\/$/, '')}/stores/${encodeURIComponent(cleanStoreId)}/documents`, {
         method: 'POST',
-        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-Client-Id': clientId,
+          'X-Actor-Type': 'field',
+        },
         body: JSON.stringify(req),
       });
 

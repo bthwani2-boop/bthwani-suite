@@ -4,7 +4,7 @@
 // platform-vars / feature-flags canonical exports: shared/platform topic
 export * from './dsh-surface-runtime.contract';
 export * from './dsh-operational-surface-binding';
-export * from '../field/use-field-runtime-actions';
+export { useFieldRuntimeActions } from '../../app-field/field.surface-model';
 export * from './ui-only-runtime-clients';
 export * from './dsh-flow-registry';
 export type { FixtureEvidenceEntry } from './dev-fixtures-isolation-guard';
