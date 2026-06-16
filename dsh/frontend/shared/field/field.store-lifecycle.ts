@@ -21,6 +21,8 @@ import {
   touchOnboardingStoreDraft,
   submitOnboardingStoreForReview,
   createManualOnboardingStore,
+  matchesOnboardingStoreFilter,
+  type PartnerOnboardingFilter,
 } from '../partner/onboarding';
 
 export {
@@ -62,15 +64,7 @@ export function isFieldStoreReadOnly(store: FieldStoreFile): boolean {
 }
 
 export function matchesFieldStoreFilter(store: FieldStoreFile, filter: FieldLeadFilter): boolean {
-  const status = resolveFieldStoreStatus(store);
-  if (filter === 'all') return true;
-  if (filter === 'today') return store.nextVisitLabel.includes('اليوم');
-  if (filter === 'ready') return status === 'ready-for-onboarding';
-  if (filter === 'follow-up') return status === 'follow-up-required';
-  if (filter === 'pending') return status === 'new-lead' || status === 'offer-pending-approval';
-  if (filter === 'submitted') return status === 'submitted';
-  if (filter === 'done') return status === 'offer-approved';
-  return true;
+  return matchesOnboardingStoreFilter(store, filter as PartnerOnboardingFilter);
 }
 
 export function resolveFieldFilterCounts(stores: readonly FieldStoreFile[]): Record<FieldLeadFilter, number> {

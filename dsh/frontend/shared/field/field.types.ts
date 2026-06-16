@@ -15,7 +15,7 @@ export type FieldFulfillmentMode = DshFulfillmentDeliveryMode;
 export type FieldFulfillmentModeAgreement = PartnerFulfillmentModeAgreement;
 
 export type FieldStatusTone = 'default' | 'brand' | 'success' | 'warning' | 'danger' | 'info';
-export type FieldLeadSource = 'candidate' | 'manual' | 'local-ui-draft' | 'backend';
+export type FieldLeadSource = 'candidate' | 'manual' | 'local-draft' | 'backend';
 
 export type FieldLeadStatus =
   | 'new-lead'

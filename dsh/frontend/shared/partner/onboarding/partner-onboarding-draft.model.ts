@@ -8,10 +8,10 @@ import { createEmptyDraft } from './partner-onboarding.lifecycle';
 
 export type OnboardingStoreFile = {
   id: string;
-  source: 'candidate' | 'manual' | 'local-ui-draft' | 'backend';
+  source: 'candidate' | 'manual' | 'local-draft' | 'backend';
   draftLocalId?: string;
   backendStoreId?: string;
-  syncStatus?: 'local-ui-draft' | 'backend' | 'syncing' | 'sync-failed';
+  syncStatus?: 'local-draft' | 'backend' | 'syncing' | 'sync-failed';
   name: string;
   category: string;
   location: string;
@@ -80,13 +80,13 @@ export function submitOnboardingStoreForReview(store: OnboardingStoreFile): Onbo
 }
 
 export function createManualOnboardingStore(): OnboardingStoreFile {
-  const draftLocalId = generateDraftId('field-store-local-ui-draft');
+  const draftLocalId = generateDraftId('field-store-local-draft');
   const emptyDraft = createEmptyDraft({ lastSavedLabel: 'مسودة جديدة' });
   return {
     id: draftLocalId,
-    source: 'local-ui-draft',
+    source: 'local-draft',
     draftLocalId,
-    syncStatus: 'local-ui-draft',
+    syncStatus: 'local-draft',
     name: 'ملف انضمام جديد',
     category: 'قيد التحديد',
     location: 'الرياض',
@@ -106,7 +106,7 @@ export function usePartnerOnboardingDraftModel({
     createStoreFromDraft: (store: OnboardingStoreFile) => Promise<{ id: string }>;
     submitDocument: (storeId: string, kind: string, uploadedRef: string) => Promise<unknown>;
   };
-  pushRoute: (route: any) => void;
+  pushRoute: (route: { kind: string; storeId?: string; backendStoreId?: string }) => void;
 }) {
   const [stores, setStores] = React.useState<OnboardingStoreFile[]>([]);
 
@@ -160,16 +160,16 @@ export function usePartnerOnboardingDraftModel({
             console.error('[partner-onboarding:sync-docs] Failed to submit CR document:', e);
           }
         }
-        if (docs.ownerIdRef) {
+        if (docs.identityProofRef) {
           try {
-            await onboardingRuntime.submitDocument(res.id, 'identity_proof', docs.ownerIdRef);
+            await onboardingRuntime.submitDocument(res.id, 'identity_proof', docs.identityProofRef);
           } catch (e) {
             console.error('[partner-onboarding:sync-docs] Failed to submit ID document:', e);
           }
         }
-        if (docs.tradeLicenseRef) {
+        if (docs.taxCertificateRef) {
           try {
-            await onboardingRuntime.submitDocument(res.id, 'tax_certificate', docs.tradeLicenseRef);
+            await onboardingRuntime.submitDocument(res.id, 'tax_certificate', docs.taxCertificateRef);
           } catch (e) {
             console.error('[partner-onboarding:sync-docs] Failed to submit tax cert document:', e);
           }
@@ -213,12 +213,12 @@ export function usePartnerOnboardingDraftModel({
         if (kind === 'commercial_registration') {
           docs.commercialRegistrationStatus = 'uploaded';
           docs.commercialRegistrationRef = uploadedRef;
-        } else if (kind === 'identity_proof' || kind === 'id_card') {
-          docs.ownerIdStatus = 'uploaded';
-          docs.ownerIdRef = uploadedRef;
-        } else if (kind === 'tax_certificate' || kind === 'trade_license') {
-          docs.tradeLicenseStatus = 'uploaded';
-          docs.tradeLicenseRef = uploadedRef;
+        } else if (kind === 'identity_proof') {
+          docs.identityProofStatus = 'uploaded';
+          docs.identityProofRef = uploadedRef;
+        } else if (kind === 'tax_certificate') {
+          docs.taxCertificateStatus = 'uploaded';
+          docs.taxCertificateRef = uploadedRef;
         } else if (kind === 'storefront_photo') {
           photos.storefrontPhotoRef = uploadedRef;
         } else if (kind === 'interior_photo') {
@@ -230,7 +230,7 @@ export function usePartnerOnboardingDraftModel({
           lastUpdatedLabel: 'الآن',
           draft: {
             ...current.draft,
-            documents: docs as any,
+            documents: docs,
             photos,
           },
         };

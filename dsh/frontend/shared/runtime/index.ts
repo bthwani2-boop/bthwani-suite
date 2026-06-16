@@ -5,7 +5,6 @@
 export * from './dsh-surface-runtime.contract';
 export * from './dsh-operational-surface-binding';
 export * from '../field/use-field-runtime-actions';
-export * from '../field/field-onboarding-storage';
 export * from './ui-only-runtime-clients';
 export * from './dsh-flow-registry';
 export type { FixtureEvidenceEntry } from './dev-fixtures-isolation-guard';

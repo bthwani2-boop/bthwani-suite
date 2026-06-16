@@ -7,5 +7,5 @@ let _draftKeyCounter = 0;
 
 export function resolveFieldDocumentDraftMediaKey(kind: string): string {
   _draftKeyCounter += 1;
-  return `field.doc.${kind}.local-ui-draft-${_draftKeyCounter}`;
+  return `field.doc.${kind}.local-draft-${_draftKeyCounter}`;
 }

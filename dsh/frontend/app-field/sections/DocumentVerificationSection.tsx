@@ -9,12 +9,10 @@ import {
   useTheme,
   useDirection,
 } from '@bthwani/ui-kit';
-import type { FieldDocumentStatus } from '../../shared';
-
-type DocumentKind = 'commercial_registration' | 'id_card' | 'trade_license' | 'other';
+import type { FieldDocumentStatus, PartnerDocumentKind } from '../../shared';
 
 type DocumentItem = {
-  id: DocumentKind;
+  id: PartnerDocumentKind;
   label: string;
   required: boolean;
   status: FieldDocumentStatus;
@@ -23,14 +21,14 @@ type DocumentItem = {
 
 const defaultDocuments: readonly DocumentItem[] = [
   { id: 'commercial_registration', label: 'السجل التجاري', required: true, status: 'missing' },
-  { id: 'id_card', label: 'الهوية الوطنية', required: true, status: 'missing' },
-  { id: 'trade_license', label: 'رخصة التجارة', required: false, status: 'missing' },
+  { id: 'identity_proof', label: 'إثبات هوية المالك', required: true, status: 'missing' },
+  { id: 'tax_certificate', label: 'الشهادة الضريبية', required: false, status: 'missing' },
 ];
 
 export type DocumentVerificationSectionProps = {
   state?: 'ready' | 'loading' | 'complete' | 'error';
   documents?: readonly DocumentItem[];
-  onUploadDocument?: (kind: DocumentKind) => void;
+  onUploadDocument?: (kind: PartnerDocumentKind) => void;
   onConfirm?: () => void;
 };
 

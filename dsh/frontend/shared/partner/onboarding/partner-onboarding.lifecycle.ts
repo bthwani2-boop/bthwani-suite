@@ -22,11 +22,11 @@ export function createEmptyDraft(overrides?: Partial<PartnerOnboardingDraft>): P
     photos: { storefrontPhotoRef: '', interiorPhotoRef: '', signagePhotoRef: '' },
     documents: {
       commercialRegistrationRef: '',
-      ownerIdRef: '',
-      tradeLicenseRef: '',
+      identityProofRef: '',
+      taxCertificateRef: '',
       commercialRegistrationStatus: 'missing',
-      ownerIdStatus: 'missing',
-      tradeLicenseStatus: 'missing',
+      identityProofStatus: 'missing',
+      taxCertificateStatus: 'missing',
     },
     products: { featuredProductName: '', featuredProductPrice: '', sampleCatalogNote: '' },
     offer: { preliminaryOffer: '', operatingHours: '', deliveryReadiness: '', financeNote: '' },
@@ -49,8 +49,8 @@ export function getPartnerRequiredMissingItems(draft: PartnerOnboardingDraft): s
   if (!draft.location.latitude.trim() || !draft.location.longitude.trim() || !draft.location.landmark.trim()) missing.push('الإحداثية GPS');
   if (!draft.photos.storefrontPhotoRef.trim()) missing.push('صورة الواجهة');
   if (!documentIsResolved(draft.documents.commercialRegistrationRef, draft.documents.commercialRegistrationStatus)) missing.push('السجل التجاري');
-  if (!documentIsResolved(draft.documents.ownerIdRef, draft.documents.ownerIdStatus)) missing.push('هوية المالك');
-  if (draft.documents.tradeLicenseRef.trim() && (draft.documents.tradeLicenseStatus === 'needs_reupload' || draft.documents.tradeLicenseStatus === 'rejected')) {
+  if (!documentIsResolved(draft.documents.identityProofRef, draft.documents.identityProofStatus)) missing.push('هوية المالك');
+  if (draft.documents.taxCertificateRef.trim() && (draft.documents.taxCertificateStatus === 'needs_reupload' || draft.documents.taxCertificateStatus === 'rejected')) {
     missing.push('رخصة التجارة تحتاج معالجة');
   }
   if (!draft.products.featuredProductName.trim()) missing.push('منتج افتتاحي واحد');
@@ -69,8 +69,8 @@ export type PartnerSectionSummary = {
 export function resolvePartnerSectionSummaries(draft: PartnerOnboardingDraft): PartnerSectionSummary[] {
   const documentsMissing = [
     { ref: draft.documents.commercialRegistrationRef, status: draft.documents.commercialRegistrationStatus, required: true },
-    { ref: draft.documents.ownerIdRef, status: draft.documents.ownerIdStatus, required: true },
-    { ref: draft.documents.tradeLicenseRef, status: draft.documents.tradeLicenseStatus, required: false },
+    { ref: draft.documents.identityProofRef, status: draft.documents.identityProofStatus, required: true },
+    { ref: draft.documents.taxCertificateRef, status: draft.documents.taxCertificateStatus, required: false },
   ].filter((item) => {
     if (item.required) return !item.ref.trim() || (item.status !== 'uploaded' && item.status !== 'approved');
     return item.ref.trim().length > 0 && (item.status === 'needs_reupload' || item.status === 'rejected');

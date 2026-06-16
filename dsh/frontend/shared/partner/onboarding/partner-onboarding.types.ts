@@ -27,6 +27,8 @@ export type PartnerOnboardingSectionId =
 
 export type PartnerDocumentRuntimeStatus = 'missing' | 'uploaded' | 'approved' | 'needs_reupload' | 'rejected';
 
+export type PartnerOnboardingFilter = 'all' | 'today' | 'ready' | 'follow-up' | 'pending' | 'submitted' | 'done';
+
 export type PartnerOnboardingDraft = {
   activeSectionId: PartnerOnboardingSectionId;
   basics: { storeName: string; ownerName: string; ownerPhone: string; managerName: string };
@@ -35,11 +37,11 @@ export type PartnerOnboardingDraft = {
   photos: { storefrontPhotoRef: string; interiorPhotoRef: string; signagePhotoRef: string };
   documents: {
     commercialRegistrationRef: string;
-    ownerIdRef: string;
-    tradeLicenseRef: string;
+    identityProofRef: string;
+    taxCertificateRef: string;
     commercialRegistrationStatus: PartnerDocumentRuntimeStatus;
-    ownerIdStatus: PartnerDocumentRuntimeStatus;
-    tradeLicenseStatus: PartnerDocumentRuntimeStatus;
+    identityProofStatus: PartnerDocumentRuntimeStatus;
+    taxCertificateStatus: PartnerDocumentRuntimeStatus;
   };
   products: { featuredProductName: string; featuredProductPrice: string; sampleCatalogNote: string };
   offer: { preliminaryOffer: string; operatingHours: string; deliveryReadiness: string; financeNote: string };

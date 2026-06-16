@@ -75,3 +75,75 @@ export const PARTNER_DOCUMENT_DISPLAY_ITEMS: readonly PartnerDocumentDisplayItem
     icon: 'image',
   },
 ];
+
+import type { OnboardingStoreFile } from '../onboarding/partner-onboarding-draft.model';
+
+export function applyFieldDocumentUploadToStore(
+  store: OnboardingStoreFile,
+  kind: PartnerDocumentKind | string,
+  uploadedRef: string,
+): OnboardingStoreFile {
+  const docs = { ...store.draft.documents };
+  const photos = { ...store.draft.photos };
+
+  if (kind === 'commercial_registration') {
+    docs.commercialRegistrationStatus = 'uploaded';
+    docs.commercialRegistrationRef = uploadedRef;
+  } else if (kind === 'identity_proof') {
+    docs.identityProofStatus = 'uploaded';
+    docs.identityProofRef = uploadedRef;
+  } else if (kind === 'tax_certificate') {
+    docs.taxCertificateStatus = 'uploaded';
+    docs.taxCertificateRef = uploadedRef;
+  } else if (kind === 'storefront_photo') {
+    photos.storefrontPhotoRef = uploadedRef;
+  } else if (kind === 'interior_photo') {
+    photos.interiorPhotoRef = uploadedRef;
+  }
+
+  return {
+    ...store,
+    lastUpdatedLabel: 'الآن',
+    draft: {
+      ...store.draft,
+      documents: docs,
+      photos,
+    },
+  };
+}
+
+import type { PartnerOnboardingDraft } from '../onboarding/partner-onboarding.types';
+
+export type PartnerDocumentItemSummary = {
+  id: PartnerDocumentKind;
+  label: string;
+  required: boolean;
+  status: string;
+  referenceLabel: string;
+};
+
+export function resolvePartnerDocumentItems(draft: PartnerOnboardingDraft): PartnerDocumentItemSummary[] {
+  return [
+    {
+      id: 'commercial_registration',
+      label: 'السجل التجاري',
+      required: true,
+      status: draft.documents.commercialRegistrationStatus,
+      referenceLabel: draft.documents.commercialRegistrationRef || 'لا يوجد مرجع مرفوع بعد',
+    },
+    {
+      id: 'identity_proof',
+      label: 'إثبات هوية المالك',
+      required: true,
+      status: draft.documents.identityProofStatus,
+      referenceLabel: draft.documents.identityProofRef || 'لا يوجد مرجع مرفوع بعد',
+    },
+    {
+      id: 'tax_certificate',
+      label: 'الشهادة الضريبية',
+      required: false,
+      status: draft.documents.taxCertificateStatus,
+      referenceLabel: draft.documents.taxCertificateRef || 'اختياري — غير مرفوع',
+    },
+  ];
+}

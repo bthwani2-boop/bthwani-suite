@@ -6,6 +6,7 @@ import React from 'react';
 import {
   createPartnerDocumentHttpClient,
   resolvePartnerDocumentBaseUrl,
+  type PartnerDocumentKind,
 } from '../partner/documents';
 import {
   createPartnerStoreOnboardingHttpClient,
@@ -21,40 +22,6 @@ export type DshFieldVisitDraftValues = {
   readonly visitSummary: string;
   readonly followUpAction: string;
 };
-
-export function applyFieldDocumentUploadToStore(
-  store: FieldStoreFile,
-  kind: string,
-  uploadedRef: string,
-): FieldStoreFile {
-  const docs = { ...store.draft.documents };
-  const photos = { ...store.draft.photos };
-
-  if (kind === 'commercial_registration') {
-    docs.commercialRegistrationStatus = 'uploaded';
-    docs.commercialRegistrationRef = uploadedRef;
-  } else if (kind === 'identity_proof' || kind === 'id_card') {
-    docs.ownerIdStatus = 'uploaded';
-    docs.ownerIdRef = uploadedRef;
-  } else if (kind === 'tax_certificate' || kind === 'trade_license') {
-    docs.tradeLicenseStatus = 'uploaded';
-    docs.tradeLicenseRef = uploadedRef;
-  } else if (kind === 'storefront_photo') {
-    photos.storefrontPhotoRef = uploadedRef;
-  } else if (kind === 'interior_photo') {
-    photos.interiorPhotoRef = uploadedRef;
-  }
-
-  return {
-    ...store,
-    lastUpdatedLabel: 'الآن',
-    draft: {
-      ...store.draft,
-      documents: docs as any,
-      photos,
-    },
-  };
-}
 
 export function useFieldRuntimeActions() {
   const partnerStoreOnboardingClient = React.useMemo(
@@ -99,7 +66,7 @@ export function useFieldRuntimeActions() {
   );
 
   const submitDocument = React.useCallback(
-    (storeId: string, kind: any, uploadedRef: string) =>
+    (storeId: string, kind: PartnerDocumentKind, uploadedRef: string) =>
       partnerDocumentClient.createDocument(storeId, {
         document_kind: kind,
         media_key: uploadedRef,

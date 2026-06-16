@@ -5,7 +5,7 @@ import { Badge, Box, colorPalette, Icon, Text, useDirection, useTheme, withAlpha
   spacing,
 } from '@bthwani/ui-kit';
 import {
-  resolveFieldCompletionPercent,
+  resolvePartnerCompletionPercent,
   resolveFieldStoreLifecycleLabel,
   resolveFieldStoreNextActionLabel,
   resolveFieldStoreStatusLabel,
@@ -21,7 +21,7 @@ type FieldStoreCardProps = {
 export function FieldStoreCard({ store, onPress }: FieldStoreCardProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
-  const progress = resolveFieldCompletionPercent(store.draft);
+  const progress = resolvePartnerCompletionPercent(store.draft);
 
   return (
     <Pressable onPress={onPress}>

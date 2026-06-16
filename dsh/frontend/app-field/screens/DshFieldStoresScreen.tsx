@@ -10,9 +10,11 @@ import {
   resolveFieldFilterCounts,
   type FieldLeadFilter,
   type FieldStoreFile,
+} from '../../shared/field';
+import {
   resolveFilteredOnboardingStores,
   resolvePriorityOnboardingStore,
-} from '../../shared';
+} from '../../shared/partner/onboarding/partner-onboarding-listing.model';
 
 function resolveStoresBindingLabel() {
   return 'جسر قائمة المتاجر';

@@ -25,10 +25,7 @@ import {
 import {
   fieldSectionLabels,
   fieldSectionOrder,
-  getFieldRequiredMissingItems,
   isFieldStoreReadOnly,
-  resolveFieldCompletionPercent,
-  resolveFieldSectionSummaries,
   resolveFieldStoreLifecycleLabel,
   resolveFieldStoreStatusLabel,
   resolveFieldStoreStatusTone,
@@ -44,10 +41,16 @@ import {
   PARTNER_SUB_CATEGORY_OPTIONS,
   getOptionsWithFallback,
   resolvePartnerSectionSummaryLabel,
+  getPartnerRequiredMissingItems,
+  resolvePartnerCompletionPercent,
+  resolvePartnerSectionSummaries,
+  resolvePartnerDocumentItems,
+} from '../../shared';
+import {
   simulateGPSAutofill,
   simulateOwnerNameOCR,
   simulateCameraCapture,
-} from '../../shared';
+} from '../utils/onboarding-simulation';
 import { DocumentVerificationSection } from '../sections/DocumentVerificationSection';
 import { getOperationsSupportFlowsForSurface } from '../../shared';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
@@ -132,32 +135,10 @@ export function DshFieldStoreOnboardingScreen({
   const readOnly = isFieldStoreReadOnly(store);
   const draft = store.draft;
   const activeSectionId = draft.activeSectionId;
-  const sections = React.useMemo(() => resolveFieldSectionSummaries(draft), [draft]);
-  const missingItems = React.useMemo(() => getFieldRequiredMissingItems(draft), [draft]);
-  const completionPercent = React.useMemo(() => resolveFieldCompletionPercent(draft), [draft]);
-  const documentItems = React.useMemo(() => ([
-    {
-      id: 'commercial_registration' as const,
-      label: 'السجل التجاري',
-      required: true,
-      status: draft.documents.commercialRegistrationStatus,
-      referenceLabel: draft.documents.commercialRegistrationRef || 'لا يوجد مرجع مرفوع بعد',
-    },
-    {
-      id: 'id_card' as const,
-      label: 'هوية المالك',
-      required: true,
-      status: draft.documents.ownerIdStatus,
-      referenceLabel: draft.documents.ownerIdRef || 'لا يوجد مرجع مرفوع بعد',
-    },
-    {
-      id: 'trade_license' as const,
-      label: 'رخصة التجارة',
-      required: false,
-      status: draft.documents.tradeLicenseStatus,
-      referenceLabel: draft.documents.tradeLicenseRef || 'اختياري — غير مرفوع',
-    },
-  ]), [draft.documents]);
+  const sections = React.useMemo(() => resolvePartnerSectionSummaries(draft), [draft]);
+  const missingItems = React.useMemo(() => getPartnerRequiredMissingItems(draft), [draft]);
+  const completionPercent = React.useMemo(() => resolvePartnerCompletionPercent(draft), [draft]);
+  const documentItems = React.useMemo(() => resolvePartnerDocumentItems(draft), [draft]);
 
   const activeIndex = fieldSectionOrder.indexOf(activeSectionId);
   const isLastSection = activeIndex === fieldSectionOrder.length - 1;

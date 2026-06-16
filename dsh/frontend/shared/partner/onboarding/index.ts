@@ -8,3 +8,4 @@ export * from './partner-onboarding.lifecycle';
 export * from './partner-store-onboarding.client';
 export * from './partner-onboarding.validation';
 export * from './partner-onboarding.view-model';
+export * from './partner-onboarding-listing.model';
