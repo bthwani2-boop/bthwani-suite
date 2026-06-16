@@ -2,7 +2,7 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { borders, Box, colorPalette, radius, Surface, withAlpha } from '@bthwani/ui-kit';
 import { useTheme } from '@bthwani/ui-kit';
-import type { MapHeatZone } from '../../shared';
+import type { MapHeatZone } from '../captain/captain.contract';
 
 const mapDemandZones: readonly MapHeatZone[] = [
   { id: 'demand-1', top: 58, right: 34, size: 164, color: withAlpha(colorPalette.brand, 0.20), label: 'طلب مرتفع' },

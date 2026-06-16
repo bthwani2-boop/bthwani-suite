@@ -14,7 +14,7 @@ import {
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
 import { translateDshRuntimeBindingStatus } from '../shared';
-import { ApprovalRecord, ApprovalStage, isPartnerOwnedException, resolveApprovalStageMeta, resolveNextOwner, translateEntityType, translateOwner, translateStage } from '../../shared';
+import { ApprovalRecord, ApprovalStage, isPartnerOwnedException, resolveApprovalStageMeta, resolveNextOwner, translateEntityType, translateOwner, translateStage } from '../../app-partner/domain/partner.workflow';
 import { getMarketingPermissionResult } from '../../shared/identity-access/dsh-role-permission.model';
 
 

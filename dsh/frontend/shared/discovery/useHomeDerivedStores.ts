@@ -1,13 +1,13 @@
 import * as React from 'react';
 import type { DshHomeCategory, DshHomeGetStore, DiscoveryFilter, StorePagerPage } from './dsh-home-types';
-import type { DshPartnerActivationStatus } from '../partner/dsh-partner-activation.model';
+import type { DshPartnerActivationStatus } from '../../app-partner/domain/dsh-partner-activation.model';
 import { resolveDshStoreClientVisibility } from '../stores/dsh-client-visibility.model';
 import { getHomePromoVisibilityRecord, isMarketingRenderable } from '../marketing/marketing.visibility';
 import type { HomePromoRecord } from '../marketing/marketing.types';
 import { resolveHomePromoPublishStage } from './home-promo-mappers';
 import { resolveHomeStoresForCategory } from './home-search-helpers';
 import { resolveDshRuntimeImageSource } from '../media/resolve-runtime-image-source';
-import { canRenderInClientSurface } from '../partner/partner.workflow';
+import { canRenderInClientSurface } from '../../app-partner/domain/partner.workflow';
 
 type UseHomeDerivedStoresParams = {
   stores?: DshHomeGetStore[];

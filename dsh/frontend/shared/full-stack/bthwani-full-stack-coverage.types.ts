@@ -1,5 +1,5 @@
 import type { BthwaniFullStackCapabilityId, BthwaniFullStackSurfaceId } from './bthwani-full-stack-capabilities';
-import type { DshControlPanelSectionId } from '../control-panel/dsh-governance.map';
+import type { DshControlPanelSectionId } from '../../control-panel/shared/dsh-control-panel-governance.map';
 
 export type BthwaniCapabilityCoverageStatus =
   | 'covered'

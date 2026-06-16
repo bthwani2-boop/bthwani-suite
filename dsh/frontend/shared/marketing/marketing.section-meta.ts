@@ -2,7 +2,7 @@
 // Authority: dsh/frontend/shared — moved from control-panel/marketing/section-meta.ts
 // Note: This module resolves governance at import time via getDshControlPanelGovernanceEntry.
 
-import { getDshControlPanelGovernanceEntry } from '../control-panel/dsh-governance.map';
+import { getDshControlPanelGovernanceEntry } from '../../control-panel/shared/dsh-control-panel-governance.map';
 
 const governance = getDshControlPanelGovernanceEntry('marketing');
 

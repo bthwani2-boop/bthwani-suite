@@ -1,8 +1,8 @@
 export type {
   ApprovalRecord,
   ApprovalStage,
-} from '../../shared';
-export { moveApprovalRecordToStage, getPartnerIntakeItems, translateEntityType, translateOwner, translateStage } from '../../shared';
+} from '../../app-partner/domain/partner.workflow';
+export { moveApprovalRecordToStage, getPartnerIntakeItems, translateEntityType, translateOwner, translateStage } from '../../app-partner/domain/partner.workflow';
 
 export { ControlPanelDshPartnerApprovalsScreen } from './ControlPanelDshPartnerApprovalsScreen';
 export { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligibilityScreen';

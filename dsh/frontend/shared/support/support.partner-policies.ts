@@ -3,7 +3,7 @@ import type {
   DshPartnerSupportCommandFilterId,
   DshPartnerSupportIssueCategoryId,
   DshPartnerSupportRouteId,
-} from '../partner';
+} from '../../app-partner/domain/partner.types';
 
 export function resolveSupportFilterFromOperationalFlow(
   flowId: DshPartnerOperationalFlowId,

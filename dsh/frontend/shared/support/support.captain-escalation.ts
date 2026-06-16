@@ -1,4 +1,4 @@
-import type { DshCaptainRoute } from '../captain';
+import type { DshCaptainRoute } from '../../app-captain/captain/captain.contract';
 import type { DshSignalEventKind } from '../marketing/dsh-signal-layer.model';
 
 export type DshCaptainSupportEscalationContext = {

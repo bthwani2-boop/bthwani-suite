@@ -3,7 +3,7 @@ import {
   isClientVisibleStage,
   isLegacyPublishedPreview,
   canRenderInClientSurface,
-} from '../partner/partner.workflow';
+} from '../../app-partner/domain/partner.workflow';
 import type { CommercialSourceMap } from '../marketing/store-card-commercial-map';
 
 

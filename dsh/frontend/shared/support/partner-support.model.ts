@@ -8,7 +8,7 @@ import type {
   DshPartnerSupportRouteId,
   DshPartnerSupportCommandContext,
   DshPartnerOperationalFlowId,
-} from '../partner/partner.types';
+} from '../../app-partner/domain/partner.types';
 import {
   buildSupportCommandContextFromOperationalFlow,
   buildSupportCommandContextFromSupportRoute,
@@ -89,10 +89,10 @@ export function usePartnerSupportModel({ initialRoute, setRoute }: PartnerSuppor
   );
 
   const handleOperationalFlowNavigation = React.useCallback(
-    (flowId: DshPartnerOperationalFlowId, orderId?: string) => {
-      const ctx = buildSupportCommandContextFromOperationalFlow(flowId, orderId);
+    (flowId: DshPartnerOperationalFlowId, source?: DshPartnerSupportCommandContext['source']) => {
+      const ctx = buildSupportCommandContextFromOperationalFlow(flowId, source);
       setSupportCommandContext(ctx);
-      setRoute('support');
+      setRoute('support-directory');
     },
     [setSupportCommandContext, setRoute],
   );

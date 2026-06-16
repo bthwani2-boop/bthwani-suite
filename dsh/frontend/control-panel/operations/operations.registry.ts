@@ -1,3 +1,3 @@
-﻿// Re-export from canonical location: dsh/frontend/shared/control-panel/operations-registry.ts
+// Re-export from canonical location: dsh/frontend/shared/control-panel/operations-registry.ts
 // This file is a re-export shim — do not add logic here.
-export * from '../../shared/control-panel/operations-registry';
+export * from '../shared/operations-registry';

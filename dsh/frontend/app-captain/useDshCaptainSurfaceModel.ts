@@ -1,7 +1,7 @@
 import {
   useDshCaptainSurfaceBinding,
   type DshCaptainNavigationCommand,
-} from '../shared/captain';
+} from './captain';
 
 export type {
   ActiveOrderPhase,
@@ -9,7 +9,7 @@ export type {
   DshCaptainNavigationCommand,
   DshCaptainSurfaceState,
   DshCaptainSurfaceDerived,
-} from '../shared/captain';
+} from './captain';
 
 export function useDshCaptainSurfaceModel(
   command: DshCaptainNavigationCommand,

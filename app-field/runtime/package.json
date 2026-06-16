@@ -10,12 +10,14 @@
     "expo": "^54.0.0",
     "expo-dev-client": "~6.0.20",
     "react": "19.1.0",
-    "react-native": "0.81.0"
+    "react-native": "0.81.0",
+    "react-native-safe-area-context": "^4.14.1"
   },
   "scripts": {
     "dev": "TOKEN=__BTHWANI_PLACEHOLDER__ expo start --dev-client --clear",
     "go": "expo start --go --clear",
     "android": "expo run:android",
-    "config": "expo config --json"
+    "config": "expo config --json",
+    "ios": "expo run:ios"
   }
 }

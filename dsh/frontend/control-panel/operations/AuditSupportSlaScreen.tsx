@@ -10,7 +10,8 @@ import {
 } from '@bthwani/ui-kit/web';
 import { Box } from '@bthwani/ui-kit';
 import { AuditTrailDetailWorkspace } from './AuditTrailDetailWorkspace';
-import { getDynamicUiAudits, resolveAuditEntry } from '../../shared';
+import { getDynamicUiAudits } from '../../app-partner/domain/partner.workflow';
+import { resolveAuditEntry } from '../../shared';
 import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/operations/dsh-operational-runtime-adapter';
 import styles from '../shared/control-panel-surface.module.css';

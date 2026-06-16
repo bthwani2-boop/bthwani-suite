@@ -36,17 +36,17 @@ import {
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
 import type { DshCanonicalStoreCard } from '../../shared/products';
 import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/stores/dsh-client-visibility.model';
-import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared';
+import { dshPromotionCandidates, type DshPromotionCandidate } from '../contracts/partner.workflow';
 import { WltDshPartnerBridge } from '../../../../wlt/frontend/dsh/app-partner';
 import type { DshFulfillmentDeliveryMode } from '../../shared/orders';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
-import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
+import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../control-panel/shared/dsh-control-panel-governance.map';
 import {
   getDshPartnerJourneyStep,
   resolveDshPartnerLifecycleStageLabel,
   type DshPartnerLifecycleStage,
-} from '../../shared/partner/partner.journey';
-import { getDshPartnerActivationStatusLabel } from '../../shared/partner/dsh-partner-activation.model';
+} from '../contracts/partner.journey';
+import { getDshPartnerActivationStatusLabel } from '../contracts/dsh-partner-activation.model';
 import { useDshEntityMedia } from '../../shared/media/useDshEntityMedia';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';

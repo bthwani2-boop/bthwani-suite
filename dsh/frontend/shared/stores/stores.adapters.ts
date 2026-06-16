@@ -1,4 +1,4 @@
-import { dshCategoryMeasurementPolicies } from '../catalog';
+import { dshCategoryMeasurementPolicies } from '../catalog/catalog.types';
 import type { DshFulfillmentDeliveryMode } from '../delivery';
 import type { DshProductRecord } from '../products/dsh-product-api.client';
 import type { DshDiscoveryStore, DshCanonicalStoreCard } from './stores.presentation';

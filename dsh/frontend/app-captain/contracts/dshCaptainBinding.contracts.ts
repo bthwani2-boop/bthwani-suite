@@ -1,2 +1,2 @@
-// Re-export from shared topic
-export * from '../../shared';
+// Re-export from local captain contracts
+export * from '../captain/captain.contract';

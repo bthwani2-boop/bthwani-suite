@@ -1,12 +1,10 @@
-﻿import React from 'react';
+import React from 'react';
 import { Box, KeyValueList, SectionHeader, Divider,
   spacing,
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
-import type {
-	DshCaptainProfileScreenState,
-	DshCaptainProfileSnapshot,
-} from '../../shared/client-state';
+import type { DshCaptainProfileSnapshot } from '../dsh-captain.types';
+import type { DshCaptainProfileScreenState } from '../captain/captain.state';
 
 export type DshCaptainProfileScreenProps = {
 	section?: 'profile-get' | 'tier-info' | 'tier-evaluate';

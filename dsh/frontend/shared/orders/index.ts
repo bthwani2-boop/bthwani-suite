@@ -19,4 +19,3 @@ export {
   shouldShowCaptainAssignmentInCP,
   getSurfaceRoleSummaryForMode,
 } from '../identity-access';
-export * from './partner-orders.model';

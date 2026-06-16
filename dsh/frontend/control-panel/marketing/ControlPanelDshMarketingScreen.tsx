@@ -29,7 +29,7 @@ function WorkspaceSkeleton() {
 
 import styles from '../shared/control-panel-surface.module.css';
 import marketingStyles from './control-panel-marketing.module.css';
-import { dshPromotionCandidates } from '../../shared';
+import { dshPromotionCandidates } from '../../app-partner/domain/partner.workflow';
 import { getDshControlPanelGovernanceEntry } from '../shared';
 import type { MarketingControlView } from './types';
 
@@ -78,7 +78,7 @@ import type {
 import type {
   PartnerOfferRecord,
   PartnerOfferStatus,
-} from '../../shared/partner/dsh-partner-offer-types';
+} from '../../app-partner/domain/dsh-partner-offer-types';
 import {
   buildCommercialProjection,
   type CommercialCampaign,
@@ -92,7 +92,7 @@ import {
 import {
   getDshPartnerActivationStateMetadata,
   type DshPartnerActivationStatus,
-} from '../../shared/partner/dsh-partner-activation.model';
+} from '../../app-partner/domain/dsh-partner-activation.model';
 import {
   getDshProductApprovalStateMetadata,
   type DshProductCategoryMappingStatus,

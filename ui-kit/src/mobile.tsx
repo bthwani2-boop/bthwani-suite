@@ -1,6 +1,6 @@
 import React, { type ReactNode } from 'react'; // Re-built
 import { StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { getBThwaniAppearanceThemeMode, type BThwaniAppearanceMode } from './appearance';
 import { BThwaniAppearanceProvider, RootProviders, type RootProvidersProps, useTheme } from './providers';
 
@@ -37,8 +37,10 @@ export function MobileRoot({ children, appearanceMode, ...rootProps }: MobileRoo
     : <MobileRootFrame>{children}</MobileRootFrame>;
 
   return (
-    <RootProviders {...rootProps} themeMode={resolvedThemeMode}>
-      {content}
-    </RootProviders>
+    <SafeAreaProvider>
+      <RootProviders {...rootProps} themeMode={resolvedThemeMode}>
+        {content}
+      </RootProviders>
+    </SafeAreaProvider>
   );
 }

@@ -13,7 +13,7 @@ import styles from '../shared/control-panel-surface.module.css';
 import type { DshOperationsDecisionKind, DshOrderLifecycleStatus } from '../../shared/orders';
 import { mapOperationsDecisionToLifecycle } from '../../shared/orders';
 import { buildOperationsHref } from './operations.registry';
-import { getLiveOrderDecisions, updateLiveOrderDecision } from '../../shared';
+import { getLiveOrderDecisions, updateLiveOrderDecision } from '../../app-partner/domain/partner.workflow';
 import { OpsOrderDetailPanel, PENDING_APPROVAL_ORDERS } from './OpsOrderDetailPanel';
 import { getOperationsActorLabel } from './FulfillmentModeQueueSection';
 import type { DshFulfillmentOperationalMode } from './operations.types';

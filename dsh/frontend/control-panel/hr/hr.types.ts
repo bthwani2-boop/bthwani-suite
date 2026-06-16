@@ -1,1 +1,1 @@
-export * from '../../shared/control-panel/control-panel.hr';
+export * from '../shared/control-panel.hr';

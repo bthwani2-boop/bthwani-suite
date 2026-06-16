@@ -24,7 +24,7 @@ import { DshCaptainMapLayer } from './screens/DshCaptainMapLayer';
 import { DshCaptainHomeOrderPanel } from './screens/DshCaptainHomeOrderPanel';
 import { DshCaptainRouteRenderer } from './DshCaptainRouteRenderer';
 import type { DshCaptainRoute, DshCaptainSurfaceProps } from './dsh-captain.types';
-import { EMPTY_CAPTAIN_ORDER_SUMMARY } from '../shared';
+import { EMPTY_CAPTAIN_ORDER_SUMMARY } from './captain';
 import { useDshCaptainSurfaceModel } from './useDshCaptainSurfaceModel';
 import { PlatformVarsProvider, FeatureFlagProvider, usePlatformVars } from '../shared';
 import type { CaptainOrderDetailScreen } from './screens/DshCaptainOrdersScreen';
@@ -59,7 +59,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
   // ── UI-only: account nav menu items (display strings + route callbacks) ────
   const captainAccountNavItems = React.useMemo(() => [
     { title: 'بيانات الكابتن',                   subtitle: 'الهوية، النوع، والحالة الحالية.',      badgeLabel: 'مباشر',                          icon: 'person-outline',       onPress: () => actions.openCaptainAccountSection('account-profile') },
-    { title: wltDshCaptainUiCopy.financeTitle,    subtitle: wltDshCaptainUiCopy.financeSubtitle,    badgeLabel: wltDshCaptainUiCopy.financeBadgeLabel, icon: 'wallet-outline',    onPress: () => actions.openCaptainAccountSection('account-finance') },
+    { title: wltDshCaptainUiCopy.financeTitle,    subtitle: wltDshCaptainUiCopy.financeSubtitle,    badgeLabel: wltDshCaptainUiCopy.badgeLabel, icon: 'wallet-outline',    onPress: () => actions.openCaptainAccountSection('account-finance') },
     { title: 'الطلبات',                          subtitle: 'الطلب النشط والسجل المختصر.',          badgeLabel: 'نشط',                             icon: 'receipt-outline',      onPress: () => actions.openCaptainAccountSection('account-orders') },
     { title: 'الوثائق والتقييم',                 subtitle: 'الملفات، التقييم، والمستوى.',          badgeLabel: 'جاهز',                            icon: 'document-text-outline', onPress: () => actions.openCaptainAccountSection('account-docs') },
     { title: 'الدوام / الإجازات',                subtitle: 'الحضور وجدول اليوم.',                  badgeLabel: 'اليوم',                           icon: 'calendar-outline',     onPress: () => actions.openCaptainAccountSection('account-shifts') },
@@ -216,7 +216,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
         onOpenSupportScreen={actions.openCaptainSupportScreen}
         onOpenSupportDirectory={actions.openSupportDirectory}
         onOpenCaptainAccountSection={actions.openCaptainAccountSection}
-        onToggleCaptainAvailability={() => actions.setCaptainAvailabilityStatus((c) => c === 'available' ? 'unavailable' : 'available')}
+        onToggleCaptainAvailability={() => actions.setCaptainAvailabilityStatus((c: any) => c === 'available' ? 'unavailable' : 'available')}
         onSetAppearanceMode={setAppearanceMode}
         onToggleStoreCourierMode={actions.toggleStoreCourierMode}
         onPushLocation={actions.pushLocation}
@@ -243,7 +243,7 @@ function DshCaptainSurfaceInner({ command, captainId, walletBalanceLabel }: DshC
       activeOrderMessages={ui.activeOrderMessages}
       activeOrderDraft={ui.activeOrderDraft}
       onSetActiveOrderDraft={actions.setActiveOrderDraft}
-      onCycleAvailability={() => actions.setCaptainAvailabilityStatus((c) => c === 'available' ? 'unavailable' : 'available')}
+      onCycleAvailability={() => actions.setCaptainAvailabilityStatus((c: any) => c === 'available' ? 'unavailable' : 'available')}
       onOpenInbox={actions.goToInbox}
       onRetryInbox={actions.resetInboxState}
       onExpandOrder={() => actions.setActiveOrderExpanded(true)}

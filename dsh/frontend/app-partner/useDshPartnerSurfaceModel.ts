@@ -1,7 +1,7 @@
-// Thin re-export — authority moved to dsh/frontend/shared/partner/partner.surface-model.ts
+// Thin re-export — authority moved to dsh/frontend/app-partner/hooks/useDshPartnerSurfaceModel.ts
 export {
   useDshPartnerSurfaceModel,
   type DshPartnerSurfaceState,
   type DshPartnerSurfaceActions,
   type DshPartnerSurfaceModel,
-} from '../shared/partner';
+} from './hooks/useDshPartnerSurfaceModel';

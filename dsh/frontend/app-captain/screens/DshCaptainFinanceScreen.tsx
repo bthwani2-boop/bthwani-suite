@@ -1,10 +1,10 @@
-﻿import React from 'react';
+import React from 'react';
 import { WltDshCaptainBridge } from '../../../../wlt/frontend/dsh/app-captain';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type {
 	DshCaptainFinanceScreenState,
 	DshCaptainFinanceSection,
-} from '../../shared/client-state';
+} from '../captain/captain.state';
 
 export type DshCaptainFinanceScreenProps = {
 	section?: DshCaptainFinanceSection;

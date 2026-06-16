@@ -2,7 +2,7 @@
   "name": "@bthwani/control-panel",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack -p 3000",
+    "dev": "next dev -p 3000",
     "build": "next build --webpack",
     "start": "next start -p 3000"
   },

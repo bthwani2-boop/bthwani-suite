@@ -18,7 +18,7 @@ import type {
 import {
   resolveFilteredOnboardingStores,
   resolvePriorityOnboardingStore,
-} from '../../shared/partner/onboarding/partner-onboarding-listing.model';
+} from '../../shared/stores/partner-onboarding-listing.model';
 
 function resolveStoresBindingLabel() {
   return 'جسر قائمة المتاجر';

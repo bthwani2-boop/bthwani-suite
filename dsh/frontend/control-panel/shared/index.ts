@@ -1,4 +1,4 @@
-﻿export {
+export {
 	DSH_CROSS_SURFACE_CLOSURE_MAP,
 	getDshClosureItemsByStatus,
 	getDshClosureItemsBySurface,
@@ -17,7 +17,7 @@
 	type DshRuntimeBindingStatus,
 	type DshSurfaceId,
 	type DshSurfaceLookupId,
-} from '../../shared/control-panel/dshCrossSurfaceClosureMap';
+} from './dshCrossSurfaceClosureMap';
 export { ControlPanelDshDecisionBoard, type ControlPanelDshDecisionBoardProps } from './ControlPanelDshDecisionBoard';
 export { ControlPanelDshActionQueue, type ControlPanelDshActionQueueItem, type ControlPanelDshActionQueueProps } from './ControlPanelDshActionQueue';
 export { ControlPanelDshWorkspaceFrame, type ControlPanelDshWorkspaceFrameProps } from './ControlPanelDshWorkspaceFrame';

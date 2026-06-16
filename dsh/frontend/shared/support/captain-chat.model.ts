@@ -3,7 +3,7 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { CompactOrderChatMessage } from '../captain/captain.contract';
+import type { CompactOrderChatMessage } from '../../app-captain/captain/captain.contract';
 
 export function useCaptainChatModel() {
   const [activeOrderDraft, setActiveOrderDraft] = React.useState('');

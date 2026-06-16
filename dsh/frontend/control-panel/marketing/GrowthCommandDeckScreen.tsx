@@ -21,7 +21,7 @@ type GrowthRecommendation = {
 import { mapStoreCommercialFeatures } from '../../shared/marketing';
 import { CommercialParityPreview } from './commercial-parity-viewer';
 import type { CampaignRecord, SubscriptionPlan, Entitlement } from '../../shared/marketing';
-import type { PartnerOfferRecord } from '../../shared/partner/dsh-partner-offer-types';
+import type { PartnerOfferRecord } from '../../app-partner/domain/dsh-partner-offer-types';
 
 
 

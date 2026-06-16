@@ -4,7 +4,7 @@ import React from 'react';
 import { Text } from '@bthwani/ui-kit';
 import marketingStyles from './control-panel-marketing.module.css';
 import styles from '../shared/control-panel-surface.module.css';
-import { dshPromotionCandidates } from '../../shared';
+import { dshPromotionCandidates } from '../../app-partner/domain/partner.workflow';
 import type {
   CampaignAudience,
   CampaignPlacement,
@@ -15,7 +15,7 @@ import type {
 import type {
   PartnerOfferRecord,
   PartnerOfferStatus,
-} from '../../shared/partner/dsh-partner-offer-types';
+} from '../../app-partner/domain/dsh-partner-offer-types';
 import {
   buildCommercialProjection,
   evaluateCommercialConflicts,
@@ -31,7 +31,7 @@ import {
 import {
   getDshPartnerActivationStateMetadata,
   type DshPartnerActivationStatus,
-} from '../../shared/partner/dsh-partner-activation.model';
+} from '../../app-partner/domain/dsh-partner-activation.model';
 import {
   getDshProductApprovalStateMetadata,
   type DshProductCategoryMappingStatus,

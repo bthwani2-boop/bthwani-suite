@@ -12,10 +12,12 @@ import {
 } from '@bthwani/ui-kit/web';
 import {
   getPartnerIntakeItems,
-  ApprovalRecord,
+  type ApprovalRecord,
   moveApprovalRecordToStage,
   translateStage,
   translateEntityType,
+} from '../../app-partner/domain/partner.workflow';
+import {
   PlatformVarsRegistry,
   getPartnerStoreOnboardingRuntimeClient,
 } from '../../shared';
@@ -56,7 +58,7 @@ import {
   PARTNER_SUB_TAB_DEFINITIONS,
   type PartnerWorkspaceTabId,
 } from './partners.types';
-import type { DshPartnerActivationStatus } from '../../shared/partner/dsh-partner-activation.model';
+import type { DshPartnerActivationStatus } from '../../app-partner/domain/dsh-partner-activation.model';
 const partnerCoveragePreviewZones: { status: string }[] = [];
 
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {

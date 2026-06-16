@@ -1,7 +1,7 @@
 import type {
   DshCaptainRoute,
   DshCaptainCommandTarget,
-} from '../shared';
+} from './captain/captain.contract';
 
 export type { DshCaptainRoute, DshCaptainCommandTarget };
 
@@ -23,7 +23,7 @@ export type {
   DshCaptainState,
   DshCaptainStateGroup,
   DshCaptainStateMeta,
-} from '../shared/client-state';
+} from './captain/captain.state';
 
 export type {
   DshCaptainFinanceSnapshot,

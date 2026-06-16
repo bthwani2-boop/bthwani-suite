@@ -5,7 +5,9 @@ export type {
   DshPartnerSupportCommandFilterId,
   DshPartnerSupportIssueCategoryId,
   DshPartnerSupportRouteId,
-} from '../shared/partner';
+  DshPartnerRoute,
+  PartnerHubSection,
+} from './contracts/partner.types';
 export {
   DSH_PARTNER_OPERATIONAL_FLOW_IDS,
   DSH_PARTNER_HIDDEN_COMPAT_OPERATIONAL_FLOW_IDS,
@@ -15,34 +17,18 @@ export {
   DSH_PARTNER_HIDDEN_COMPAT_SUPPORT_ROUTE_IDS,
   DSH_PARTNER_SUPPORT_ROUTE_TO_OPERATIONAL_FLOW,
   DSH_PARTNER_OPERATIONAL_FLOW_TO_SUPPORT_ROUTE,
+} from './contracts/partner.types';
+export {
   mapDshPartnerOperationalFlowToSupportRoute,
   mapDshPartnerSupportRouteToOperationalFlow,
   isDshPartnerHiddenCompatOperationalFlow,
   isDshPartnerHiddenCompatSupportRoute,
-} from '../shared/partner';
-
-// UI-only: surface route identifiers and props.
-export type DshPartnerRoute =
-  | 'home'
-  | 'entry'
-  | 'inbox'
-  | 'bell'
-  | 'support-directory'
-  | 'support-screen'
-  | 'inventory-management'
-  | 'order-rejection'
-  | 'store-courier'
-  | 'product-edit'
-  | 'category-management'
-  | 'product-media'
-  | 'product-overrides';
+} from './contracts/partner.flow-maps';
 
 export type DshPartnerSurfaceProps = {
   initialRoute?: DshPartnerRoute;
   initialOrderId?: string;
 };
-
-export type PartnerHubSection = 'hub' | 'profile' | 'operations' | 'inventory' | 'wallet' | 'analytics' | 'settings';
 
 export type PartnerDshSurfaceState = 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
 

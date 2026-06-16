@@ -2,7 +2,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const runtimeRoot = fileURLToPath(new URL('.', import.meta.url));
-const shellShimPath = (name) => path.resolve(runtimeRoot, '../shell/shims', name);
+const shellShimPath = (name) => {
+  const abs = path.resolve(runtimeRoot, '../shell/shims', name);
+  return path.relative(runtimeRoot, abs).replace(/\\/g, '/');
+};
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

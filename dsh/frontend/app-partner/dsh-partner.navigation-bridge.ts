@@ -1,6 +1,5 @@
-// Thin re-exports from shared — all domain logic lives in dsh/frontend/shared.
-export type { PartnerStoreScopeOption } from '../shared/partner';
-export { storeScopeOptions } from '../shared/partner';
+export type { PartnerStoreScopeOption } from './contracts/partner.types';
+export { storeScopeOptions } from './contracts/partner.types';
 
 export type { PartnerStoreHoursDay } from '../shared/delivery/fulfillment';
 export { defaultServiceModes, defaultZone, defaultStoreHours } from '../shared/delivery/fulfillment';

@@ -501,6 +501,98 @@
     ],
     "dsh/frontend/app-field/screens/DshFieldStoreProductsUploadScreen.tsx": [
       "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-captain/captain/captain-availability.model.ts": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-captain/captain/captain-gps.model.ts": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-captain/captain/captain-profile.model.ts": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-captain/captain/captain-service-mode.model.ts": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-captain/captain/captain-surface.binding.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-captain/captain/captain.derived.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-captain/captain/captain.state.ts": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-captain/captain/captain.surface-model.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-captain/captain/use-captain-order-runtime.ts": [
+      "ui_only_creates_runtime_client",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_resolves_runtime_base_url",
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_media_upload_logic",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-partner/domain/partner.adapters.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_status_or_next_action_map",
+      "ui_only_non_deterministic_runtime_id"
+    ],
+    "dsh/frontend/app-partner/domain/partner.journey.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-partner/domain/partner.workflow.ts": [
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_media_upload_logic",
+      "ui_only_non_deterministic_runtime_id",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-partner/hooks/useDshPartnerSurfaceModel.ts": [
+      "ui_only_runtime_adapter_policy",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerOrdersRuntime.ts": [
+      "ui_only_creates_runtime_client",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_resolves_runtime_base_url",
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerOrdersModel.ts": [
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerProfileModel.ts": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/control-panel/shared/control-panel.hr.ts": [
+      "ui_only_runtime_adapter_policy",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/shared/dsh-control-panel-governance.map.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/control-panel/shared/dsh-control-panel-operations-room.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/shared/dshCrossSurfaceClosureMap.ts": [
+      "ui_only_creates_runtime_client",
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic",
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
     ]
   },
   "_allowlistMetaAuditedAt": "2026-06-16",
@@ -1442,6 +1534,146 @@
       "reason": "Smart products upload and classification screen.",
       "expiry": "2026-12-01",
       "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain-availability.model.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain-gps.model.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain-profile.model.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain-service-mode.model.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain-surface.binding.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain.derived.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain.state.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain.surface-model.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/use-captain-order-runtime.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/domain/partner.adapters.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/domain/partner.journey.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/domain/partner.workflow.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/hooks/useDshPartnerSurfaceModel.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerOrdersRuntime.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerOrdersModel.ts": {
+      "owner": "dsh-partner",
+      "reason": "Partner orders model wraps usePartnerOrdersRuntime; resides in runtime-hooks as surface-owned runtime binding, not UI-only.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerProfileModel.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/shared/control-panel.hr.ts": {
+      "owner": "dsh-ops",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/shared/dsh-control-panel-governance.map.ts": {
+      "owner": "dsh-ops",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/shared/dsh-control-panel-operations-room.ts": {
+      "owner": "dsh-ops",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/shared/dshCrossSurfaceClosureMap.ts": {
+      "owner": "dsh-ops",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
       "blocksClosure": false
     }
   }

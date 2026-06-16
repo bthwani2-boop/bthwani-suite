@@ -5,7 +5,7 @@ import { Box, Button, Surface, Tabs, Text, TextField, SelectField, ListItem, Key
   radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType, PartnerOfferSource } from '../../shared/partner/dsh-partner-offer-types';
+import type { PartnerOfferRecord, PartnerOfferStatus, PartnerOfferType, PartnerOfferSource } from '../../app-partner/domain/dsh-partner-offer-types';
 import {
   getPartnerOfferItems,
   getPartnerOfferSummaries,

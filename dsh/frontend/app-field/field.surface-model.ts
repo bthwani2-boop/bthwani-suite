@@ -7,7 +7,7 @@ import {
   createPartnerDocumentHttpClient,
   resolvePartnerDocumentBaseUrl,
   type PartnerDocumentKind,
-} from '../shared/partner/documents';
+} from '../shared/stores';
 import {
   createPartnerStoreOnboardingHttpClient,
   resolvePartnerStoreOnboardingBaseUrl,
@@ -26,7 +26,7 @@ import {
   createManualOnboardingStore,
   matchesOnboardingStoreFilter,
   type PartnerOnboardingFilter,
-} from '../shared/partner/onboarding';
+} from '../shared/stores';
 import {
   createDshFieldVisitHttpClient,
   resolveDshFieldVisitBaseUrl,
@@ -40,11 +40,11 @@ import type {
   DshFieldStoreVisitValues,
   DshFieldStoreVisitErrors,
 } from './dsh-field.routes';
-import { usePartnerOnboardingDraftModel } from '../shared/partner/onboarding/partner-onboarding-draft.model';
-import { usePartnerReadinessEscalationModel } from '../shared/partner/readiness/partner-readiness-escalation.model';
-import { usePartnerReadinessModel } from '../shared/partner/readiness/partner-readiness.model';
+import { usePartnerOnboardingDraftModel } from '../shared/stores/partner-onboarding-draft.model';
+import { usePartnerReadinessEscalationModel } from '../shared/stores/partner-readiness-escalation.model';
+import { usePartnerReadinessModel } from '../shared/stores/partner-readiness.model';
 
-export type { PartnerReadinessEscalationState, PartnerEscalationTargetModel } from '../shared/partner/readiness';
+export type { PartnerReadinessEscalationState, PartnerEscalationTargetModel } from '../shared/stores';
 export {
   createEmptyDraft,
   getPartnerRequiredMissingItems,

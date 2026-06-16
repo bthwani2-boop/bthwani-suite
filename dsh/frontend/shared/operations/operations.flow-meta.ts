@@ -1,4 +1,4 @@
-import { getDshControlPanelGovernanceEntry } from '../control-panel/dsh-governance.map';
+import { getDshControlPanelGovernanceEntry } from '../../control-panel/shared/dsh-control-panel-governance.map';
 
 const governance = getDshControlPanelGovernanceEntry('operations');
 

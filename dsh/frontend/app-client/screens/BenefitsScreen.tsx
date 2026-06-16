@@ -35,7 +35,7 @@ import {
 } from '../../shared/marketing/marketing.visibility';
 import type { DshNotificationItem } from './NotificationsScreen';
 import type { CampaignRecord } from '../../shared/marketing/marketing.types';
-import type { PartnerOfferRecord } from '../../shared/partner/dsh-partner-offer-types';
+import type { PartnerOfferRecord } from '../../app-partner/domain/dsh-partner-offer-types';
 
 type DshBenefitsSection = 'now' | 'loyalty' | 'subscription' | 'offers' | 'history';
 

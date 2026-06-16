@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { DshStoreMenuItem } from '../../shared/products';
-import type { DshFulfillmentDeliveryMode } from '../checkout/dsh-client-binding.contracts';
+import type { DshFulfillmentDeliveryMode } from '../../shared/checkout/dsh-client-binding.contracts';
 
 type MeasurementPickerAnchor = {
   nativeEvent?: { pageX: number; pageY: number };

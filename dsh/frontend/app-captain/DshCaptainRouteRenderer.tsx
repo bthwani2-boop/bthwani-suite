@@ -3,7 +3,8 @@ import { View } from 'react-native';
 import { Badge, Box, Button, Divider, Icon, KeyValueList, MobileScrollView, Text, TopBar, spacing } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import type { DshCaptainRoute } from './dsh-captain.types';
-import type { CaptainSupportRoute, CaptainAvailabilityMeta } from '../shared';
+import type { CaptainSupportRoute, CaptainAvailabilityMeta, CompactOrderChatMessage } from './captain/captain.contract';
+import type { DshCaptainLocationPush } from './captain/use-captain-order-runtime';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
 import {
   CaptainDeliveryConfirmSheet,
@@ -23,7 +24,7 @@ import { CaptainAccountNavRow } from './parts/CaptainAccountNavRow';
 import { OfferDeclineSheet } from './sheets';
 import { CaptainSupportScreenRouter } from './CaptainSupportScreenRouter';
 import type { DshCaptainBellEvent } from '../shared/orders';
-import type { CompactOrderChatMessage } from '../shared';
+
 
 type CaptainOrderDetailSummary = React.ComponentProps<typeof CaptainOrderDetailScreen>['summary'];
 type CaptainOrdersInboxScreenState = NonNullable<React.ComponentProps<typeof CaptainOrdersInboxScreen>>['state'];
@@ -93,7 +94,7 @@ export type DshCaptainRouteRendererProps = {
   onToggleCaptainAvailability: () => void;
   onSetAppearanceMode: (mode: BThwaniAppearanceMode) => void;
   onToggleStoreCourierMode: (next: boolean) => void;
-  onPushLocation: (orderId: string, lat: number, lng: number) => void;
+  onPushLocation: (push: DshCaptainLocationPush) => Promise<any>;
   onRingBell: () => void;
 };
 
@@ -170,14 +171,14 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
         </Box>
         <CaptainPickupConfirmSheet
           visible={isPickupSheetVisible}
-          orderTitle={activeSummary.orderId}
+          orderTitle={activeSummary?.orderId ?? ''}
           state={pickupSheetState}
           onConfirm={onConfirmPickup}
           onCancel={onClosePickupSheet}
         />
         <CaptainDeliveryConfirmSheet
           visible={isDeliverySheetVisible}
-          orderTitle={activeSummary.orderId}
+          orderTitle={activeSummary?.orderId ?? ''}
           onConfirm={onConfirmDelivery}
           onCancel={onCloseDeliverySheet}
         />
@@ -201,9 +202,9 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
 
     if (route === 'orderchat') return (
       <DshCaptainOrderChatScreen
-        orderId={activeSummary.orderId}
-        pickupLabel={activeSummary.pickupLabel}
-        dropoffLabel={activeSummary.dropoffLabel}
+        orderId={activeSummary?.orderId ?? ''}
+        pickupLabel={activeSummary?.pickupLabel ?? ''}
+        dropoffLabel={activeSummary?.dropoffLabel ?? ''}
         state={orderChatState}
       />
     );
@@ -221,9 +222,9 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
       <DshCaptainPickupDropoffScreen
         mode="pickup"
         orderId={activeOrderId}
-        storeName={activeSummary.pickupLabel}
+        storeName={activeSummary?.pickupLabel ?? ''}
         customerName="العميل"
-        address={activeSummary.dropoffLabel}
+        address={activeSummary?.dropoffLabel ?? ''}
         itemsCount={3}
         onConfirm={() => onOpenSupportScreen('proof-upload')}
         onReportIssue={onGoToInbox}
@@ -269,10 +270,10 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
     if (route === 'account-orders') return (
       <KeyValueList items={[
         { label: 'الطلب النشط', value: `#${activeOrderDisplayId}`, tone: 'success' },
-        { label: 'المرحلة الحالية', value: activeSummary.currentStageLabel, tone: 'info' },
-        { label: 'الاستلام', value: activeSummary.pickupLabel },
-        { label: 'التسليم', value: activeSummary.dropoffLabel },
-        { label: 'الخطوة التالية', value: activeSummary.nextActionLabel, tone: 'warning' },
+        { label: 'المرحلة الحالية', value: activeSummary?.currentStageLabel ?? '', tone: 'info' },
+        { label: 'الاستلام', value: activeSummary?.pickupLabel ?? '' },
+        { label: 'التسليم', value: activeSummary?.dropoffLabel ?? '' },
+        { label: 'الخطوة التالية', value: activeSummary?.nextActionLabel ?? '', tone: 'warning' },
       ]} />
     );
 
@@ -360,8 +361,8 @@ export function DshCaptainRouteRenderer(props: DshCaptainRouteRendererProps) {
         onBack={onOpenSupportDirectory}
         onNavigate={onOpenSupportScreen}
         captainCollectsCod={captainCollectsCod}
-        dshAuthBearerToken={dshAuthBearerToken}
-        dshClientId={dshClientId}
+        dshAuthBearerToken={dshAuthBearerToken || undefined}
+        dshClientId={dshClientId || undefined}
         activeOrderId={activeOrderId}
         onAcceptTask={onAcceptTask}
         onDeclineTask={(id) => onDeclineTask(id)}

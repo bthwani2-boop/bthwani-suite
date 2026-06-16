@@ -20,7 +20,7 @@ import {
   spacing,
 } from '@bthwani/ui-kit';
 import { getDshFlowPolicySummary } from '../../shared/runtime/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared/control-panel/dsh-governance.map';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared/dsh-control-panel-governance.map';
 import { resolveFieldDocumentDraftMediaKey } from '../../shared/media';
 import {
   PARTNER_DOCUMENT_DISPLAY_ITEMS,

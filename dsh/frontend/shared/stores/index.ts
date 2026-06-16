@@ -5,3 +5,20 @@ export * from './stores.adapters';
 export * from './stores.view-model';
 export * from './client-store.model';
 export * from './store-scope.model';
+
+// Relocated partner topic subfolders
+export * from './dsh-field-visit.client';
+export * from './partner-document.types';
+export * from './partner-document.client';
+export * from './partner-document.policy';
+export * from './partner-document.mapping';
+export * from './partner-onboarding.types';
+export * from './partner-onboarding-draft.model';
+export * from './partner-onboarding.lifecycle';
+export * from './partner-store-onboarding.client';
+export * from './partner-onboarding.validation';
+export * from './partner-onboarding.view-model';
+export * from './partner-onboarding-listing.model';
+export * from './partner-readiness.client';
+export * from './partner-readiness.model';
+export * from './partner-readiness-escalation.model';

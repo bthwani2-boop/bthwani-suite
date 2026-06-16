@@ -5,7 +5,7 @@ import { Badge, Box, Button, Divider, KeyValueList, MobileScrollView, Text, Text
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import type { DshCaptainOrderStage } from '../../shared/orders';
-import type { DshCaptainProfileSnapshot } from '../../shared/client-state';
+import type { DshCaptainProfileSnapshot } from '../dsh-captain.types';
 import { getOperationsSupportFlowsForSurface, type DshOperationsSupportFlowId } from '../../shared';
 import { type DshCaptainRegistryFlowId } from '../contracts/dshCaptainBinding.contracts';
 

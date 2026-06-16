@@ -1,7 +1,7 @@
-// Re-export from shared topic
+// Re-export from local captain folder
 export type {
   DshCaptainRouteId,
   DshCaptainLegacyRoute,
   DshCaptainRouteRecord,
-} from '../shared';
-export { dshCaptainRoutes } from '../shared';
+} from './captain';
+export { dshCaptainRoutes } from './captain';

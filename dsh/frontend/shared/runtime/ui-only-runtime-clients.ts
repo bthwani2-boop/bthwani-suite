@@ -1,12 +1,12 @@
 import { createDshCheckoutHttpClient, type DshCheckoutAuthContext } from '../checkout';
-import { createPartnerReadinessHttpClient, resolvePartnerReadinessBaseUrl } from '../partner/readiness/partner-readiness.client';
+import { createPartnerReadinessHttpClient, resolvePartnerReadinessBaseUrl } from '../stores/partner-readiness.client';
 import { createDshMediaApiHttpClient } from '../media/dsh-media-api.client';
 import { createDshOrderLifecycleHttpClient, resolveDshOrderApiBaseUrl } from '../orders/dsh-order-lifecycle-client';
 import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../products/dsh-product-api.transport';
 import { createDshStoreVisibilityHttpClient, resolveDshStoreVisibilityBaseUrl } from '../stores/dsh-store-visibility-transport';
 import { resolveDshAuthBaseUrl } from '../runtime/dsh-auth-client';
 import { createDshDiscoveryStoresClient, type DshDiscoveryStoresRuntimeConfig } from '../stores';
-import { createPartnerStoreOnboardingHttpClient, resolvePartnerStoreOnboardingBaseUrl } from '../partner/onboarding/partner-store-onboarding.client';
+import { createPartnerStoreOnboardingHttpClient, resolvePartnerStoreOnboardingBaseUrl } from '../stores/partner-store-onboarding.client';
 
 export function getPartnerStoreOnboardingRuntimeClient() {
   return createPartnerStoreOnboardingHttpClient(resolvePartnerStoreOnboardingBaseUrl());

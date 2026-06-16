@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { DshHomeCategory } from '../discovery/dsh-home-types';
+import type { DshHomeCategory } from '../../shared/discovery/dsh-home-types';
 
 type UseHomeBackHandlerParams = {
   categoriesSheetVisible: boolean;

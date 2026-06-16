@@ -3,8 +3,8 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import { storeScopeOptions } from '../partner/partner.types';
-import { buildPartnerProfileFromScope } from '../partner/partner.adapters';
+import { storeScopeOptions } from '../../app-partner/domain/partner.types';
+import { buildPartnerProfileFromScope } from '../../app-partner/domain/partner.adapters';
 
 export function useStoreScopeModel() {
   const [storeScopeVisible, setStoreScopeVisible] = React.useState(false);

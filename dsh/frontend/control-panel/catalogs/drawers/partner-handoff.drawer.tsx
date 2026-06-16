@@ -1,4 +1,4 @@
-﻿// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
+// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Bridge from control-panel/partners and app-partner into catalog onboarding.
 //   Shows partner activation status, readiness checklist, incoming items, and handoff result.
@@ -17,7 +17,7 @@ import {
   getDshPartnerReadinessChecklist,
   getDshPartnerVisibilityBadge,
   getDshPartnerVisibilityBadgeLabel,
-} from '../../../shared/partner/dsh-partner-activation.model';
+} from '../../../app-partner/domain/dsh-partner-activation.model';
 import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/products';
-import type { DshFulfillmentDeliveryMode } from '../checkout/dsh-client-binding.contracts';
+import type { DshFulfillmentDeliveryMode } from '../../shared/checkout/dsh-client-binding.contracts';
 
 export function useStoreState() {
 	const [selectedMode, setSelectedMode] = React.useState<DshFulfillmentDeliveryMode>('bthwani_delivery');

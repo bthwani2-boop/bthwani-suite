@@ -11,7 +11,7 @@ import { Box, Button, Text, TextField, useTheme,
 } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster } from '../catalogs.data';
-import type { DshPartnerActivationStatus } from '../../../shared/partner/dsh-partner-activation.model';
+import type { DshPartnerActivationStatus } from '../../../app-partner/domain/dsh-partner-activation.model';
 import {
   resolveDshProductClientVisibility,
   resolveDshStoreClientVisibility,

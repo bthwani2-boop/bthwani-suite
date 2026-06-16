@@ -24,7 +24,7 @@ import type {
 } from '../dsh-partner.types';
 import { getPartnerOrderIssueCategorySpec } from '../parts/PartnerOrderIssuePanel';
 import { isDshHiddenCompatFlow } from '../../shared/runtime/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
+import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared/dsh-control-panel-governance.map';
 import { DSH_ORDER_LIFECYCLE_HANDOFFS, getHandoffsForSurface, getSurfaceObservation } from '../../shared/orders';
 import { getSurfaceModeCapability } from '../../shared/orders';
 
@@ -668,7 +668,18 @@ export function PartnerSupportScreen({
   const [selectedFilterId, setSelectedFilterId] = React.useState<DshPartnerSupportCommandFilterId>(initialFilterId);
   const [supportQuery, setSupportQuery] = React.useState('');
   const [showSearch, setShowSearch] = React.useState(false);
-  const [expandedCaseId, setExpandedCaseId] = React.useState<string | null>(initialCaseId);
+  const [expandedCaseId, setExpandedCaseId] = React.useState<string | null>(() => {
+    if (initialCaseId) return initialCaseId;
+    if (initialSupportRouteId || initialIssueCategoryId) {
+      return findBestCaseIdForSelection({
+        filterId: initialFilterId,
+        caseId: initialCaseId,
+        supportRouteId: initialSupportRouteId,
+        issueCategoryId: initialIssueCategoryId,
+      });
+    }
+    return null;
+  });
 
   const [activeActionCaseId, setActiveActionCaseId] = React.useState<string | null>(null);
   const [activeActionType, setActiveActionType] = React.useState<'handle' | 'proof' | 'quick-message' | 'escalate' | 'reject' | null>(null);
@@ -679,10 +690,19 @@ export function PartnerSupportScreen({
     setSelectedFilterId(initialFilterId);
     if (initialCaseId) {
       setExpandedCaseId(initialCaseId);
+    } else if (initialSupportRouteId || initialIssueCategoryId) {
+      setExpandedCaseId(
+        findBestCaseIdForSelection({
+          filterId: initialFilterId,
+          caseId: initialCaseId,
+          supportRouteId: initialSupportRouteId,
+          issueCategoryId: initialIssueCategoryId,
+        })
+      );
     } else {
       setExpandedCaseId(null);
     }
-  }, [initialCaseId, initialFilterId]);
+  }, [initialCaseId, initialFilterId, initialSupportRouteId, initialIssueCategoryId]);
 
   const visibleItems = React.useMemo(() => {
     let items = [...runtimePartnerSupportCases];

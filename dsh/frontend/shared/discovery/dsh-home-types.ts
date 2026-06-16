@@ -1,5 +1,5 @@
 import type { CommercialSourceMap } from '../marketing/store-card-commercial-map';
-import type { DshPartnerVisibilityBadge } from '../partner/dsh-partner-activation.model';
+import type { DshPartnerVisibilityBadge } from '../../app-partner/domain/dsh-partner-activation.model';
 import type { HomePromoRecord, MarketingVideoRecord } from '../marketing/marketing.types';
 
 export type DshServiceId = 'dsh' | 'knz' | 'amn' | 'arb' | 'wlt' | 'esf' | 'kwd' | 'mrf' | 'snd';
