@@ -70,3 +70,6 @@ dsh/frontend/media-fixtures/**/*.svg
 
 # BThwani local analysis outputs
 graphify-out/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
