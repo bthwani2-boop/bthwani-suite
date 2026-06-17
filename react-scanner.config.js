@@ -1,6 +1,6 @@
 module.exports = {
   crawlFrom: './dsh/frontend',
-  exclude: [/node_modules/, /\.spec\./, /__tests__/, /data\//, /media-fixtures\//],
+  exclude: [/node_modules/, /\.spec\./, /__tests__/, /data\//],
   includeSubComponents: true,
   importedFrom: /@bthwani\/ui-kit/,
   processors: [

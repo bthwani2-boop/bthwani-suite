@@ -228,7 +228,7 @@ if (Test-Path $wltSrcPath) {
     foreach ($f in $goFiles) {
         $content = Get-Content $f.FullName -Raw
         $rel = $f.FullName.Replace($REPO_ROOT.ToString(), '')
-        foreach ($pattern in @('dsh_media_assets', '/media-fixtures/', 'dsh_local_password', 'dsh-postgres:5432')) {
+        foreach ($pattern in @('dsh_media_assets', 'dsh_local_password', 'dsh-postgres:5432')) {
             if ($content -match [regex]::Escape($pattern)) {
                 $wltLines.Add("VIOLATION: $rel contains '$pattern'")
                 $wltClean = $false
@@ -255,7 +255,7 @@ foreach ($surface in $runtimeSurfaces) {
     foreach ($f in $files) {
         $content = Get-Content $f.FullName -Raw
         $rel = $f.FullName.Replace($REPO_ROOT.ToString(), '')
-        if ($content -match "'/media-fixtures/|`"/media-fixtures/") {
+        if ($content -match "'/real-media-runtime/|`"/real-media-runtime/") {
             $canonLines.Add("HARDCODED_FIXTURE_URL: $rel")
             $canonClean = $false
         }

@@ -60,13 +60,6 @@ tools/registry/runs/*
 .claude/settings.local.json
 
 # Local media fixtures (seeds) - keep images local only
-dsh/frontend/media-fixtures/**/*.png
-dsh/frontend/media-fixtures/**/*.jpg
-dsh/frontend/media-fixtures/**/*.jpeg
-dsh/frontend/media-fixtures/**/*.webp
-!dsh/frontend/media-fixtures/README.md
-!dsh/frontend/media-fixtures/MANIFEST.local-required.tsv
-dsh/frontend/media-fixtures/**/*.svg
 
 # BThwani local analysis outputs
 graphify-out/

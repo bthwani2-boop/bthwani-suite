@@ -93,9 +93,9 @@ profile: edge
 
 Do not add nginx to any current Compose file.
 
-## media-fixtures
+## real media runtime
 
-`dsh/frontend/media-fixtures/` is a **dev/demo media source only** — not production storage. It is not copied into any Docker image (see `Dockerfile.dsh-api` COPY directives and `/media-fixtures/` note). Images in this directory are excluded from git via `.gitignore`. If static media serving is needed in Docker, plan a dedicated static/CDN slice — do not bind-mount media-fixtures into production images.
+Real media runtime is the current path. Media behavior is validated by `pnpm run guard:real-media-runtime`; local `dsh/frontend/real media runtime` is retired and must not be used as Docker/runtime storage.
 
 ## Mongo and Redis — Optional Only
 

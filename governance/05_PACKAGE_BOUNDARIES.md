@@ -12,7 +12,7 @@
 | `<service>/frontend/shared` | Service-local shared UI/state glue | Shared within one service only. |
 | `<service>/backend/contracts.ts` | Service contract entrypoint | Generated or contract-derived types stay behind service-local backend boundaries. |
 | `<service>/backend/client.ts` | Typed API clients | No UI state; no visual policy. |
-| service-local fixture roots such as `dsh/frontend/media-fixtures` | Media/test fixtures | Not runtime truth. |
+| real media runtime and media API/storage ownership | Runtime media | Runtime truth is backend/API/storage guarded by `guard:real-media-runtime`. |
 
 ## Import policy
 

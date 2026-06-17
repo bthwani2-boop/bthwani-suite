@@ -33,13 +33,9 @@ const extensions = new Set(['.ts', '.tsx', '.js', '.jsx']);
 const ignoredSegments = new Set(['node_modules', '.git', 'dist', 'build', '.next', '.expo', 'coverage', 'generated', '__generated__']);
 
 const forbiddenText = [
-  { id: 'absolute_dsh_frontend_data_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*dsh[\\/]+frontend[\\/]+data[^'"]*['"]/im },
-  { id: 'absolute_dsh_frontend_media_fixtures_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*dsh[\\/]+frontend[\\/]+media-fixtures[^'"]*['"]/im },
-  { id: 'relative_data_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:\.\.\/){1,4}data(?:\/|['"])/im },
-  { id: 'relative_media_fixtures_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:\.\.\/){1,4}media-fixtures(?:\/|['"])/im },
-  { id: 'legacy_preview_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*legacy-preview/i },
+  { id: 'absolute_dsh_frontend_data_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*dsh[\\/]+frontend[\\/]+data[^'"]*['"]/im },  { id: 'relative_data_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:\.\.\/){1,4}data(?:\/|['"])/im },  { id: 'legacy_preview_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*legacy-preview/i },
   { id: 'preview_data_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:preview-data|operational-statuses\.preview-data)/im },
-  { id: 'runtime_require_data_or_media_fixture', regex: /\brequire\(['"][^'"]*(?:dsh\/frontend\/data|dsh\/frontend\/media-fixtures|(?:\.\.\/){1,4}(?:data|media-fixtures))[^'"]*['"]\)/i },
+  { id: 'runtime_require_data_or_media_fixture', regex: /\brequire\(['"][^'"]*(?:dsh\/frontend\/data|dsh\/frontend\/(?:\.\.\/){1,4}(?:data))[^'"]*['"]\)/i },
   { id: 'runtime_preview_identity_token', regex: /\b(?:proof\.delivery\.preview|cart-preview|DSH_CAPTAIN_FALLBACK_ID|PLACEHOLDER_URI)\b/i },
   { id: 'standalone_surface_split_wording', regex: /standalone surface|فول ستاك منفصل/i },
   // WLT demo runtime IDs — hardcoded IDs that replace real subject/actor identifiers

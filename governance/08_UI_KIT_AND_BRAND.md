@@ -271,7 +271,7 @@ stale-data       — labeled with age indicator or refresh action
 
 1. **No Eager-Loaded Large Images:** Heavy raster images must not be eagerly loaded. Lazy loading is the default policy.
 2. **Fixed Dimensions:** Image containers must have fixed dimensions defined at render time to prevent layout shift.
-3. **DSH Demo Media Policy:** Experimental, demo, and fixture media files belong exclusively in `dsh/frontend/media-fixtures`. Related surfaces must import from this central source via adapters or references — no independent local demo copies are permitted.
+3. **DSH Real Media Runtime Policy:** Runtime media belongs to the DSH media API/storage path and must be validated through `guard:real-media-runtime`; local demo media fixture folders are retired.
 4. **Production Media:** Production images must be served via the approved storage provider and referenced by ID or URL. Static hardcoded image maps are forbidden in production.
 5. **Format Preference:** SVG for icons and decorative graphics; WebP or AVIF for photos. PNG and JPEG raster imports inside code are advisory warnings.
 
@@ -291,7 +291,7 @@ All non-production design artifacts must be explicitly classified and isolated:
    dead           — no consumers, eligible for deletion
    retire-candidate — scheduled for removal, documented
    ```
-2. **Isolation Rule:** Demo data, mock banners, seed images, prototype style recipes, and experimental copy must never live inside surface-specific screen files. They must reside in their canonical location (`dsh/frontend/data`, `dsh/frontend/media-fixtures`) and be consumed via imports or adapters.
+2. **Isolation Rule:** Demo data, mock banners, seed images, prototype style recipes, and experimental copy must never live inside surface-specific screen files. They must reside in their canonical location (runtime data/API ownership and real media runtime) and be consumed via imports or adapters.
 3. **Retire Process:** A retire-candidate may be deleted only after:
    * Consumer scan confirms zero active imports.
    * Build and typecheck pass without it.
@@ -342,7 +342,6 @@ The following guards enforce this contract. They must be run on every relevant c
 | `guard-ui-kit-central-design-ownership.mjs` | Local design drift, icon drift, font drift, lane misuse, free design vars | advisory → strict per category |
 | `guard-design-token-drift.mjs` | Local token/color/palette drift outside ui-kit | advisory |
 | `guard-platform-vars-control.mjs` | Platform Vars allowlist enforcement | advisory |
-| `guard-service-frontend-fixture-media-identity.mjs` | Demo/fixture media isolation | advisory |
 | `guard-central-i18n-direction.mjs` | RTL direction imports | strict |
 
 **Promotion Rule:** A guard category moves from advisory to strict only after the corresponding debt has been remediated and human approval is recorded. No broad strict-fail before remediation.

@@ -35,12 +35,12 @@ module.exports = {
       severity: 'error',
     },
     {
-      name: 'no-runtime-data-media-fixtures',
+      name: 'no-runtime-preview-data',
       from: {
         path: '^dsh/frontend/(shared|control-panel|app-client|app-partner|app-captain|app-field)',
       },
       to: {
-        path: '^dsh/frontend/(data|media-fixtures)',
+        path: '^dsh/frontend/data',
       },
       severity: 'error',
     },

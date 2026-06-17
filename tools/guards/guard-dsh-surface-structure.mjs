@@ -33,9 +33,7 @@ const runtimeScreenFiles = [
   { file: 'dsh/frontend/app-field/screens/DshFieldStoreVisitScreen.tsx' },
 ];
 const forbiddenPatterns = [
-  { id: 'runtime_data_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:\.\.\/){1,4}data(?:\/|['"])/im },
-  { id: 'runtime_media_fixtures_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:\.\.\/){1,4}media-fixtures(?:\/|['"])/im },
-  { id: 'runtime_media_fixture_require', regex: /\brequire\(['"][^'"]*(?:media-fixtures|(?:\.\.\/){1,4}data)[^'"]*['"]\)/i },
+  { id: 'runtime_data_import', regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:\.\.\/){1,4}data(?:\/|['"])/im },  { id: 'runtime_media_fixture_require', regex: /\brequire\(['"][^'"]*(?:(?:\.\.\/){1,4}data)[^'"]*['"]\)/i },
   { id: 'storage_direct_access', regex: /\b(?:localStorage|AsyncStorage|sessionStorage|indexedDB)\b/ },
   { id: 'captain_pod_preview_runtime_truth', regex: /\b(?:CAPTAIN_POD_PLACEHOLDER_URI|CAPTAIN_POD_MEDIA_KEY)\b|proof\.delivery\.preview|data:image\/png;base64/i },
   { id: 'captain_fallback_identity', regex: /\bDSH_CAPTAIN_FALLBACK_ID\b|CAP-0041|captain_id:\s*captainId\b|captainId\s*\?\?\s*['"]unknown['"]/ },

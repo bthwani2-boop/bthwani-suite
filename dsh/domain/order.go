@@ -107,7 +107,7 @@ type UpdateOrderStatusRequest struct {
 }
 
 // DeliverOrderRequest — PoD submission (DSH-SLICE-005E).
-// PodMediaKey is a reference to the media-fixtures key; DSH never stores raw binaries.
+// PodMediaKey is a reference to the runtime media key; DSH stores metadata and references, not raw binaries.
 // WLT payout is NOT triggered here; payout is WLT responsibility after DELIVERED event.
 type DeliverOrderRequest struct {
 	CaptainID   string  `json:"captain_id"`

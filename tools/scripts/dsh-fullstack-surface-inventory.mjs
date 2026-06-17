@@ -138,8 +138,8 @@ for (const abs of files) {
   if (owner === 'wlt-dsh-bridge' || classification.hasWltBoundarySignal) {
     wltDshBoundaryReport.push({ file: rel, owner, lines, dshMayMutateMoney: /\b(createLedger|mutateWallet|approvePayout|executeRefund|settlePartner|settleCaptain|balance\s*=)\b/.test(text) });
   }
-  if (classification.hasMediaRuntimeSignal || /\bmedia-fixtures|dsh\/frontend\/data|legacy-preview\b/i.test(text)) {
-    mediaRuntimeGateReport.push({ file: rel, owner, lines, fixtureReference: /\bmedia-fixtures|dsh\/frontend\/data|legacy-preview\b/i.test(text) });
+  if (classification.hasMediaRuntimeSignal || /\breal-media-runtime|dsh\/frontend\/data|legacy-preview\b/i.test(text)) {
+    mediaRuntimeGateReport.push({ file: rel, owner, lines, fixtureReference: /\breal-media-runtime|dsh\/frontend\/data|legacy-preview\b/i.test(text) });
   }
 }
 

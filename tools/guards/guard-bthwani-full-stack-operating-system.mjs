@@ -151,7 +151,7 @@ for (const script of ['guard:test-coverage', 'guard:visual', 'guard:rtl-visual',
 for (const [rule, regex] of [
   ['shared_must_not_import_surfaces_rule_missing', /shared-must-not-import-surfaces/],
   ['surfaces_must_not_import_each_other_rule_missing', /surfaces-must-not-import-each-other/],
-  ['no_runtime_data_media_fixtures_rule_missing', /no-runtime-data-media-fixtures/],
+  ['no_runtime_preview_data_rule_missing', /no-runtime-preview-data/],
   ['wlt_dsh_bridge_only_rule_missing', /wlt-dsh-bridge-only/],
 ]) {
   if (!regex.test(depcruiseConfig)) {

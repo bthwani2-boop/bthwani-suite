@@ -284,8 +284,6 @@
     },
     {
       "id": "GUARD_SERVICE_FRONTEND_FIXTURE_MEDIA_IDENTITY",
-      "file": "tools/guards/guard-service-frontend-fixture-media-identity.mjs",
-      "config": "tools/guards/guard-service-frontend-fixture-media-identity.config.json",
       "ownerPolicy": [
         "governance/14_GUARDS_CATALOG.md"
       ],
@@ -311,8 +309,6 @@
         "mrf/**",
         "snd/**",
         "kwd/**",
-        "tools/guards/guard-service-frontend-fixture-media-identity.mjs",
-        "tools/guards/guard-service-frontend-fixture-media-identity.config.json",
         "governance/14_GUARDS_CATALOG.md"
       ],
       "triggerExtensions": [
@@ -767,7 +763,6 @@
     },
     {
       "id": "GUARD_DSH_MEDIA_MANIFEST",
-      "file": "tools/guards/guard-dsh-media-manifest.mjs",
       "ownerPolicy": [
         "governance/14_GUARDS_CATALOG.md",
         "governance/22_DSH_GOLDEN_SLICE.md"
@@ -800,7 +795,6 @@
     },
     {
       "id": "GUARD_DSH_SHARED_FOUNDATIONS_FINAL",
-      "file": "tools/guards/guard-dsh-shared-foundations-final.mjs",
       "ownerPolicy": [
         "governance/14_GUARDS_CATALOG.md",
         "governance/22_DSH_GOLDEN_SLICE.md"

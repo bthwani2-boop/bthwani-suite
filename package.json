@@ -71,7 +71,6 @@
     "guard:operating-model:research": "node tools/guards/guard-cross-service-operating-model.mjs --research-plan",
     "guard:service-runtime:dsh": "node tools/guards/guard-service-runtime.mjs --service dsh",
     "guard:service-workspace-model": "node tools/guards/guard-service-workspace-model.mjs",
-    "guard:fixture-media-identity": "node tools/guards/guard-service-frontend-fixture-media-identity.mjs",
     "guard:wlt-dsh-shared-ownership": "node tools/guards/guard-wlt-dsh-shared-ownership.mjs",
     "guard:surface-lightweight-bindings": "node tools/guards/guard-surface-lightweight-bindings.mjs",
     "guard:ui-only-roots-ownership": "node tools/guards/guard-ui-only-roots-ownership.mjs"

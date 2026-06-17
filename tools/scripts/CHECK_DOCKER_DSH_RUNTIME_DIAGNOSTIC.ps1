@@ -253,27 +253,15 @@ Test-Http -Name "auth-service health" -Url "http://127.0.0.1:18082/health" -OutF
 Test-Http -Name "minio console" -Url "http://127.0.0.1:9001" -OutFile "http-minio-console.txt" | Out-Null
 
 # ─────────────────────────────────────────────────────────────
-# 8) Media fixture/runtime storage gap checks
+# 8) Real media runtime storage checks
 # ─────────────────────────────────────────────────────────────
 
-$MediaFixtures = Join-Path (Get-Location) "dsh\frontend\media-fixtures"
-$Manifest = Join-Path $MediaFixtures "MANIFEST.local-required.tsv"
+$RealMediaGuard = Join-Path (Get-Location) "tools\guards\guard-real-media-runtime.mjs"
 
-if (Test-Path -LiteralPath $MediaFixtures) {
-  $Findings.Add("MEDIA_FIXTURES_FOLDER_FOUND: dsh\frontend\media-fixtures") | Out-Null
-  Run-Capture "media fixtures tree shallow" {
-    Get-ChildItem -LiteralPath ".\dsh\frontend\media-fixtures" -Recurse -File |
-      Select-Object FullName, Length, LastWriteTime |
-      Sort-Object FullName
-  } "media-fixtures-files.txt" | Out-Null
+if (Test-Path -LiteralPath $RealMediaGuard) {
+  $Findings.Add("REAL_MEDIA_RUNTIME_GUARD_FOUND: tools\guards\guard-real-media-runtime.mjs") | Out-Null
 } else {
-  $Warnings.Add("MEDIA_FIXTURES_FOLDER_MISSING: dsh\frontend\media-fixtures") | Out-Null
-}
-
-if (Test-Path -LiteralPath $Manifest) {
-  $Findings.Add("MEDIA_MANIFEST_FOUND: dsh\frontend\media-fixtures\MANIFEST.local-required.tsv") | Out-Null
-} else {
-  $Warnings.Add("MEDIA_MANIFEST_MISSING: dsh\frontend\media-fixtures\MANIFEST.local-required.tsv") | Out-Null
+  $Warnings.Add("REAL_MEDIA_RUNTIME_GUARD_MISSING: tools\guards\guard-real-media-runtime.mjs") | Out-Null
 }
 
 Run-Capture "search media upload contracts" {
@@ -325,7 +313,7 @@ Scope:
 - Auth health endpoint
 - PostgreSQL expected local ports
 - MinIO/Object Storage readiness for images/videos
-- media-fixtures/runtime-storage gap
+- real-media-runtime/storage gap
 
 Read-only:
 - No source files modified.
