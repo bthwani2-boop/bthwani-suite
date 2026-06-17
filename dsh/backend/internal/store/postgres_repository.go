@@ -589,13 +589,15 @@ INSERT INTO dsh_store_discovery_stores (
   distance_label, delivery_label, service_label, status_label,
   status_tone, has_offer, publish_stage,
   supports_pickup, supports_partner_delivery,
+  contact_number, opening_hours, catalog_summary,
   search_text, created_at, updated_at
 ) VALUES (
   $1, $2, $3, $4,
   '—', '—', '—', 'قيد المراجعة',
   'closed', FALSE, 'pending_review',
   $5, $6,
-  $7, NOW(), NOW()
+  NULLIF($7, ''), NULLIF($8, ''), NULLIF($9, ''),
+  $10, NOW(), NOW()
 )
 RETURNING id, name, address, category_id, publish_stage, created_at`
 
@@ -605,6 +607,7 @@ RETURNING id, name, address, category_id, publish_stage, created_at`
 	err := repo.db.QueryRowContext(ctx, query,
 		id, req.Name, req.Address, categoryID,
 		req.SupportsPickup, req.SupportsPartnerDelivery,
+		req.ContactNumber, req.OpeningHours, req.CatalogSummary,
 		searchText,
 	).Scan(&res.ID, &res.Name, &res.Address, &catIDResult, &res.PublishStage, &res.CreatedAt)
 	if err != nil {

@@ -210,7 +210,12 @@ export function ModernPremiumHeader({
           ) : null}
         </Pressable>
 
-        {onProfilePress ? (
+        {onSearchPress ? (
+          <HeaderIconButton
+            icon="search-outline"
+            onPress={onSearchPress}
+          />
+        ) : onProfilePress ? (
           <Pressable onPress={onProfilePress} style={styles.profileAvatar}>
             <Icon name="person" size={20} color={colorPalette.brand} />
           </Pressable>

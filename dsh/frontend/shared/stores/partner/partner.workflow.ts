@@ -182,6 +182,13 @@ export type ApprovalRecordMetadata = {
   mediaKey?: string;
   nextOwner?: string;
   systemNote?: string;
+
+  // Field-store onboarding metadata passed from live DSH intake queues.
+  address?: string;
+  categoryId?: string;
+  publishStage?: string;
+  supportsPickup?: boolean;
+  supportsPartnerDelivery?: boolean;
 };
 
 export type ApprovalRecord = {

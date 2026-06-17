@@ -1725,6 +1725,8 @@ export type PartnerOfferSummary = {
   title: string;
   status: PartnerOfferStatus;
   partnerName: string;
+  offerType: PartnerOfferType;
+  source: PartnerOfferSource;
 };
 
 const OFFER_STORE_KEY = '__BTHWANI_DSH_PARTNER_OFFERS__';

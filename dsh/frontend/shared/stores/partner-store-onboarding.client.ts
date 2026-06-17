@@ -10,6 +10,9 @@ export type PartnerCreateStoreRequest = {
   readonly category_id?: string;
   readonly supports_pickup: boolean;
   readonly supports_partner_delivery: boolean;
+  readonly contact_number?: string;
+  readonly opening_hours?: string;
+  readonly catalog_summary?: string;
 };
 
 export type PartnerCreateStoreResponse = {
@@ -26,7 +29,30 @@ export type PartnerPendingReviewStore = {
   readonly name: string;
   readonly address: string;
   readonly category_id?: string;
+  readonly publish_stage?: string;
+  readonly supports_pickup?: boolean;
+  readonly supports_partner_delivery?: boolean;
   readonly created_at?: string;
+};
+
+export type PartnerStoreDetail = PartnerPendingReviewStore & {
+  readonly image_url?: string;
+  readonly logo_image_url?: string;
+  readonly rating?: number;
+  readonly distance_label?: string;
+  readonly delivery_label?: string;
+  readonly service_label?: string;
+  readonly status_label?: string;
+  readonly status_tone?: string;
+  readonly has_offer?: boolean;
+  readonly offer_label?: string;
+  readonly contact_number?: string;
+  readonly opening_hours?: string;
+  readonly catalog_summary?: string;
+  readonly partner_readiness_status?: string;
+  readonly catalog_quality_status?: string;
+  readonly catalog_pricing_status?: string;
+  readonly marketing_visibility_status?: string;
 };
 
 export type PartnerStoreOnboardingFetchFn = (input: string, init?: RequestInit) => Promise<Response>;
@@ -44,6 +70,7 @@ export type PartnerStoreOnboardingError =
 export interface PartnerStoreOnboardingClient {
   createStore(req: PartnerCreateStoreRequest): Promise<PartnerCreateStoreResponse>;
   getPendingReviewStores(): Promise<readonly PartnerPendingReviewStore[]>;
+  getStoreDetail(id: string): Promise<PartnerStoreDetail>;
 }
 
 export function isPartnerStoreOnboardingOfflineError(
@@ -113,6 +140,31 @@ export function createPartnerStoreOnboardingHttpClient(
       }
 
       return response.json() as Promise<readonly PartnerPendingReviewStore[]>;
+    },
+    getStoreDetail: async (id) => {
+      const transport = fetchFn ?? globalThis.fetch?.bind(globalThis);
+
+      if (!baseUrl || !transport) {
+        throw { kind: 'offline' } satisfies PartnerStoreOnboardingOfflineError;
+      }
+
+      const safeId = encodeURIComponent(id.trim());
+      const response = await transport(`${baseUrl.replace(/\/$/, '')}/stores/${safeId}`, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw {
+          kind: 'http',
+          status: response.status,
+          body: await response.text(),
+        } satisfies PartnerStoreOnboardingHttpError;
+      }
+
+      return response.json() as Promise<PartnerStoreDetail>;
     },
   };
 }

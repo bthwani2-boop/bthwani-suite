@@ -143,12 +143,13 @@ function LoyaltyDetailPanel({ rowKey, tab, tiers, subscriptions, rewards, entitl
     if (tab === 'tiers' || tab === 'overview') {
       const tier = tiers.find(t => t.id === rowKey);
       if (tier) {
+        const tierBenefits = tier.benefits ?? [];
         return (
           <Box gap={2}>
             <Text role="bodyStrong" style={{ textAlign: 'right' }}>{tier.name}</Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{tier.minimumPoints} نقطة للتأهل</Text>
-            {tier.benefits.length > 0 ? (
-              tier.benefits.map(b => (
+            {tierBenefits.length > 0 ? (
+              tierBenefits.map(b => (
                 <View key={b.id} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: theme.line }}>
                   <Text role="caption" style={{ color: theme.textMuted }}>{b.description ?? ''}</Text>
                   <Badge label={b.label} tone="info" />
@@ -290,14 +291,17 @@ export function LoyaltyCommandDeckScreen() {
     },
   ];
 
-  const tierRows: DeckRow[] = tiers.map((tier) => ({
-    rowKey: tier.id,
-    rowHeading: tier.name,
-    subtitle: `${tier.minimumPoints} نقطة • ${tier.benefits.length ? tier.benefits.map((benefit) => benefit.label).join(' • ') : 'بدون مزايا إضافية'}`,
-    badgeLabel: 'مستوى',
-    badgeTone: currentTier?.id === tier.id ? 'brand' : 'default',
-    actionLabel: 'اختيار مستوى',
-  }));
+  const tierRows: DeckRow[] = tiers.map((tier) => {
+    const tierBenefits = tier.benefits ?? [];
+    return {
+      rowKey: tier.id,
+      rowHeading: tier.name,
+      subtitle: `${tier.minimumPoints} نقطة • ${tierBenefits.length ? tierBenefits.map((benefit) => benefit.label).join(' • ') : 'بدون مزايا إضافية'}`,
+      badgeLabel: 'مستوى',
+      badgeTone: currentTier?.id === tier.id ? 'brand' : 'default',
+      actionLabel: 'اختيار مستوى',
+    };
+  });
 
   const subscriptionRows: DeckRow[] = subscriptions.map((subscription) => ({
     rowKey: subscription.id,
@@ -310,7 +314,7 @@ export function LoyaltyCommandDeckScreen() {
 
   const rewardRows: DeckRow[] = activeRewards.map((reward) => ({
     rowKey: reward.id,
-    rowHeading: reward.title,
+    rowHeading: reward.title ?? reward.id,
     subtitle: reward.description ?? 'مكافأة قابلة للاسترداد.',
     badgeLabel: `${reward.pointsCost} نقطة`,
     badgeTone: 'warning',

@@ -1,4 +1,4 @@
-# BThwani Docker local helper — standardizes port env vars before any compose command.
+# BThwani Docker local helper - standardizes port env vars before any compose command.
 # Overrides stale machine-level env vars set by older workarounds.
 #
 # Usage:
@@ -100,7 +100,7 @@ switch ($Command) {
 
         if ($Failures.Count -gt 0) {
             Write-Host ""
-            Write-Host "SMOKE: FAIL — $($Failures.Count) check(s) failed: $($Failures -join ', ')"
+            Write-Host "SMOKE: FAIL - $($Failures.Count) check(s) failed: $($Failures -join ', ')"
             exit 1
         }
         Write-Host ""

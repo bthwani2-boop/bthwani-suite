@@ -217,12 +217,19 @@ export function useFieldRuntimeActions() {
       const address = (store.draft.location.addressLine || store.location).trim();
       const categoryId = (store.draft.classification.mainCategory || store.category).trim();
 
+      const contactNumber = store.draft.basics.ownerPhone.trim() || undefined;
+      const openingHours = store.draft.offer.operatingHours.trim() || undefined;
+      const catalogSummary = store.draft.products.sampleCatalogNote.trim() || undefined;
+
       return partnerStoreOnboardingClient.createStore({
         name: name || store.name,
         address: address || store.location,
         category_id: categoryId || undefined,
         supports_pickup: false,
         supports_partner_delivery: true,
+        contact_number: contactNumber,
+        opening_hours: openingHours,
+        catalog_summary: catalogSummary,
       });
     },
     [partnerStoreOnboardingClient],

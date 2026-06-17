@@ -55,10 +55,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
   const [submitStatus, setSubmitStatus] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const matchedDesk: { deskId: string } | null = null;
-    if (matchedDesk) {
-      setSelectedDeskId(matchedDesk.deskId);
-    }
+    // searchParams-based desk selection not yet implemented
   }, [searchParams]);
 
   const selectedDesk = React.useMemo(
@@ -78,7 +75,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
     setDesks((prev) =>
       prev.map((d) =>
         d.deskId === selectedDesk.deskId
-          ? { ...d, lookupPanel: { ...d.lookupPanel, inputs: d.lookupPanel.inputs.map((inp) => (inp.key === key ? { ...inp, value } : inp)) } }
+          ? { ...d, lookupPanel: { ...d.lookupPanel, inputs: d.lookupPanel.inputs.map((inp: { key: string; value: string; [k: string]: unknown }) => (inp.key === key ? { ...inp, value } : inp)) } }
           : d,
       ),
     );
