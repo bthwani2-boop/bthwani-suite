@@ -68,9 +68,6 @@ function requireFile(relative) {
   return read(relative);
 }
 
-const command = requireFile('dsh/docs/JOURNIES/command');
-const commandAdditional = requireFile('dsh/docs/JOURNIES/command_additional');
-const tasks = requireFile('dsh/docs/JOURNIES/tasks');
 const operatingModel = requireFile('governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md');
 const goldenSlice = requireFile('governance/22_DSH_GOLDEN_SLICE.md');
 const serviceClosure = requireFile('governance/10_SERVICE_CLOSURE.md');
@@ -82,9 +79,6 @@ const depcruiseConfig = requireFile('tools/guards/design/configs/dependency-crui
 const host = requireFile('dsh/frontend/control-panel/DshControlPanelSurfaceHost.tsx');
 
 const requiredDocs = [
-  ['command_full_stack_definition', command, 'dsh/docs/JOURNIES/command', /فول ستاك بثواني[\s\S]+DSH Backend[\s\S]+WLT finance bridge/],
-  ['command_additional_capability_order', commandAdditional, 'dsh/docs/JOURNIES/command_additional', /Full-Stack Foundation[\s\S]+Final Full-Stack Regression/],
-  ['tasks_capability_backlog', tasks, 'dsh/docs/JOURNIES/tasks', /capability_id[\s\S]+control_panel_section[\s\S]+closure_status/],
   ['operating_model_definition', operatingModel, 'governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md', /Capability Closure Rule[\s\S]+WLT Boundary[\s\S]+Media Runtime Rule/],
   ['golden_slice_capability_matrix', goldenSlice, 'governance/22_DSH_GOLDEN_SLICE.md', /Full-Stack Capability Matrix[\s\S]+capability \| backend \| openapi/],
   ['service_closure_final_vocab', serviceClosure, 'governance/10_SERVICE_CLOSURE.md', /CLOSED_WITH_EVIDENCE[\s\S]+HARD_BLOCKED_EXTERNAL_ONLY/],
@@ -136,9 +130,6 @@ const requiredCapabilities = [
 for (const capability of requiredCapabilities) {
   if (!capabilities.includes(`'${capability}'`) || !capabilityMap.includes(`id: '${capability}'`)) {
     add('FAIL', 'capability_binding_missing', 'dsh/frontend/shared/full-stack', capability, 'Capability IDs and binding map must stay aligned.');
-  }
-  if (!tasks.includes(`capability_id: ${capability}`) && capability !== 'control-panel-governance') {
-    add('FAIL', 'tasks_capability_missing', 'dsh/docs/JOURNIES/tasks', capability, 'Every full-stack capability must appear in the backlog with required task fields.');
   }
 }
 

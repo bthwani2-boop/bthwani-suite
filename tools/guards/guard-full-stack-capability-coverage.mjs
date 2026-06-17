@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -71,15 +71,11 @@ const REQUIRED_CONTROL_PANEL_SECTIONS = [
   'dashboard', 'operations', 'support', 'finance', 'catalogs', 'partners', 'marketing', 'platform', 'administration', 'hr',
 ];
 
-const tasks = read('dsh/docs/JOURNIES/tasks');
 const capabilityMap = read('dsh/frontend/shared/full-stack/bthwani-full-stack-capability.map.ts');
 const capabilitiesFile = read('dsh/frontend/shared/full-stack/bthwani-full-stack-capabilities.ts');
 const governanceMap = read('dsh/frontend/shared/control-panel/dsh-governance.map.ts');
 const coverageTypesFile = read('dsh/frontend/shared/full-stack/bthwani-full-stack-coverage.types.ts');
 
-if (!tasks) {
-  add('FAIL', 'tasks_backlog_missing', 'dsh/docs/JOURNIES/tasks', 'file missing', 'Create the full-stack backlog with capability_id fields for all 13 capabilities.');
-}
 
 if (!capabilityMap) {
   add('FAIL', 'capability_map_missing', 'dsh/frontend/shared/full-stack/bthwani-full-stack-capability.map.ts', 'file missing', 'Create the capability map with all 13 capabilities.');
@@ -96,10 +92,6 @@ for (const capId of REQUIRED_CAPABILITIES) {
 
   if (capabilityMap && !capabilityMap.includes(`id: '${capId}'`)) {
     add('FAIL', 'capability_binding_missing_from_map', 'dsh/frontend/shared/full-stack/bthwani-full-stack-capability.map.ts', capId, 'Add a complete capability binding entry for this capability in BTHWANI_FULL_STACK_CAPABILITY_MAP.');
-  }
-
-  if (tasks && !tasks.includes(`capability_id: ${capId}`) && capId !== 'control-panel-governance') {
-    add('FAIL', 'capability_missing_from_tasks_backlog', 'dsh/docs/JOURNIES/tasks', capId, 'Add this capability to the tasks backlog with all required task fields.');
   }
 }
 

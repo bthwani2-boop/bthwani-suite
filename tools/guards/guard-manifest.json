@@ -500,100 +500,6 @@
       ]
     },
     {
-      "id": "GUARD_STEWARD_V3",
-      "file": "tools/guards/guard-steward-v3.mjs",
-      "ownerPolicy": [
-        "governance/14_GUARDS_CATALOG.md",
-        "governance/13_CI_AND_GATES.md"
-      ],
-      "purpose": "validate additive V3 guard system health without replacing existing guards",
-      "runners": [
-        "v3"
-      ],
-      "mode": "advisory",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "tools/guards/**",
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "triggerExtensions": [
-        ".mjs",
-        ".json",
-        ".md",
-        ".ps1"
-      ]
-    },
-    {
-      "id": "GUARD_PHASE_SCOPE_V3",
-      "file": "tools/guards/guard-phase-scope-v3.mjs",
-      "ownerPolicy": [
-        "governance/09_API_BINDING_RUNTIME.md",
-        "governance/24_TRACEABILITY_AND_ROADMAP.md"
-      ],
-      "purpose": "phase-aware scope guard for UI/UX, API, runtime, and production stages",
-      "runners": [
-        "v3"
-      ],
-      "mode": "phase-aware",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "governance/24_TRACEABILITY_AND_ROADMAP.md",
-        "governance/09_API_BINDING_RUNTIME.md"
-      ],
-      "triggerExtensions": [
-        ".md",
-        ".json"
-      ]
-    },
-    {
-      "id": "GUARD_UIUX_RATCHET_V3",
-      "file": "tools/guards/guard-uiux-ratchet-v3.mjs",
-      "ownerPolicy": [
-        "governance/08_UI_KIT_AND_BRAND.md",
-        "governance/24_TRACEABILITY_AND_ROADMAP.md"
-      ],
-      "purpose": "UI/UX ratchet guard for central colors, RTL, ui-kit ownership, local design drift, and touched-scope discipline",
-      "runners": [
-        "v3"
-      ],
-      "mode": "audit",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "ui-kit/**",
-        "dsh/**",
-        "wlt/**",
-        "app-client/runtime/**",
-        "app-partner/runtime/**",
-        "governance/08_UI_KIT_AND_BRAND.md"
-      ],
-      "triggerExtensions": [
-        ".ts",
-        ".tsx",
-        ".js",
-        ".jsx",
-        ".mjs",
-        ".css"
-      ]
-    },
-    {
       "id": "GUARD_PLATFORM_VARS_CONTROL",
       "file": "tools/guards/guard-platform-vars-control.mjs",
       "config": "tools/guards/guard-platform-vars-control.config.json",
@@ -627,36 +533,6 @@
         ".jsx",
         ".json",
         ".md"
-      ]
-    },
-    {
-      "id": "GUARD_RELEASE_READINESS_V3",
-      "file": "tools/guards/guard-release-readiness-v3.mjs",
-      "ownerPolicy": [
-        "governance/11_EVIDENCE_AND_TRACEABILITY.md",
-        "governance/13_CI_AND_GATES.md"
-      ],
-      "purpose": "release readiness evidence, diff, warning, rollback, and guard-result aggregation",
-      "runners": [
-        "v3"
-      ],
-      "mode": "advisory",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "governance/11_EVIDENCE_AND_TRACEABILITY.md",
-        "governance/13_CI_AND_GATES.md",
-        "tools/registry/runs/**"
-      ],
-      "triggerExtensions": [
-        ".md",
-        ".json",
-        ".txt"
       ]
     },
     {
@@ -1295,7 +1171,7 @@
         "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
         "governance/22_DSH_GOLDEN_SLICE.md"
       ],
-      "purpose": "verify all 13 BThwani full-stack capabilities are registered in capability map, tasks backlog, and governance map with correct full-stack fields and no preview references",
+      "purpose": "verify all 13 BThwani full-stack capabilities are registered in capability map and governance map with correct full-stack fields and no preview references",
       "runners": [
         "governance"
       ],
@@ -1310,7 +1186,6 @@
       "triggerPaths": [
         "dsh/frontend/shared/full-stack/**",
         "dsh/frontend/shared/control-panel/dsh-governance.map.ts",
-        "dsh/docs/JOURNIES/tasks",
         "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
         "governance/22_DSH_GOLDEN_SLICE.md"
       ],

@@ -48,7 +48,6 @@ Production readiness = NOT_CLAIMED.
 القالب العام لإغلاق أي شريحة موجود الآن في:
 
 ```text
-dsh/docs/templates/BTHWANI_DSH_UNIVERSAL_SLICE_FINAL_CLOSURE_COMMAND.md
 ```
 
 وهذا صحيح لأنه أمر عام وليس ملف شريحة.
@@ -326,7 +325,6 @@ requested_amount_snapshot_minor_units
 
 #### التصحيح المطلوب
 
-نقله إلى `dsh/docs/performance/` أو `dsh/docs/references/`.
 
 **حالة هذا التصحيح: DONE** — أُضيف HTML comment يوضح أنه GOVERNANCE_REFERENCE وليس slice manifest؛ مُصنَّف في DSH_FULL_REPO_SLICE_COVERAGE_INDEX.md.
 

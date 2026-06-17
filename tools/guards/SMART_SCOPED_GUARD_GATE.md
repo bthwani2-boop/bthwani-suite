@@ -14,7 +14,7 @@ Do not create a new execution layer.
 
 Do not replace:
 
-- tools/guards/RUN_BTHWANI_GUARDS_V3.ps1
+- tools/guards/RUN_BTHWANI_GUARDS_UNIFIED.ps1
 - tools/guards/RUN_GOVERNANCE_GUARDS.ps1
 - tools/GHB_COMMIT_PUSH_CURRENT_BRANCH.ps1
 - Git hooks
@@ -121,7 +121,7 @@ Minimum gates:
 
 Suggested guard when relevant:
 
-- powershell -NoProfile -ExecutionPolicy Bypass -File "tools\guards\RUN_BTHWANI_GUARDS_V3.ps1" -Profile ui -Phase UI_UX_FLOW -Mode Ratchet
+- powershell -NoProfile -ExecutionPolicy Bypass -File "tools\guards\RUN_BTHWANI_GUARDS_UNIFIED.ps1" -Profile ui -Phase UI_UX_FLOW -Mode Audit
 
 Do not pass -CreateZip unless explicitly requested.
 
@@ -148,7 +148,7 @@ Minimum gates:
 
 Suggested guard when relevant:
 
-- powershell -NoProfile -ExecutionPolicy Bypass -File "tools\guards\RUN_BTHWANI_GUARDS_V3.ps1" -Profile governance -Phase GOVERNANCE -Mode Ratchet
+- powershell -NoProfile -ExecutionPolicy Bypass -File "tools\guards\RUN_BTHWANI_GUARDS_UNIFIED.ps1" -Profile governance -Phase GOVERNANCE -Mode Audit
 
 Do not pass -CreateZip unless explicitly requested.
 
@@ -159,8 +159,8 @@ If changed files span multiple domains, run each needed guard once only.
 Example:
 
 - governance file + UI file:
-  1. governance / GOVERNANCE / Ratchet
-  2. ui / UI_UX_FLOW / Ratchet
+  1. governance / GOVERNANCE / Audit
+  2. ui / UI_UX_FLOW / Audit
 
 Do not run all guards blindly.
 

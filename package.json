@@ -26,7 +26,6 @@
     "guard:ui-only-file-volume": "node tools/guards/guard-ui-only-file-volume.mjs",
     "guard:dsh-shared-no-ui": "node tools/guards/guard-dsh-shared-no-ui.mjs",
     "guard:wlt-dsh-ui-only-bindings": "node tools/guards/guard-wlt-dsh-shared-ownership.mjs",
-    "guard:ui-only-ownership-matrix": "node tools/guards/generate-ui-only-file-ownership-matrix.mjs",
     "guard:no-broken-imports": "node tools/guards/guard-no-broken-imports.mjs",
     "guard:real-media-runtime": "node tools/guards/guard-real-media-runtime.mjs",
     "guard:bthwani-full-stack": "node tools/guards/guard-bthwani-full-stack-operating-system.mjs",

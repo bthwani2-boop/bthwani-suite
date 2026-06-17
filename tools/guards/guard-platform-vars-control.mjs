@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { createResult, isTextFile, lineOf, parseArgs, readText, walk, writeOutputs } from './common-v3.mjs';
+import { createResult, isTextFile, lineOf, parseArgs, readText, walk, writeOutputs } from './common-guard.mjs';
 
 const args = parseArgs();
 args.root = args.root || process.cwd();

@@ -14,7 +14,7 @@ This contract is useful for mobile UI validation, RTL validation, checkout/cart/
 
 This file must not:
 
-- replace `tools/guards/RUN_BTHWANI_GUARDS_V3.ps1`
+- replace `tools/guards/RUN_BTHWANI_GUARDS_UNIFIED.ps1`
 - replace `tools/guards/SMART_SCOPED_GUARD_GATE.md`
 - run full workspace lint
 - run full workspace typecheck

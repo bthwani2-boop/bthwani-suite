@@ -73,3 +73,14 @@ graphify-out/
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+
+# Local binaries and generated guard reports
+*.exe
+tools/guards/ownership-report.json
+tools/guards/ownership-report.md
+tools/guards/platform-vars.json
+tools/guards/platform-vars.md
+tools/guards/report.md
+tools/guards/token-drift.json
+tools/guards/token-drift.md
+tools/guards/webapp-website-inventory.md

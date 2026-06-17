@@ -30,7 +30,6 @@ Lean index for the current DSH docs baseline. Service-state truth lives in the l
 - `dsh/docs/CLOSURE_DECISION_LOG.md` — append-only historical decision log only; it does not override the live matrices.
 - `dsh/docs/DSH_CONTROL_PANEL_SHARED_OWNER_DECISION.md` — control-panel/shared ownership policy.
 - `dsh/docs/slices/` — per-journey and per-slice manifests.
-- `dsh/docs/templates/` — reusable command/templates only.
 
 ## Archived Root Docs
 
