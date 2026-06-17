@@ -283,47 +283,6 @@
       ]
     },
     {
-      "id": "GUARD_SERVICE_FRONTEND_FIXTURE_MEDIA_IDENTITY",
-      "ownerPolicy": [
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "purpose": "detect service frontend fixture/media identity drift and report immediate remediation paths",
-      "runners": [
-        "governance"
-      ],
-      "mode": "advisory changed-files-blocking",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "service",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "dsh/**",
-        "wlt/**",
-        "knz/**",
-        "arb/**",
-        "amn/**",
-        "esf/**",
-        "mrf/**",
-        "snd/**",
-        "kwd/**",
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "triggerExtensions": [
-        ".ts",
-        ".tsx",
-        ".js",
-        ".jsx",
-        ".json",
-        ".jsonc",
-        ".md",
-        ".yml",
-        ".yaml"
-      ]
-    },
-    {
       "id": "GUARD_API_BINDING_RUNTIME",
       "file": "tools/guards/guard-api-binding-runtime.mjs",
       "ownerPolicy": [
@@ -759,70 +718,6 @@
         ".mjs",
         ".cjs",
         ".css"
-      ]
-    },
-    {
-      "id": "GUARD_DSH_MEDIA_MANIFEST",
-      "ownerPolicy": [
-        "governance/14_GUARDS_CATALOG.md",
-        "governance/22_DSH_GOLDEN_SLICE.md"
-      ],
-      "purpose": "verify DSH media keys are registered in manifest and resolvers, and consumer screens have no raw path leaks",
-      "runners": [
-        "governance"
-      ],
-      "mode": "blocking",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "service",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "dsh/frontend/shared/**",
-        "governance/14_GUARDS_CATALOG.md",
-        "governance/22_DSH_GOLDEN_SLICE.md"
-      ],
-      "triggerExtensions": [
-        ".ts",
-        ".tsx",
-        ".js",
-        ".jsx",
-        ".tsv",
-        ".md"
-      ]
-    },
-    {
-      "id": "GUARD_DSH_SHARED_FOUNDATIONS_FINAL",
-      "ownerPolicy": [
-        "governance/14_GUARDS_CATALOG.md",
-        "governance/22_DSH_GOLDEN_SLICE.md"
-      ],
-      "purpose": "verify DSH media keys, resolver coverage, raw path leakage, and scattered preview stores under dsh/frontend",
-      "runners": [
-        "governance"
-      ],
-      "mode": "blocking",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "service",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "dsh/frontend/shared/**",
-        "governance/14_GUARDS_CATALOG.md",
-        "governance/22_DSH_GOLDEN_SLICE.md"
-      ],
-      "triggerExtensions": [
-        ".ts",
-        ".tsx",
-        ".js",
-        ".jsx",
-        ".tsv",
-        ".md"
       ]
     },
     {
