@@ -1,9 +1,9 @@
-// Canonical location: dsh/frontend/shared/captain/captain-navigation.model.ts
-// Authority: dsh/frontend/shared/captain — route history, back navigation, command-driven routing.
+// Canonical location: dsh/frontend/app-captain/captain/captain-navigation.model.ts
+// Authority: dsh/frontend/app-captain/captain — captain surface-local orchestration pending Phase 2 classification.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { DshCaptainRoute, CaptainSupportRoute, DshCaptainCommandTarget } from './captain.contract';
+import type { DshCaptainRoute, CaptainSupportRoute, DshCaptainCommandTarget } from '../../shared/delivery/captain/captain.contract';
 import { getRouteForCommandTarget } from '../../shared/delivery/delivery.policy';
 
 type CaptainNavigationDeps = {

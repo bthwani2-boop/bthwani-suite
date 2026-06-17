@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/documents/partner-document.types.ts
-// Authority: shared/partner/documents — types and statuses for contract document compliance.
+// dsh/frontend/shared/stores/documents/partner-document.types.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 export type PartnerDocumentKind =

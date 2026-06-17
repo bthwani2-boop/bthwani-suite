@@ -15,7 +15,7 @@ import type {
   OperationsPanelId,
   OperationsViewState,
 } from './operations.types';
-import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
+import { getDshControlPanelGovernanceEntry } from '../../shared/runtime/dsh-control-panel-governance.map';
 import styles from '../shared/control-panel-surface.module.css';
 import {
   getOperationsGroupMeta,

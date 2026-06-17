@@ -14,7 +14,7 @@ import {
   MARKETING_SIGNAL_ENTITY_TYPES,
   MARKETING_SIGNAL_STAGES,
   type ApprovalRecord,
-} from '../../app-partner/domain/partner.workflow';
+} from '../stores/partner/partner.workflow';
 
 type MediaReviewRecord = ApprovalRecord & {
   systemNote?: string;

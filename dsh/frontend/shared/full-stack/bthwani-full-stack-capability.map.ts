@@ -1,4 +1,4 @@
-import type { DshControlPanelSectionId } from '../../control-panel/shared/dsh-control-panel-governance.map';
+import type { DshControlPanelSectionId } from '../runtime/dsh-control-panel-governance.map';
 import type { DshSurfaceId } from '../runtime/dsh-flow-registry';
 import type { BthwaniFullStackCapabilityId, DshSharedTopicId } from './bthwani-full-stack-capabilities';
 

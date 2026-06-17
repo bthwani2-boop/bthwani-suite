@@ -273,7 +273,7 @@ export function BottomNavBar({
   launcherActive = false,
 }: BottomNavBarProps) {
   const insets = useSafeAreaInsets();
-  const bottomPadding = Math.max(insets.bottom, Platform.OS === 'android' ? 44 : 12);
+  const bottomPadding = insets.bottom > 0 ? insets.bottom : (Platform.OS === 'android' ? 8 : 12);
   const { width } = useWindowDimensions();
   const rowDirection = resolveRowDirection(direction);
   const { tokens, mode } = useBThwaniAppearance();
@@ -495,11 +495,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   navContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
+    width: '100%',
   },
   navSurface: {
     borderTopLeftRadius: 32,

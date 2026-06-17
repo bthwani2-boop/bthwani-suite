@@ -1,6 +1,6 @@
 import React from 'react';
 import { StateView } from '@bthwani/ui-kit';
-import { WltDshFieldBridge } from '../../../../wlt/frontend/dsh/app-field';
+import { WltDshFieldBridge } from '../../shared/wlt/generated/wlt_frontend_dsh_app_field.facade';
 import { resolveFieldStoreStatus } from '../field.surface-model';
 import type { FieldStoreFile } from '../dsh-field.routes';
 

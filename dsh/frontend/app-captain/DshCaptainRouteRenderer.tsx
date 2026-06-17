@@ -3,8 +3,8 @@ import { View } from 'react-native';
 import { Badge, Box, Button, Divider, Icon, KeyValueList, MobileScrollView, Text, TopBar, spacing } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import type { DshCaptainRoute } from './dsh-captain.types';
-import type { CaptainSupportRoute, CaptainAvailabilityMeta, CompactOrderChatMessage } from './captain/captain.contract';
-import type { DshCaptainLocationPush } from './captain/use-captain-order-runtime';
+import type { CaptainSupportRoute, CaptainAvailabilityMeta, CompactOrderChatMessage } from '../shared/delivery/captain/captain.contract';
+import type { DshCaptainLocationPush } from '../shared/delivery/captain/use-captain-order-runtime';
 import { DshEntryScreen } from './screens/DshCaptainEntryScreen';
 import {
   CaptainDeliveryConfirmSheet,

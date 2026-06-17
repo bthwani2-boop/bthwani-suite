@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/readiness/partner-readiness.model.ts
-// Authority: shared/partner/readiness — computing active store readiness, progress, and readonly states.
+// dsh/frontend/shared/stores/readiness/partner-readiness.model.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';

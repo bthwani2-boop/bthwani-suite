@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import {
   createDshOrderLifecycleHttpClient,
   resolveDshOrderApiBaseUrl,
-} from '../../shared/orders/dsh-order-lifecycle-client';
+} from '../../orders/dsh-order-lifecycle-client';
 
 export type DshCaptainLifecycleStatus = 'EN_ROUTE' | 'ARRIVED';
 

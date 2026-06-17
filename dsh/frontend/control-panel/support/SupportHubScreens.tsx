@@ -12,7 +12,7 @@ import {
   WebControlPanelWorkspaceTabs,
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
-import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+import type { DshFulfillmentDeliveryMode } from '../../shared/delivery/delivery.contract';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
 // SSoT: delivery mode labels come from dsh-delivery-mode.model, not inline strings.
 import { getDshDeliveryModeDefinition } from '../../shared';

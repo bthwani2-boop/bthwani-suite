@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { DshHomeCategory } from './dsh-home-types';
-import type { DshPartnerActivationStatus } from '../../app-partner/domain/dsh-partner-activation.model';
+import type { DshPartnerActivationStatus } from '../stores/partner/dsh-partner-activation.model';
 import { resolveHomeCategoryContext } from './home-promo-mappers';
 import { getMarketingVideoVisibilityRecord, isMarketingRenderable } from '../marketing/marketing.visibility';
 import type { MarketingVideoRecord } from '../marketing/marketing.types';

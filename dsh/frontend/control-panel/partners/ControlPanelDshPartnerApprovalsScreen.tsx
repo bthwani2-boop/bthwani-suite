@@ -16,7 +16,7 @@ import {
   moveApprovalRecordToStage,
   translateStage,
   translateEntityType,
-} from '../../app-partner/domain/partner.workflow';
+} from '../../shared/stores/partner/partner.workflow';
 import {
   PlatformVarsRegistry,
   getPartnerStoreOnboardingRuntimeClient,
@@ -58,7 +58,7 @@ import {
   PARTNER_SUB_TAB_DEFINITIONS,
   type PartnerWorkspaceTabId,
 } from './partners.types';
-import type { DshPartnerActivationStatus } from '../../app-partner/domain/dsh-partner-activation.model';
+import type { DshPartnerActivationStatus } from '../../shared/stores/partner/dsh-partner-activation.model';
 const partnerCoveragePreviewZones: { status: string }[] = [];
 
 function PartnerApprovalCard({ item, onAction }: { item: ApprovalRecord; onAction: (id: string, action: 'approve' | 'reject' | 'fix' | 'activate') => void }) {

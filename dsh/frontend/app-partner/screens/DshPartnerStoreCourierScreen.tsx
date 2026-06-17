@@ -22,7 +22,7 @@ import type {
   StoreCourierCompensation,
   StoreDeliveryPolicy,
   StoreDeliveryPricingSource,
-} from '../contracts/dsh-partner-binding.contracts';
+} from '../domain/dsh-partner-binding.contracts';
 import { getSurfaceModeCapability, getSurfaceRoleSummaryForMode } from '../../shared/orders';
 
 type PolicyOption = { id: StoreDeliveryPolicy; label: string; description: string };

@@ -4,7 +4,7 @@ export type {
   DshPartnerDocumentVerification,
   DshPartnerCatalogOverride,
   DshPromotionCandidate,
-} from '../../app-partner/domain/partner.workflow';
+} from '../../shared/stores/partner/partner.workflow';
 export {
   resolvePartnerIdForStore,
   getPartnerActivationStatus,
@@ -26,4 +26,4 @@ export {
   updatePromotionCandidateStatus,
   dshPartnerIntakeMetrics,
   dshPartnerIntakeItems,
-} from '../../app-partner/domain/partner.workflow';
+} from '../../shared/stores/partner/partner.workflow';

@@ -7,7 +7,7 @@ export type {
   DshPartnerSupportRouteId,
   DshPartnerRoute,
   PartnerHubSection,
-} from './contracts/partner.types';
+} from '../shared/stores/partner/partner.types';
 export {
   DSH_PARTNER_OPERATIONAL_FLOW_IDS,
   DSH_PARTNER_HIDDEN_COMPAT_OPERATIONAL_FLOW_IDS,
@@ -17,13 +17,13 @@ export {
   DSH_PARTNER_HIDDEN_COMPAT_SUPPORT_ROUTE_IDS,
   DSH_PARTNER_SUPPORT_ROUTE_TO_OPERATIONAL_FLOW,
   DSH_PARTNER_OPERATIONAL_FLOW_TO_SUPPORT_ROUTE,
-} from './contracts/partner.types';
+} from '../shared/stores/partner/partner.types';
 export {
   mapDshPartnerOperationalFlowToSupportRoute,
   mapDshPartnerSupportRouteToOperationalFlow,
   isDshPartnerHiddenCompatOperationalFlow,
   isDshPartnerHiddenCompatSupportRoute,
-} from './contracts/partner.flow-maps';
+} from '../shared/stores/partner/partner.flow-maps';
 
 export type DshPartnerSurfaceProps = {
   initialRoute?: DshPartnerRoute;

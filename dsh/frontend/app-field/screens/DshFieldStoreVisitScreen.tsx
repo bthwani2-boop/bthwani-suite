@@ -26,7 +26,7 @@ import {
   type DshFieldStoreVisitState,
 } from '../dsh-field.routes';
 import { getDshFlowPolicySummary } from '../../shared/runtime/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared/dsh-control-panel-governance.map';
+import { resolveDshControlPanelSectionLabel } from '../../shared/runtime/dsh-control-panel-governance.map';
 
 export type {
   DshFieldStoreVisitErrors,

@@ -1,5 +1,5 @@
-export type { PartnerStoreScopeOption } from './contracts/partner.types';
-export { storeScopeOptions } from './contracts/partner.types';
+export type { PartnerStoreScopeOption } from '../shared/stores/partner/partner.types';
+export { storeScopeOptions } from '../shared/stores/partner/partner.types';
 
 export type { PartnerStoreHoursDay } from '../shared/delivery/fulfillment';
 export { defaultServiceModes, defaultZone, defaultStoreHours } from '../shared/delivery/fulfillment';

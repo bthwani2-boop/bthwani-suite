@@ -19,7 +19,7 @@ import {
 import {
   type DshPartnerActivationStatus,
   getDshPartnerActivationStatusLabel,
-} from '../contracts/dsh-partner-activation.model';
+} from '../../shared/stores/partner/dsh-partner-activation.model';
 import { resolveDshStoreClientVisibility } from '../../shared/stores/dsh-client-visibility.model';
 
 export type StoreProfileScreenProps = {

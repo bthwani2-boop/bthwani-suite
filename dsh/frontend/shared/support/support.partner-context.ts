@@ -2,11 +2,11 @@ import {
   type DshPartnerOperationalFlowId,
   type DshPartnerSupportCommandContext,
   type DshPartnerSupportRouteId,
-} from '../../app-partner/domain/partner.types';
+} from '../stores/partner/partner.types';
 import {
   mapDshPartnerOperationalFlowToSupportRoute,
   mapDshPartnerSupportRouteToOperationalFlow,
-} from '../../app-partner/domain/partner.flow-maps';
+} from '../stores/partner/partner.flow-maps';
 import {
   resolveIssueCategoryFromOperationalFlow,
   resolveIssueCategoryFromRoute,

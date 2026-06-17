@@ -24,8 +24,8 @@ export type {
   StoreDeliveryPolicy,
   StoreDeliveryPricingSource,
   StoreCourierCompensation,
-} from './contracts/dsh-partner-binding.contracts';
-export { DSH_PARTNER_BINDING_CONTRACTS } from './contracts/dsh-partner-binding.contracts';
+} from './domain/dsh-partner-binding.contracts';
+export { DSH_PARTNER_BINDING_CONTRACTS } from './domain/dsh-partner-binding.contracts';
 
 // UI panels (surface-specific)
 export { PartnerCatalogReadinessPanel } from './parts/PartnerCatalogReadinessPanel';

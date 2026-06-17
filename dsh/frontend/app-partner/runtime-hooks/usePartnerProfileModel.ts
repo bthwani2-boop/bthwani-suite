@@ -1,12 +1,12 @@
-// Canonical location: dsh/frontend/shared/partner/partner-profile.model.ts
-// Authority: dsh/frontend/shared/partner — partner surface routes and sections.
+// Canonical location: dsh/frontend/app-partner/runtime-hooks/usePartnerProfileModel.ts
+// Authority: dsh/frontend/app-partner — partner surface.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { DshPartnerRoute, PartnerHubSection } from '../contracts/partner.types';
+import type { DshPartnerRoute, PartnerHubSection } from '../../shared/stores/partner/partner.types';
 
-export type { PartnerRuntimeProfile } from '../contracts/partner.types';
-export { buildPartnerProfileFromScope } from '../contracts/partner.adapters';
+export type { PartnerRuntimeProfile } from '../../shared/stores/partner/partner.types';
+export { buildPartnerProfileFromScope } from '../../shared/stores/partner/partner.adapters';
 
 export function usePartnerProfileModel(initialRoute: DshPartnerRoute = 'inbox') {
   const [route, setRoute] = React.useState<DshPartnerRoute>(initialRoute);

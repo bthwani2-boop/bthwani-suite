@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/readiness/partner-readiness-escalation.model.ts
-// Authority: shared/partner/readiness — onboarding readiness escalations state and actions.
+// dsh/frontend/shared/stores/readiness/partner-readiness-escalation.model.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';

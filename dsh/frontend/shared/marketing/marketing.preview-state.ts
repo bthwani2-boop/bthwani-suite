@@ -6,14 +6,14 @@ import {
   getClientVisibleRecords as _getClientVisible,
   moveApprovalRecordToStage,
   upsertApprovalRecord,
-} from '../../app-partner/domain/partner.workflow';
+} from '../stores/partner/partner.workflow';
 
 import type {
   PartnerOfferRecord,
   PartnerOfferStatus,
   PartnerOfferType,
   PartnerOfferSource,
-} from '../../app-partner/domain/dsh-partner-offer-types';
+} from '../stores/partner/dsh-partner-offer-types';
 
 
 import type {

@@ -8,7 +8,7 @@ import type {
   DshPartnerSupportRouteId,
   DshPartnerSupportCommandContext,
   DshPartnerOperationalFlowId,
-} from '../../app-partner/domain/partner.types';
+} from '../stores/partner/partner.types';
 import {
   buildSupportCommandContextFromOperationalFlow,
   buildSupportCommandContextFromSupportRoute,

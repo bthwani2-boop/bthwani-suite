@@ -2,7 +2,7 @@
 // Re-exported for backward compat from state-machines/workflow.ts
 
 import type { DshPartnerActivationStatus } from './dsh-partner-activation.model';
-import { addDshAuditEntry, DshAuditEntry } from '../../shared/identity-access/dsh-role-permission.model';
+import { addDshAuditEntry, DshAuditEntry } from '../../identity-access/dsh-role-permission.model';
 export type PartnerComplaint = {
   id: string; partnerId: string; status: 'open' | 'investigating' | 'resolved';
   category: string; severity: 'high' | 'medium' | 'low'; description: string;

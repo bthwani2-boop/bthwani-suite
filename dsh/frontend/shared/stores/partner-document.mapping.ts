@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/documents/partner-document.mapping.ts
-// Authority: shared/partner/documents — mappings, labels and typed error helpers.
+// dsh/frontend/shared/stores/documents/partner-document.mapping.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import type { PartnerDocumentKind, PartnerDocumentStatus } from './partner-document.types';

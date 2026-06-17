@@ -40,7 +40,7 @@ import {
   resolveDshOnDemandPolicyLabel,
 } from '../runtime/dsh-flow-registry';
 
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared/dsh-control-panel-governance.map';
+import { resolveDshControlPanelSectionLabel } from '../runtime/dsh-control-panel-governance.map';
 import { getDshOrderLifecycleRuntimeClient } from '../runtime/ui-only-runtime-clients';
 import { fetchDshRuntimeOrders } from '../operations/dsh-operational-runtime-adapter';
 
@@ -49,7 +49,7 @@ import {
   CLIENT_ORDER_TERMINAL_STATUSES,
 } from './orders.adapters';
 
-import { mapRuntimeRowToPartnerOrderItem } from '../../app-partner/domain/partner.adapters';
+import { mapRuntimeRowToPartnerOrderItem } from '../stores/partner/partner.adapters';
 
 import {
   createDshOrderLifecycleHttpClient,

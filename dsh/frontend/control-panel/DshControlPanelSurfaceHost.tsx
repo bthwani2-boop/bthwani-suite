@@ -11,14 +11,14 @@ import {
 import { ControlPanelDshClosureDashboardScreen } from './dashboard';
 import { ControlPanelDshSupportHubScreen } from './support/SupportHubScreens';
 import { ControlPanelDshFinanceHubScreen } from './finance';
-import type { CanonicalFinanceGroupId, FinancePanelId } from '../../../wlt/frontend/dsh/shared';
+import type { CanonicalFinanceGroupId, FinancePanelId } from '../shared/wlt/generated/wlt_frontend_dsh_shared.facade';
 import { ControlPanelDshCatalogScreen } from './catalogs/catalogs.screen';
 import { ControlPanelDshPartnerApprovalsScreen } from './partners/ControlPanelDshPartnerApprovalsScreen';
 import { ControlPanelDshMarketingScreen } from './marketing/ControlPanelDshMarketingScreen';
 import { ControlPanelDshPlatformScreen } from './platform/ControlPanelDshPlatformScreen';
 import { ControlPanelDshAdministrationScreen } from './administration/ControlPanelDshAdministrationScreen';
 import { ControlPanelHrScreen } from './hr/ControlPanelHrScreen';
-import type { DshControlPanelSectionId } from './shared/dsh-control-panel-governance.map';
+import type { DshControlPanelSectionId } from '../shared/runtime/dsh-control-panel-governance.map';
 
 import { PlatformVarsProvider, FeatureFlagProvider } from '../shared';
 

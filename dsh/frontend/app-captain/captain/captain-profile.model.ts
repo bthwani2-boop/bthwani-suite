@@ -1,9 +1,9 @@
-// Canonical location: dsh/frontend/shared/captain/captain-profile.model.ts
-// Authority: dsh/frontend/shared/captain — captain active service type and app mode.
+// Canonical location: dsh/frontend/app-captain/captain/captain-profile.model.ts
+// Authority: dsh/frontend/app-captain/captain — captain surface-local orchestration pending Phase 2 classification.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { CaptainServiceType, CaptainAppMode } from './captain.contract';
+import type { CaptainServiceType, CaptainAppMode } from '../../shared/delivery/captain/captain.contract';
 
 export function useCaptainProfileModel() {
   const [activeServiceType, setActiveServiceType] = React.useState<CaptainServiceType>('dsh');

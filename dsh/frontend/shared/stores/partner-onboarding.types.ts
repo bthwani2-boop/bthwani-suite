@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/onboarding/partner-onboarding.types.ts
-// Authority: shared/partner/onboarding — partner onboarding types and status structures.
+// dsh/frontend/shared/stores/onboarding/partner-onboarding.types.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import type { DshFulfillmentDeliveryMode } from '../delivery';

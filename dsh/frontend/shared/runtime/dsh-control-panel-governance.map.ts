@@ -14,8 +14,8 @@
  *  - mobile surfaces import ONLY from dsh/frontend/shared (this file via index.ts).
  */
 
-import type { DshOnDemandPolicy, DshSurfaceId } from '../../shared/runtime/dsh-flow-registry';
-import type { BthwaniFullStackCapabilityId } from '../../shared/full-stack/bthwani-full-stack-capabilities';
+import type { DshOnDemandPolicy, DshSurfaceId } from './dsh-flow-registry';
+import type { BthwaniFullStackCapabilityId } from '../full-stack/bthwani-full-stack-capabilities';
 
 export const DSH_CONTROL_PANEL_SECTION_IDS = [
   'dashboard',

@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/onboarding/partner-onboarding-draft.model.ts
-// Authority: shared/partner/onboarding — managing local store draft state and synchronization.
+// dsh/frontend/shared/stores/onboarding/partner-onboarding-draft.model.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';

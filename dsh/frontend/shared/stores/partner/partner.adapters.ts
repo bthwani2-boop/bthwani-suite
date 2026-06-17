@@ -1,9 +1,9 @@
 // Partner adapters — order item mapping, profile builder, ops summary.
 // No JSX. No ui-kit. No Tamagui.
 
-import type { DshRuntimeOrderRow } from '../../shared/operations/dsh-operational-runtime-adapter';
-import { getSurfaceModeCapability } from '../../shared/identity-access';
-import type { DshOrderLifecycleHandoff } from '../../shared/orders/dsh-order-lifecycle-handoffs';
+import type { DshRuntimeOrderRow } from '../../operations/dsh-operational-runtime-adapter';
+import { getSurfaceModeCapability } from '../../identity-access';
+import type { DshOrderLifecycleHandoff } from '../../orders/dsh-order-lifecycle-handoffs';
 import type { PartnerStoreScopeOption, PartnerRuntimeProfile } from './partner.types';
 
 // ── Partner order item adapter ─────────────────────────────────────────────

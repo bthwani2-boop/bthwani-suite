@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/documents/partner-document.client.ts
-// Authority: shared/partner/documents — HTTP client for store documents backend API.
+// dsh/frontend/shared/stores/documents/partner-document.client.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import { PlatformVarsRegistry } from '../platform/platform-vars';

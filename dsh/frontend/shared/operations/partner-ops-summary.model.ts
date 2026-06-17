@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { getActionableHandoffsForSurface } from '../orders/dsh-order-lifecycle-handoffs';
-import { buildPartnerDeliveryOpsSummary } from '../../app-partner/domain/partner.adapters';
+import { buildPartnerDeliveryOpsSummary } from '../stores/partner/partner.adapters';
 import type { PartnerOrderItem } from '../orders';
 
 export function usePartnerOpsSummaryModel(partnerOrders: readonly PartnerOrderItem[]) {

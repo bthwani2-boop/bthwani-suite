@@ -10,12 +10,12 @@ import { useCaptainGpsModel } from './captain-gps.model';
 import { useCaptainNavigationModel } from './captain-navigation.model';
 import { useCaptainProfileModel } from './captain-profile.model';
 import { useCaptainServiceModeModel } from './captain-service-mode.model';
-import type { CaptainSupportRoute, DshCaptainRoute } from './captain.contract';
+import type { CaptainSupportRoute, DshCaptainRoute } from '../../shared/delivery/captain/captain.contract';
 import {
   useCaptainActiveLocationPush,
   useCaptainOrderRuntime,
   type DshCaptainLocationPush,
-} from './use-captain-order-runtime';
+} from '../../shared/delivery/captain/use-captain-order-runtime';
 import {
   useDshCaptainSurfaceModel as useDshCaptainSurfacePresenterModel,
   type DshCaptainNavigationCommand,

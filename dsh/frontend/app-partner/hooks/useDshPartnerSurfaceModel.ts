@@ -1,5 +1,5 @@
-// Canonical location: dsh/frontend/shared/partner/partner.surface-model.ts
-// Authority: dsh/frontend/shared/partner — thin orchestration shell for partner surface.
+// Canonical location: dsh/frontend/app-partner/hooks/useDshPartnerSurfaceModel.ts
+// Authority: dsh/frontend/app-partner — partner surface.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
@@ -9,8 +9,8 @@ import type {
   DshPartnerSupportCommandContext,
   DshPartnerOperationalFlowId,
   PartnerHubSection,
-} from '../contracts/partner.types';
-import { storeScopeOptions } from '../contracts/partner.types';
+} from '../../shared/stores/partner/partner.types';
+import { storeScopeOptions } from '../../shared/stores/partner/partner.types';
 import type { PartnerOrderItem } from '../../shared/orders';
 
 // Topic models
@@ -19,7 +19,7 @@ import { useStoreScopeModel } from '../../shared/stores/store-scope.model';
 import { usePartnerOrdersModel } from '../runtime-hooks/usePartnerOrdersModel';
 import { usePartnerSupportModel } from '../../shared/support/partner-support.model';
 import { usePartnerOpsSummaryModel } from '../../shared/operations/partner-ops-summary.model';
-import type { PartnerDeliveryOpsSummary } from '../contracts/partner.adapters';
+import type { PartnerDeliveryOpsSummary } from '../../shared/stores/partner/partner.adapters';
 
 export type DshPartnerSurfaceState = {
   route: DshPartnerRoute;

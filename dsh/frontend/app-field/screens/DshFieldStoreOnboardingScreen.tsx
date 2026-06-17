@@ -44,7 +44,7 @@ import {
   getOperationsSupportFlowsForSurface,
 } from '../../shared';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared/dsh-control-panel-governance.map';
+import { resolveDshControlPanelSectionLabel } from '../../shared/runtime/dsh-control-panel-governance.map';
 
 import { useOnboardingMedia } from './useOnboardingMedia';
 import {

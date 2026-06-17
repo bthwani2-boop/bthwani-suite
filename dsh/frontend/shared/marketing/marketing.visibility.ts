@@ -2,13 +2,13 @@ import {
   getDshPartnerActivationStateMetadata,
   isDshPartnerClientVisible,
   type DshPartnerActivationStatus,
-} from '../../app-partner/domain/dsh-partner-activation.model';
+} from '../stores/partner/dsh-partner-activation.model';
 import {
   getDshProductApprovalStateMetadata,
   isDshProductClientVisible,
   type DshProductIdentityApprovalStatus,
 } from '../products';
-import { canRenderInClientSurface } from '../../app-partner/domain/partner.workflow';
+import { canRenderInClientSurface } from '../stores/partner/partner.workflow';
 
 type CampaignRecord = {
   id: string;

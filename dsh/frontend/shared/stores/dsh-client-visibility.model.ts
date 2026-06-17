@@ -1,5 +1,5 @@
-import type { ApprovalStage } from '../../app-partner/domain/partner.workflow';
-import { getPartnerActivationStatus, resolvePartnerIdForStore } from '../../app-partner/domain/partner.workflow';
+import type { ApprovalStage } from './partner/partner.workflow';
+import { getPartnerActivationStatus, resolvePartnerIdForStore } from './partner/partner.workflow';
 import {
   getDshPartnerActivationStateMetadata,
   getDshPartnerReadinessChecklist,
@@ -8,7 +8,7 @@ import {
   type DshPartnerActivationStatus,
   type DshPartnerReadinessCheckItem,
   type DshPartnerVisibilityBadge,
-} from '../../app-partner/domain/dsh-partner-activation.model';
+} from './partner/dsh-partner-activation.model';
 import {
   getDshProductApprovalStateMetadata,
   getDshProductPublishingPrerequisites,

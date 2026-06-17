@@ -12,7 +12,7 @@ import type { DshClientState } from '../dsh-client.types';
 import type { DshCheckoutAuthContext } from '../../shared/checkout';
 import type { DshStoreMenuItem, DshDiscoveryStore } from '../../shared/products';
 import type { HomePromoRecord, MarketingGrowthRecord, MarketingVideoRecord } from '../../shared/marketing/marketing.types';
-import type { WltDshWalletSessionState } from '../../../../wlt/frontend/dsh/shared';
+import type { WltDshWalletSessionState } from '../../shared/wlt/generated/wlt_frontend_dsh_shared.facade';
 import type { DshStoreGetScreenProps } from '../screens/StoreScreen';
 import type { DshSignalSummary } from '../../shared/marketing/dsh-signal-layer.model';
 import type { DshOrderDetailsResponse } from '../../shared/orders';

@@ -39,7 +39,7 @@ import {
   resolveWltDshFinanceEventKindForPaymentMethod,
   useWltDshWalletSession,
   type WltDshFinanceEventKind,
-} from '../../../../wlt/frontend/dsh/shared';
+} from '../../shared/wlt/generated/wlt_frontend_dsh_shared.facade';
 import { resolveDshRuntimeImageSource } from '../../shared/media/resolve-runtime-image-source';
 import {
   type DshClientCreateOrderRequest,

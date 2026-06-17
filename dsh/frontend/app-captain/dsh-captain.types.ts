@@ -1,7 +1,7 @@
 import type {
   DshCaptainRoute,
   DshCaptainCommandTarget,
-} from './captain/captain.contract';
+} from '../shared/delivery/captain/captain.contract';
 
 export type { DshCaptainRoute, DshCaptainCommandTarget };
 

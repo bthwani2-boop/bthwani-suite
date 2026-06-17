@@ -10,3 +10,6 @@ export * from './delivery.view-model';
 
 // Adapters
 export * from './delivery.adapters';
+export * from './captain/captain.contract';
+export * from './captain/captain.surface.types';
+export * from './captain/use-captain-order-runtime';

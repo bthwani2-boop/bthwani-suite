@@ -6,7 +6,7 @@ import {
 import {
   fetchDshRuntimeOrders,
 } from '../../shared/operations/dsh-operational-runtime-adapter';
-import { mapRuntimeRowToPartnerOrderItem } from '../contracts/partner.adapters';
+import { mapRuntimeRowToPartnerOrderItem } from '../../shared/stores/partner/partner.adapters';
 import { usePlatformVars } from '../../shared/platform/PlatformVarsProvider';
 
 type PartnerOrderItemLike = ReturnType<typeof mapRuntimeRowToPartnerOrderItem>;

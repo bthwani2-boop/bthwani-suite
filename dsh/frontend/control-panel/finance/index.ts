@@ -2,8 +2,8 @@
 // All logic (registry, types, api-matrix, hub rendering) lives in wlt/frontend/dsh/control-panel/.
 
 // Hub screen
-export { WltDshFinanceHubHost as ControlPanelDshFinanceHubScreen } from '../../../../wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost';
-export type { WltDshFinanceHubHostProps as ControlPanelDshFinanceScreenProps } from '../../../../wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost';
+export { WltDshFinanceHubHost as ControlPanelDshFinanceHubScreen } from '../../shared/wlt/generated/wlt_frontend_dsh_control_panel_screens_WltDshFinanceHubHost.facade';
+export type { WltDshFinanceHubHostProps as ControlPanelDshFinanceScreenProps } from '../../shared/wlt/generated/wlt_frontend_dsh_control_panel_screens_WltDshFinanceHubHost.facade';
 
 // Finance routing types
 export type {
@@ -12,7 +12,7 @@ export type {
   FinanceViewState,
   FinanceGroupMeta,
   FinanceNormalizationResult,
-} from '../../../../wlt/frontend/dsh/shared';
+} from '../../shared/wlt/generated/wlt_frontend_dsh_shared.facade';
 
 // Finance routing helpers
 export {
@@ -22,4 +22,4 @@ export {
   buildFinanceHref,
   getFinanceGroupMeta,
   normalizeFinanceLocation,
-} from '../../../../wlt/frontend/dsh/shared';
+} from '../../shared/wlt/generated/wlt_frontend_dsh_shared.facade';

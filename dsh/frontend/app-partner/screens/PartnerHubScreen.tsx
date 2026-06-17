@@ -32,21 +32,21 @@ import {
   getWltDshPartnerCommissionLabel,
   getWltDshPartnerOperationalModeCommission,
   wltDshPartnerUiCopy,
-} from '../../../../wlt/frontend/dsh/app-partner/wlt-dsh-partner.ui-copy';
+} from '../../shared/wlt/generated/wlt_frontend_dsh_app_partner_wlt_dsh_partner_ui_copy.facade';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
 import type { DshCanonicalStoreCard } from '../../shared/products';
 import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/stores/dsh-client-visibility.model';
-import { dshPromotionCandidates, type DshPromotionCandidate } from '../contracts/partner.workflow';
-import { WltDshPartnerBridge } from '../../../../wlt/frontend/dsh/app-partner';
+import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/stores/partner/partner.workflow';
+import { WltDshPartnerBridge } from '../../shared/wlt/generated/wlt_frontend_dsh_app_partner.facade';
 import type { DshFulfillmentDeliveryMode } from '../../shared/orders';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
-import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../control-panel/shared/dsh-control-panel-governance.map';
+import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared/runtime/dsh-control-panel-governance.map';
 import {
   getDshPartnerJourneyStep,
   resolveDshPartnerLifecycleStageLabel,
   type DshPartnerLifecycleStage,
-} from '../contracts/partner.journey';
-import { getDshPartnerActivationStatusLabel } from '../contracts/dsh-partner-activation.model';
+} from '../../shared/stores/partner/partner.journey';
+import { getDshPartnerActivationStatusLabel } from '../../shared/stores/partner/dsh-partner-activation.model';
 import { useDshEntityMedia } from '../../shared/media/useDshEntityMedia';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';

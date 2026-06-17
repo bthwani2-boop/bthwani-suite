@@ -1,9 +1,9 @@
-// Canonical location: dsh/frontend/shared/captain/captain-service-mode.model.ts
-// Authority: dsh/frontend/shared/captain — service type and store-courier mode switching.
+// Canonical location: dsh/frontend/app-captain/captain/captain-service-mode.model.ts
+// Authority: dsh/frontend/app-captain/captain — captain surface-local orchestration pending Phase 2 classification.
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { CaptainServiceType, CaptainAppMode, DshCaptainRoute } from './captain.contract';
+import type { CaptainServiceType, CaptainAppMode, DshCaptainRoute } from '../../shared/delivery/captain/captain.contract';
 
 type ServiceModeDeps = {
   setActiveServiceType: React.Dispatch<React.SetStateAction<CaptainServiceType>>;

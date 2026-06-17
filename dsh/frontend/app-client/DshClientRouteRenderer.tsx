@@ -25,7 +25,7 @@ import { DshAddressLocationScreen } from './screens/AddressLocationScreen';
 import { DshIdentityHubScreen } from './screens/DshIdentityHubScreen';
 import { DshPreferencesHubScreen } from './screens/DshPreferencesHubScreen';
 import { DshAppearanceHubScreen } from './screens/DshAppearanceHubScreen';
-import { WltHomeGetScreen } from '../../../wlt/frontend/app-client-wlt';
+import { WltHomeGetScreen } from '../shared/wlt/generated/wlt_frontend_app_client_wlt.facade';
 import { hostClientStates } from './dsh-client.navigation-bridge';
 import { buildDshClientCheckoutPresenterModel } from '../shared/checkout';
 import { mapLiveOrderStatusToClientState } from '../shared/orders';

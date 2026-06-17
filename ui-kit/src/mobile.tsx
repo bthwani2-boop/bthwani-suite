@@ -19,7 +19,7 @@ function MobileRootFrame({ children }: { children: ReactNode }) {
         barStyle={mode === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={theme.background}
       />
-      <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={{ flex: 1, backgroundColor: theme.background }}>
         {children}
       </SafeAreaView>
     </>

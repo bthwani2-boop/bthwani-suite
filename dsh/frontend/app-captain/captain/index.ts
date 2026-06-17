@@ -1,7 +1,7 @@
-// Canonical location: dsh/frontend/shared/captain/index.ts
-// Authority: dsh/frontend/shared/captain — captain domain entrypoint.
+// Canonical location: dsh/frontend/app-captain/captain/index.ts
+// Authority: dsh/frontend/app-captain/captain — captain surface-local orchestration pending Phase 2 classification.
 
-export * from './captain.contract';
+export * from '../../shared/delivery/captain/captain.contract';
 export * from './captain.cod';
 export * from './captain.state';
 export * from './captain.surface-model';

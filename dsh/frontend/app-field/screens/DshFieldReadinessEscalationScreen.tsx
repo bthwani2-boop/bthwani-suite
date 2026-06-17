@@ -20,7 +20,7 @@ import {
 } from '@bthwani/ui-kit';
 import { getOperationsSupportFlowSpec, getOperationsSupportFlowsForSurface } from '../../shared';
 import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared/dsh-control-panel-governance.map';
+import { resolveDshControlPanelSectionLabel } from '../../shared/runtime/dsh-control-panel-governance.map';
 
 
 export type DshFieldReadinessEscalationScreenProps = {

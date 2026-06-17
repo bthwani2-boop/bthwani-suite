@@ -32,6 +32,6 @@ export {
 	resolveDshControlPanelSectionLabel,
 	type DshControlPanelGovernanceEntry,
 	type DshControlPanelSectionId,
-} from './dsh-control-panel-governance.map';
+} from '../../shared/runtime/dsh-control-panel-governance.map';
 export { getDshRecommendationConfidenceLabel, getDshRecommendationSeverityLabel, DSH_CROSS_SURFACE_JOURNEYS, type DshRecommendationConfidence, type DshRecommendationSeverity, type DshUnifiedRecommendation } from './dsh-control-panel-display';
 export { DSH_CONTROL_PANEL_TONE_MAP, resolveRuntimeOrderStatusTone, type DshControlPanelTone } from './dsh-control-panel-display';

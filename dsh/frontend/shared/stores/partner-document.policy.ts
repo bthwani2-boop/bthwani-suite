@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/documents/partner-document.policy.ts
-// Authority: shared/partner/documents — contract compliance and verification policy rules.
+// dsh/frontend/shared/stores/documents/partner-document.policy.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import type { PartnerDocumentKind } from './partner-document.types';

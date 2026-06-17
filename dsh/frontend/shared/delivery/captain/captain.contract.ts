@@ -1,9 +1,9 @@
-// Canonical location: dsh/frontend/shared/captain/captain.contract.ts
-// Authority: dsh/frontend/shared/captain — captain domain contract definitions.
+// Canonical location: dsh/frontend/shared/delivery/captain/captain.contract.ts
+// Authority: dsh/frontend/shared/delivery/captain — shared captain delivery contracts/runtime.
 
-import type { DshCaptainOrderAction, DshCaptainOrderId, DshCaptainOrderMode, DshCaptainOrderProofStatus, DshCaptainOrderStage } from '../../shared/orders/dsh-order.contract';
-import type { DshOnDemandPolicy } from '../../shared/runtime/dsh-flow-registry';
-import { getDshFlowById } from '../../shared/runtime/dsh-flow-registry';
+import type { DshCaptainOrderAction, DshCaptainOrderId, DshCaptainOrderMode, DshCaptainOrderProofStatus, DshCaptainOrderStage } from '../../orders/dsh-order.contract';
+import type { DshOnDemandPolicy } from '../../runtime/dsh-flow-registry';
+import { getDshFlowById } from '../../runtime/dsh-flow-registry';
 
 export type CaptainServiceType = 'dsh' | 'amn';
 export type CaptainAvailabilityStatus = 'available' | 'unavailable' | 'break' | 'planned-leave';

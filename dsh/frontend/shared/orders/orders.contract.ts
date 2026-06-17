@@ -3,7 +3,7 @@ import {
   getDshDeliveryModeDefinition,
   type DshFulfillmentDeliveryMode,
 } from '../delivery/delivery.contract';
-import type { DshControlPanelSectionId } from '../../control-panel/shared/dsh-control-panel-governance.map';
+import type { DshControlPanelSectionId } from '../runtime/dsh-control-panel-governance.map';
 import type { DshOnDemandPolicy, DshSurfaceId } from '../runtime/dsh-flow-registry';
 import {
   getDshSignalActorRoute,

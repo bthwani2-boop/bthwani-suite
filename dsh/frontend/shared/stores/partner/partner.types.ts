@@ -1,7 +1,7 @@
 // DSH Partner domain — operational flows, intake, workspace, scope, profile types.
 // No JSX. No ui-kit. No Tamagui.
 
-import type { DshFulfillmentDeliveryMode } from '../../shared/delivery';
+import type { DshFulfillmentDeliveryMode } from '../../delivery';
 
 // ── Operational Flows ──────────────────────────────────────────────────────
 

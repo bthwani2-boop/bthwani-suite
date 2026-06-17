@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/visits/dsh-field-visit.client.ts
-// Authority: shared/partner/visits — HTTP client for field agent visits backend API.
+// dsh/frontend/shared/stores/visits/dsh-field-visit.client.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import { PlatformVarsRegistry } from '../platform/platform-vars';

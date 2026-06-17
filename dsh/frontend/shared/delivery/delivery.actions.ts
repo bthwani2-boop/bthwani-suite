@@ -3,9 +3,9 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { CompactOrderChatMessage, CaptainAppMode } from '../../app-captain/captain/captain.contract';
-import type { StoreCourierStage, ActiveOrderPhase } from '../../app-captain/captain/captain.surface.types';
-import { resolveDshRuntimeOrderId, useCaptainOrderRuntime } from '../../app-captain/captain/use-captain-order-runtime';
+import type { CompactOrderChatMessage, CaptainAppMode } from './captain/captain.contract';
+import type { StoreCourierStage, ActiveOrderPhase } from './captain/captain.surface.types';
+import { resolveDshRuntimeOrderId, useCaptainOrderRuntime } from './captain/use-captain-order-runtime';
 
 export type DeliveryActionsDeps = {
   captainRuntimeId: string;

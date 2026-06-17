@@ -1,5 +1,5 @@
-// Canonical location: dsh/frontend/shared/captain/captain.surface-model.ts
-// Authority: dsh/frontend/shared/captain — thin orchestration shell for captain surface.
+// Canonical location: dsh/frontend/app-captain/captain/captain.surface-model.ts
+// Authority: dsh/frontend/app-captain/captain — captain surface-local orchestration pending Phase 2 classification.
 // Wires topic models (navigation, chat, service-mode, pod, delivery) around shared state.
 // Composition-only: no local React state or side-effects.
 // No JSX. No ui-kit. No Tamagui.
@@ -8,16 +8,16 @@ import React from 'react';
 import type {
   DshCaptainRoute,
   CaptainSupportRoute,
-} from './captain.contract';
+} from '../../shared/delivery/captain/captain.contract';
 import type {
   DshCaptainLocationPush,
   useCaptainOrderRuntime,
-} from './use-captain-order-runtime';
+} from '../../shared/delivery/captain/use-captain-order-runtime';
 import type {
   DshCaptainNavigationCommand,
   DshCaptainSurfaceState,
   DshCaptainSurfaceDerived,
-} from './captain.surface.types';
+} from '../../shared/delivery/captain/captain.surface.types';
 import { buildCaptainDerived } from './captain.derived';
 
 import type { useCaptainAvailabilityModel } from './captain-availability.model';
@@ -37,7 +37,7 @@ export type {
   DshCaptainNavigationCommand,
   DshCaptainSurfaceState,
   DshCaptainSurfaceDerived,
-} from './captain.surface.types';
+} from '../../shared/delivery/captain/captain.surface.types';
 
 export type DshCaptainSurfaceSharedProps = {
   command: DshCaptainNavigationCommand;

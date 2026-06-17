@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/readiness/partner-readiness.client.ts
-// Authority: shared/partner/readiness — HTTP client for store readiness approvals/escalations API.
+// dsh/frontend/shared/stores/readiness/partner-readiness.client.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import { PlatformVarsRegistry } from '../platform/platform-vars';

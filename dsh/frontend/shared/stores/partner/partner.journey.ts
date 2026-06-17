@@ -2,7 +2,7 @@
 // Canonical location: partner/partner.journey.ts
 // Re-exported for backward compat from state-machines/dsh-partner-onboarding-journey.map.ts
 
-import type { DshOnDemandPolicy, DshSurfaceId } from '../../shared/runtime/dsh-flow-registry';
+import type { DshOnDemandPolicy, DshSurfaceId } from '../../runtime/dsh-flow-registry';
 
 // ---------------------------------------------------------------------------
 // Core type definitions

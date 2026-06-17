@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/onboarding/partner-onboarding.validation.ts
-// Authority: shared/partner/onboarding — validation rules for onboarding screens.
+// dsh/frontend/shared/stores/onboarding/partner-onboarding.validation.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import type { PartnerOnboardingDraft } from './partner-onboarding.types';

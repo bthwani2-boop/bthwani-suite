@@ -1,16 +1,16 @@
-// Canonical location: dsh/frontend/shared/captain/captain.derived.ts
-// Authority: dsh/frontend/shared/captain — pure derived-state computation for captain surface.
+// Canonical location: dsh/frontend/app-captain/captain/captain.derived.ts
+// Authority: dsh/frontend/app-captain/captain — captain surface-local orchestration pending Phase 2 classification.
 // No JSX. No ui-kit. No Tamagui. No React hooks — all computations are pure functions.
 
 import {
   type CaptainAvailabilityStatus,
   type DshCaptainRoute,
   getCaptainAvailabilityMeta,
-} from './captain.contract';
+} from '../../shared/delivery/captain/captain.contract';
 import { EMPTY_CAPTAIN_ORDER_SUMMARY } from './captain.cod';
-import { resolveDshRuntimeOrderId } from './use-captain-order-runtime';
+import { resolveDshRuntimeOrderId } from '../../shared/delivery/captain/use-captain-order-runtime';
 import { isCaptainPodRequiredForMode, isCaptainCodCollectorForMode } from '../../shared/identity-access/surface-visibility.policy';
-import type { DshCaptainSurfaceState, DshCaptainSurfaceDerived } from './captain.surface.types';
+import type { DshCaptainSurfaceState, DshCaptainSurfaceDerived } from '../../shared/delivery/captain/captain.surface.types';
 
 const CAPTAIN_BOTTOM_NAV_ROUTES = new Set<DshCaptainRoute>([
   'home', 'map', 'inbox', 'account', 'account-finance', 'account-orders',

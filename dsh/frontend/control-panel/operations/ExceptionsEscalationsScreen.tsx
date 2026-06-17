@@ -23,7 +23,7 @@ import {
   getDshRenderableFlowsForSurface,
   type DshFlowRegistryEntry,
 } from '../../shared/runtime/dsh-flow-registry';
-import { findDshControlPanelGovernanceSectionByFlowId } from '../shared/dsh-control-panel-governance.map';
+import { findDshControlPanelGovernanceSectionByFlowId } from '../../shared/runtime/dsh-control-panel-governance.map';
 import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 
 export type ExceptionsEscalationsScreenProps = { hubHref: string; subGroup?: string; };

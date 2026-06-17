@@ -3,7 +3,7 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { DshPartnerRoute } from '../domain/partner.types';
+import type { DshPartnerRoute } from '../../shared/stores/partner/partner.types';
 import { usePartnerOrdersRuntime } from './usePartnerOrdersRuntime';
 import type { PartnerOrderItem } from '../../shared/orders/orders.contract';
 

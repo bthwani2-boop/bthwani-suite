@@ -20,7 +20,7 @@ import type { DshStoreSearchCategory } from './stores.adapters';
 import type { DshDiscoveryStore, DshCanonicalStoreCard } from './stores.presentation';
 import type { DshStoreMenuItem } from '../products';
 import { getDshFulfillmentDeliveryModeMeta } from '../cart';
-import { canRenderInClientSurface } from '../../app-partner/domain/partner.workflow';
+import { canRenderInClientSurface } from './partner/partner.workflow';
 import { getDshClientStateMeta } from '../orders/orders.client-state';
 import { resolveDshRuntimeImageSource } from '../media/resolve-runtime-image-source';
 import { resolveDshStoreClientVisibility } from '../stores/dsh-client-visibility.model';

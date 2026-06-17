@@ -1,6 +1,6 @@
 import React from 'react';
 import { getSnapshot } from '../commissions/field-finance-runtime.adapter';
-import { wltDshFieldBridgeDataContract } from '../bridges/wlt-dsh-field-bridge.contract';
+import { wltDshFieldBridgeDataContract } from '../contracts/wlt-dsh-field-bridge.contract';
 import type {
   WltDshFinanceSummaryRecord,
   WltFieldFinanceSnapshot,

@@ -50,7 +50,7 @@ import {
   useTheme,
   spacing,
 } from '@bthwani/ui-kit';
-import { resolveDshControlPanelSectionLabel } from '../../control-panel/shared/dsh-control-panel-governance.map';
+import { resolveDshControlPanelSectionLabel } from '../../shared/runtime/dsh-control-panel-governance.map';
 import {
   type ApprovalStage,
   getPartnerQueueRecords,
@@ -59,7 +59,7 @@ import {
   translateStage,
   translateEntityType,
   canRenderInClientSurface,
-} from '../contracts/partner.workflow';
+} from '../../shared/stores/partner/partner.workflow';
 
 
 // ── Light list model — only what is needed per row ────────────────────

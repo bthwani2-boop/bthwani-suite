@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/onboarding/partner-onboarding.lifecycle.ts
-// Authority: shared/partner/onboarding — lifecycle, status, completion and progress logic.
+// dsh/frontend/shared/stores/onboarding/partner-onboarding.lifecycle.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import type {

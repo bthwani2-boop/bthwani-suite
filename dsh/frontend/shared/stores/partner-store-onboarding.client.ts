@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/onboarding/partner-store-onboarding.client.ts
-// Authority: shared/partner/onboarding — HTTP client for store creation backend API.
+// dsh/frontend/shared/stores/onboarding/partner-store-onboarding.client.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import { PlatformVarsRegistry } from '../platform/platform-vars';

@@ -1,5 +1,5 @@
-// Canonical location: dsh/frontend/shared/captain/captain.cod.ts
-// Authority: dsh/frontend/shared/captain — captain COD tracking and initialization structures.
+// Canonical location: dsh/frontend/app-captain/captain/captain.cod.ts
+// Authority: dsh/frontend/app-captain/captain — captain surface-local orchestration pending Phase 2 classification.
 
 export type DshCaptainCodState =
   | 'no_cod'

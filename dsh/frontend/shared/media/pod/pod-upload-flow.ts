@@ -3,7 +3,7 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { CaptainAppMode } from '../../../app-captain/captain/captain.contract';
+import type { CaptainAppMode } from '../../delivery/captain/captain.contract';
 import { getCaptainLifecycleForOrderStage } from '../../delivery/delivery.policy';
 
 export function usePodUploadFlow() {

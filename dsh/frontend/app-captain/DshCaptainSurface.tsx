@@ -18,7 +18,7 @@ import {
   BottomNavBar, Box, colorPalette, Icon, MobileScrollView, MobileWorkspaceHeader,
   ModernPremiumHeader, StateView, Surface, useTheme,
 } from '@bthwani/ui-kit';
-import { wltDshCaptainUiCopy, buildWltDshCaptainTopBarLocationLabel } from '../../../wlt/frontend/dsh/app-captain/wlt-dsh-captain.ui-copy';
+import { wltDshCaptainUiCopy, buildWltDshCaptainTopBarLocationLabel } from '../shared/wlt/generated/wlt_frontend_dsh_app_captain_wlt_dsh_captain_ui_copy.facade';
 import { DshCaptainStoreCourierHomeContent } from './screens/DshCaptainStoreCourierHomeContent';
 import { DshCaptainMapLayer } from './screens/DshCaptainMapLayer';
 import { DshCaptainHomeOrderPanel } from './screens/DshCaptainHomeOrderPanel';

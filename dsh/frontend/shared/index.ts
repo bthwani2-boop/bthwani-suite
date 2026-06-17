@@ -48,7 +48,7 @@ export type {
   ApprovalStageTone,
   DshPromotionCandidate,
   DshPromotionIntentStatus,
-} from '../app-partner/domain/partner.workflow';
+} from './stores/partner/partner.workflow';
 export {
   translateStage,
   translateEntityType,
@@ -70,4 +70,4 @@ export {
   dshPromotionCandidates,
   getPromotionCandidates,
   getPartnerIntakeItems,
-} from '../app-partner/domain/partner.workflow';
+} from './stores/partner/partner.workflow';

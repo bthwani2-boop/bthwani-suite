@@ -180,7 +180,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
     setDesks((prev) =>
       prev.map((d) => {
         if (d.deskId !== selectedDesk.deskId) return d;
-        return { ...d, deliveryModeSelector: { ...d.deliveryModeSelector, selectedMode: modeId as import('../../app-client/contracts/dsh-client-binding.contracts').DshFulfillmentDeliveryMode } };
+        return { ...d, deliveryModeSelector: { ...d.deliveryModeSelector, selectedMode: modeId as import('../../shared/delivery/delivery.contract').DshFulfillmentDeliveryMode } };
       }),
     );
   };

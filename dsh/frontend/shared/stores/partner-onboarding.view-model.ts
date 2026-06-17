@@ -1,5 +1,5 @@
-// dsh/frontend/shared/partner/onboarding/partner-onboarding.view-model.ts
-// Authority: shared/partner/onboarding — mapping options, summaries, and simulation helpers.
+// dsh/frontend/shared/stores/onboarding/partner-onboarding.view-model.ts
+// Authority: dsh/frontend/shared/stores — shared DSH stores/onboarding/review domain.
 // No JSX. No ui-kit. No Tamagui.
 
 import type { PartnerOnboardingDraft, PartnerOnboardingSectionId } from './partner-onboarding.types';

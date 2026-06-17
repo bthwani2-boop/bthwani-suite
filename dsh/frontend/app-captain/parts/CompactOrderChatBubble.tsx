@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge, Box, Surface, Text } from '@bthwani/ui-kit';
-import type { CompactOrderChatMessage } from '../captain/captain.contract';
+import type { CompactOrderChatMessage } from '../../shared/delivery/captain/captain.contract';
 
 export function CompactOrderChatBubble({ message }: { message: CompactOrderChatMessage }) {
   const isOutbound = message.side === 'end';

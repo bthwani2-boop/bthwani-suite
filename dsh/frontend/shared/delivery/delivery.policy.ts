@@ -1,7 +1,7 @@
 // Canonical location: dsh/frontend/shared/delivery/delivery.policy.ts
 // Authority: dsh/frontend/shared/delivery — delivery route and handoff policies.
 
-import type { DshCaptainRoute, DshCaptainCommandTarget } from '../../app-captain/captain/captain.contract';
+import type { DshCaptainRoute, DshCaptainCommandTarget } from './captain/captain.contract';
 import type { DshCaptainOrderStage } from '../orders/dsh-order.contract';
 import type { DshFulfillmentDeliveryMode } from '../cart/cart.contract';
 import { getHandoffsForSurface, type DshOrderLifecycleHandoff } from '../orders/dsh-order-lifecycle-handoffs';
