@@ -6,12 +6,12 @@
   "main": "./index.js",
   "dependencies": {
     "@bthwani/ui-kit": "workspace:*",
-    "@react-native-async-storage/async-storage": "3.0.2",
-    "expo": "^54.0.0",
-    "expo-dev-client": "~6.0.20",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~54.0.35",
+    "expo-dev-client": "~6.0.21",
     "react": "19.1.0",
-    "react-native": "0.81.0",
-    "react-native-safe-area-context": "^4.14.1"
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "~5.6.0"
   },
   "scripts": {
     "dev": "expo start --dev-client --clear",

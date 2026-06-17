@@ -15,7 +15,7 @@
   "devDependencies": {
     "@types/react": "^19.2.14",
     "react": "19.1.0",
-    "react-native": "0.81.0",
+    "react-native": "0.81.5",
     "typescript": "5.9.3"
   },
   "dependencies": {
@@ -23,15 +23,15 @@
     "@tamagui/config": "2.0.0-rc.41",
     "@tamagui/native": "2.0.0-rc.41",
     "react": "19.1.0",
-    "react-native": "0.81.0",
-    "react-native-safe-area-context": "^4.14.1",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "~5.6.0",
     "tamagui": "2.0.0-rc.41"
   },
   "peerDependencies": {
     "@tamagui/config": "2.0.0-rc.41",
     "next": "16.2.2",
     "react": "19.1.0",
-    "react-native": "0.81.0",
+    "react-native": "0.81.5",
     "tamagui": "2.0.0-rc.41"
   },
   "exports": {

@@ -80,10 +80,14 @@
   "packageManager": "pnpm@8.15.0+sha512.ea45517d5285d123eac02c3793505fa1fd6da90a2fc60d1e8d9e0c1e9292886ecfaff513f062b9d1cc8021bb8615033b1ac5bea3b2ee3fc165a6d7034bbe6b03",
   "pnpm": {
     "overrides": {
-      "expo": "~54.0.0",
+      "expo": "~54.0.35",
       "react": "19.1.0",
       "react-dom": "19.1.0",
-      "react-native": "0.81.0"
+      "react-native": "0.81.5",
+      "expo-dev-client": "~6.0.21",
+      "expo-modules-core": "~3.0.30",
+      "@react-native-async-storage/async-storage": "2.2.0",
+      "react-native-safe-area-context": "~5.6.0"
     }
   },
   "devDependencies": {
@@ -92,7 +96,7 @@
     "@expo/vector-icons": "15.1.1",
     "@ls-lint/ls-lint": "2.3.1",
     "@playwright/test": "1.58.2",
-    "@react-native-async-storage/async-storage": "3.0.2",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "@stoplight/spectral-cli": "6.16.0",
     "@tamagui/cli": "2.0.0-rc.41",
     "@tamagui/config": "2.0.0-rc.41",
@@ -109,7 +113,7 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-compiler": "19.1.0-rc.2",
     "eslint-plugin-react-hooks": "^5.1.0",
-    "expo": "^54.0.0",
+    "expo": "~54.0.35",
     "globals": "^16.0.0",
     "jscpd": "5.0.6",
     "knip": "6.16.1",
@@ -119,13 +123,16 @@
     "openapi-typescript": "7.13.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "react-native": "0.81.0",
+    "react-native": "0.81.5",
     "react-scanner": "1.2.0",
     "repomix": "1.14.1",
     "sherif": "1.11.1",
     "style-dictionary": "5.4.4",
     "stylelint": "17.13.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "expo-dev-client": "~6.0.21",
+    "expo-modules-core": "~3.0.30",
+    "react-native-safe-area-context": "~5.6.0"
   },
   "dependencies": {
     "expo-image-picker": "56.0.18"
