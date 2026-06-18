@@ -9,7 +9,7 @@ import {
   WebControlPanelDecisionRow
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS } from './workflow';
-import type { DshPartnerModeAgreement } from './workflow';
+import type { DshPartnerModeAgreement } from '../../shared/stores/partner/partner.types';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type PartnerFulfillmentLaneProps = {

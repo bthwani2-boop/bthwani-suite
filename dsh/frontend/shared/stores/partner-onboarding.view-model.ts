@@ -58,7 +58,7 @@ export function resolvePartnerSectionSummaryLabel(draft: PartnerOnboardingDraft,
   }
   if (sectionId === 'documents') {
     const cr = draft.documents.commercialRegistrationRef.trim();
-    const id = draft.documents.ownerIdRef.trim();
+    const id = draft.documents.identityProofRef.trim();
     return cr || id ? 'تم إرفاق وثائق السجل التجاري والهوية للمراجعة' : 'لم ترفع أي مستندات';
   }
   if (sectionId === 'products') {

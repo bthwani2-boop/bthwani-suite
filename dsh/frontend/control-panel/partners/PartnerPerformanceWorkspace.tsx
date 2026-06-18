@@ -11,7 +11,16 @@ import {
 import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerDisputes, updatePartnerDisputeStatus } from './workflow';
 import type { PartnerDispute } from '../../shared';
 const PARTNER_PERFORMANCE_METRICS: { id: string; capacity: string; compliance: string; kpis: { onTime: string; cancelRate: string; rating: string }; disputes: number }[] = [];
-const PARTNER_VISIBILITY_TIMELINE_DATA: unknown[] = [];
+type PartnerVisibilityTimelineEvent = {
+  id: string;
+  partnerId: string;
+  eventType: 'activated' | 'paused';
+  date: string;
+  reason: string;
+  actionBy: string;
+};
+
+const PARTNER_VISIBILITY_TIMELINE_DATA: PartnerVisibilityTimelineEvent[] = [];
 import styles from '../shared/control-panel-surface.module.css';
 
 function parseKpiPercent(value: string): number {

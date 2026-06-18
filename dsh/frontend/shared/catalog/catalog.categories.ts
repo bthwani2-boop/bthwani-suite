@@ -32,7 +32,7 @@ export function useDshPartnerCategories(storeId: string): DshPartnerCategoriesRe
       .listCategories(storeId, { limit: 100 })
       .then((resp) => {
         const cats = resp.categories ?? [];
-        setCategories(cats);
+        setCategories([...cats]);
         setState(cats.length === 0 ? 'empty' : 'ready');
       })
       .catch(() => setState('error'));

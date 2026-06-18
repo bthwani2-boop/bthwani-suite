@@ -191,6 +191,7 @@ export function useDshOrderTracking({
     if (!config) return undefined;
     let cancelled = false;
     const orderClient = getDshOrderLifecycleRuntimeClient(checkoutAuth);
+    if (!orderClient) return undefined;
     orderClient.listOrders({ limit: 50 })
       .then((resp) => {
         if (cancelled || !resp.orders.length) return;
@@ -221,6 +222,10 @@ export function useDshOrderTracking({
     if (!config) { setLiveOrderDetails(null); return undefined; }
 
     const orderClient = getDshOrderLifecycleRuntimeClient(checkoutAuth);
+    if (!orderClient) {
+      setLiveOrderDetails(null);
+      return undefined;
+    }
     let cancelled = false;
     let timeout: ReturnType<typeof setTimeout> | undefined;
     let nextDelayMs = 2000;
@@ -322,6 +327,7 @@ export function useDshOrderTracking({
     if (!config || !selectedOrderId) return;
 
     const orderClient = getDshOrderLifecycleRuntimeClient(checkoutAuth);
+    if (!orderClient) return;
     orderClient.cancelOrder(selectedOrderId, { actor: 'client', note: 'إلغاء الطلب من قبل العميل' })
       .then(() => orderClient.getOrder(selectedOrderId))
       .then((details) => {
@@ -338,6 +344,7 @@ export function useDshOrderTracking({
     if (!config || !selectedOrderId) return;
 
     const orderClient = getDshOrderLifecycleRuntimeClient(checkoutAuth);
+    if (!orderClient) return;
     await orderClient.createSupportEscalation({ order_id: selectedOrderId, actor: 'client', issue_type: issueType as any, description });
     const details = await orderClient.getOrder(selectedOrderId);
     setLiveOrderDetails(details);

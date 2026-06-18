@@ -26,6 +26,7 @@ const GEO_HEATMAP_ZONES: GeoHeatmapZone[] = [];
 import styles from '../shared/control-panel-surface.module.css';
 import {
   buildRecommendation,
+  isGeoFilterId,
   matchesFilter,
   matchesSubTab,
   resolveMapPinLabel,
@@ -44,13 +45,14 @@ const SUB_TABS = [
   { id: 'peak', label: 'الذروة' },
 ] as const;
 
-const TERTIARY_FILTERS: readonly GeoFilterId[] = ['الآن', '١٥ دقيقة', '٣٠ دقيقة', 'خطر عالٍ', 'نقص كباتن', 'ضغط متاجر'];
-
-const FILTER_LABELS: Record<string, string> = {
-  orders: 'الطلبات', captains: 'الكباتن', stores: 'المتاجر', sla: 'الالتزام', peak: 'الذروة',
-  'الآن': 'الآن', '١٥ دقيقة': '١٥ دقيقة', '٣٠ دقيقة': '٣٠ دقيقة',
-  'خطر عالٍ': 'خطر عالٍ', 'نقص كباتن': 'نقص كباتن', 'ضغط متاجر': 'ضغط متاجر',
-};
+const TERTIARY_FILTERS = [
+  { id: 'now', label: 'الآن' },
+  { id: '15m', label: '١٥ دقيقة' },
+  { id: '30m', label: '٣٠ دقيقة' },
+  { id: 'high-risk', label: 'خطر عالٍ' },
+  { id: 'captain-shortage', label: 'نقص كباتن' },
+  { id: 'store-pressure', label: 'ضغط متاجر' },
+] as const satisfies ReadonlyArray<{ id: GeoFilterId; label: string }>;
 
 const ZONE_LAYOUT: Record<string, {
   zone: { top: string; right: string; width: string; height: string };
@@ -83,7 +85,7 @@ const ZONE_LAYOUT: Record<string, {
 
 export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGroup?: string }) {
   const [activeSubTab, setActiveSubTab] = React.useState(subGroup ?? 'orders');
-  const [activeFilter, setActiveFilter] = React.useState<GeoFilterId>('الآن');
+  const [activeFilter, setActiveFilter] = React.useState<GeoFilterId>('now');
   const [selectedZoneId, setSelectedZoneId] = React.useState(GEO_HEATMAP_ZONES[0]?.id ?? '');
   const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
 
@@ -146,8 +148,16 @@ export function GeoHeatmapScreen({ hubHref, subGroup }: { hubHref: string; subGr
         </Text>
         <WebControlPanelTertiaryFilters
           ariaLabel="مرشحات الخريطة"
-          items={TERTIARY_FILTERS.map((filter) => ({ id: filter, label: FILTER_LABELS[filter], active: filter === activeFilter }))}
-          onSelect={(nextFilterId: string) => setActiveFilter(nextFilterId as GeoFilterId)}
+          items={TERTIARY_FILTERS.map((filter) => ({
+            id: filter.id,
+            label: filter.label,
+            active: filter.id === activeFilter,
+          }))}
+          onSelect={(nextFilterId: string) => {
+            if (isGeoFilterId(nextFilterId)) {
+              setActiveFilter(nextFilterId);
+            }
+          }}
         />
       </Box>
 

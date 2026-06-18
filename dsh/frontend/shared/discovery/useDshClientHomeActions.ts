@@ -36,7 +36,7 @@ export function useDshClientHomeActions({
   isAwnakEnabled: boolean;
   setSheinInlineOpen: (v: boolean) => void;
   setAwnakInlineOpen: (v: boolean) => void;
-  activeStore: { id?: string; pickupAddress?: string } | null | undefined;
+  activeStore: { id?: string; pickupAddress?: string; name?: string; subtitle?: string } | null | undefined;
   selectedFulfillmentMode: DshFulfillmentDeliveryMode;
   setSelectedFulfillmentMode: (m: DshFulfillmentDeliveryMode) => void;
   setCreateOrderValues: (updater: (v: any) => any) => void;
@@ -62,7 +62,7 @@ export function useDshClientHomeActions({
     setCreateOrderValues((cur: any) => ({
       ...cur,
       fulfillmentMode: nextMode,
-      pickupAddress: resolveStorePickupAddress(activeStore),
+      pickupAddress: resolveStorePickupAddress(activeStore ?? {}),
       dropoffAddress: nextMode === 'pickup' ? '' : cur.dropoffAddress,
     }));
     setRoute('cart-get');

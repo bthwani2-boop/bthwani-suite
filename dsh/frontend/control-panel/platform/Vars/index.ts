@@ -9,4 +9,4 @@ export type {
   DshPlatformVarRisk,
   DshPlatformVarScope,
   DshPlatformVarStatus,
-} from './vars.types';
+} from '../../../shared/platform/platform.types';

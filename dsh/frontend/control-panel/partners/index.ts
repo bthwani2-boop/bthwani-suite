@@ -15,7 +15,11 @@ export type { PartnerDeactivationWorkspaceProps } from './PartnerDeactivationWor
 
 export { PartnerFulfillmentLane } from './PartnerFulfillmentLane';
 export type { PartnerFulfillmentLaneProps } from './PartnerFulfillmentLane';
-export type { DshPartnerFulfillmentAgreement, DshPartnerFulfillmentMode, DshPartnerModeAgreement } from './workflow';
+export type {
+  DshPartnerFulfillmentAgreement,
+  DshPartnerFulfillmentMode,
+  DshPartnerModeAgreement,
+} from '../../shared/stores/partner/partner.types';
 export {
   PARTNER_PRIMARY_TABS,
   PARTNER_SUB_TAB_DEFINITIONS,

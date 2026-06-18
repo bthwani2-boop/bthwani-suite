@@ -106,6 +106,7 @@ export function DshPlatformVarsWorkspace({ activeDomainFilter }: { activeDomainF
     isDesignVar,
     isValidDesignVal,
     confirmSaveProposed,
+    getLive,
   } = usePlatformVarsModel({ activeDomain: activeDomainFilter, addAuditEvent });
 
   const activeDomain = activeDomainFilter;

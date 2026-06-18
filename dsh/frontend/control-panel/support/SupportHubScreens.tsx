@@ -34,15 +34,24 @@ import {
   SUPPORT_PRIMARY_TABS,
   SUPPORT_SECONDARY_TABS,
   SUPPORT_TAB_WORKSPACE_MAP,
+  getOperationsSupportFlowSpec,
+  type DshOperationsSupportFlowId,
   type SupportTab,
 } from './support.types';
 
-type DshOperationsSupportFlowId = string;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DshControlPanelSupportRow = Record<string, any>;
-function getOperationsSupportFlowSpec(_id: string) {
-  return { title: '—', forbiddenActions: [] as string[], severity: 'warning' as const, ownerLabel: '—', description: '—', nextAction: '—' };
-}
+type DshControlPanelSupportRow = {
+  id: string;
+  flowId: DshOperationsSupportFlowId;
+  surface: string;
+  status: string;
+  slaAge: string;
+  fulfillmentMode: DshFulfillmentDeliveryMode;
+  fulfillmentLabel: string;
+  responsibleActor: string;
+  evidence: string;
+  primaryActionLabel: string;
+  secondaryActionLabel: string;
+};
 const DSH_CALL_INTAKE_STUBS: unknown[] = [];
 const DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS: DshControlPanelSupportRow[] = [];
 const DSH_CUSTOMER_360_STUBS: unknown[] = [];
@@ -182,7 +191,9 @@ function buildSupportRow(rowData: DshControlPanelSupportRow): SupportRow {
         ? 'danger'
         : flowEntry.severity === 'warning'
           ? 'warning'
-          : 'warning',
+          : flowEntry.severity === 'success'
+            ? 'success'
+            : 'warning',
     slaAge: rowData.slaAge,
     owner: flowEntry.ownerLabel,
     fulfillmentMode: rowData.fulfillmentMode,

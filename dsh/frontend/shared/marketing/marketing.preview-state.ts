@@ -37,6 +37,12 @@ import type {
   MarketingVideoAudience,
   MarketingVideoSource,
   MarketingVideoTargetType,
+  MarketingGrowthFamily,
+  MarketingGrowthSource,
+  MarketingGrowthStatus,
+  MarketingGrowthAudience,
+  MarketingGrowthRouteTarget,
+  MarketingGrowthRecord,
 } from './marketing.types';
 
 type DshHomeGetPromo = {
@@ -812,38 +818,6 @@ export const growthStoreDataContract = {
   timezoneSemantics: 'not_applicable',
   moneySemantics: 'not_applicable',
 } as const;
-
-export type MarketingGrowthFamily = 'campaign' | 'promotion' | 'subscription' | 'shorts';
-export type MarketingGrowthSource = 'marketing' | 'partner';
-export type MarketingGrowthStatus = 'draft' | 'pending-marketing' | 'published' | 'paused';
-export type MarketingGrowthAudience = 'all' | 'client' | 'operations';
-export type MarketingGrowthRouteTarget =
-  | 'home'
-  | 'promo-apply'
-  | 'main_category'
-  | 'sub_category'
-  | 'store'
-  | 'product'
-  | 'search';
-
-export type MarketingGrowthRecord = {
-  id: string;
-  title: string;
-  subtitle: string;
-  family: MarketingGrowthFamily;
-  status: MarketingGrowthStatus;
-  audience: MarketingGrowthAudience;
-  source: MarketingGrowthSource;
-  routeTarget: MarketingGrowthRouteTarget;
-  routeTargetId?: string;
-  routeTargetExtra?: string;
-  ctaLabel: string;
-  highlight: string;
-  metricValue: string;
-  accentColor: string;
-  impressions: number;
-  clicks: number;
-};
 
 const GROWTH_STORE_KEY = '__BTHWANI_DSH_MARKETING_GROWTH__';
 

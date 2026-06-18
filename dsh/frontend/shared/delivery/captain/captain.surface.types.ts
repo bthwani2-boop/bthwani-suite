@@ -1,8 +1,6 @@
 import type { CaptainSupportRoute, CompactOrderChatMessage, CaptainAvailabilityStatus, CaptainGpsStatus, CaptainAppMode, CaptainServiceType, CaptainAvailabilityMeta } from './captain.contract';
 import type { DshCaptainRoute, DshCaptainCommandTarget } from './captain.contract';
-
-export type ActiveOrderPhase = 'pickup' | 'delivery';
-export type StoreCourierStage = 'ready_for_pickup' | 'picked_up' | 'out_for_delivery' | 'delivered' | 'delivery_failed';
+import type { ActiveOrderPhase, StoreCourierStage } from '../delivery.contract';
 
 export type DshCaptainNavigationCommand = {
   token: number;

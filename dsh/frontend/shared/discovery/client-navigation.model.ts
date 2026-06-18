@@ -4,6 +4,7 @@
 
 import React from 'react';
 import type { DshRoute } from '../checkout/dsh-client-binding.contracts';
+import type { ClientOperationScreenId } from './useDshClientBellState';
 
 export type ClientNavigationModelProps = {
   route: DshRoute;
@@ -11,8 +12,8 @@ export type ClientNavigationModelProps = {
   handleRegisterBackHandler: (handler: (() => boolean) | null) => void;
   openCreateOrderJourney: () => void;
   openTrackedOrder: (orderId?: string, overrides?: any) => void;
-  setSelectedOperationScreen: (screen: string) => void;
-  selectedOperationScreen: string;
+  setSelectedOperationScreen: React.Dispatch<React.SetStateAction<ClientOperationScreenId | null>>;
+  selectedOperationScreen: ClientOperationScreenId | null;
   onExit?: () => void;
   openSupportFlow: () => void;
   serviceDialTrigger: any;

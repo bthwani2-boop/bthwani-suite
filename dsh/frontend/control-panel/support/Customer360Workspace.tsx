@@ -4,14 +4,73 @@ import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box } from '@bthwani/ui-kit';
 import { WebControlPanelDecisionRow, WebControlPanelKpiStrip } from '@bthwani/ui-kit/web';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DshCustomer360OrderSummary = Record<string, any>;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DshCustomer360Record = Record<string, any>;
+import type {
+  DshGlobalControlLink,
+  DshReadOnlyFinanceVisibility,
+  DshRouteHintedAction,
+  DshSignalRoute,
+} from '../../shared/orders';
+import type { SupportVerificationStatus } from './support.types';
+
+type DshCustomer360OrderSummary = {
+  orderId: string;
+  store: string;
+  deliveryMode: string;
+  deliveryModeLabel: string;
+  lifecycleStatus: string;
+  refundVisibility: string;
+  paymentVisibility: string;
+  latestTicket: string;
+  primaryAction: DshRouteHintedAction;
+};
+
+type DshCustomer360Record = {
+  customerId: string;
+  customerName: string;
+  latestIssueSummary: string;
+  activeOrderId?: string;
+  openTicketId?: string;
+  verificationStatus: SupportVerificationStatus;
+  wltVisibilitySummary: string;
+  onDemandPolicy: string;
+  searchFilters: {
+    areaZoneLabel: string;
+    dateRangeLabel: string;
+    wltVisibilityLabel: string;
+    deliveryMode: string;
+    ticketStatus: string;
+    lookupInputs: ReadonlyArray<{ key: string; label: string; value: string }>;
+  };
+  wltReadOnlyVisibility: DshReadOnlyFinanceVisibility;
+  lastFiveOrdersSummary: readonly DshCustomer360OrderSummary[];
+  ticketsHistory: ReadonlyArray<{
+    ticketId: string;
+    owner: string;
+    status: string;
+    statusLabel: string;
+    latestNote: string;
+    routeHint: string;
+    sla: string;
+  }>;
+  addressServiceability: {
+    serviceabilityStatus: string;
+    previewClassification: string;
+    lastAddress: string;
+    outOfZoneReason?: string;
+  };
+  notesTimeline: ReadonlyArray<{
+    noteId: string;
+    source: string;
+    timestampLabel: string;
+    body: string;
+  }>;
+  quickActions: readonly DshGlobalControlLink[];
+  contextSignal: DshSignalRoute;
+};
+
 const DSH_CUSTOMER_360_PREVIEW: DshCustomer360Record[] = [];
 function getDshCustomer360ByContext(_ctx: unknown): DshCustomer360Record | null { return null; }
 function getDshCustomer360Record(_id: string): DshCustomer360Record | undefined { return undefined; }
-import type { DshGlobalControlLink } from '../../shared/orders';
 import styles from '../shared/control-panel-surface.module.css';
 import { SUPPORT_VERIFICATION_STATUS_META, SUPPORT_TICKET_STATUS_META } from './support.types';
 

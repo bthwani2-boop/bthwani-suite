@@ -12,7 +12,10 @@ import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
 import {
+  getDshDiscoveryStoresRuntimeClient,
   getDshStoreVisibilityRuntimeClient,
+  isDshDiscoveryStoresOfflineError,
+  resolveDshDiscoveryStoresRuntimeConfig,
 } from '../../shared';
 
 export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
@@ -28,11 +31,6 @@ type ApiDiscoveryStore = {
   service_label: string;
   has_offer: boolean;
   publish_stage: string;
-};
-
-type ApiDiscoveryStoresResponse = {
-  stores: ApiDiscoveryStore[];
-  pagination: { limit: number; offset: number; total: number };
 };
 
 type CpStoreRow = {
@@ -88,32 +86,34 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
 
   const [rows, setRows] = React.useState<Array<CpStoreRow & { customStatus: string | null; customStatusTone: 'warning' | 'success' | 'danger' | 'neutral' | null }>>([]);
 
-  // Fetch live stores from GET /stores — replaces preview list when API is reachable
+  // Fetch live stores from the configured DSH runtime.
   React.useEffect(() => {
-    const client = getDshStoreVisibilityRuntimeClient();
-    if (!client) return;
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (!config) {
+      setRows([]);
+      setStoresSource('offline');
+      return;
+    }
 
     let cancelled = false;
-    const fetchFn = globalThis.fetch;
-    fetchFn(`${baseUrl}/stores?limit=100`, {
-      headers: { Accept: 'application/json' },
-    })
-      .then((res) => res.json() as Promise<ApiDiscoveryStoresResponse>)
+    const client = getDshDiscoveryStoresRuntimeClient(config);
+    setStoresSource('loading');
+
+    client.listDiscoveryStores({ limit: 100 })
       .then((data) => {
         if (cancelled) return;
-        const isEmpty = !Array.isArray(data?.stores) || data.stores.length === 0;
-        if (!isEmpty) {
-          setRows(data.stores.map((s) => ({
-            ...mapApiStoreToCpRow(s),
-            customStatus: null as string | null,
-            customStatusTone: null as 'warning' | 'success' | 'danger' | 'neutral' | null,
-          })));
-        }
+        setRows(data.stores.map((store) => ({
+          ...mapApiStoreToCpRow(store),
+          customStatus: null,
+          customStatusTone: null,
+        })));
         setStoresSource('api');
       })
       .catch((err) => {
         if (!cancelled) {
-          const isOffline = !globalThis.navigator?.onLine || (err instanceof TypeError && /network|fetch/i.test(String(err)));
+          const isOffline =
+            isDshDiscoveryStoresOfflineError(err) ||
+            !globalThis.navigator?.onLine;
           setStoresSource(isOffline ? 'offline' : 'api-error');
         }
       });

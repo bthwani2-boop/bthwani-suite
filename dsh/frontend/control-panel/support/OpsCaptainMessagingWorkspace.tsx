@@ -49,12 +49,16 @@ export type OpsCaptainMessagingWorkspaceProps = {
   captainId?: string;
   captainName?: string;
   orderId?: string;
+  ticketCode?: string;
+  slaLabel?: string;
 };
 
 export function OpsCaptainMessagingWorkspace({
   captainId = '—',
   captainName,
   orderId,
+  ticketCode,
+  slaLabel,
 }: OpsCaptainMessagingWorkspaceProps) {
   const [draft, setDraft] = React.useState('');
   const [messages, setMessages] = React.useState<ReadonlyArray<DshSupportTicketMessage>>([]);
@@ -116,8 +120,8 @@ export function OpsCaptainMessagingWorkspace({
           <Box padding={4} gap={4}>
             {/* Context strip */}
             <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <Chip label={DEMO_TICKET.ticketCode} tone="brand" />
-              <Chip label={`SLA: ${DEMO_TICKET.slaLabel}`} tone="default" />
+              <Chip label={ticketCode ? `تذكرة ${ticketCode}` : 'لا توجد تذكرة مرتبطة'} tone="brand" />
+              {slaLabel ? <Chip label={`SLA: ${slaLabel}`} tone="default" /> : null}
               <Chip label="تسليم / توصيل / إثبات" />
               {isEscalated ? <Chip label="مصعد" tone="danger" /> : null}
             </Box>
@@ -164,7 +168,7 @@ export function OpsCaptainMessagingWorkspace({
                 />
               </Box>
               <Text role="caption" tone="muted">
-                الإرسال الفعلي يتطلب ربط مسار المراسلة. هذه مساحة معاينة فقط.
+                الإرسال غير متاح حتى يكتمل ربط مسار المراسلة الحقيقي.
               </Text>
             </Surface>
           </Box>

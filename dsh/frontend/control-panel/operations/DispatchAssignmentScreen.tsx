@@ -96,6 +96,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   const [runtimeError, setRuntimeError] = React.useState<string | null>(null);
   const [retryCount, setRetryCount] = React.useState(0);
   const retry = React.useCallback(() => setRetryCount((n) => n + 1), []);
+  const client = React.useMemo(() => getDshOrderLifecycleRuntimeClient(), []);
 
   const [rows, setRows] = React.useState<DispatchRowState[]>(() => []);
 

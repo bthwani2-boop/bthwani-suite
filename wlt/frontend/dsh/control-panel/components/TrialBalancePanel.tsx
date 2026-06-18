@@ -3,7 +3,7 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
 import { buildWltTrialBalancePreview } from '../../shared';
-import type { WltLedgerEntry } from '../../shared';
+import type { WltLedgerEntry } from '../../shared/control-panel/financialCenter.types';
 
 export function TrialBalancePanel({ entries, businessDate }: {
   entries: readonly WltLedgerEntry[];

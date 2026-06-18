@@ -9,7 +9,7 @@ export type AuditEvent = {
   action: string;
   operator: string;
   timestamp: string;
-  status: 'success' | 'warning' | 'danger';
+  status: 'success' | 'warning' | 'danger' | 'blocked';
   oldValue: string;
   newValue: string;
   reason: string;

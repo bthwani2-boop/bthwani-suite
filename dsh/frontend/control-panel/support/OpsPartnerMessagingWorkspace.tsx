@@ -49,12 +49,20 @@ export type OpsPartnerMessagingWorkspaceProps = {
   partnerId?: string;
   partnerName?: string;
   orderId?: string;
+  ticketCode?: string;
+  slaLabel?: string;
+  ownerQueue?: string;
+  entityType?: string;
 };
 
 export function OpsPartnerMessagingWorkspace({
   partnerId = '—',
   partnerName,
   orderId,
+  ticketCode,
+  slaLabel,
+  ownerQueue,
+  entityType = 'طلب',
 }: OpsPartnerMessagingWorkspaceProps) {
   const [draft, setDraft] = React.useState('');
   const [messages, setMessages] = React.useState<ReadonlyArray<DshSupportTicketMessage>>([]);
@@ -106,7 +114,7 @@ export function OpsPartnerMessagingWorkspace({
             </div>
             <p className={styles.surfaceHeaderSubtitle}>
               {resolvedPartnerName} — {partnerId}
-              {resolvedEntityId ? ` — ${DEMO_TICKET.entityType} ${resolvedEntityId}` : ''}
+              {resolvedEntityId ? ` — ${entityType} ${resolvedEntityId}` : ''}
             </p>
           </Box>
         </div>
@@ -116,9 +124,9 @@ export function OpsPartnerMessagingWorkspace({
           <Box padding={4} gap={4}>
             {/* Context strip */}
             <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <Chip label={DEMO_TICKET.ticketCode} tone="brand" />
-              <Chip label={`SLA: ${DEMO_TICKET.slaLabel}`} tone="default" />
-              <Chip label={`الصف: ${DEMO_TICKET.ownerQueue}`} />
+              <Chip label={ticketCode ? `تذكرة ${ticketCode}` : 'لا توجد تذكرة مرتبطة'} tone="brand" />
+              {slaLabel ? <Chip label={`SLA: ${slaLabel}`} tone="default" /> : null}
+              {ownerQueue ? <Chip label={`الصف: ${ownerQueue}`} /> : null}
               {isEscalated ? <Chip label="مصعد" tone="danger" /> : null}
             </Box>
 
@@ -157,7 +165,7 @@ export function OpsPartnerMessagingWorkspace({
                 />
               </Box>
               <Text role="caption" tone="muted">
-                الإرسال الفعلي يتطلب ربط مسار المراسلة. هذه مساحة معاينة فقط.
+                الإرسال غير متاح حتى يكتمل ربط مسار المراسلة الحقيقي.
               </Text>
             </Surface>
           </Box>

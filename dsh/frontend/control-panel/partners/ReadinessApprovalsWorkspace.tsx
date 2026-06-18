@@ -152,32 +152,34 @@ export function ReadinessApprovalsWorkspace() {
             </Surface>
           )}
 
-          <Box gap={3} className={styles.formBox}>
-            <Text role="bodySm" tone="default">
-              إقرار مدقق العمليات (اعتماد أو رفض الملف الميداني كاملاً):
-            </Text>
-            <input
-              type="text"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="اكتب مبررات الاعتماد أو أسباب الرفض بالتفصيل..."
-              className={styles.reasonInput}
-              disabled={isSubmitting}
-            />
+          <div className={styles.formBox}>
+            <Box gap={3}>
+              <Text role="bodySm" tone="default">
+                إقرار مدقق العمليات (اعتماد أو رفض الملف الميداني كاملاً):
+              </Text>
+              <input
+                type="text"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="اكتب مبررات الاعتماد أو أسباب الرفض بالتفصيل..."
+                className={styles.reasonInput}
+                disabled={isSubmitting}
+              />
 
-            <WebControlPanelActionCluster
-              primary={{
-                id: 'btn-approve-readiness',
-                label: 'اعتماد ومطابقة (جاهز)',
-                onAction: () => handleDecision('approved'),
-              }}
-              secondary={{
-                id: 'btn-reject-readiness',
-                label: 'رفض الملف (غير جاهز)',
-                onAction: () => handleDecision('rejected'),
-              }}
-            />
-          </Box>
+              <WebControlPanelActionCluster
+                primary={{
+                  id: 'btn-approve-readiness',
+                  label: 'اعتماد ومطابقة (جاهز)',
+                  onAction: () => handleDecision('approved'),
+                }}
+                secondary={{
+                  id: 'btn-reject-readiness',
+                  label: 'رفض الملف (غير جاهز)',
+                  onAction: () => handleDecision('rejected'),
+                }}
+              />
+            </Box>
+          </div>
         </Surface>
       </div>
 

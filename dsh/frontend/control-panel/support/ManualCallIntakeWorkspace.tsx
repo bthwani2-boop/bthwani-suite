@@ -4,15 +4,61 @@ import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box } from '@bthwani/ui-kit';
 import { WebControlPanelDecisionRow, WebControlPanelKpiStrip } from '@bthwani/ui-kit/web';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DshCallIntakePreview = Record<string, any>;
-const DSH_CALL_INTAKE_PREVIEW: DshCallIntakePreview[] = [];
-function getDshCallIntakeByContext(_ctx: unknown): DshCallIntakePreview | null { return null; }
-function getDshCallIntakePreview(_id: string): DshCallIntakePreview | undefined { return undefined; }
 import type {
   DshGlobalControlLink,
   DshRouteHintedAction,
+  DshSignalRoute,
+  DshVerificationStatus,
+  DshVerificationStep,
 } from '../../shared/orders';
+import type { SupportVerificationStatus } from './support.types';
+
+type DshCallIntakePreview = {
+  intakeId: string;
+  customerId: string;
+  customerName: string;
+  issueSummary: string;
+  source: string;
+  orderContext?: string;
+  ticketContext?: string;
+  onDemandPolicy: string;
+  auditRequired: boolean;
+  lookupPanel: {
+    inputs: ReadonlyArray<{ key: string; label: string; value: string }>;
+  };
+  callReasonSelector: {
+    selectedReason: string;
+    options: readonly string[];
+    previewClassification: string;
+  };
+  identityVerificationResult: {
+    verificationStatus: DshVerificationStatus | SupportVerificationStatus;
+    previewClassification: string;
+    sensitiveFieldsLocked: readonly string[];
+    verificationSteps: readonly DshVerificationStep[];
+  };
+  forbiddenActions: readonly string[];
+  ticketPreview: {
+    mode: string;
+    auditRequired: boolean;
+    ticketId: string;
+    summary: string;
+    routeHint: string;
+  };
+  transferContextToOperations: readonly DshRouteHintedAction[];
+  closeCallOutcome: {
+    outcome: string;
+    auditRequired: boolean;
+    summary: string;
+    signal: DshSignalRoute;
+  };
+  quickActions: readonly DshGlobalControlLink[];
+  nextAction: string;
+};
+
+const DSH_CALL_INTAKE_PREVIEW: DshCallIntakePreview[] = [];
+function getDshCallIntakeByContext(_ctx: unknown): DshCallIntakePreview | null { return null; }
+function getDshCallIntakePreview(_id: string): DshCallIntakePreview | undefined { return undefined; }
 import styles from '../shared/control-panel-surface.module.css';
 import { SUPPORT_VERIFICATION_STATUS_META } from './support.types';
 

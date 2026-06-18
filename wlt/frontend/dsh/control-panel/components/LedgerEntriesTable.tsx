@@ -5,7 +5,7 @@ import { Box, Text,
   radius,
 } from '@bthwani/ui-kit';
 import { useRouter } from 'next/navigation';
-import type { WltLedgerEntry } from '../../shared';
+import type { WltLedgerEntry } from '../../shared/control-panel/financialCenter.types';
 import { getWltPostingRuleForEvent } from '../../shared';
 
 const STATUS_LABELS: Record<string, string> = {

@@ -12,7 +12,11 @@ import {
   loadWltDshFinanceRuntimeReadModel,
   type WltDshFinanceRuntimeResult,
 } from '../../shared';
-import type { WltFinancialCenterSection, WltLedgerEntry, WltFinancialCenterBlockingVariance } from '../../shared';
+import type {
+  WltFinancialCenterSection,
+  WltLedgerEntry,
+  WltFinancialCenterBlockingVariance,
+} from '../../shared/control-panel/financialCenter.types';
 
 const SECTION_COLOR: Record<string, string> = {
   asset: 'var(--bth-info-text)',

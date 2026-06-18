@@ -1,4 +1,5 @@
 import type { DshSurfaceId } from '../../shared/runtime/dsh-flow-registry';
+export type { DshSurfaceId } from '../../shared/runtime/dsh-flow-registry';
 
 export type DshLegacySurfaceId = 'client' | 'partner' | 'captain' | 'field';
 

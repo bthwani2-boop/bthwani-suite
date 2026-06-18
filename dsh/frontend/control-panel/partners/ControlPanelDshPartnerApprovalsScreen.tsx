@@ -435,7 +435,7 @@ function PartnerApprovalCard({
             onAction: isSubmitting ? undefined : () => handleActionWithDelay('reject')
           }}
         />
-        <Box paddingX={3} paddingBottom={2}>
+        <Box paddingX={3} style={{ paddingBottom: 8 }}>
           <Text role="caption" tone={selected ? 'brand' : 'muted'}>
             {selected ? 'التفاصيل معروضة بالأسفل' : 'انقر على البطاقة لعرض تفاصيل المتجر المرسلة من الميداني'}
           </Text>

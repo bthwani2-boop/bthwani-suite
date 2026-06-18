@@ -3,6 +3,10 @@
 
 import type { DshPartnerActivationStatus } from './dsh-partner-activation.model';
 import { addDshAuditEntry, DshAuditEntry } from '../../identity-access/dsh-role-permission.model';
+import type {
+  DshOperationsDecisionKind,
+  DshOrderLifecycleStatus,
+} from '../../orders';
 export type PartnerComplaint = {
   id: string; partnerId: string; status: 'open' | 'investigating' | 'resolved';
   category: string; severity: 'high' | 'medium' | 'low'; description: string;
@@ -537,7 +541,14 @@ export function updatePromotionCandidateStatus(id: string, status: DshPromotionI
   });
 }
 
-let _globalLiveOrderDecisions: Record<string, { decision: string; note: string; submitted: boolean; nextLifecycleStatus: string }> = {};
+type LiveOrderDecisionRecord = {
+  decision: DshOperationsDecisionKind;
+  note: string;
+  submitted: boolean;
+  nextLifecycleStatus: DshOrderLifecycleStatus;
+};
+
+let _globalLiveOrderDecisions: Record<string, LiveOrderDecisionRecord> = {};
 
 const PENDING_APPROVAL_LOOKUP: Record<string, { customerName: string; storeName: string }> = {
   'PA-0081': { customerName: 'أحمد محمد', storeName: 'بيك إن بريستو' },
@@ -554,11 +565,16 @@ let _globalUiAuditRows: UiAuditRow[] = [];
 
 export function getDynamicUiAudits(): UiAuditRow[] { return _globalUiAuditRows; }
 
-export function getLiveOrderDecisions(): Record<string, { decision: string; note: string; submitted: boolean; nextLifecycleStatus: string }> {
+export function getLiveOrderDecisions(): Record<string, LiveOrderDecisionRecord> {
   return _globalLiveOrderDecisions;
 }
 
-export function updateLiveOrderDecision(orderId: string, decision: string, note: string, nextLifecycleStatus: string): void {
+export function updateLiveOrderDecision(
+  orderId: string,
+  decision: DshOperationsDecisionKind,
+  note: string,
+  nextLifecycleStatus: DshOrderLifecycleStatus,
+): void {
   _globalLiveOrderDecisions = { ..._globalLiveOrderDecisions, [orderId]: { decision, note, submitted: true, nextLifecycleStatus } };
 
   const info = PENDING_APPROVAL_LOOKUP[orderId] || { customerName: 'عميل', storeName: 'متجر' };

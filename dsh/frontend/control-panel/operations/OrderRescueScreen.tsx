@@ -8,18 +8,20 @@ import { buildOperationsHref } from './operations.registry';
 import styles from '../shared/control-panel-surface.module.css';
 // SSoT: rescue triggers are derived from the lifecycle handoffs table.
 // The control-panel sees rescue_required observations from partner_rejected and delivery_failed handoffs.
-import { getHandoffsForSurface } from '../../shared/orders';
+import {
+  getHandoffsForSurface,
+  type DshOrderRescueCase,
+  type DshOrderRescueNextActionId,
+  type DshOrderRescueOwner,
+  type DshOrderRescueReason,
+} from '../../shared/orders';
 
 export type OrderRescueScreenProps = {
   hubHref: string;
   subGroup?: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type RescueCase = Record<string, any>;
-type DshOrderRescueReason = string;
-type DshOrderRescueOwner = string;
-type DshOrderRescueNextActionId = string;
+type RescueCase = DshOrderRescueCase;
 
 // Label maps — enum keys only (values from data are already Arabic)
 const REASON_LABELS: Record<string, string> = {
@@ -550,14 +552,17 @@ export function OrderRescueScreen({ hubHref: _hubHref, subGroup: _subGroup }: Or
 
   // Deep-link: auto-open if URL contains a rescue/order context
   React.useEffect(() => {
-    const matched: { rescueId: string } | null = null;
-    if (matched) setOpenRescueId(matched.rescueId);
-  }, [searchParams]);
+    const requestedRescueId = searchParams.get('rescueId');
+    const requestedOrderId = searchParams.get('orderId');
+    if (!requestedRescueId && !requestedOrderId) return;
 
-  const playbook = React.useMemo(
-    () => undefined,
-    [],
-  );
+    const matched = cases.find(
+      (rescueCase) =>
+        rescueCase.rescueId === requestedRescueId ||
+        rescueCase.orderId === requestedOrderId,
+    );
+    if (matched) setOpenRescueId(matched.rescueId);
+  }, [cases, searchParams]);
 
   const kpis = React.useMemo(() => [
     { id: 'total',    label: 'حالات الإنقاذ', value: String(cases.length),                                                                                                                                                                             tone: 'neutral'  as const },
@@ -595,37 +600,6 @@ export function OrderRescueScreen({ hubHref: _hubHref, subGroup: _subGroup }: Or
               {`${h.handoffId} — ${h.description}`}
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Playbook hint — only when nothing is open */}
-      {playbook && !openRescueId && (
-        <div
-          className={styles.surfaceCompactPanel}
-          style={{
-            padding: '12px 16px',
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: '12px',
-            flexWrap: 'wrap',
-          }}
-        >
-          <div style={{ flex: 1, textAlign: 'right', minWidth: 0 }}>
-            <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--bthwani-control-panel-text)', marginBottom: '2px' }}>
-              {playbook.title}
-            </div>
-            <div style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)' }}>
-              {playbook.checkpoints.slice(0, 2).join(' · ')}
-            </div>
-          </div>
-          <button
-            type="button"
-            className={styles.rescueSecondaryBtn}
-            onClick={() => router.push(buildOperationsHref('exceptions-escalations'))}
-          >
-            فتح الاستثناءات
-          </button>
         </div>
       )}
 

@@ -49,12 +49,20 @@ export type OpsClientMessagingWorkspaceProps = {
   clientId?: string;
   clientName?: string;
   orderId?: string;
+  ticketCode?: string;
+  slaLabel?: string;
+  slaRisk?: 'normal' | 'at-risk';
+  ownerQueue?: string;
 };
 
 export function OpsClientMessagingWorkspace({
   clientId = '—',
   clientName,
   orderId,
+  ticketCode,
+  slaLabel,
+  slaRisk = 'normal',
+  ownerQueue,
 }: OpsClientMessagingWorkspaceProps) {
   const [draft, setDraft] = React.useState('');
   const [messages, setMessages] = React.useState<ReadonlyArray<DshSupportTicketMessage>>([]);
@@ -116,9 +124,9 @@ export function OpsClientMessagingWorkspace({
           <Box padding={4} gap={4}>
             {/* Context strip */}
             <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <Chip label={`${DEMO_TICKET.ticketCode}`} tone="brand" />
-              <Chip label={`SLA: ${DEMO_TICKET.slaLabel}`} tone={DEMO_TICKET.slaRisk === 'at-risk' ? 'warning' : 'default'} />
-              <Chip label={`الصف: ${DEMO_TICKET.ownerQueue}`} />
+              <Chip label={ticketCode ? `تذكرة ${ticketCode}` : 'لا توجد تذكرة مرتبطة'} tone="brand" />
+              {slaLabel ? <Chip label={`SLA: ${slaLabel}`} tone={slaRisk === 'at-risk' ? 'warning' : 'default'} /> : null}
+              {ownerQueue ? <Chip label={`الصف: ${ownerQueue}`} /> : null}
               {isEscalated ? <Chip label="مصعد" tone="danger" /> : null}
             </Box>
 
@@ -157,7 +165,7 @@ export function OpsClientMessagingWorkspace({
                 />
               </Box>
               <Text role="caption" tone="muted">
-                الإرسال الفعلي يتطلب ربط مسار المراسلة. هذه مساحة معاينة فقط.
+                الإرسال غير متاح حتى يكتمل ربط مسار المراسلة الحقيقي.
               </Text>
             </Surface>
           </Box>

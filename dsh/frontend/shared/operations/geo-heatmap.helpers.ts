@@ -4,7 +4,17 @@
 // All functions are stateless â€” no hooks, no imports from React.
 // Extracted to keep GeoHeatmapScreen under 330 lines.
 
-import type { DshLifecycleStep, DshSurfaceId, DshUnifiedRecommendation } from '../../shared';
+import type { DshSurfaceId } from '../runtime/dsh-flow-registry';
+
+type GeoLifecycleStep =
+  | 'tracking'
+  | 'delivery'
+  | 'partner-preparation'
+  | 'operations-monitoring'
+  | 'operations-intervention';
+
+type GeoRecommendationSeverity = 'high' | 'medium' | 'low';
+type GeoRecommendationConfidence = 'high' | 'medium' | 'low';
 
 export type GeoHeatmapZone = {
   id: (string);
@@ -23,9 +33,24 @@ export type GeoHeatmapZone = {
 };
 
 export type GeoSubTabId = 'orders' | 'captains' | 'stores' | 'sla' | 'peak';
-export type GeoFilterId = 'Ø§Ù„Ø¢Ù†' | 'Ù¡Ù¥ Ø¯Ù‚ÙŠÙ‚Ø©' | 'Ù£Ù  Ø¯Ù‚ÙŠÙ‚Ø©' | 'Ø®Ø·Ø± Ø¹Ø§Ù„Ù' | 'Ù†Ù‚Øµ ÙƒØ¨Ø§ØªÙ†' | 'Ø¶ØºØ· Ù…ØªØ§Ø¬Ø±';
+export const GEO_FILTER_IDS = [
+  'now',
+  '15m',
+  '30m',
+  'high-risk',
+  'captain-shortage',
+  'store-pressure',
+] as const;
 
-const SUB_TAB_META: Record<GeoSubTabId, { affectedSurface: DshSurfaceId; lifecycleStep: DshLifecycleStep }> = {
+export type GeoFilterId = (typeof GEO_FILTER_IDS)[number];
+
+const GEO_FILTER_ID_SET: ReadonlySet<string> = new Set(GEO_FILTER_IDS);
+
+export function isGeoFilterId(value: string): value is GeoFilterId {
+  return GEO_FILTER_ID_SET.has(value);
+}
+
+const SUB_TAB_META: Record<GeoSubTabId, { affectedSurface: DshSurfaceId; lifecycleStep: GeoLifecycleStep }> = {
   orders: { affectedSurface: 'app-client', lifecycleStep: 'tracking' },
   captains: { affectedSurface: 'app-captain', lifecycleStep: 'delivery' },
   stores: { affectedSurface: 'app-partner', lifecycleStep: 'partner-preparation' },
@@ -33,7 +58,7 @@ const SUB_TAB_META: Record<GeoSubTabId, { affectedSurface: DshSurfaceId; lifecyc
   peak: { affectedSurface: 'control-panel', lifecycleStep: 'operations-intervention' },
 };
 
-export function resolveLifecycleStep(subTabId: GeoSubTabId): DshLifecycleStep {
+export function resolveLifecycleStep(subTabId: GeoSubTabId): GeoLifecycleStep {
   return SUB_TAB_META[subTabId]?.lifecycleStep ?? 'operations-monitoring';
 }
 
@@ -41,13 +66,13 @@ export function resolveAffectedSurface(subTabId: GeoSubTabId): DshSurfaceId {
   return SUB_TAB_META[subTabId]?.affectedSurface ?? 'control-panel';
 }
 
-export function resolveSeverity(zone: GeoHeatmapZone): DshUnifiedRecommendation['severity'] {
+export function resolveSeverity(zone: GeoHeatmapZone): GeoRecommendationSeverity {
   if (zone.severity === 'danger') return 'high';
   if (zone.severity === 'warning') return 'medium';
   return 'low';
 }
 
-export function resolveConfidence(zone: GeoHeatmapZone): DshUnifiedRecommendation['confidence'] {
+export function resolveConfidence(zone: GeoHeatmapZone): GeoRecommendationConfidence {
   if (zone.confidence === 'Ø¹Ø§Ù„ÙŠØ©') return 'high';
   if (zone.confidence === 'Ù…ØªÙˆØ³Ø·Ø©') return 'medium';
   return 'low';
@@ -94,15 +119,15 @@ export function matchesSubTab(zone: GeoHeatmapZone, subTabId: GeoSubTabId): bool
 }
 
 export function matchesFilter(zone: GeoHeatmapZone, filterId: GeoFilterId): boolean {
-  if (filterId === 'Ø§Ù„Ø¢Ù†') return zone.demandOrders >= 12;
-  if (filterId === 'Ù¡Ù¥ Ø¯Ù‚ÙŠÙ‚Ø©') return zone.demandOrders >= 18 || zone.delayedPickups > 0;
-  if (filterId === 'Ù£Ù  Ø¯Ù‚ÙŠÙ‚Ø©') return true;
-  if (filterId === 'Ø®Ø·Ø± Ø¹Ø§Ù„Ù') return zone.severity === 'danger' || zone.slaRisk === 'Ø­Ø±Ø¬';
-  if (filterId === 'Ù†Ù‚Øµ ÙƒØ¨Ø§ØªÙ†') return zone.supplyDemandGap > 0;
+  if (filterId === 'now') return zone.demandOrders >= 12;
+  if (filterId === '15m') return zone.demandOrders >= 18 || zone.delayedPickups > 0;
+  if (filterId === '30m') return true;
+  if (filterId === 'high-risk') return zone.severity === 'danger' || zone.slaRisk === 'Ø­Ø±Ø¬';
+  if (filterId === 'captain-shortage') return zone.supplyDemandGap > 0;
   return zone.storePressure === 'Ù…Ø±ØªÙØ¹' || zone.storePressure === 'Ø­Ø±Ø¬';
 }
 
-export function buildRecommendation(zone: GeoHeatmapZone, subTabId: GeoSubTabId, hubHref: string): DshUnifiedRecommendation {
+export function buildRecommendation(zone: GeoHeatmapZone, subTabId: GeoSubTabId, hubHref: string) {
   return {
     id: `geo-${zone.id}-${subTabId}`,
     surface: 'control-panel',
@@ -125,6 +150,6 @@ export function buildRecommendation(zone: GeoHeatmapZone, subTabId: GeoSubTabId,
     primaryActionLabel: 'ØªØ«Ø¨ÙŠØª Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡',
     secondaryActionLabel: 'Ø¹Ø±Ø¶ Ø§Ù„Ø¯Ù„ÙŠÙ„',
     counterpartRouteHint: resolveRouteHint(hubHref, zone.id),
-    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE',
+    runtimeBindingStatus: 'NEEDS_RUNTIME_EVIDENCE' as const,
   };
 }

@@ -57,7 +57,7 @@ function resolveRowTone(row: WltDailyReconciliationRow) {
   return 'success' as const;
 }
 
-const EVIDENCE_LABEL: Record<DshFinancePreviewRow['evidenceStatus'], string> = {
+const EVIDENCE_LABEL: Record<WltDailyReconciliationRow['evidenceStatus'], string> = {
   complete: 'مكتملة ✓',
   partial: 'جزئية ⚠️',
   missing: 'ناقصة 🚨',
@@ -122,7 +122,7 @@ export function DailyReconciliationWorkbench() {
   const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
   const [showCloseSimPreview, setShowCloseSimPreview] = React.useState(false);
 
-  const getInitialAuditLogs = React.useCallback((row: DshFinancePreviewRow) => {
+  const getInitialAuditLogs = React.useCallback((row: WltDailyReconciliationRow) => {
     const logs = [];
     logs.push({
       timestamp: '09:00 ص',

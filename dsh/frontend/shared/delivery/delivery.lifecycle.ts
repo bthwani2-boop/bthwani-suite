@@ -3,7 +3,7 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { ActiveOrderPhase, StoreCourierStage } from './captain/captain.surface.types';
+import type { ActiveOrderPhase, StoreCourierStage } from './delivery.contract';
 
 export function useDeliveryLifecycle() {
   const [inboxState, setInboxState] = React.useState<'ready' | 'offer-accepting' | 'offer-accepted' | 'delivered' | 'error'>('ready');

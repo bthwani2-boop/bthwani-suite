@@ -27,6 +27,17 @@ export type DshOpsApprovalOrder = {
 export type PendingApprovalOrder = DshOpsApprovalOrder;
 
 type OpsDecision = DshOperationsDecisionKind;
+type SupportTicketTone = 'neutral' | 'warning' | 'danger' | 'success';
+
+type SupportTicketData = {
+  ticketId: string;
+  statusTone: SupportTicketTone;
+  status: string;
+  type: string;
+  description: string;
+  attachmentRef: string | null;
+  chatHistory: Array<{ sender: string; time: string; text: string }>;
+};
 
 type OpsOrderDetailPanelProps = {
   readonly order: DshOpsApprovalOrder;
@@ -93,14 +104,14 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
     color: theme.textInverse,
   });
 
-  const ticketData = {
+  const ticketData: SupportTicketData = {
     ticketId: '—',
-    statusTone: 'neutral' as const,
+    statusTone: 'neutral',
     status: '—',
     type: '—',
     description: '—',
-    attachmentRef: null as string | null,
-    chatHistory: [] as { sender: string; time: string; text: string }[],
+    attachmentRef: null,
+    chatHistory: [],
   };
 
   return (
@@ -171,8 +182,20 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
             <span style={{ fontSize: '12px', fontWeight: 700, color: theme.text }}>بلاغ رقم: {ticketData.ticketId}</span>
             <span style={{
               fontSize: '11px', padding: '2px 8px', borderRadius: '99px', fontWeight: 700,
-              background: ticketData.statusTone === 'warning' ? theme.warningSurface : ticketData.statusTone === 'danger' ? theme.dangerSurface : theme.successSurface,
-              color: ticketData.statusTone === 'warning' ? theme.warning : ticketData.statusTone === 'danger' ? theme.danger : theme.success,
+              background: ticketData.statusTone === 'warning'
+                ? theme.warningSurface
+                : ticketData.statusTone === 'danger'
+                  ? theme.dangerSurface
+                  : ticketData.statusTone === 'success'
+                    ? theme.successSurface
+                    : theme.surfaceInset,
+              color: ticketData.statusTone === 'warning'
+                ? theme.warning
+                : ticketData.statusTone === 'danger'
+                  ? theme.danger
+                  : ticketData.statusTone === 'success'
+                    ? theme.success
+                    : theme.textMuted,
             }}>{ticketData.status}</span>
           </div>
           <div style={{ fontSize: '12px', color: theme.text, fontWeight: 600 }}>نوع البلاغ: <span style={{ color: theme.brand }}>{ticketData.type}</span></div>

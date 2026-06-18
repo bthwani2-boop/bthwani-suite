@@ -6,9 +6,18 @@ import { WebSectionCard } from '@bthwani/ui-kit/web';
 import { usePlatformAuditState } from '../usePlatformAuditState';
 import styles from '../../shared/control-panel-surface.module.css';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type RolloutRecord = Record<string, any>;
 type RolloutLevel = 'service' | 'capability';
+
+type RolloutRecord = {
+  key: string;
+  title: string;
+  level: RolloutLevel;
+  parentService?: string;
+  scope: string;
+  initialStage: string;
+  stageOptions: readonly string[];
+};
+
 const PREVIEW_ROLLOUT_RECORDS: RolloutRecord[] = [];
 import { FeatureFlagsRegistry } from '../../../shared/platform/feature-flags';
 

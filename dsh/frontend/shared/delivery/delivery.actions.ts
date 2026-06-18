@@ -4,7 +4,7 @@
 
 import React from 'react';
 import type { CompactOrderChatMessage, CaptainAppMode } from './captain/captain.contract';
-import type { StoreCourierStage, ActiveOrderPhase } from './captain/captain.surface.types';
+import type { StoreCourierStage, ActiveOrderPhase } from './delivery.contract';
 import { resolveDshRuntimeOrderId, useCaptainOrderRuntime } from './captain/use-captain-order-runtime';
 
 export type DeliveryActionsDeps = {

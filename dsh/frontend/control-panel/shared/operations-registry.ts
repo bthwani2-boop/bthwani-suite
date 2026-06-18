@@ -11,7 +11,6 @@ import type {
   OperationsNormalizationResult,
   OperationsPanelId,
 } from '../../shared/operations/operations.types';
-import type { DshOperationalEntry } from '../../shared/operations/dsh-operational.contract';
 import { DSH_OPERATIONAL_REGISTRY } from '../../shared/operations/dsh-operational-registry';
 
 export type { AnyOperationsWorkspaceId } from '../../shared/operations/operations.types';
@@ -19,6 +18,7 @@ export type { AnyOperationsWorkspaceId } from '../../shared/operations/operation
 export const OPERATIONS_CANONICAL_GROUPS: readonly OperationsGroupMeta[] = [
   {
     id: 'command-center',
+    label: 'مركز القيادة',
     description: 'Ù†Ø¨Ø¶ Ø§Ù„Ø¹Ù…Ù„ÙŠØ§ØªØŒ Ø§Ù„Ù…Ø¹ÙˆÙ‚Ø§ØªØŒ ÙˆØ£ÙØ¶Ù„ Ø¥Ø¬Ø±Ø§Ø¡ ØªØ§Ù„ÙŠ.',
     badge: 'Ù‚ÙŠØ§Ø¯Ø©',
     subGroups: [

@@ -26,7 +26,7 @@ export interface DshCategoryData {
   subcategories: DshCategorySubcategory[];
 }
 
-export interface DshDiscoveryStore {
+export interface MarketingTargetStore {
   id: string;
   name: string;
   subtitle?: string;
@@ -48,7 +48,7 @@ export interface StoreItem {
 }
 
 export const dshCategoryData: DshCategoryData[] = [];
-export const dshDiscoveryStores: DshDiscoveryStore[] = [];
+export const dshDiscoveryStores: MarketingTargetStore[] = [];
 export const storeItemsByStoreId: Record<string, StoreItem[]> = {};
 
 function normalizeSearchText(value: string): string {

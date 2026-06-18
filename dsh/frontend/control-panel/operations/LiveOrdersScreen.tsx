@@ -19,7 +19,11 @@ import { getOperationsActorLabel } from './FulfillmentModeQueueSection';
 import type { DshFulfillmentOperationalMode } from './operations.types';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/operations/dsh-operational-runtime-adapter';
-import { DSH_CONTROL_PANEL_TONE_MAP, resolveRuntimeOrderStatusTone } from '../shared/dsh-control-panel-display';
+import {
+  DSH_CONTROL_PANEL_TONE_MAP,
+  resolveRuntimeOrderStatusTone,
+  type DshControlPanelTone,
+} from '../shared/dsh-control-panel-display';
 
 export type LiveOrdersScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'empty';
@@ -41,10 +45,10 @@ const FULFILLMENT_MODE_IDS: readonly DshFulfillmentOperationalMode[] = ['bthwani
 export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrdersScreenProps) {
   const router = useRouter();
   const { theme } = useTheme();
-  const PREVIEW_ROWS: { id: string; destination: string; captain: string; status: string; statusTone: string; suggestion: { label: string; reason: string; action: string; secondary: string }; eta: string; ringLabel: string; fulfillmentMode: DshFulfillmentOperationalMode; arrivalTimeline: string[]; actionPlans: string[] }[] = [];
+  const PREVIEW_ROWS: { id: string; destination: string; captain: string; status: string; statusTone: DshControlPanelTone; suggestion: { label: string; reason: string; action: string; secondary: string }; eta: string; ringLabel: string; fulfillmentMode: DshFulfillmentOperationalMode; arrivalTimeline: string[]; actionPlans: string[] }[] = [];
   const activeMode = FULFILLMENT_MODE_IDS.find((m) => m === subGroup) ?? null;
   const [selectedItemId, setSelectedItemId] = React.useState<SelectedItem>(null);
-  const [decisions, setDecisions] = React.useState<DecisionState>(() => getLiveOrderDecisions() as any);
+  const [decisions, setDecisions] = React.useState<DecisionState>(() => getLiveOrderDecisions());
   const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
   const [retryCount, setRuntimeRetryCount] = React.useState(0);
   const retry = React.useCallback(() => setRuntimeRetryCount((n) => n + 1), []);
@@ -74,7 +78,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   const handleDecision = React.useCallback((orderId: string, decision: OpsDecision, note: string) => {
     const nextStatus = mapOperationsDecisionToLifecycle(decision);
     updateLiveOrderDecision(orderId, decision, note, nextStatus);
-    setDecisions(getLiveOrderDecisions() as any);
+    setDecisions(getLiveOrderDecisions());
     setSelectedItemId(null);
   }, []);
 
@@ -170,7 +174,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                   { label: 'الكابتن', value: order.captain },
                   { label: 'ETA المتوقع', value: order.eta },
                   { label: 'تنبيه الوصول', value: order.ringLabel },
-                  { label: 'توجيه الإجراء', value: order.actionHint },
+                  { label: 'توجيه الإجراء', value: order.suggestion.action },
                 ].map(({ label, value }) => (
                   <div key={label} style={{ background: 'var(--bthwani-control-panel-surface-inset)', borderRadius: '6px', padding: '6px 10px' }}>
                     <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)', marginBottom: '2px' }}>{label}</div>
@@ -259,7 +263,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
         );
       }
     } else if (selectedItemId.type === 'fulfillment') {
-      const rows: { id: string; storeName: string; customerName: string; slaLabel: string; statusTone: string; statusLabel: string; nextAction: string; fulfillmentMode: DshFulfillmentOperationalMode }[] = [];
+      const rows: { id: string; storeName: string; customerName: string; slaLabel: string; statusTone: DshControlPanelTone; statusLabel: string; nextAction: string; fulfillmentMode: DshFulfillmentOperationalMode }[] = [];
       const order = rows.find((r) => r.id === selectedItemId.id);
       if (order) {
         inspectorContent = (
@@ -272,7 +276,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                 <span style={{ fontSize: '12px', fontWeight: 800 }}>الحالة:</span>
                 <WebControlPanelStatusTag
                   label={order.statusLabel}
-                  tone={order.statusTone as any}
+                  tone={order.statusTone}
                 />
               </div>
 
@@ -428,13 +432,13 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
               title={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.label || activeMode}
               meta={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.operationalOwner}
             >
-              {([] as { id: string; customerName: string; storeName: string; statusLabel: string; statusTone: string; slaLabel: string; nextAction: string }[]).map((row) => (
+              {([] as { id: string; customerName: string; storeName: string; statusLabel: string; statusTone: DshControlPanelTone; slaLabel: string; nextAction: string }[]).map((row) => (
                 <WebControlPanelDecisionRow
                   key={row.id}
                   entityId={row.id}
                   entityLabel={`${row.customerName} — ${row.storeName}`}
                   status={row.statusLabel}
-                  statusTone={row.statusTone as any}
+                  statusTone={row.statusTone}
                   sla={row.slaLabel}
                   onInspect={() => setSelectedItemId({ type: 'fulfillment', id: row.id, mode: activeMode })}
                   primaryAction={{
