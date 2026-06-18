@@ -168,6 +168,9 @@ const ALLOWED_FIXTURE_CONTEXTS = [
   'category', 'catalog', 'control-panel',
 ] as const;
 
+type DshRuntimeProcessLike = { env?: Record<string, string | undefined> };
+const runtimeProcess = (globalThis as { process?: DshRuntimeProcessLike }).process;
+
 // ─── Runtime Guard ────────────────────────────────────────────────────────────
 
 /**
@@ -183,7 +186,7 @@ export function guardDevFixture(callerFile: string, context: string): void {
   const isDevEnv: boolean =
     _devGlobal !== undefined
       ? Boolean(_devGlobal)
-      : typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production';
+      : runtimeProcess?.env?.NODE_ENV !== 'production';
 
   if (!isDevEnv) {
     const allowed = ALLOWED_FIXTURE_CONTEXTS.some((ctx) => context.toLowerCase().includes(ctx));

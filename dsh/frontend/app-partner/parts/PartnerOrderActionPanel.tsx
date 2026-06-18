@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Button, ListItem, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
 import type { DshPartnerPreparationStage } from '../../shared/orders';
-import type { DshFulfillmentDeliveryMode } from '../../shared/orders';
+import type { DshFulfillmentDeliveryMode } from '../../shared/checkout/dsh-client-binding.contracts';
 import { getSurfaceModeCapability } from '../../shared/orders';
 
 type PartnerFulfillmentMode = DshFulfillmentDeliveryMode;

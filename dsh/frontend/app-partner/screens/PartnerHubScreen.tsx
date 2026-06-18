@@ -34,11 +34,11 @@ import {
   wltDshPartnerUiCopy,
 } from '../../shared/wlt/generated/wlt_frontend_dsh_app_partner_wlt_dsh_partner_ui_copy.facade';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
-import type { DshCanonicalStoreCard } from '../../shared/products';
+import type { DshCanonicalStoreCard } from '../../shared/stores';
 import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/stores/dsh-client-visibility.model';
 import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/stores/partner/partner.workflow';
 import { WltDshPartnerBridge } from '../../shared/wlt/generated/wlt_frontend_dsh_app_partner.facade';
-import type { DshFulfillmentDeliveryMode } from '../../shared/orders';
+import type { DshFulfillmentDeliveryMode } from '../../shared/checkout/dsh-client-binding.contracts';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
 import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared/runtime/dsh-control-panel-governance.map';
 import {
@@ -1567,7 +1567,6 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
   const [isAvailable, setIsAvailable] = React.useState<boolean>(storeOpen);
 
-  const _storeMediaId = activeCanonicalStore?.id ?? canonicalStoreId;
 
   const { direction } = useDirection();
   const { theme } = useTheme();
@@ -1590,6 +1589,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   const activeCanonicalStore = React.useMemo((): DshCanonicalStoreCard | undefined => {
     return undefined;
   }, []);
+  const _storeMediaId = activeCanonicalStore?.id ?? canonicalStoreId;
   const resolvedActiveZoneLabel = activeCanonicalStore?.zoneLabel ?? activeZoneLabel;
 
   const { assets: storeMediaAssets } = useDshEntityMedia('store', _storeMediaId);

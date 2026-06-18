@@ -16,6 +16,7 @@ import {
   radius,
 } from '@bthwani/ui-kit';
 import {
+  type DshCategoryRecord,
   type DshCreateCategoryRequest,
   type DshUpdateCategoryRequest,
 } from '../../shared/products/dsh-product-api.client';

@@ -28,6 +28,7 @@ export type WltDshPartnerWalletTransaction = {
   readonly policyLabel?: string;
   readonly sourceTruthLabel?: string;
   readonly runtimeBindingLabel?: string;
+  readonly previewNoticeLabel?: string;
 };
 
 function mapAmountTone(tone: WltDshFinanceTone): WltDshPartnerTransactionTone {
@@ -83,5 +84,6 @@ export function mapWltDshPartnerTransactions(
     isStoreCourierCompensation: record.kind === 'store-courier-compensation',
     isCaptainPayout: record.kind === 'captain-earning' || record.kind === 'captain-cod-liability',
     policyLabel: resolvePolicyLabel(record.kind),
+    previewNoticeLabel: record.isPreview ? 'قراءة مالية مرجعية — لا تنفذ تسوية' : undefined,
   }));
 }

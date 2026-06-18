@@ -19,7 +19,6 @@ import {
   VideoUploadScreen,
 } from './OperationScreens';
 import { OrdersInboxScreen } from './OrdersInboxScreen';
-import type { PartnerOrderItem } from './OrdersInboxScreen';
 import { DshPartnerStoreCourierScreen } from './DshPartnerStoreCourierScreen';
 import { PartnerEntryScreen } from './PartnerEntryScreen';
 import { PartnerSupportScreen } from './PartnerSupportScreen';
@@ -28,6 +27,7 @@ import { CategoryManagementScreen } from './CategoryManagementScreen';
 import { ProductMediaScreen } from './ProductMediaScreen';
 import { ProductOverridesScreen } from './ProductOverridesScreen';
 import { defaultServiceModes } from '../../shared/delivery/fulfillment';
+import type { PartnerOrderItem } from '../../shared';
 
 type Props = {
   route: DshPartnerRoute;
@@ -74,7 +74,7 @@ export function DshPartnerRouteRenderer(props: Props): React.ReactElement {
     partnerOrdersState, partnerOrders, runtimePartnerProfile, selectedStoreScope,
     deliveryOpsSummary, dshAuthBearerToken, dshClientId,
     renderMainShell, renderSurfaceShell,
-    setRoute, setActiveOrderId, openOrdersBoard, openOrdersSearch, openAccountHub,
+    setRoute, setActiveOrderId, setOrdersSearchMode, openOrdersBoard, openOrdersSearch, openAccountHub,
     goBackToHub, openSupportDirectory, returnToSupportDirectory, openSupportScreen,
     openInventoryManagement, openStoreCourier, openSupportCommandFromOperationalFlow,
     handleMarkReady, setEditingProductId,

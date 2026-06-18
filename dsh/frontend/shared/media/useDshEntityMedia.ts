@@ -11,8 +11,11 @@ import {
 
 const EMPTY: readonly DshMediaAsset[] = Object.freeze([]);
 
+type DshRuntimeProcessLike = { env?: Record<string, string | undefined> };
+const runtimeProcess = (globalThis as { process?: DshRuntimeProcessLike }).process;
+
 const baseUrl =
-  (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_DSH_API_BASE_URL) ||
+  runtimeProcess?.env?.EXPO_PUBLIC_DSH_API_BASE_URL ||
   (typeof globalThis !== 'undefined' && (globalThis as Record<string, unknown>)['__DSH_API_BASE_URL__'] as string) ||
   '';
 

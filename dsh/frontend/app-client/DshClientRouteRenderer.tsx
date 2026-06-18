@@ -1,4 +1,5 @@
 import React from 'react';
+import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import { View, Platform } from 'react-native';
 import { Text, colorPalette, spacing } from '@bthwani/ui-kit';
 
@@ -247,7 +248,7 @@ export function DshClientRouteRenderer({
     return (
       <DshMySpaceScreen
         appearanceHydrated={appearanceHydrated}
-        appearanceMode={appearanceMode}
+        appearanceMode={appearanceMode as BThwaniAppearanceMode}
         marketingPrograms={liveMarketingPrograms.map((item) => ({
           id: item.id,
           title: item.title,
@@ -255,7 +256,7 @@ export function DshClientRouteRenderer({
           meta: item.routeTarget,
           badgeLabel: item.family === 'subscription' ? 'اشتراك' : item.family === 'promotion' ? 'برومو' : item.family === 'shorts' ? 'شورتات' : 'حملة',
         }))}
-        onAppearanceModeChange={setAppearanceMode}
+        onAppearanceModeChange={(mode: BThwaniAppearanceMode) => setAppearanceMode(mode)}
         onOpenOrders={() => setRoute('orders-list')}
         onOpenWallet={() => setRoute('wlt-home')}
         onOpenLoyalty={() => { setSelectedOperationScreen('loyalty-points-client-balance'); setRoute('benefits'); }}
@@ -292,7 +293,7 @@ export function DshClientRouteRenderer({
   if (route === 'store-get') {
     return (
       <DshStoreGetScreen
-        appearanceMode={appearanceMode}
+        appearanceMode={appearanceMode as BThwaniAppearanceMode}
         state={storeDetailState}
         store={activeStoreScreenStore}
         menuItems={activeStoreItems}
@@ -444,8 +445,8 @@ export function DshClientRouteRenderer({
   if (route === 'appearance') {
     return (
       <DshAppearanceHubScreen
-        appearanceMode={appearanceMode}
-        onAppearanceModeChange={setAppearanceMode}
+        appearanceMode={appearanceMode as BThwaniAppearanceMode}
+        onAppearanceModeChange={(mode: BThwaniAppearanceMode) => setAppearanceMode(mode)}
         onBack={() => setRoute('my-space')}
         onRetry={() => setRoute('appearance')}
       />

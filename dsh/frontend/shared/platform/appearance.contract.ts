@@ -1,20 +1,14 @@
-export const DSH_APPEARANCE_MODES = [
-  'light',
-  'dark',
-  'system',
-  'lightPremium',
-  'darkPremium',
-] as const;
+export const DSH_DEFAULT_APPEARANCE_MODE = 'system' as const;
 
-export type DshAppearanceMode = (typeof DSH_APPEARANCE_MODES)[number];
+export type DshAppearanceMode = string;
 
 export function isDshAppearanceMode(value: unknown): value is DshAppearanceMode {
-  return DSH_APPEARANCE_MODES.includes(value as DshAppearanceMode);
+  return typeof value === 'string' && value.trim().length > 0;
 }
 
 export function normalizeDshAppearanceMode(
   value: unknown,
-  fallback: DshAppearanceMode = 'system',
+  fallback: DshAppearanceMode = DSH_DEFAULT_APPEARANCE_MODE,
 ): DshAppearanceMode {
   return isDshAppearanceMode(value) ? value : fallback;
 }

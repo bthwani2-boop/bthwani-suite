@@ -102,7 +102,7 @@ export function DshPartnerOrderRejectionScreen({
       </Surface>
 
       {!showRejectionPanel ? (
-        <Box gap={3} marginTop={spacing[4]}>
+        <Box gap={3} style={{ marginTop: spacing[4] }}>
           <Button label="قبول الطلب وبدء التحضير" tone="primary" onPress={onAccept} />
           <Button
             label="رفض الطلب"
@@ -130,13 +130,13 @@ export function DshPartnerOrderRejectionScreen({
                 <View style={[styles.radioCircle, selectedReasonId === reason.id && styles.radioCircleActive]}>
                   {selectedReasonId === reason.id && <View style={styles.radioInner} />}
                 </View>
-                <Text role="bodyMd" style={[styles.reasonLabel, selectedReasonId === reason.id && { color: colorPalette.deepBlue }]}>
+                <Text role="bodyMd" style={[styles.reasonLabel, selectedReasonId === reason.id && { color: colorPalette.brandStrong }]}>
                   {reason.label}
                 </Text>
               </Pressable>
             ))}
           </Box>
-          <Box gap={2} marginTop={spacing[2]}>
+          <Box gap={2} style={{ marginTop: spacing[2] }}>
             <Button
               label="تأكيد الرفض"
               tone="danger"
@@ -148,7 +148,7 @@ export function DshPartnerOrderRejectionScreen({
         </Surface>
       )}
 
-      <Box padding={spacing[3]} backgroundColor={colorPalette.lightSurface} borderRadius={radius.md}>
+      <Box padding={spacing[3]} style={{ backgroundColor: colorPalette.surfacePrimary, borderRadius: radius.md }}>
         <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[2] }}>
           <Icon name="time-outline" size={16} tone="muted" />
           <Text role="caption" tone="muted">ملاحظة: التأخر في اتخاذ القرار قد يؤدي إلى إلغاء الطلب تلقائياً.</Text>
@@ -171,11 +171,11 @@ const styles = StyleSheet.create({
   },
   itemText: {
     flex: 1,
-    color: colorPalette.deepBlue,
+    color: colorPalette.brandStrong,
     textAlign: 'right',
   },
   itemQty: {
-    color: colorPalette.orange,
+    color: colorPalette.brand,
     width: 40,
     textAlign: 'left',
   },
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
   reasonLabel: {
     flex: 1,
     textAlign: 'right',
-    color: colorPalette.deepBlueLighter,
+    color: colorPalette.brandStrong,
   },
   radioCircle: {
     width: 20,

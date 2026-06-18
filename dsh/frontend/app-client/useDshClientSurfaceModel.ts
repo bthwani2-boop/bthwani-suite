@@ -13,8 +13,15 @@ type UseDshClientSurfaceModelProps = DshClientSurfaceProps & {
 export function useDshClientSurfaceModel(props: UseDshClientSurfaceModelProps) {
   const appearance = useAppClientAppearance();
 
+  const dshAppearance = {
+    hydrated: appearance.hydrated,
+    mode: appearance.mode as DshAppearanceMode,
+    setMode: (mode: DshAppearanceMode) =>
+      appearance.setMode(mode as Parameters<typeof appearance.setMode>[0]),
+  };
+
   return useDshClientSurfaceBinding({
     ...props,
-    appearance,
+    appearance: dshAppearance,
   });
 }

@@ -15,6 +15,7 @@ export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerT
 
   React.useEffect(() => {
     let cancelled = false;
+
     void getPartnerSnapshot(activePartnerId, dshAuthBearerToken)
       .then((snapshot) => {
         if (cancelled) return;
@@ -25,6 +26,7 @@ export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerT
         if (cancelled) return;
         setLastError(error instanceof Error ? error.message : 'wlt_partner_runtime_unavailable');
       });
+
     return () => {
       cancelled = true;
     };
@@ -37,7 +39,9 @@ export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerT
 
   return {
     partnerPreview,
+    partnerSummary: partnerPreview,
     previewTransactions,
-    warnings: lastError ? [`WLT runtime blocked: ${lastError}`] : partnerPreview.warnings,
+    summaryTransactions: previewTransactions,
+    warnings: lastError ? ['WLT runtime blocked: ' + lastError] : partnerPreview.warnings,
   };
 }

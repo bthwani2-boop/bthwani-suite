@@ -1,3 +1,12 @@
+import type {
+  DshPartnerOperationalFlowId,
+  DshPartnerRoute,
+  DshPartnerSupportCommandContext,
+  DshPartnerSupportCommandFilterId,
+  DshPartnerSupportIssueCategoryId,
+  DshPartnerSupportRouteId,
+  PartnerHubSection,
+} from '../shared/stores/partner/partner.types';
 // Re-export domain types from shared so consumers can import from one place.
 export type {
   DshPartnerOperationalFlowId,
