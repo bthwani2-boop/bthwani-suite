@@ -1,8 +1,12 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Badge, Box, Button, Divider, Icon, MobileScrollView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
+import { Badge, borders, Box, Button, Divider, Icon, MobileScrollView, Text, TopBar, useTheme,
+  radius,
+  spacing,
+} from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
-import { resolveFieldFilterCounts, type FieldStoreFile } from '../../data/stores.preview-data';
+import { resolveFieldFilterCounts } from '../field.surface-model';
+import type { FieldStoreFile } from '../dsh-field.routes';
 
 type DshFieldProfileHomeScreenProps = {
   stores: readonly FieldStoreFile[];
@@ -37,18 +41,11 @@ export function DshFieldProfileHomeScreen({
         variant="surface"
         title="ملف الميداني"
         subtitle="صفحة الهوية والملف التشغيلي للميدان"
-        trailingAction={{
-          id: 'back',
-          icon: <Icon name="arrow-back" size={24} tone="brand" />,
-          mirrorInRtl: true,
-          accessibilityLabel: 'العودة',
-          onPress: onBack,
-        }}
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
         <Box padding={4} gap={4}>
-          <Box gap={3} paddingVertical={2}>
-            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+          <Box gap={3} paddingY={2}>
+            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing[2] }}>
               <Badge label="DSH" tone="success" />
               <Badge label="الميداني" tone="brand" />
             </View>
@@ -56,7 +53,7 @@ export function DshFieldProfileHomeScreen({
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
               الفريق الشمالي · الملف التشغيلي يبقى عند الميداني حتى اكتمال الملف والمراجعة والمالية المرتبطة به.
             </Text>
-            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: spacing[2] }}>
               <Badge label={`ملفات اليوم ${counts.today}`} tone="brand" />
               <Badge label={`مرسل ${counts.submitted}`} tone="info" />
               <Badge label={`مالية جاهزة ${counts.done}`} tone="success" />
@@ -65,7 +62,7 @@ export function DshFieldProfileHomeScreen({
 
           <Divider />
 
-          <Box gap={3} paddingVertical={2}>
+          <Box gap={3} paddingY={2}>
             <Text role="label" tone="muted" style={{ textAlign: 'right' }}>
               المظهر والتحكم
             </Text>
@@ -79,16 +76,16 @@ export function DshFieldProfileHomeScreen({
                 backgroundColor: theme.surface,
               }}
             >
-              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+              <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[3], flexShrink: 1, minWidth: 0 }}>
                 <View
                   style={{
                     width: 36,
                     height: 36,
-                    borderRadius: 10,
+                    borderRadius: radius.sm,
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: theme.surfaceInset,
-                    borderWidth: 1,
+                    borderWidth: borders.hairline,
                     borderColor: theme.line,
                     flexShrink: 0,
                   }}
@@ -107,36 +104,36 @@ export function DshFieldProfileHomeScreen({
                 style={{
                   flexDirection: 'row-reverse',
                   backgroundColor: theme.surfaceInset,
-                  borderRadius: 12,
+                  borderRadius: radius.sm2,
                   padding: 3,
-                  borderWidth: 1,
+                  borderWidth: borders.hairline,
                   borderColor: theme.line,
-                  gap: 4,
+                  gap: spacing[1],
                 }}
               >
                 <Pressable
                   onPress={() => onAppearanceModeChange('lightPremium')}
                   style={{
-                    paddingHorizontal: 12,
+                    paddingHorizontal: spacing[3],
                     paddingVertical: 6,
                     borderRadius: 9,
                     backgroundColor: appearanceMode === 'lightPremium' ? theme.brand : 'transparent',
                   }}
                 >
-                  <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text }}>
+                  <Text role="bodyStrong" style={{ color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text }}>
                     فاتح
                   </Text>
                 </Pressable>
                 <Pressable
                   onPress={() => onAppearanceModeChange('darkGlass')}
                   style={{
-                    paddingHorizontal: 12,
+                    paddingHorizontal: spacing[3],
                     paddingVertical: 6,
                     borderRadius: 9,
                     backgroundColor: appearanceMode === 'darkGlass' ? theme.brand : 'transparent',
                   }}
                 >
-                  <Text role="bodyStrong" style={{ fontSize: 12, color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text }}>
+                  <Text role="bodyStrong" style={{ color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text }}>
                     داكن
                   </Text>
                 </Pressable>
@@ -148,37 +145,37 @@ export function DshFieldProfileHomeScreen({
 
           <Box gap={0}>
             <Pressable onPress={onOpenProfile}>
-              <Box paddingVertical={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+              <Box paddingY={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
                 <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
                   <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
                     <Text role="bodyStrong">بيانات الميداني</Text>
                     <Text role="bodySm" tone="muted">الهوية، التغطية، والوردية الحالية.</Text>
                   </View>
-                  <Icon name="chevron-back" size={20} tone="muted" mirrorInRtl />
+                  <Icon name="chevron-back" size={20} tone="muted" mirrored />
                 </View>
               </Box>
             </Pressable>
 
             <Pressable onPress={onOpenHistory}>
-              <Box paddingVertical={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+              <Box paddingY={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
                 <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
                   <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
                     <Text role="bodyStrong">السجل</Text>
                     <Text role="bodySm" tone="muted">آخر حالة لكل متجر والتقدم المرتبط به.</Text>
                   </View>
-                  <Icon name="chevron-back" size={20} tone="muted" mirrorInRtl />
+                  <Icon name="chevron-back" size={20} tone="muted" mirrored />
                 </View>
               </Box>
             </Pressable>
 
             <Pressable onPress={onOpenFinance}>
-              <Box paddingVertical={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
+              <Box paddingY={3} style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}>
                 <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }}>
                   <View style={{ flex: 1, alignItems: 'flex-end', gap: 2 }}>
                     <Text role="bodyStrong">المالية</Text>
                     <Text role="bodySm" tone="muted">المستحقات والملخص المالي بعد اكتمال الاعتماد.</Text>
                   </View>
-                  <Icon name="chevron-back" size={20} tone="muted" mirrorInRtl />
+                  <Icon name="chevron-back" size={20} tone="muted" mirrored />
                 </View>
               </Box>
             </Pressable>

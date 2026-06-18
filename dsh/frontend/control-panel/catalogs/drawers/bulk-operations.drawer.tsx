@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * CatalogBulkOperationsWorkspace — UI_PREVIEW_ONLY
+ * CatalogBulkOperationsWorkspace — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * API boundary: POST /catalog/bulk (not yet bound)
  *
@@ -19,7 +19,10 @@
  */
 
 import React, { useState } from 'react';
-import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { generateLocalTempId } from '../../../shared/platform/local-temp-id';
+import { Box, Button, Surface, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import type { CatalogPreviewProposal } from '../catalogs.model';
 import { WorkspacePreviewNotice } from '../catalogs.parts';
 import type { CatalogProductMaster } from '../catalogs.data';
@@ -113,7 +116,7 @@ export function CatalogBulkOperationsWorkspace({
     setActionResult(result);
 
     onProposal({
-      id: `bulk-${action}-${Date.now()}`, // draft proposal ID only
+      id: generateLocalTempId(`bulk-${action}`),
       type: action === 'bulk-send-marketing' ? 'bulk-send-marketing'
         : action === 'bulk-request-fix' ? 'bulk-request-fix'
           : 'bulk-approve',
@@ -145,7 +148,7 @@ export function CatalogBulkOperationsWorkspace({
     >
       {/* Header */}
       <Box layoutDirection="row" justify="space-between" align="center">
-        <Text role="titleLg" style={{ fontWeight: '800', fontSize: 18, color: theme.brandHeaderBackground }}>
+        <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
           📋 عمليات مجمعة
         </Text>
         <Button label="✕ إغلاق" tone="secondary" size="sm" onPress={onClose} />
@@ -153,7 +156,7 @@ export function CatalogBulkOperationsWorkspace({
 
       {/* Notice */}
       <WorkspacePreviewNotice
-        bannerTitle="UI_PREVIEW_ONLY — لا تعديل فعلي على الكتالوج"
+        bannerTitle="لا تعديل فعلي على الكتالوج"
         subtitle="كل الإجراءات المجمعة تُنتج مقترحًا يحتاج ربط API. لا تعديل local على البيانات."
       />
 
@@ -171,29 +174,29 @@ export function CatalogBulkOperationsWorkspace({
       >
         {isEmpty ? (
           <>
-            <Text role="caption" style={{ fontWeight: '800', color: theme.danger }}>
+            <Text role="caption" weight="black" style={{ color: theme.danger }}>
               ⛔ لم يتم تحديد أي منتجات
             </Text>
             <Text role="caption" tone="muted">
               يجب تحديد منتج واحد على الأقل من الجدول لتفعيل الإجراءات المجمعة.
               أغلق هذا الـ workspace واختر المنتجات من الجدول أولًا.
             </Text>
-            <Text role="caption" style={{ color: theme.danger, fontWeight: '600', fontSize: 11 }}>
+            <Text role="caption" weight="semibold" style={{ color: theme.danger, fontSize: 11 }}>
               كل الإجراءات المجمعة معطّلة حتى يتم التحديد.
             </Text>
           </>
         ) : (
           <>
-            <Text role="caption" style={{ fontWeight: '800', color: theme.success }}>
+            <Text role="caption" weight="black" style={{ color: theme.success }}>
               ✅ {selectedProductIds.length} منتج محدد
             </Text>
             <Box gap={1} style={{ maxHeight: 120, overflow: 'scroll' }}>
               {selectedProducts.map((p) => (
                 <Box key={p.id} layoutDirection="row" align="center" gap={2}>
-                  <Text role="caption" style={{ fontSize: 10, color: theme.brand, fontWeight: '700', direction: 'ltr' }}>
+                  <Text role="caption" weight="bold" style={{ fontSize: 10, color: theme.brand, direction: 'ltr' }}>
                     {p.sku}
                   </Text>
-                  <Text role="caption" style={{ flex: 1, fontSize: 12 }}>{p.name}</Text>
+                  <Text role="caption" style={{ flex: 1,}}>{p.name}</Text>
                   <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{p.approvalStage}</Text>
                 </Box>
               ))}
@@ -204,7 +207,7 @@ export function CatalogBulkOperationsWorkspace({
 
       {/* Bulk actions */}
       <Box gap={3}>
-        <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+        <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
           الإجراءات المجمعة
         </Text>
 
@@ -242,28 +245,28 @@ export function CatalogBulkOperationsWorkspace({
           tone="inset"
           padding={4}
           gap={3}
-          style={{ borderRadius: 10, borderWidth: 2, borderColor: theme.success, borderStyle: 'solid' }}
+          style={{ borderRadius: radius.sm, borderWidth: 2, borderColor: theme.success, borderStyle: 'solid' }}
         >
-          <Text role="caption" style={{ fontWeight: '800', color: theme.success }}>
+          <Text role="caption" weight="black" style={{ color: theme.success }}>
             ✅ تم إرسال الاقتراح المجمع
           </Text>
           <Box gap={1}>
             <Box layoutDirection="row" gap={2}>
               <Text role="caption" tone="muted">الإجراء:</Text>
-              <Text role="caption" style={{ fontWeight: '700' }}>{BULK_ACTION_LABELS[actionResult.action]}</Text>
+              <Text role="caption" weight="bold" style={{ }}>{BULK_ACTION_LABELS[actionResult.action]}</Text>
             </Box>
             <Box layoutDirection="row" gap={2}>
               <Text role="caption" tone="muted">العدد:</Text>
-              <Text role="caption" style={{ fontWeight: '700' }}>{actionResult.count} منتج</Text>
+              <Text role="caption" weight="bold" style={{ }}>{actionResult.count} منتج</Text>
             </Box>
             <Box layoutDirection="row" gap={2}>
               <Text role="caption" tone="muted">المالك:</Text>
-              <Text role="caption" style={{ fontWeight: '700' }}>{actionResult.owner}</Text>
+              <Text role="caption" weight="bold" style={{ }}>{actionResult.owner}</Text>
             </Box>
-            <Text role="caption" style={{ color: theme.warning, fontWeight: '600', fontSize: 11 }}>
+            <Text role="caption" weight="semibold" style={{ color: theme.warning, fontSize: 11 }}>
               {actionResult.rollbackNote}
             </Text>
-            <Text role="caption" style={{ color: theme.brand, fontWeight: '600', fontSize: 11, direction: 'ltr' }}>
+            <Text role="caption" weight="semibold" style={{ color: theme.brand, fontSize: 11, direction: 'ltr' }}>
               API: {actionResult.apiBoundary} — not yet bound
             </Text>
           </Box>
@@ -271,7 +274,7 @@ export function CatalogBulkOperationsWorkspace({
       )}
 
       <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'center' }}>
-        UI_PREVIEW_ONLY • Carbon batch action principle applied • API boundary: POST /catalog/bulk
+        محاكاة محلية • Carbon batch action principle • API boundary: POST /catalog/bulk
       </Text>
     </Surface>
   );

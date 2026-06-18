@@ -18,36 +18,45 @@ import {
 	radius,
 	spacing,
 } from '@bthwani/ui-kit';
-import { useWltDshWalletPreview } from './useWltDshWalletPreview';
-import { listLedgerEntries } from './wlt-dsh-client.adapter';
-import { formatWltYer } from '../control-panel/financeContracts';
+import { useWltDshWalletSession } from './useWltDshWalletSession';
+import { listLedgerEntries } from '../shared/wallet/client-wallet-runtime.adapter';
+import { adaptClientLedgerEntries, formatWltDshAmountLabel } from '../shared';
+import type { WltDshClientWalletLedgerRow } from '../shared';
 
 export type CustomerWalletScreenProps = {
-	clientId?: string;
+	clientId: string;
 	bearerToken?: string;
 };
 
-export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken }: CustomerWalletScreenProps) {
+export function CustomerWalletScreen({ clientId, bearerToken }: CustomerWalletScreenProps) {
 	const { theme } = useTheme();
-	const wallet = useWltDshWalletPreview(clientId, bearerToken);
-	const [transactions, setTransactions] = React.useState<any[]>([]);
+	const wallet = useWltDshWalletSession(clientId, bearerToken);
+	const [transactions, setTransactions] = React.useState<readonly WltDshClientWalletLedgerRow[]>([]);
 	const [loadingTx, setLoadingTx] = React.useState<boolean>(false);
+	const [offline, setOffline] = React.useState<boolean>(false);
 	const [rechargeAmount, setRechargeAmount] = React.useState<string>('');
 	const [rechargeError, setRechargeError] = React.useState<string | null>(null);
 	const [rechargeSuccess, setRechargeSuccess] = React.useState<boolean>(false);
 
+	const loading = !wallet.hydrated || loadingTx;
+
 	const fetchTransactions = React.useCallback(async () => {
 		if (!wallet.linked) return;
 		setLoadingTx(true);
+		setOffline(false);
 		try {
 			const res = await listLedgerEntries(clientId, bearerToken, 20, 0);
-			setTransactions(res.entries || []);
+			setTransactions(adaptClientLedgerEntries(res.entries || []));
 		} catch (err) {
 			console.error('Failed to fetch ledger entries:', err);
+			const isOffline = !globalThis.navigator?.onLine || (err instanceof TypeError && /network|fetch/i.test(String(err)));
+			setOffline(isOffline);
 		} finally {
 			setLoadingTx(false);
 		}
 	}, [wallet.linked, clientId, bearerToken]);
+
+	const retry = React.useCallback(() => { void fetchTransactions(); }, [fetchTransactions]);
 
 	React.useEffect(() => {
 		void fetchTransactions();
@@ -68,21 +77,15 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 		}
 
 		try {
-			// Convert YER to minor units (multiply by 100)
-			const res = await wallet.topUp(amount * 100);
-			if (res.success) {
-				setRechargeSuccess(true);
-				setRechargeAmount('');
-				await handleRefresh();
-			} else {
-				setRechargeError(res.error || 'فشلت عملية الشحن، يرجى المحاولة مرة أخرى');
-			}
+			wallet.createWalletFundingLink(amount * 100);
+			setRechargeSuccess(true);
+			setRechargeAmount('');
 		} catch (err) {
 			setRechargeError('حدث خطأ غير متوقع أثناء الشحن');
 		}
 	};
 
-	if (!wallet.hydrated) {
+	if (loading) {
 		return (
 			<Surface tone="default" style={styles.centerContainer}>
 				<Text role="bodyMd" tone="muted" style={{ textAlign: 'center' }}>
@@ -106,6 +109,13 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 						المحفظة الإلكترونية
 					</Text>
 				</View>
+
+				{offline && (
+					<Card tone="warning" gap={2} padding={3}>
+						<Text role="bodyStrong" style={{ textAlign: 'right' }}>لا يوجد اتصال بالشبكة</Text>
+						<Button label="إعادة المحاولة" tone="secondary" size="sm" onPress={retry} />
+					</Card>
+				)}
 
 				{/* Wallet status banner */}
 				{!wallet.linked ? (
@@ -132,8 +142,8 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 							<Text role="label" tone="muted" style={{ textAlign: 'right' }}>
 								الرصيد المتاح
 							</Text>
-							<Text role="hero" style={[styles.balanceText, { color: theme.brand }]}>
-								{formatWltYer(wallet.balance ?? 0)}
+							<Text role="hero" weight="black" style={[styles.balanceText, { color: theme.brand }]}>
+								{formatWltDshAmountLabel(wallet.balance ?? 0)}
 							</Text>
 							<View style={styles.badgeRow}>
 								<Badge label="محفظة نشطة" tone="success" />
@@ -168,7 +178,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 							)}
 							{rechargeSuccess && (
 								<Text role="bodySm" style={{ color: colorPalette.success, textAlign: 'right' }}>
-									تم شحن الرصيد بنجاح!
+									تم تجهيز رابط الشحن عبر WLT.
 								</Text>
 							)}
 						</Surface>
@@ -187,8 +197,8 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 							) : (
 								<Surface tone="default" style={styles.txListContainer}>
 									{transactions.map((tx, idx) => {
-										const isCredit = tx.transaction_type === 'CREDIT';
-										const dateLabel = new Date(tx.created_at).toLocaleDateString('ar-YE', {
+										const isCredit = tx.direction === 'credit';
+										const dateLabel = new Date(tx.createdAt).toLocaleDateString('ar-YE', {
 											month: 'short',
 											day: 'numeric',
 											hour: '2-digit',
@@ -198,7 +208,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 											<React.Fragment key={tx.id}>
 												{idx > 0 && <Divider />}
 												<ListItem
-													title={tx.description || (isCredit ? 'شحن رصيد' : 'دفع قيمة طلب')}
+													title={tx.description || tx.typeLabel}
 													subtitle={dateLabel}
 													meta={
 														<View style={{ alignItems: 'flex-start' }}>
@@ -208,7 +218,7 @@ export function CustomerWalletScreen({ clientId = 'client-dev-001', bearerToken 
 																	color: isCredit ? colorPalette.success : colorPalette.danger,
 																}}
 															>
-																{isCredit ? '+' : '-'} {formatWltYer(tx.amount * 100)}
+																{isCredit ? '+' : '-'} {tx.amountLabel}
 															</Text>
 															<Badge
 																label={tx.status === 'COMPLETED' ? 'مكتمل' : 'معلق'}
@@ -252,7 +262,6 @@ const styles = StyleSheet.create({
 	},
 	balanceText: {
 		fontSize: 32,
-		fontWeight: '800',
 		textAlign: 'right',
 		marginVertical: spacing[2],
 	},

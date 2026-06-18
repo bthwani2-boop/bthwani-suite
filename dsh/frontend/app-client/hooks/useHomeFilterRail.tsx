@@ -1,19 +1,20 @@
 import * as React from 'react';
+import type { StyleProp, ImageStyle, TextStyle } from 'react-native';
 import { Icon, type BThwaniFilterRailItem } from '@bthwani/ui-kit';
 import { CategoryIconImage } from '../parts/home/HomeCategoryCarousel';
 import {
   DSH_CATEGORY_ICONS as categoryIconMap,
   DSH_SUBCATEGORY_ICONS as subcategoryIconMap,
-} from '../../data/categories.preview-data';
-import { dshHomeDiscoveryFilterFixtures as discoveryFilters } from '../../data/stores.preview-data';
-import { getDshCategoryIconUrl } from '../shared/get-dsh-category-icon-url';
+} from '../../shared/catalog/catalog.icons';
+import { DSH_HOME_DISCOVERY_FILTERS as discoveryFilters } from '../../shared/discovery/home-service-config';
+import { getDshCategoryIconUrl } from '../../shared/catalog/catalog.icon-url';
 import {
   buildHomeCategoryFilterId,
   buildHomeModeFilterId,
   HOME_CATEGORY_FILTER_PREFIX,
   HOME_MODE_FILTER_PREFIX,
-} from '../shared/home-search-helpers';
-import type { DiscoveryFilter, DshHomeCategory } from '../contracts/dsh-home-types';
+} from '../../shared/discovery/home-search-helpers';
+import type { DiscoveryFilter, DshHomeCategory } from '../../shared/discovery/dsh-home-types';
 import { useFeatureFlag } from '../../shared';
 
 export function useHomeFilterRail({
@@ -29,8 +30,8 @@ export function useHomeFilterRail({
   onOpenCategory,
   onOpenSheinInfo,
 }: {
-  theme: any;
-  styles: any;
+  theme: { textInverse: string; textMuted: string };
+  styles: { filterChipIcon: StyleProp<ImageStyle | TextStyle> };
   categoryItems: DshHomeCategory[];
   activeFilter: DiscoveryFilter;
   setActiveFilter: (val: DiscoveryFilter) => void;
@@ -48,17 +49,17 @@ export function useHomeFilterRail({
     return rawCategoryItems.filter((cat) => cat.id !== 'awnak');
   }, [rawCategoryItems, isAwnakEnabled]);
 
-  const selectedCategoryFixture = React.useMemo(
+  const selectedCategory = React.useMemo(
     () =>
       activeCategoryId && activeCategoryId !== 'all'
         ? categoryItems.find((category) => category.id === activeCategoryId) ?? null
         : null,
     [activeCategoryId, categoryItems],
   );
-  const selectedCategoryLabel = selectedCategoryFixture?.label ?? 'الفئات';
+  const selectedCategoryLabel = selectedCategory?.label ?? 'الفئات';
   const selectedSubcategories = React.useMemo(
-    () => selectedCategoryFixture?.subcategories ?? [],
-    [selectedCategoryFixture],
+    () => selectedCategory?.subcategories ?? [],
+    [selectedCategory],
   );
   const allCategoryRailItems = React.useMemo(
     () =>
@@ -77,7 +78,7 @@ export function useHomeFilterRail({
         key: category.id,
         title: category.label,
         subtitle: category.subtitle,
-        // mediaKey threads the fixture key to DshCategoryOrbitCarouselBase → resolveDshImageSource
+        // mediaKey threads category identity to DshCategoryOrbitCarouselBase.
         mediaKey: category.mediaKey,
         iconUrl: getDshCategoryIconUrl(category.id),
         emojiFallback: category.emojiFallback ?? categoryIconMap[category.id] ?? '📂',
@@ -85,17 +86,17 @@ export function useHomeFilterRail({
     [categoryItems],
   );
   const activeCategoryDialItem = React.useMemo(() => {
-    if (!selectedCategoryFixture) return null;
+    if (!selectedCategory) return null;
     return {
-      id: selectedCategoryFixture.id,
-      key: selectedCategoryFixture.id,
+      id: selectedCategory.id,
+      key: selectedCategory.id,
       title: selectedCategoryLabel,
-      subtitle: selectedCategoryFixture.subtitle,
-      mediaKey: selectedCategoryFixture.mediaKey,
-      iconUrl: getDshCategoryIconUrl(selectedCategoryFixture.id),
-      emojiFallback: selectedCategoryFixture.emojiFallback ?? categoryIconMap[selectedCategoryFixture.id] ?? '📂',
+      subtitle: selectedCategory.subtitle,
+      mediaKey: selectedCategory.mediaKey,
+      iconUrl: getDshCategoryIconUrl(selectedCategory.id),
+      emojiFallback: selectedCategory.emojiFallback ?? categoryIconMap[selectedCategory.id] ?? '📂',
     };
-  }, [selectedCategoryFixture, selectedCategoryLabel]);
+  }, [selectedCategory, selectedCategoryLabel]);
   const selectedSubcategoryCards = React.useMemo(
     () =>
       selectedSubcategories.map((subcategory) => ({
@@ -112,7 +113,7 @@ export function useHomeFilterRail({
       {
         id: buildHomeCategoryFilterId('all'),
         label: 'الكل',
-        icon: ({ selected }: any) => (
+        icon: ({ selected }: { selected: boolean }) => (
           <Icon
             name="menu-outline"
             size={16}
@@ -199,7 +200,7 @@ export function useHomeFilterRail({
 
   return {
     allCategoryRailItems,
-    selectedCategoryFixture,
+    selectedCategory,
     selectedCategoryLabel,
     categoriesDialItems,
     activeCategoryDialItem,

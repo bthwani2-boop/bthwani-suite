@@ -2,7 +2,7 @@
 
 // Authority: control-panel/marketing — VideosCommandDeckScreen (slim entry point).
 // Giant Screen split: types → video-types.ts | utils → video-target-utils.ts
-//                     preview → VideoPreview.tsx | editor → VideoEditorSection.tsx
+//                     preview → VideoViewer.tsx | editor → VideoEditorSection.tsx
 // This file retains: component state, URL param management, data handlers, layout JSX.
 
 import React from 'react';
@@ -15,6 +15,7 @@ import {
   Text,
   useTheme,
   useDirection,
+  radius,
 } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
@@ -26,14 +27,12 @@ import {
   toggleMarketingVideoStatus,
   duplicateMarketingVideoItem,
   removeMarketingVideoItem,
-  type MarketingVideoRecord,
-  type MarketingVideoSummary,
-  type MarketingVideoStatus,
-} from '../../data/marketing.preview-data';
+} from '../../shared/marketing';
+import type { MarketingVideoRecord, MarketingVideoStatus, MarketingVideoSummary } from '../../shared/marketing';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 import type { VideoDraft, EditorWorkspaceTab } from './video-types';
 import { createDraft } from './video-target-utils';
-import { VideoPreview } from './VideoPreview';
+import { VideoViewer } from './VideoViewer';
 import { VideoEditorSection } from './VideoEditorSection';
 
 export type VideosCommandDeckScreenProps = {
@@ -196,12 +195,12 @@ export function VideosCommandDeckScreen({ hubHref, operationsHref }: VideosComma
         <View style={[styles.headerRow, isRtl ? styles.rowReverse : null]}>
           <Box gap={1} >
             <View style={[styles.headerRow, { gap: 8, justifyContent: 'flex-start' }]}>
-              <Text role="caption" style={[{ color: theme.brand, fontWeight: '900', letterSpacing: 1 }, rtlText]}>استوديو الفيديو DSH v1</Text>
+              <Text role="caption" weight="black" style={[{ color: theme.brand, letterSpacing: 1 }, rtlText]}>استوديو الفيديو DSH v1</Text>
               <View style={{ backgroundColor: theme.brand, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
-                <Text role="caption" style={[{ color: theme.textInverse, fontSize: 9, fontWeight: '900' }, rtlText]}>احترافي</Text>
+                <Text role="caption" weight="black" style={[{ color: theme.textInverse, fontSize: 9 }, rtlText]}>احترافي</Text>
               </View>
             </View>
-            <Text role="titleLg" style={[{ fontSize: 24, fontWeight: '900', color: theme.brandHeaderBackground }, rtlText]}>استوديو الفيديو التسويقي</Text>
+            <Text role="titleLg" weight="black" style={[{ color: theme.brandHeaderBackground }, rtlText]}>استوديو الفيديو التسويقي</Text>
           </Box>
 
           <View style={[styles.kpiRow]}>
@@ -211,8 +210,8 @@ export function VideosCommandDeckScreen({ hubHref, operationsHref }: VideosComma
               { label: 'قيد المراجعة', value: kpis.review.value, color: theme.warning, bg: theme.surface },
             ].map((kpi) => (
               <View key={kpi.label} style={[styles.kpiPill, { backgroundColor: kpi.bg, borderWidth: 1, borderColor: theme.lineStrong }]}>
-                <Text role="caption" style={[{ fontWeight: '800', fontSize: 10, color: theme.textMuted }, rtlText]}>{kpi.label}</Text>
-                <Text role="titleMd" style={[{ color: kpi.color, fontWeight: '900', fontSize: 16 }, rtlText]}>{String(kpi.value)}</Text>
+                <Text role="caption" weight="black" style={[{ fontSize: 10, color: theme.textMuted }, rtlText]}>{kpi.label}</Text>
+                <Text role="titleMd" weight="black" style={[{ color: kpi.color, fontSize: 16 }, rtlText]}>{String(kpi.value)}</Text>
               </View>
             ))}
           </View>
@@ -226,13 +225,13 @@ export function VideosCommandDeckScreen({ hubHref, operationsHref }: VideosComma
         {/* Left: List Panel */}
         <Surface tone="raised" style={styles.listPanel}>
           <View style={[styles.panelHeader]}>
-            <Text role="titleSm" style={[{ fontWeight: '900' }, rtlText]}>مكتبة المحتوى</Text>
+            <Text role="titleSm" weight="black" style={[{ }, rtlText]}>مكتبة المحتوى</Text>
             <Text role="caption" tone="muted" style={rtlText}>{totalItems} فيديوهات</Text>
           </View>
           <Box gap={2} style={styles.listBody}>
             {visibleItems.length === 0 ? (
               <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.surfaceInset, borderRadius: 12 }}>
-                <Text style={{ color: theme.textMuted, fontWeight: '800', textAlign: 'center' }}>لا توجد فيديوهات مطابقة للبحث أو الفلتر المختار.</Text>
+                <Text weight="black" style={{ color: theme.textMuted, textAlign: 'center' }}>لا توجد فيديوهات مطابقة للبحث أو الفلتر المختار.</Text>
               </View>
             ) : (
               visibleItems.map((item) => {
@@ -246,7 +245,7 @@ export function VideosCommandDeckScreen({ hubHref, operationsHref }: VideosComma
                       <View style={[styles.headerRow, { alignItems: 'center' }]}>
                         <Text role="bodyStrong" numberOfLines={1} style={[{ flex: 1, fontSize: 13, color: theme.brandHeaderBackground }, rtlText]}>{item.title}</Text>
                         <View style={[styles.statusBadge, { backgroundColor: item.status === 'published' ? theme.successSurface : theme.surfaceSecondary }]}>
-                          <Text role="caption" style={[{ color: item.status === 'published' ? theme.success : theme.textMuted, fontWeight: '900', fontSize: 9 }, rtlText]}>{statusLabel(item.status)}</Text>
+                          <Text role="caption" weight="black" style={[{ color: item.status === 'published' ? theme.success : theme.textMuted, fontSize: 9 }, rtlText]}>{statusLabel(item.status)}</Text>
                         </View>
                       </View>
                       <View style={[styles.headerRow, { gap: 6, marginTop: 4, justifyContent: 'flex-start' }]}>
@@ -295,7 +294,7 @@ export function VideosCommandDeckScreen({ hubHref, operationsHref }: VideosComma
         />
 
         {/* Right: Preview Panel */}
-        <VideoPreview
+        <VideoViewer
           draft={draft}
           theme={theme}
           styles={styles}
@@ -325,7 +324,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
 
     compactRow: { flexDirection: 'row', gap: 12, padding: 8, borderRadius: 8, backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.line },
     compactRowSelected: { borderColor: theme.brandHeaderBackground, backgroundColor: theme.surfaceInset },
-    compactPoster: { width: 40, height: 60, borderRadius: 6, backgroundColor: theme.background, overflow: 'hidden' },
+    compactPoster: { width: 40, height: 60, borderRadius: radius.xs, backgroundColor: theme.background, overflow: 'hidden' },
     compactImage: { width: '100%', height: '100%', opacity: 0.8 },
     statusBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 },
 
@@ -333,13 +332,13 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     editorContent: { flex: 1, minHeight: 0, padding: 16 },
 
     previewPanel: { flex: 1.5, borderRadius: 12, backgroundColor: theme.brandHeaderBackground, display: 'flex', flexDirection: 'column' },
-    previewFrame: { width: 260, height: 460, backgroundColor: theme.background, borderRadius: 24, overflow: 'hidden', position: 'relative', borderWidth: 6, borderColor: theme.surfaceSecondary },
+    previewFrame: { width: 260, height: 460, backgroundColor: theme.background, borderRadius: radius.xl, overflow: 'hidden', position: 'relative', borderWidth: 6, borderColor: theme.surfaceSecondary },
     previewImage: { width: '100%', height: '100%', opacity: 0.8 },
     previewOverlay: { position: 'absolute', inset: 0, padding: 20, justifyContent: 'space-between' },
     previewTopBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    previewBadge: { backgroundColor: theme.brand, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
+    previewBadge: { backgroundColor: theme.brand, paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.xs },
     previewBadgeText: { color: theme.textInverse, fontSize: 10, fontWeight: '900' },
-    previewTime: { backgroundColor: theme.overlay, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
+    previewTime: { backgroundColor: theme.overlay, paddingHorizontal: 6, paddingVertical: 2, borderRadius: radius.xs },
     previewTimeText: { color: theme.textInverse, fontSize: 9, fontWeight: '700' },
     previewBottomContent: { gap: 12, display: 'flex', flexDirection: 'column' },
     previewCta: { backgroundColor: theme.surface, alignSelf: 'flex-start', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 8 },

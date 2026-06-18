@@ -236,6 +236,10 @@ func (repo *MemoryRepository) ListStores(ctx context.Context, query domain.Store
 	}, nil
 }
 
+func (repo *MemoryRepository) ListPendingStores(_ context.Context) ([]domain.CreateFieldStoreResponse, error) {
+	return nil, nil
+}
+
 func clientVisible(store memoryStore) bool {
 	return domain.VisibilityServiceabilityInput{
 		PublishStage:              store.summary.PublishStage,
@@ -371,6 +375,10 @@ func (repo *MemoryRepository) GetProduct(_ context.Context, _ string) (domain.Pr
 }
 
 func (repo *MemoryRepository) ListProducts(_ context.Context, _ string, _ string, _ int, _ int) (domain.ListProductsResponse, error) {
+	return domain.ListProductsResponse{}, errors.New("product list requires postgres backend (set DATABASE_URL)")
+}
+
+func (repo *MemoryRepository) ListAllProducts(_ context.Context, _ string, _ int, _ int) (domain.ListProductsResponse, error) {
 	return domain.ListProductsResponse{}, errors.New("product list requires postgres backend (set DATABASE_URL)")
 }
 
@@ -586,4 +594,13 @@ func (repo *MemoryRepository) CreateFieldReadinessApproval(_ context.Context, _ 
 
 func (repo *MemoryRepository) GetLatestFieldReadinessApproval(_ context.Context, _ string) (domain.FieldReadinessApprovalRecord, error) {
 	return domain.FieldReadinessApprovalRecord{}, errors.New("readiness approval retrieval requires postgres backend (set DATABASE_URL)")
+}
+
+// J-013 stubs
+func (repo *MemoryRepository) ListNotifications(_ context.Context, _ domain.ListNotificationsQuery) (domain.ListNotificationsResponse, error) {
+	return domain.ListNotificationsResponse{Notifications: []domain.NotificationRecord{}, Total: 0}, nil
+}
+
+func (repo *MemoryRepository) MarkNotificationRead(_ context.Context, _ string, _ string) error {
+	return nil
 }

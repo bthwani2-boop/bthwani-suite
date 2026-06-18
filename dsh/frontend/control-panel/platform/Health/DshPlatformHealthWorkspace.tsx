@@ -3,19 +3,25 @@
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebSignalCard } from '@bthwani/ui-kit/web';
-import { useDemoPlatformState } from '../useDemoPlatformState';
+import { usePlatformAuditState } from '../usePlatformAuditState';
 import styles from '../../shared/control-panel-surface.module.css';
 
-import { PREVIEW_SYSTEM_WARNINGS, type SystemWarning } from '../../../data/platform.preview-data';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SystemWarning = Record<string, any>;
+const PREVIEW_SYSTEM_WARNINGS: SystemWarning[] = [];
 
-export function DshPlatformHealthWorkspace() {
-  const { addAuditEvent } = useDemoPlatformState();
+export function DshPlatformHealthWorkspace({ activeFilter }: { activeFilter: string }) {
+  const { addAuditEvent } = usePlatformAuditState();
   const [dismissedWarnings, setDismissedWarnings] = React.useState<Set<string>>(new Set());
   const [selectedWarningId, setSelectedWarningId] = React.useState<string | null>('store-pickup');
   const [lastHealthCheck, setLastHealthCheck] = React.useState<string>('لم يتم الفحص بعد');
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
 
-  const activeWarnings = PREVIEW_SYSTEM_WARNINGS.filter((w) => !dismissedWarnings.has(w.id));
+  const activeWarnings = PREVIEW_SYSTEM_WARNINGS.filter((w) => {
+    if (dismissedWarnings.has(w.id)) return false;
+    if (activeFilter === 'all') return true;
+    return w.severity === activeFilter;
+  });
 
   React.useEffect(() => {
     if (activeWarnings.length > 0) {

@@ -3,7 +3,7 @@
 # Context: dsh/ (workspace root/dsh directory — contains domain/ and backend/).
 # PORT env var: defaults to 8080 inside container.
 # DATABASE_URL: optional; omit to run with in-memory repository (dev/smoke mode).
-# Note: /media-fixtures/ static serving is NOT available inside Docker — dev-only path.
+# Note: legacy fixture static serving is not available inside Docker.
 
 FROM golang:1.24-alpine AS builder
 WORKDIR /src

@@ -143,6 +143,9 @@ type CreateFieldStoreRequest struct {
 	CategoryID              string `json:"category_id,omitempty"`
 	SupportsPickup          bool   `json:"supports_pickup"`
 	SupportsPartnerDelivery bool   `json:"supports_partner_delivery"`
+	ContactNumber           string `json:"contact_number,omitempty"`
+	OpeningHours            string `json:"opening_hours,omitempty"`
+	CatalogSummary          string `json:"catalog_summary,omitempty"`
 }
 
 // CreateFieldStoreResponse — returned after a successful POST /stores.

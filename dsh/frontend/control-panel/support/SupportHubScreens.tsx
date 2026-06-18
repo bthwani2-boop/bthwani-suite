@@ -12,15 +12,10 @@ import {
   WebControlPanelWorkspaceTabs,
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
-import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import type { DshFulfillmentDeliveryMode } from '../../shared/delivery/delivery.contract';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
 // SSoT: delivery mode labels come from dsh-delivery-mode.model, not inline strings.
-import { getDshDeliveryModeDefinition } from '../../shared/dsh-delivery-mode.model';
-import {
-  DSH_CALL_INTAKE_PREVIEW,
-  DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS,
-  DSH_CUSTOMER_360_PREVIEW,
-} from '../../data/support.preview-data';
+import { getDshDeliveryModeDefinition } from '../../shared';
 import { buildOperationsHref } from '../operations/operations.registry';
 import { SupportEscalationQueueScreen } from './SupportEscalationQueueScreen';
 import { SupportSlaDashboardScreen } from './SupportSlaDashboardScreen';
@@ -31,11 +26,6 @@ import { OpsClientMessagingWorkspace } from './OpsClientMessagingWorkspace';
 import { OpsPartnerMessagingWorkspace } from './OpsPartnerMessagingWorkspace';
 import { OpsCaptainMessagingWorkspace } from './OpsCaptainMessagingWorkspace';
 import {
-  getOperationsSupportFlowPreview,
-  type DshControlPanelSupportRowSeed,
-  type DshOperationsSupportFlowId,
-} from '../../data/support.preview-data';
-import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,
   resolveDshControlPanelSectionLabel,
@@ -44,8 +34,27 @@ import {
   SUPPORT_PRIMARY_TABS,
   SUPPORT_SECONDARY_TABS,
   SUPPORT_TAB_WORKSPACE_MAP,
+  getOperationsSupportFlowSpec,
+  type DshOperationsSupportFlowId,
   type SupportTab,
 } from './support.types';
+
+type DshControlPanelSupportRow = {
+  id: string;
+  flowId: DshOperationsSupportFlowId;
+  surface: string;
+  status: string;
+  slaAge: string;
+  fulfillmentMode: DshFulfillmentDeliveryMode;
+  fulfillmentLabel: string;
+  responsibleActor: string;
+  evidence: string;
+  primaryActionLabel: string;
+  secondaryActionLabel: string;
+};
+const DSH_CALL_INTAKE_STUBS: unknown[] = [];
+const DSH_CONTROL_PANEL_SUPPORT_ROW_SEEDS: DshControlPanelSupportRow[] = [];
+const DSH_CUSTOMER_360_STUBS: unknown[] = [];
 
 type SupportFulfillmentMode = DshFulfillmentDeliveryMode;
 
@@ -93,29 +102,6 @@ function resolveCommitmentLabel() {
   return 'خطر الالتزام';
 }
 
-function resolveSupportPolicyLabel(policy?: string): string {
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  if (policy === 'chat-on-open') {
-    return 'محادثة عند الفتح';
-  }
-
-  if (policy === 'finance-preview-only') {
-    return 'مالي للقراءة فقط';
-  }
-
-  if (policy === 'summary-only') {
-    return 'ملخص أولًا';
-  }
-
-  return 'سياسة مرتبطة بالسجل';
-}
 
 const SUPPORT_GOVERNANCE = getDshControlPanelGovernanceEntry('support');
 const FINANCE_GOVERNANCE = getDshControlPanelGovernanceEntry('finance');
@@ -184,8 +170,8 @@ function buildSupportHref(tab: SupportTab, context?: SupportRouteContext) {
   return `/support?${searchParams.toString()}`;
 }
 
-function buildSupportRow(rowData: DshControlPanelSupportRowSeed): SupportRow {
-  const flowEntry = getOperationsSupportFlowPreview(rowData.flowId);
+function buildSupportRow(rowData: DshControlPanelSupportRow): SupportRow {
+  const flowEntry = getOperationsSupportFlowSpec(rowData.flowId);
   const registryFlowId = SUPPORT_REGISTRY_FLOW_MAP[rowData.flowId];
   const flowSummary = registryFlowId ? getDshFlowPolicySummary(registryFlowId) : undefined;
   const governanceEntry = registryFlowId ? findDshControlPanelGovernanceSectionByFlowId(registryFlowId) : SUPPORT_GOVERNANCE;
@@ -205,7 +191,9 @@ function buildSupportRow(rowData: DshControlPanelSupportRowSeed): SupportRow {
         ? 'danger'
         : flowEntry.severity === 'warning'
           ? 'warning'
-          : 'warning',
+          : flowEntry.severity === 'success'
+            ? 'success'
+            : 'warning',
     slaAge: rowData.slaAge,
     owner: flowEntry.ownerLabel,
     fulfillmentMode: rowData.fulfillmentMode,
@@ -216,7 +204,7 @@ function buildSupportRow(rowData: DshControlPanelSupportRowSeed): SupportRow {
     nextAction: flowEntry.nextAction,
     recommendation: `قسم المتابعة: ${governanceSectionLabel}`,
     governanceSectionLabel,
-    policyLabel: resolveSupportPolicyLabel(flowSummary?.onDemandPolicy),
+    policyLabel: resolveDshOnDemandPolicyLabel(flowSummary?.onDemandPolicy),
     forbiddenPreview,
     financeReference,
     primaryActionLabel: rowData.primaryActionLabel,
@@ -272,13 +260,13 @@ export function ControlPanelDshSupportHubScreen() {
 
   const rows = filterRows(activeTab, activeSubTab);
   const selectedRow = rows.find((row) => row.id === selectedId) ?? rows[0] ?? SUPPORT_ROWS[0];
-  const selectedFlowPreview = selectedRow ? getOperationsSupportFlowPreview(selectedRow.flowId) : null;
+  const selectedFlowSpec = selectedRow ? getOperationsSupportFlowSpec(selectedRow.flowId) : null;
   const selectedRegistrySummary = selectedRow?.registryFlowId ? getDshFlowPolicySummary(selectedRow.registryFlowId) : undefined;
   const selectedFinanceReference = selectedRegistrySummary?.financialImpact ? FINANCE_GOVERNANCE?.financeReference ?? 'wlt-finance' : undefined;
   const primaryMetricValue = activeTab === 'customer-360'
-    ? DSH_CUSTOMER_360_PREVIEW.length
+    ? DSH_CUSTOMER_360_STUBS.length
     : activeTab === 'call-intake'
-      ? DSH_CALL_INTAKE_PREVIEW.length
+      ? DSH_CALL_INTAKE_STUBS.length
       : rows.length;
 
   return (
@@ -515,7 +503,7 @@ export function ControlPanelDshSupportHubScreen() {
                     <Text role="caption" tone="muted">السطح: {selectedRow?.surface}</Text>
                     <Text role="caption" tone="muted">المالك: {selectedRow?.owner}</Text>
                     <Text role="caption" tone="muted">قسم الحوكمة: {selectedRow?.governanceSectionLabel ?? 'الدعم'}</Text>
-                    <Text role="caption" tone="muted">مالك التصعيد: {selectedFlowPreview?.escalationOwnerLabel ?? '—'}</Text>
+                    <Text role="caption" tone="muted">مالك التصعيد: {selectedFlowSpec?.escalationOwnerLabel ?? '—'}</Text>
                     <Text role="caption" tone="muted">سياسة العرض: {selectedRow?.policyLabel ?? '—'}</Text>
                     <Text role="caption" tone="muted">وضع التنفيذ: {selectedRow?.fulfillmentLabel}</Text>
                     <Text role="caption" tone="muted">المسؤول الحالي: {selectedRow?.responsibleActor}</Text>
@@ -523,8 +511,8 @@ export function ControlPanelDshSupportHubScreen() {
                     <Text role="caption" tone="muted">الدليل: {selectedRow?.evidence}</Text>
                     <Text role="caption" tone="muted">الإجراء التالي: {selectedRow?.nextAction}</Text>
                     <Text role="caption" tone="muted">الممنوع: {selectedRow?.forbiddenPreview ?? 'غير محدد'}</Text>
-                    {selectedFlowPreview?.financialImpactPreview ? (
-                      <Text role="caption" tone="muted">WLT Preview: {selectedFlowPreview.financialImpactPreview}</Text>
+                    {selectedFlowSpec?.financialImpactRef ? (
+                      <Text role="caption" tone="muted">WLT Preview: {selectedFlowSpec.financialImpactRef}</Text>
                     ) : null}
                     {selectedFinanceReference ? (
                       <Text role="caption" tone="muted">مرجع ledger: {selectedFinanceReference}</Text>
@@ -534,7 +522,7 @@ export function ControlPanelDshSupportHubScreen() {
                     title="توصية الدعم"
                     reason={selectedRow ? `لماذا؟ ${selectedRow.recommendation} · ما السياسة؟ ${selectedRow.policyLabel} · ما الدليل؟ ${selectedRow.evidence} · ما القرار التالي؟ ${selectedRegistrySummary?.nextPolicyActionPreview ?? selectedRow.nextAction}` : 'اختر صفًا.'}
                     confidence="high"
-                    auditTag={selectedRow?.registryFlowId ?? selectedFlowPreview?.flowId ?? selectedRow?.owner ?? 'support'}
+                    auditTag={selectedRow?.registryFlowId ?? selectedFlowSpec?.flowId ?? selectedRow?.owner ?? 'support'}
                     primaryAction={
                       selectedRow
                         ? {

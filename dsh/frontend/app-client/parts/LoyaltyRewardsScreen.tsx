@@ -11,11 +11,13 @@ import {
   useTheme,
   ActionStrip,
 } from '@bthwani/ui-kit';
-import { loyaltyRewardsFixture } from '../../data/subscriptions.preview-data';
+import type { LoyaltyClientMetric, LoyaltyClientSection } from '../../shared/marketing/commercial-contract';
 
 export type DshLoyaltyRewardsScreenProps = {
   title?: string;
   compact?: boolean;
+  metrics?: LoyaltyClientMetric[];
+  sections?: LoyaltyClientSection[];
   onStatusChange?: (message: string) => void;
 };
 
@@ -28,10 +30,11 @@ type RewardRow = {
 export function DshLoyaltyRewardsScreen({
   title = 'النقاط والولاء',
   compact = false,
+  metrics = [],
+  sections = [],
   onStatusChange,
 }: DshLoyaltyRewardsScreenProps = {}) {
   const { theme } = useTheme();
-  const { metrics, sections } = loyaltyRewardsFixture;
   const rewardsSection = sections.find((section) => section.title.includes('المكافآت'));
   const tierSection = sections.find((section) => section.title.includes('مزايا المستوى'));
   const [showAllRewards, setShowAllRewards] = React.useState(false);

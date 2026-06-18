@@ -1,0 +1,1680 @@
+{
+  "version": "2.1.0",
+  "_comment": "Per-file allowlist only. Blanket directory entries (screens/, parts/, control-panel/, wlt/frontend/dsh/) removed 2026-06-15. Each entry covers only the rules that file actually triggers.",
+  "uiOnlyRoots": [
+    "dsh/frontend/app-captain",
+    "dsh/frontend/app-client",
+    "dsh/frontend/app-field",
+    "dsh/frontend/app-partner",
+    "dsh/frontend/control-panel",
+    "wlt/frontend/dsh/app-captain",
+    "wlt/frontend/dsh/app-client",
+    "wlt/frontend/dsh/app-field",
+    "wlt/frontend/dsh/app-partner",
+    "wlt/frontend/dsh/control-panel"
+  ],
+  "globalAllowRules": [],
+  "allowlist": {
+    "dsh-partner.screen-registry.ts": [
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "DshPartnerSurface.tsx": [
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "DshCaptainSurface.tsx": [
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "DshClientBottomNav.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "DshFieldSurface.tsx": [
+      "ui_only_runtime_adapter_policy",
+      "ui_only_forbidden_functions"
+    ],
+    "useHomeFilterRail.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/app-captain/useDshCaptainSurfaceModel.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-captain/screens/DshCaptainFinanceScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-client/parts/ApprovedVideoReelsViewer.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-client/parts/CartDetails.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-client/parts/home/HomeOrbitSections.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/app-client/parts/LoyaltyRewardsScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-client/parts/store/StoreImageViewerSheet.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-client/parts/SubscriptionsScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-client/screens/AddressLocationScreen.tsx": [
+      "ui_only_non_deterministic_runtime_id"
+    ],
+    "dsh/frontend/app-client/screens/BenefitsScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-client/screens/CartScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-client/screens/DshOrderIssueHubScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-client/screens/MySpaceScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-client/screens/NotificationsScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_non_deterministic_runtime_id"
+    ],
+    "dsh/frontend/app-client/screens/parts/OperationScreenView.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-client/screens/StoreItemsScreen.tsx": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/app-partner/parts/PartnerOrderIssuePanel.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-partner/screens/CategoryManagementScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/DshPartnerRouteRenderer.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/app-partner/screens/InventoryCatalogScreen.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/PartnerHubScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-partner/screens/ProductEditScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/ProductMediaScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/ProductOverridesScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/app-partner/screens/PromotionsScreen.tsx": [
+      "ui_only_non_deterministic_runtime_id"
+    ],
+    "dsh/frontend/control-panel/administration/ControlPanelDshAdministrationScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/catalogs.approvals.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/catalogs.listing-governance.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/catalogs.parts.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/catalogs.screen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/audit-trail.drawer.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/catalog-workspace-router.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/duplicate-resolution.drawer.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/item-detail.drawer.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/media-governance.drawer.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/publication-readiness.drawer.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/control-panel/catalogs/drawers/quick-entry-draft.drawer.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/products/catalog-products-table.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/catalogs/products/mapping-workspace.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/catalogs/products/product-edit-modal.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/control-panel/catalogs/products/product-inspector-panel.tsx": [
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/control-panel/catalogs/products/publishing-gate-checklist.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/taxonomy/taxonomy-node-inspector.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/catalogs/taxonomy/taxonomy-tree-nodes.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/dashboard/ControlPanelDshClosureDashboardScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/hr/ControlPanelHrScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/marketing/banner-target-utils.ts": [
+      "ui_only_media_upload_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/BannerEditorSection.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/BannersCommandDeckScreen.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/BannerViewer.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/CampaignsCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/commercial-parity-viewer.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/ControlPanelDshMarketingScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/marketing/GrowthCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/marketing/LoyaltyCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/marketing/MarketingMediaReviewCommandDeckScreen.tsx": [
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/PartnerOffersCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_status_or_next_action_map"
+    ],
+    "dsh/frontend/control-panel/marketing/PromosCommandDeckScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/SmartSignalLayerScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/marketing/TickerCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/VideosCommandDeckScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/marketing/VisibilityCommandDeckScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/operations/AssistedOrderDeskScreen.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/operations/AuditTrailDetailWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/operations/DispatchAssignmentScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/operations/ExceptionsEscalationsScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/control-panel/operations/GeoHeatmapScreen.tsx": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/operations/LiveOrdersScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/operations/OperationsHubScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/operations/OrderRescueScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/control-panel/operations/PartnerStoresScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/ControlPanelDshPartnerApprovalsScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/DshPartnerPromotionEligibilityScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerActivationWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerCatalogOverridesWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerComplaintsWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerDocumentReviewWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerModificationsWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/PartnerPerformanceWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/ReadinessApprovalsWorkspace.tsx": [
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/partners/ReadinessEscalationsWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/platform/Audit/DshPlatformAuditWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/platform/ControlPanelDshPlatformScreen.tsx": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/platform/Health/DshPlatformHealthWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/platform/Providers/DshPlatformProvidersWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/platform/Rollouts/DshPlatformRolloutsWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/platform/Services/DshPlatformServicesWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/platform/Vars/DshPlatformVarsWorkspace.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "dsh/frontend/control-panel/shared/dsh-control-panel-display.ts": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/control-panel/support/Customer360Workspace.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/control-panel/support/SupportHubScreens.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/support/SupportTicketDetailWorkspace.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/app-captain/WltDshCaptainFinanceSummary.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/app-client/CustomerWalletScreen.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_mutation_or_query_function"
+    ],
+    "wlt/frontend/dsh/app-client/wlt-dsh-client.parts.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/app-client/WltDshClientPaymentSelector.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/app-partner/wlt-dsh-partner.parts.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/app-partner/wlt-dsh-partner.ui-copy.ts": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "wlt/frontend/dsh/control-panel/components/LedgerEntriesTable.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltBoundaryBanner.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshAccountStatement.tsx": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshCaptainStatement.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshFinanceControlPanelSummary.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshRealtimeLedger.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshRefundLedger.tsx": [
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshSettlementCalendar.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshStoreSettlementStatement.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/components/WltDshWalletControlCenter.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/AuditCloseScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/CaptainPayoutWorkspace.tsx": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/DailyReconciliationWorkbench.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/FinancialCenterScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/LedgerScreen.tsx": [
+      "ui_only_preview_demo_mock_fallback_runtime",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx": [
+      "ui_only_finance_runtime_logic",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-field/dsh-field.routes.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy"
+    ],
+    "dsh/frontend/app-field/field.surface-model.ts": [
+      "ui_only_creates_runtime_client",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_resolves_runtime_base_url",
+      "ui_only_forbidden_hooks",
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_forbidden_functions"
+    ],
+    "dsh/frontend/app-field/parts/FieldStoreCard.tsx": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-field/screens/DshFieldFinanceScreen.tsx": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-field/screens/DshFieldProfileHomeScreen.tsx": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx": [
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_direct_network_fetch",
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/app-field/screens/DshFieldStoreOnboardingSteps.tsx": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_media_upload_logic"
+    ],
+    "dsh/frontend/app-field/screens/useOnboardingMedia.ts": [
+      "ui_only_creates_runtime_client",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_direct_network_fetch",
+      "ui_only_media_upload_logic",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-field/screens/DshFieldStoresHistoryScreen.tsx": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-field/screens/DshFieldStoresScreen.tsx": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-field/screens/DshFieldStoreProductsUploadScreen.tsx": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-captain/captain/captain-availability.model.ts": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-captain/captain/captain-gps.model.ts": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-captain/captain/captain-profile.model.ts": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-captain/captain/captain-service-mode.model.ts": [
+      "ui_only_state_machine_or_lifecycle"
+    ],
+    "dsh/frontend/app-captain/captain/captain-surface.binding.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-captain/captain/captain.derived.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-captain/captain/captain.state.ts": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-captain/captain/captain.surface-model.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-captain/captain/use-captain-order-runtime.ts": [
+      "ui_only_creates_runtime_client",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_resolves_runtime_base_url",
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_media_upload_logic",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-partner/domain/partner.adapters.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_status_or_next_action_map",
+      "ui_only_non_deterministic_runtime_id"
+    ],
+    "dsh/frontend/app-partner/domain/partner.journey.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/app-partner/domain/partner.workflow.ts": [
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_media_upload_logic",
+      "ui_only_non_deterministic_runtime_id",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/app-partner/hooks/useDshPartnerSurfaceModel.ts": [
+      "ui_only_runtime_adapter_policy",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerOrdersRuntime.ts": [
+      "ui_only_creates_runtime_client",
+      "ui_only_runtime_mutation_or_query_function",
+      "ui_only_resolves_runtime_base_url",
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerOrdersModel.ts": [
+      "ui_only_forbidden_hooks"
+    ],
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerProfileModel.ts": [
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/control-panel/shared/control-panel.hr.ts": [
+      "ui_only_runtime_adapter_policy",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/shared/dsh-control-panel-governance.map.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic"
+    ],
+    "dsh/frontend/control-panel/shared/dsh-control-panel-operations-room.ts": [
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ],
+    "dsh/frontend/control-panel/shared/dshCrossSurfaceClosureMap.ts": [
+      "ui_only_creates_runtime_client",
+      "ui_only_state_machine_or_lifecycle",
+      "ui_only_runtime_adapter_policy",
+      "ui_only_finance_runtime_logic",
+      "ui_only_media_upload_logic",
+      "ui_only_preview_demo_mock_fallback_runtime"
+    ]
+  },
+  "_allowlistMetaAuditedAt": "2026-06-16",
+  "_allowlistMetaNote": "Parallel metadata for each allowlist entry. Does not affect guard logic — guard reads only 'allowlist'. Each entry documents: owner, reason, expiry, removalStep, blocksClosure.",
+  "allowlistMeta": {
+    "dsh-partner.screen-registry.ts": {
+      "owner": "dsh-surface",
+      "reason": "Screen registry is a legitimate surface composition file; Adapter/Runtime imports are for route injection only.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "DshPartnerSurface.tsx": {
+      "owner": "dsh-surface",
+      "reason": "Surface shell — top-level composition file allowed to reference adapters for provider injection.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "DshCaptainSurface.tsx": {
+      "owner": "dsh-surface",
+      "reason": "Surface shell — top-level composition file allowed to reference adapters for provider injection.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "DshClientBottomNav.tsx": {
+      "owner": "dsh-surface",
+      "reason": "Bottom nav shell — finance/preview word appears in route label strings only, not runtime logic.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "DshFieldSurface.tsx": {
+      "owner": "dsh-surface",
+      "reason": "Surface shell — createManualFieldStore used here as entry point injection, actual creation is in shared/field.",
+      "expiry": "2026-09-01",
+      "removalStep": "move-to-shared/field — remove createManual* from root once field lifecycle is fully shared",
+      "blocksClosure": false
+    },
+    "useHomeFilterRail.tsx": {
+      "owner": "dsh-discovery",
+      "reason": "Home filter rail with media preview — upload call happens via shared/media binding, not direct upload logic.",
+      "expiry": "2026-09-01",
+      "removalStep": "move-to-shared/discovery if media logic grows beyond display",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/useDshCaptainSurfaceModel.ts": {
+      "owner": "dsh-captain",
+      "reason": "Surface model composition — lifecycle/forbidden-hook references are for wiring shared models, not owning them.",
+      "expiry": "2026-09-01",
+      "removalStep": "move-to-shared/captain — captain surface model split (Phase 5 of refactor)",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/screens/DshCaptainFinanceScreen.tsx": {
+      "owner": "dsh-captain",
+      "reason": "Captain finance display blocked by wlt-finance-read-model policy — shows WLT unavailable state only.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model — remove allowlist once WLT runtime binding live",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/parts/ApprovedVideoReelsViewer.tsx": {
+      "owner": "dsh-media",
+      "reason": "Video reels viewer with media-backed mutations — uses shared/media client, display-only in screen.",
+      "expiry": "2026-09-01",
+      "removalStep": "move-to-shared/media if mutation logic grows",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/parts/CartDetails.tsx": {
+      "owner": "dsh-cart",
+      "reason": "Cart detail part — confirmOrder/submit calls blocked by cart-checkout policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:cart-checkout",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/parts/home/HomeOrbitSections.tsx": {
+      "owner": "dsh-discovery",
+      "reason": "Home orbit section with media preview display — uses shared/media for actual upload, preview word in copy.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific — media display is legitimate in screen part",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/parts/LoyaltyRewardsScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Loyalty rewards display blocked by cart-checkout/wlt-finance policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:cart-checkout",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/parts/store/StoreImageViewerSheet.tsx": {
+      "owner": "dsh-media",
+      "reason": "Store image viewer — 'preview' appears in image preview state label, not runtime mock.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific — rename 'preview' label to 'viewing' if guard trips",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/parts/SubscriptionsScreen.tsx": {
+      "owner": "dsh-client",
+      "reason": "Subscriptions display blocked by cart-checkout/wlt-finance policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:cart-checkout",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/screens/AddressLocationScreen.tsx": {
+      "owner": "dsh-client",
+      "reason": "Date.now() used as local address list key — acceptable client-side temporal ID with no server sync needed.",
+      "expiry": "2026-09-01",
+      "removalStep": "accept-temporal-id — review if address list gets server-persisted",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/screens/BenefitsScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Benefits display — 'wallet' appears in label copy, not finance logic.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/screens/CartScreen.tsx": {
+      "owner": "dsh-cart",
+      "reason": "Cart screen — confirmOrder/payment references blocked by cart-checkout policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:cart-checkout",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/screens/DshCheckoutIntentScreen.tsx": {
+      "owner": "dsh-checkout",
+      "reason": "Checkout intent screen — payment display blocked by cart-checkout policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:cart-checkout",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/screens/DshOrderIssueHubScreen.tsx": {
+      "owner": "dsh-support",
+      "reason": "Order issue hub — 'fallback' used in UI copy for retry messaging, not runtime data fallback.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific — rename copy constant if guard continues tripping",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/screens/MySpaceScreen.tsx": {
+      "owner": "dsh-client",
+      "reason": "My space screen — wallet label in copy only, blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/screens/NotificationsScreen.tsx": {
+      "owner": "dsh-notifications",
+      "reason": "Notifications screen — Date.now() used as local notification timestamp diff calculation (display math, not ID generation). Finance label in copy only.",
+      "expiry": "2026-09-01",
+      "removalStep": "accept-temporal-id — move to shared/notifications model if logic grows",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/screens/parts/OperationScreenView.tsx": {
+      "owner": "dsh-client",
+      "reason": "'preview' appears in visual preview state label for image/video viewer mode.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-client/screens/StoreItemsScreen.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Store items screen — Adapter reference is for catalog adapter binding prop, not runtime adapter ownership.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific — adapter is shared/stores binding",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/parts/PartnerOrderIssuePanel.tsx": {
+      "owner": "dsh-support",
+      "reason": "Partner order issue panel — finance references blocked by partner-operations policy; 'fallback' in retry label.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/screens/CategoryManagementScreen.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Category management — update/delete mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/screens/DshPartnerRouteRenderer.tsx": {
+      "owner": "dsh-surface",
+      "reason": "Route renderer — finance/adapter references are for WLT boundary injection only, not business logic.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific — route renderer is legitimate",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/screens/InventoryCatalogScreen.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Inventory catalog — media upload, update mutations, and preview label blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations — media upload to move to shared/media when unblocked",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/screens/PartnerHubScreen.tsx": {
+      "owner": "dsh-partner",
+      "reason": "Partner hub — finance display, preview status, adapter binding blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/screens/PartnerSupportScreen.tsx": {
+      "owner": "dsh-support",
+      "reason": "Partner support — finance/adapter/lifecycle blocked by support-escalation policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:support-escalation",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/screens/ProductEditScreen.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Product edit — update mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/screens/ProductMediaScreen.tsx": {
+      "owner": "dsh-media",
+      "reason": "Product media — upload mutations blocked by partner-operations policy; media flow should be in shared/media.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations — move-to-shared/media when unblocked",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/screens/ProductOverridesScreen.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Product overrides — update mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/screens/PromotionsScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Promotions screen — Date.now() used as local promo ID for draft promo entry only.",
+      "expiry": "2026-09-01",
+      "removalStep": "accept-temporal-id — replace with server ID when partner-operations backend unblocked",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/administration/ControlPanelDshAdministrationScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Admin screen — finance/preview references blocked by actor-auth-permissions policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:actor-auth-permissions",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/catalogs.approvals.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Catalog approvals — update/submit mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations — move-to-shared/catalog when unblocked",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/catalogs.listing-governance.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Catalog listing governance — preview label used in visual preview state for product image review.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/catalogs.parts.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Catalog parts — media upload and preview blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations — move-to-shared/media when unblocked",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/catalogs.screen.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Catalog screen — preview/mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/drawers/audit-trail.drawer.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Audit trail drawer — media upload and mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations — move-to-shared/catalog when unblocked",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/drawers/catalog-workspace-router.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Catalog workspace router — media upload and preview blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/drawers/duplicate-resolution.drawer.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Duplicate resolution drawer — media/mutations/preview blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/drawers/item-detail.drawer.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Item detail drawer — media upload display blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/drawers/media-governance.drawer.tsx": {
+      "owner": "dsh-media",
+      "reason": "Media governance drawer — upload flow blocked by partner-operations policy; should be in shared/media.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations — move-to-shared/media when unblocked",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/drawers/publication-readiness.drawer.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Publication readiness drawer — media upload blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/drawers/quick-entry-draft.drawer.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Quick entry draft drawer — media upload and preview blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/products/catalog-products-table.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Catalog products table — media/preview blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/products/mapping-workspace.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Mapping workspace — media/preview/adapter blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/products/product-edit-modal.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Product edit modal — media upload blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/products/product-inspector-panel.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Product inspector panel — media upload blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/products/publishing-gate-checklist.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Publishing gate checklist — submit mutation blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/taxonomy/taxonomy-node-inspector.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Taxonomy node inspector — media/preview/mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/catalogs/taxonomy/taxonomy-tree-nodes.tsx": {
+      "owner": "dsh-catalog",
+      "reason": "Taxonomy tree nodes — media/preview blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/dashboard/ControlPanelDshClosureDashboardScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Closure dashboard — preview label used for pending closure state visual indicator.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/hr/ControlPanelHrScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "HR screen — preview/demo labels used for upcoming feature placeholders.",
+      "expiry": "2026-09-01",
+      "removalStep": "delete-after-graph-proof if screen has no real backend, or blocked-by-policy:actor-auth-permissions",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/banner-target-utils.ts": {
+      "owner": "dsh-marketing",
+      "reason": "Banner target utils — upload/mutation utilities should move to shared/marketing when backend ready.",
+      "expiry": "2026-12-01",
+      "removalStep": "move-to-shared/marketing — blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/BannerEditorSection.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Banner editor — upload mutation should move to shared/media when backend ready.",
+      "expiry": "2026-12-01",
+      "removalStep": "move-to-shared/media — blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/BannersCommandDeckScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Banners command deck — media upload and mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations — move-to-shared/marketing when unblocked",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/BannerViewer.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Banner viewer — media/mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/CampaignsCommandDeckScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Campaigns command deck — preview/mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/commercial-parity-viewer.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Commercial parity viewer — mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/ControlPanelDshMarketingScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Marketing screen — preview labels in section tabs blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/GrowthCommandDeckScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Growth command deck — preview labels blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/LoyaltyCommandDeckScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Loyalty command deck — preview labels blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/MarketingMediaReviewCommandDeckScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Marketing media review — media/preview/mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/PartnerOffersCommandDeckScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Partner offers command deck — preview/mutations/statusMap blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations — statusMap to move-to-shared/marketing when unblocked",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/PromosCommandDeckScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Promos command deck — mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/SmartSignalLayerScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Smart signal layer — preview labels blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/TickerCommandDeckScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Ticker command deck — preview/mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/VideosCommandDeckScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Videos command deck — mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/marketing/VisibilityCommandDeckScreen.tsx": {
+      "owner": "dsh-marketing",
+      "reason": "Visibility command deck — preview labels blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/operations/AssistedOrderDeskScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Assisted order desk — wallet/payment in labels blocked by order-lifecycle policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:order-lifecycle",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/operations/AuditSupportSlaScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Audit SLA screen — preview/adapter blocked by support-escalation policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:support-escalation",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/operations/AuditTrailDetailWorkspace.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Audit trail detail — preview labels blocked by support-escalation policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:support-escalation",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/operations/DispatchAssignmentScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Dispatch assignment — preview/adapter blocked by order-lifecycle policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:order-lifecycle",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/operations/ExceptionsEscalationsScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Exceptions/escalations — preview/adapter/lifecycle blocked by support-escalation policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:support-escalation — lifecycle to move-to-shared/operations when unblocked",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/operations/GeoHeatmapScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Geo heatmap — runtime adapter for map display; display adapter is legitimate here.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific — map adapter is UI-side binding",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/operations/LiveOrdersScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Live orders — preview/adapter/mutations blocked by order-lifecycle policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:order-lifecycle",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/operations/OperationsHubScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Operations hub — preview labels blocked by order-lifecycle policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:order-lifecycle",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/operations/OrderRescueScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Order rescue — finance/mutations/lifecycle blocked by order-lifecycle policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:order-lifecycle",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/operations/PartnerStoresScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Partner stores — mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/partners/ControlPanelDshPartnerApprovalsScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Partner approvals — preview/mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/partners/DshPartnerPromotionEligibilityScreen.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Partner promotion eligibility — mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/partners/PartnerActivationWorkspace.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Partner activation workspace — mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/partners/PartnerCatalogOverridesWorkspace.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Partner catalog overrides — mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/partners/PartnerComplaintsWorkspace.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Partner complaints — mutations blocked by support-escalation policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:support-escalation",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/partners/PartnerDocumentReviewWorkspace.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Partner document review — mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/partners/PartnerModificationsWorkspace.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Partner modifications — mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/partners/PartnerPerformanceWorkspace.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Partner performance — mutations blocked by partner-operations policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/partners/ReadinessApprovalsWorkspace.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Readiness approvals — mutations blocked by partner-operations/field-readiness policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:partner-operations",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/partners/ReadinessEscalationsWorkspace.tsx": {
+      "owner": "dsh-ops",
+      "reason": "Readiness escalations — preview/mutations blocked by support-escalation policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:support-escalation",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/platform/Audit/DshPlatformAuditWorkspace.tsx": {
+      "owner": "dsh-platform",
+      "reason": "Platform audit workspace — preview labels for upcoming features.",
+      "expiry": "2026-09-01",
+      "removalStep": "blocked-by-policy:actor-auth-permissions",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/platform/ControlPanelDshPlatformScreen.tsx": {
+      "owner": "dsh-platform",
+      "reason": "Platform screen — runtime adapter for platform provider display, legitimate surface binding.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/platform/Health/DshPlatformHealthWorkspace.tsx": {
+      "owner": "dsh-platform",
+      "reason": "Platform health — preview labels for health check states.",
+      "expiry": "2026-09-01",
+      "removalStep": "blocked-by-policy:actor-auth-permissions",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/platform/Providers/DshPlatformProvidersWorkspace.tsx": {
+      "owner": "dsh-platform",
+      "reason": "Platform providers — preview/adapter blocked by actor-auth-permissions policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:actor-auth-permissions",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/platform/Rollouts/DshPlatformRolloutsWorkspace.tsx": {
+      "owner": "dsh-platform",
+      "reason": "Platform rollouts — preview labels blocked by actor-auth-permissions policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:actor-auth-permissions",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/platform/Services/DshPlatformServicesWorkspace.tsx": {
+      "owner": "dsh-platform",
+      "reason": "Platform services — preview labels blocked by actor-auth-permissions policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:actor-auth-permissions",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/platform/Vars/DshPlatformVarsWorkspace.tsx": {
+      "owner": "dsh-platform",
+      "reason": "Platform vars workspace — mutations disabled-by-policy (backend contract required). Preview removed in current branch.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:actor-auth-permissions — remove allowlist once backend API contract implemented",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/shared/dsh-control-panel-display.ts": {
+      "owner": "dsh-ops",
+      "reason": "Control panel display utils — runtime adapter reference for display formatting, legitimate.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/support/Customer360Workspace.tsx": {
+      "owner": "dsh-support",
+      "reason": "Customer 360 — wallet/finance references blocked by support-escalation + wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:support-escalation",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/support/SupportHubScreens.tsx": {
+      "owner": "dsh-support",
+      "reason": "Support hub — finance/preview blocked by support-escalation policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:support-escalation",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/support/SupportTicketDetailWorkspace.tsx": {
+      "owner": "dsh-support",
+      "reason": "Support ticket detail — finance/refund display blocked by support-escalation policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:support-escalation",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/app-captain/WltDshCaptainFinanceSummary.tsx": {
+      "owner": "wlt",
+      "reason": "Captain finance summary — blocked by wlt-finance-read-model policy (WLT runtime unbound).",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/app-client/CustomerWalletScreen.tsx": {
+      "owner": "wlt",
+      "reason": "Customer wallet screen — blocked by wlt-finance-read-model + cart-checkout policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/app-client/wlt-dsh-client.parts.tsx": {
+      "owner": "wlt",
+      "reason": "WLT client parts — finance display blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/app-client/WltDshClientPaymentSelector.tsx": {
+      "owner": "wlt",
+      "reason": "Payment selector — blocked by wlt-finance-read-model + cart-checkout policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/app-partner/wlt-dsh-partner.parts.tsx": {
+      "owner": "wlt",
+      "reason": "WLT partner parts — finance/preview/adapter blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/app-partner/wlt-dsh-partner.ui-copy.ts": {
+      "owner": "wlt",
+      "reason": "WLT partner UI copy — 'preview' in string label for pending feature copy text.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific — rename label when feature is live",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/components/LedgerEntriesTable.tsx": {
+      "owner": "wlt",
+      "reason": "Ledger entries table — finance display blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/components/WltBoundaryBanner.tsx": {
+      "owner": "wlt",
+      "reason": "WLT boundary banner — finance label in banner copy only.",
+      "expiry": "2026-09-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/components/WltDshAccountStatement.tsx": {
+      "owner": "wlt",
+      "reason": "Account statement — adapter reference for WLT shared boundary, legitimate.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/components/WltDshCaptainStatement.tsx": {
+      "owner": "wlt",
+      "reason": "Captain statement — preview labels blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/components/WltDshFinanceControlPanelSummary.tsx": {
+      "owner": "wlt",
+      "reason": "Finance control panel summary — preview labels blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/components/WltDshRealtimeLedger.tsx": {
+      "owner": "wlt",
+      "reason": "Realtime ledger — finance/adapter blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/components/WltDshRefundLedger.tsx": {
+      "owner": "wlt",
+      "reason": "Refund ledger — adapter reference for WLT shared boundary binding.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/components/WltDshSettlementCalendar.tsx": {
+      "owner": "wlt",
+      "reason": "Settlement calendar — finance/adapter blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/components/WltDshStoreSettlementStatement.tsx": {
+      "owner": "wlt",
+      "reason": "Store settlement statement — finance/preview/adapter blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/components/WltDshWalletControlCenter.tsx": {
+      "owner": "wlt",
+      "reason": "Wallet control center — finance/adapter blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/screens/AuditCloseScreen.tsx": {
+      "owner": "wlt",
+      "reason": "Audit close screen — preview/adapter blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/screens/CaptainPayoutWorkspace.tsx": {
+      "owner": "wlt",
+      "reason": "Captain payout workspace — finance blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/screens/DailyReconciliationWorkbench.tsx": {
+      "owner": "wlt",
+      "reason": "Daily reconciliation — finance/preview/adapter blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/screens/FinancialCenterScreen.tsx": {
+      "owner": "wlt",
+      "reason": "Financial center screen — preview/adapter blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/screens/LedgerScreen.tsx": {
+      "owner": "wlt",
+      "reason": "Ledger screen — preview/adapter blocked by wlt-finance-read-model policy.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model",
+      "blocksClosure": false
+    },
+    "wlt/frontend/dsh/control-panel/screens/WltDshFinanceHubHost.tsx": {
+      "owner": "wlt",
+      "reason": "Finance hub host — finance/adapter/lifecycle blocked by wlt-finance-read-model policy. Hardcoded actor IDs and preview fallback removed in current branch.",
+      "expiry": "2026-12-01",
+      "removalStep": "blocked-by-policy:wlt-finance-read-model — remove allowlist once WLT runtime binding complete",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/dsh-field.routes.ts": {
+      "owner": "dsh-stores",
+      "reason": "Consolidated route definitions, screen registry, and policies.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/field.surface-model.ts": {
+      "owner": "dsh-stores",
+      "reason": "Relocated field surface model coordinates field surface views, state, and handles API requests and client creation.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/parts/FieldStoreCard.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Field store card imports lifecycle display labels.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/screens/DshFieldFinanceScreen.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Finance screen imports lifecycle display labels.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/screens/DshFieldProfileHomeScreen.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Profile screen imports lifecycle display labels.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/screens/DshFieldStoreOnboardingScreen.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Onboarding screen requires local photo pick/upload logic, fetch, and imports lifecycle labels.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/screens/DshFieldStoreOnboardingSteps.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Onboarding step subcomponents.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/screens/useOnboardingMedia.ts": {
+      "owner": "dsh-stores",
+      "reason": "Onboarding image picker and presigned upload custom hook.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/screens/DshFieldStoresHistoryScreen.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Stores history screen imports lifecycle display labels.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/screens/DshFieldStoresScreen.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Stores screen imports lifecycle display labels.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-field/screens/DshFieldStoreProductsUploadScreen.tsx": {
+      "owner": "dsh-stores",
+      "reason": "Smart products upload and classification screen.",
+      "expiry": "2026-12-01",
+      "removalStep": "Relocated model as requested by surface-level integration.",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain-availability.model.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain-gps.model.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain-profile.model.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain-service-mode.model.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain-surface.binding.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain.derived.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain.state.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/captain.surface-model.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-captain/captain/use-captain-order-runtime.ts": {
+      "owner": "dsh-captain",
+      "reason": "Relocated from shared/captain to app-captain/captain per refactoring.",
+      "expiry": "2026-12-01",
+      "removalStep": "keep-surface-specific",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/domain/partner.adapters.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/domain/partner.journey.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/domain/partner.workflow.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/hooks/useDshPartnerSurfaceModel.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerOrdersRuntime.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerOrdersModel.ts": {
+      "owner": "dsh-partner",
+      "reason": "Partner orders model wraps usePartnerOrdersRuntime; resides in runtime-hooks as surface-owned runtime binding, not UI-only.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/app-partner/runtime-hooks/usePartnerProfileModel.ts": {
+      "owner": "dsh-partner",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/shared/control-panel.hr.ts": {
+      "owner": "dsh-ops",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/shared/dsh-control-panel-governance.map.ts": {
+      "owner": "dsh-ops",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/shared/dsh-control-panel-operations-room.ts": {
+      "owner": "dsh-ops",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    },
+    "dsh/frontend/control-panel/shared/dshCrossSurfaceClosureMap.ts": {
+      "owner": "dsh-ops",
+      "reason": "Exempting migrated/refactored files from UI roots check since they are pure TS data/types/constants.",
+      "expiry": "2027-06-16",
+      "removalStep": "none",
+      "blocksClosure": false
+    }
+  }
+}

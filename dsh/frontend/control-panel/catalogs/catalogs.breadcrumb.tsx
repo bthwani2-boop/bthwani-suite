@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Text, useTheme } from '@bthwani/ui-kit';
@@ -65,17 +65,17 @@ export function CatalogBreadcrumb({
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
         <Text role="caption" tone="muted" style={{ fontSize: 10 }}>الكتالوج</Text>
         <Text role="caption" tone="muted" style={{ fontSize: 10 }}>›</Text>
-        <Text role="caption" style={{ fontSize: 10, color: theme.brand, fontWeight: 700 }}>{PRIMARY_TABS.find(t => t.id === activeTab)?.label}</Text>
+        <Text role="caption" weight="bold" style={{ fontSize: 10, color: theme.brand }}>{PRIMARY_TABS.find(t => t.id === activeTab)?.label}</Text>
         {SECONDARY_TABS[activeTab]?.find(s => s.id === activeSubTab)?.label && (
           <>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>›</Text>
-            <Text role="caption" style={{ fontSize: 10, color: theme.brand, fontWeight: 700 }}>{SECONDARY_TABS[activeTab].find(s => s.id === activeSubTab)?.label}</Text>
+            <Text role="caption" weight="bold" style={{ fontSize: 10, color: theme.brand }}>{SECONDARY_TABS[activeTab].find(s => s.id === activeSubTab)?.label}</Text>
           </>
         )}
         {activeFilter !== 'all' && (
           <>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>›</Text>
-            <Text role="caption" style={{ fontSize: 10, color: theme.brand, fontWeight: 700 }}>
+            <Text role="caption" weight="bold" style={{ fontSize: 10, color: theme.brand }}>
               {FILTER_LABELS.find(f => f.id === activeFilter)?.label}
             </Text>
           </>

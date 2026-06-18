@@ -1,11 +1,9 @@
 package store
 
 import (
-	"bufio"
 	"context"
 	"database/sql"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -220,74 +218,8 @@ func scanProductRow(row *sql.Row) (domain.ProductRecord, error) {
 	return r, nil
 }
 
-// scanProductRowColumns scans a *sql.Rows into a ProductRecord (no overrides).
-
-var manifestMap map[string]string
-
-func loadManifest() map[string]string {
-	if manifestMap != nil {
-		return manifestMap
-	}
-	paths := []string{
-		"../frontend/media-fixtures/MANIFEST.local-required.tsv",
-		"../../frontend/media-fixtures/MANIFEST.local-required.tsv",
-		"dsh/frontend/media-fixtures/MANIFEST.local-required.tsv",
-		"frontend/media-fixtures/MANIFEST.local-required.tsv",
-		"media-fixtures/MANIFEST.local-required.tsv",
-	}
-	var file *os.File
-	var err error
-	for _, p := range paths {
-		file, err = os.Open(p)
-		if err == nil {
-			break
-		}
-	}
-	if err != nil {
-		return make(map[string]string)
-	}
-	defer file.Close()
-
-	m := make(map[string]string)
-	scanner := bufio.NewScanner(file)
-	if scanner.Scan() {
-		for scanner.Scan() {
-			line := scanner.Text()
-			parts := strings.Split(line, "\t")
-			if len(parts) >= 2 {
-				m[parts[0]] = parts[1]
-			}
-		}
-	}
-	manifestMap = m
-	return manifestMap
-}
-
-func GetMediaURL(mediaKey string) string {
-	m := loadManifest()
-	relPath, exists := m[mediaKey]
-	if !exists {
-		return ""
-	}
-	return "/media-fixtures/" + relPath
-}
-
 func (repo *PostgresRepository) CreateProductMedia(ctx context.Context, req domain.UploadProductMediaRequest) (domain.ProductMediaRecord, error) {
-	id := fmt.Sprintf("med-%d", time.Now().UnixNano())
-	url := GetMediaURL(req.MediaKey)
-	if url == "" {
-		return domain.ProductMediaRecord{}, fmt.Errorf("invalid or unregistered media key: %s", req.MediaKey)
-	}
-
-	query := `
-INSERT INTO dsh_catalog_product_media (id, product_id, media_key, url, created_at)
-VALUES ($1, $2, $3, $4, NOW())
-RETURNING id, product_id, media_key, url, created_at`
-
-	row := repo.db.QueryRowContext(ctx, query, id, req.ProductID, req.MediaKey, url)
-	var rec domain.ProductMediaRecord
-	err := row.Scan(&rec.ID, &rec.ProductID, &rec.MediaKey, &rec.URL, &rec.CreatedAt)
-	return rec, err
+	return domain.ProductMediaRecord{}, fmt.Errorf("legacy media_key product media create is retired; use POST /media/upload-intents")
 }
 
 func (repo *PostgresRepository) DeleteProductMedia(ctx context.Context, id string) error {
@@ -693,6 +625,75 @@ RETURNING id, item_id, action, note, operator_id, created_at`
 	}
 
 	return rec, nil
+}
+
+func (repo *PostgresRepository) ListAllProducts(ctx context.Context, approvalStatus string, limit int, offset int) (domain.ListProductsResponse, error) {
+	where := []string{}
+	args := []any{}
+
+	if approvalStatus != "" {
+		args = append(args, approvalStatus)
+		where = append(where, fmt.Sprintf("approval_status = $%d", len(args)))
+	}
+
+	whereClause := "1 = 1"
+	if len(where) > 0 {
+		whereClause = strings.Join(where, " AND ")
+	}
+
+	countQuery := fmt.Sprintf(`SELECT COUNT(*) FROM dsh_catalog_products WHERE %s`, whereClause)
+	var total int
+	if err := repo.db.QueryRowContext(ctx, countQuery, args...).Scan(&total); err != nil {
+		return domain.ListProductsResponse{}, err
+	}
+
+	args = append(args, limit)
+	limitPlaceholder := len(args)
+	args = append(args, offset)
+	offsetPlaceholder := len(args)
+
+	query := fmt.Sprintf(`
+SELECT p.id, p.store_id, p.name, p.sku, p.gtin, p.barcode, p.description, p.base_price_label, p.base_price_minor_units, p.category_id, p.approval_status, p.created_at, p.updated_at,
+       o.price_override, o.price_override_minor_units, o.stock_override, o.available_override
+FROM dsh_catalog_products p
+LEFT JOIN dsh_catalog_overrides o ON p.store_id = o.store_id AND p.id = o.product_id
+WHERE %s
+ORDER BY p.created_at DESC
+LIMIT $%d OFFSET $%d`, whereClause, limitPlaceholder, offsetPlaceholder)
+
+	rows, err := repo.db.QueryContext(ctx, query, args...)
+	if err != nil {
+		return domain.ListProductsResponse{}, err
+	}
+	defer rows.Close()
+
+	products := []domain.ProductRecord{}
+	productIDs := []string{}
+	for rows.Next() {
+		record, err := scanProductRowColumnsWithOverrides(rows)
+		if err != nil {
+			return domain.ListProductsResponse{}, err
+		}
+		products = append(products, record)
+		productIDs = append(productIDs, record.ID)
+	}
+	if err := rows.Err(); err != nil {
+		return domain.ListProductsResponse{}, err
+	}
+	if mediaByProductID, err := repo.listProductMediaByProductIDs(ctx, productIDs); err == nil {
+		for i := range products {
+			products[i].Media = mediaByProductID[products[i].ID]
+		}
+	}
+
+	return domain.ListProductsResponse{
+		Products: products,
+		Pagination: domain.Pagination{
+			Limit:  limit,
+			Offset: offset,
+			Total:  total,
+		},
+	}, nil
 }
 
 func (repo *PostgresRepository) ListConflicts(ctx context.Context, storeID string, status string, limit int, offset int) (domain.ListConflictsResponse, error) {

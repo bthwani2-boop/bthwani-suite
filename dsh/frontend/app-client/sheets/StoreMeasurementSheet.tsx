@@ -12,13 +12,17 @@ import {
   Icon,
   Text,
   colorPalette,
+  shadowPresets,
+  radius,
+  spacing,
+  typographyRoles,
 } from '@bthwani/ui-kit';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/products';
 import {
   formatCurrencyValue,
   normalizeDisplayText,
   resolveMeasurementUnitPrice,
-} from '../shared/store-formatting';
+} from '../../shared/stores';
 
 // ---------------------------------------------------------------------------
 // Appearance token subset passed from the Store screen shell.
@@ -43,7 +47,7 @@ export type StoreMeasurementAppearance = {
 
 export type StoreMeasurementSheetProps = {
   pickerItem: DshStoreGetMenuItem | null;
-  activeMeasurementOptions: string[];
+  activeMeasurementOptions: readonly string[];
   selectedMeasureOption: string | null;
   setSelectedMeasureOption: (option: string | null) => void;
   selectedMeasureQty: number;
@@ -128,7 +132,7 @@ export const StoreMeasurementSheet = React.memo(function StoreMeasurementSheet({
               {pickerItem ? (
                 <>
                   <View style={styles.measurePopoverHeader}>
-                    <Text style={[styles.measureSheetTitle, { color: primaryText }]}>
+                    <Text weight="black" style={[styles.measureSheetTitle, { color: primaryText }]}>
                       {normalizeDisplayText(pickerItem.name)}
                     </Text>
                   </View>
@@ -168,6 +172,8 @@ export const StoreMeasurementSheet = React.memo(function StoreMeasurementSheet({
                               onPress={() => setSelectedMeasureOption(option)}
                             >
                               <Text
+                                role="caption"
+                                weight="black"
                                 style={[
                                   styles.measureOptionText,
                                   { color: selected ? (isDarkGlass ? brandContrastColor : colorPalette.white) : primaryText },
@@ -177,6 +183,7 @@ export const StoreMeasurementSheet = React.memo(function StoreMeasurementSheet({
                                 {option}
                               </Text>
                               <Text
+                                weight="bold"
                                 style={[
                                   styles.measureOptionPriceText,
                                   { color: selected ? (isDarkGlass ? glassMutedTextColor : colorPalette.brandSurface) : secondaryText },
@@ -200,7 +207,7 @@ export const StoreMeasurementSheet = React.memo(function StoreMeasurementSheet({
                         </TouchableOpacity>
 
                         <View style={[styles.measureQtyValuePill, { backgroundColor: subtleSurface, borderColor: modalBorder }]}>
-                          <Text style={[styles.measureQtyValueText, { color: primaryText }]}>
+                          <Text weight="black" style={[styles.measureQtyValueText, { color: primaryText }]}>
                             {selectedMeasureQty}
                           </Text>
                         </View>
@@ -216,7 +223,7 @@ export const StoreMeasurementSheet = React.memo(function StoreMeasurementSheet({
 
                       <View style={[styles.measureFooterBar, { borderColor: modalBorder }]}>
                         <View style={[styles.measurePriceValueBox, { backgroundColor: modalSurface }]}>
-                          <Text style={[styles.measurePriceValueText, { color: primaryText }]}>
+                          <Text role="bodyMd" weight="black" style={[styles.measurePriceValueText, { color: primaryText }]}>
                             {formatCurrencyValue(selectedMeasureTotalPrice || selectedMeasureUnitPrice)}
                           </Text>
                         </View>
@@ -226,7 +233,7 @@ export const StoreMeasurementSheet = React.memo(function StoreMeasurementSheet({
                           activeOpacity={0.9}
                           onPress={onAddToCart}
                         >
-                          <Text style={[styles.measureConfirmText, { color: isDarkGlass ? brandContrastColor : colorPalette.white }]}>
+                          <Text role="labelMd" weight="black" style={[styles.measureConfirmText, { color: isDarkGlass ? brandContrastColor : colorPalette.white }]}>
                             أضف للسلة
                           </Text>
                           <Icon name="cart-outline" size={16} color={isDarkGlass ? brandContrastColor : colorPalette.white} />
@@ -286,22 +293,12 @@ const styles = StyleSheet.create({
     flex: 1,
     maxWidth: 280,
     backgroundColor: colorPalette.white,
-    borderRadius: 16,
-    padding: 8,
+    borderRadius: radius.md2,
+    padding: spacing[2],
     borderWidth: 1,
     borderColor: colorPalette.line,
     gap: 6,
-    ...Platform.select({
-      ios: {
-        shadowColor: colorPalette.black,
-        shadowOpacity: 0.08,
-        shadowRadius: 10,
-        shadowOffset: { width: 0, height: 4 },
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
+    ...shadowPresets.raised,
   },
   measurePopoverHeader: {
     alignItems: 'flex-end',
@@ -309,13 +306,12 @@ const styles = StyleSheet.create({
   },
   measureSheetTitle: {
     color: colorPalette.ink,
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: typographyRoles.bodyMd.fontSize,
     textAlign: 'right',
   },
   measureOptionsGrid: {
     flexDirection: 'row-reverse',
-    gap: 4,
+    gap: spacing[1],
     justifyContent: 'space-between',
   },
   measureOptionChip: {
@@ -324,12 +320,12 @@ const styles = StyleSheet.create({
     backgroundColor: colorPalette.white,
     borderWidth: 1,
     borderColor: colorPalette.line,
-    borderRadius: 18,
+    borderRadius: radius.lg,
     paddingHorizontal: 10,
     paddingVertical: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: spacing[1],
   },
   measureOptionChipActive: {
     backgroundColor: colorPalette.brand,
@@ -337,16 +333,13 @@ const styles = StyleSheet.create({
   },
   measureOptionText: {
     color: colorPalette.ink,
-    fontSize: 12,
-    fontWeight: '800',
   },
   measureOptionTextActive: {
     color: colorPalette.white,
   },
   measureOptionPriceText: {
     color: colorPalette.inkMuted,
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: typographyRoles.overline.fontSize,
   },
   measureOptionPriceTextActive: {
     color: colorPalette.brandSurface,
@@ -355,8 +348,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    marginTop: 4,
+    gap: spacing[2],
+    marginTop: spacing[1],
   },
   measureQtyGhostButton: {
     width: 38,
@@ -381,7 +374,7 @@ const styles = StyleSheet.create({
   measureQtyValuePill: {
     minWidth: 56,
     height: 38,
-    borderRadius: 16,
+    borderRadius: radius.md2,
     backgroundColor: colorPalette.brandSoft,
     borderWidth: 1,
     borderColor: colorPalette.borderSubtle,
@@ -391,17 +384,16 @@ const styles = StyleSheet.create({
   },
   measureQtyValueText: {
     color: colorPalette.ink,
-    fontSize: 15,
-    fontWeight: '900',
+    fontSize: typographyRoles.bodyMd.fontSize,
   },
   measureFooterBar: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     overflow: 'hidden',
-    borderRadius: 16,
+    borderRadius: radius.md2,
     borderWidth: 1,
     borderColor: colorPalette.line,
-    marginTop: 4,
+    marginTop: spacing[1],
   },
   measurePriceValueBox: {
     minWidth: 72,
@@ -409,12 +401,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingVertical: spacing[2],
   },
   measurePriceValueText: {
     color: colorPalette.ink,
-    fontSize: 14,
-    fontWeight: '900',
   },
   measureConfirmButton: {
     flex: 1,
@@ -428,7 +418,5 @@ const styles = StyleSheet.create({
   },
   measureConfirmText: {
     color: colorPalette.white,
-    fontSize: 13.5,
-    fontWeight: '900',
   },
 });

@@ -2,87 +2,10 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import {
-  getWltDshAccountStatementsPreview,
-  getWltDshCaptainSettlementStatementsPreview,
-  getWltFieldCommissionStatementsPreview,
-  getWltDshPartnerSettlementStatementsPreview,
-  formatWltYer,
-} from '../financeContracts';
+import type { WltDshFinanceRuntimeResult } from '../../shared/boundary/wltDshFinanceRuntime.adapter';
+import { buildRuntimeWalletRows, type WalletSummaryRow } from '../../shared/wallet/wallet-control-center.read-model';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
-type WalletSummaryRow = {
-  actorLabel: string;
-  actorId: string;
-  actorType: string;
-  availableLabel: string;
-  pendingLabel: string;
-  heldLabel: string;
-  status: 'ready' | 'needs_action' | 'blocked';
-  statusLabel: string;
-  nextAction?: string;
-};
-
-function buildClientWalletRows(): WalletSummaryRow[] {
-  const statements = getWltDshAccountStatementsPreview();
-  return statements
-    .filter((s) => s.actor === 'customer_wallet')
-    .map((s) => ({
-      actorLabel: s.actorLabel,
-      actorId: s.actorId,
-      actorType: 'عميل',
-      availableLabel: s.closingBalanceLabel,
-      pendingLabel: s.holdsLabel,
-      heldLabel: s.holdsLabel,
-      status: 'ready' as const,
-      statusLabel: 'نشط',
-    }));
-}
-
-function buildPartnerWalletRows(): WalletSummaryRow[] {
-  const statements = getWltDshPartnerSettlementStatementsPreview();
-  return statements.map((s) => ({
-    actorLabel: s.partnerName,
-    actorId: s.partnerId,
-    actorType: 'شريك',
-    availableLabel: s.netSettlementLabel,
-    pendingLabel: s.remainingPayableLabel,
-    heldLabel: s.status === 'held' ? s.remainingPayableLabel : formatWltYer(0),
-    status: (s.status === 'held' ? 'blocked' : s.status === 'ready_for_payout' ? 'needs_action' : 'ready') as WalletSummaryRow['status'],
-    statusLabel: s.status === 'held' ? 'محجوز' : s.status === 'ready_for_payout' ? 'جاهز للصرف' : 'نشط',
-    nextAction: s.status === 'ready_for_payout' ? 'صرف مستحقات' : s.status === 'held' ? 'مراجعة سبب الحجز' : undefined,
-  }));
-}
-
-function buildCaptainWalletRows(): WalletSummaryRow[] {
-  const statements = getWltDshCaptainSettlementStatementsPreview();
-  return statements.map((s) => ({
-    actorLabel: s.captainName,
-    actorId: s.captainId,
-    actorType: 'كابتن',
-    availableLabel: s.grossEarningsLabel,
-    pendingLabel: s.outstandingCodLiabilityLabel,
-    heldLabel: s.hasEligibilityBlock ? s.eligibilityShortfallLabel : formatWltYer(0),
-    status: (s.status === 'blocked' ? 'blocked' : s.hasEligibilityBlock || s.outstandingCodLiabilityLabel !== formatWltYer(0) ? 'needs_action' : 'ready') as WalletSummaryRow['status'],
-    statusLabel: s.status === 'blocked' ? 'موقوف' : s.hasEligibilityBlock ? 'رصيد ضامن غير كافٍ' : 'نشط',
-    nextAction: s.hasEligibilityBlock ? 'شحن رصيد ضامن' : s.status === 'pending_clearance' ? 'إيداع COD' : undefined,
-  }));
-}
-
-function buildFieldWalletRows(): WalletSummaryRow[] {
-  const statements = getWltFieldCommissionStatementsPreview();
-  return statements.map((s) => ({
-    actorLabel: s.fieldAgentName,
-    actorId: s.fieldAgentId,
-    actorType: 'ميداني',
-    availableLabel: formatWltYer(s.totalCommissionMinorUnits),
-    pendingLabel: formatWltYer(s.remainingMinorUnits),
-    heldLabel: formatWltYer(s.heldMinorUnits),
-    status: (s.heldMinorUnits > 0 ? 'needs_action' : s.status === 'paid_preview' ? 'ready' : 'needs_action') as WalletSummaryRow['status'],
-    statusLabel: s.heldMinorUnits > 0 ? 'محجوز جزئي' : s.status === 'paid_preview' ? 'مدفوع' : 'قيد المراجعة',
-    nextAction: s.heldMinorUnits > 0 ? 'مراجعة سبب الحجز' : undefined,
-  }));
-}
 
 function resolveStatusClass(status: WalletSummaryRow['status']): string {
   if (status === 'blocked') return wltStyles.walletRowStatusBlocked;
@@ -141,16 +64,16 @@ function WalletRowCard({ row, onSelect }: { row: WalletSummaryRow; onSelect: (ro
   );
 }
 
-export function WltDshWalletControlCenter() {
+export function WltDshWalletControlCenter({
+  runtimeFinance = null,
+}: {
+  runtimeFinance?: WltDshFinanceRuntimeResult | null;
+} = {}) {
   const [selectedRow, setSelectedRow] = React.useState<WalletSummaryRow | null>(null);
   const [activeFilter, setActiveFilter] = React.useState<'all' | 'client' | 'partner' | 'captain' | 'field'>('all');
+  const runtimeRows = React.useMemo(() => buildRuntimeWalletRows(runtimeFinance), [runtimeFinance]);
 
-  const allRows = React.useMemo<WalletSummaryRow[]>(() => [
-    ...buildClientWalletRows(),
-    ...buildPartnerWalletRows(),
-    ...buildCaptainWalletRows(),
-    ...buildFieldWalletRows(),
-  ], []);
+  const allRows = React.useMemo<WalletSummaryRow[]>(() => runtimeRows, [runtimeRows]);
 
   const filteredRows = React.useMemo(() => {
     if (activeFilter === 'all') return allRows;
@@ -174,7 +97,7 @@ export function WltDshWalletControlCenter() {
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div className={wltStyles.walletCenterHeader}>
           <div>
-            <Text role="titleMd" style={{ fontWeight: 800 }}>مركز تحكم المحافظ</Text>
+            <Text role="titleMd" weight="black">مركز تحكم المحافظ</Text>
             <Text role="bodySm" tone="soft" style={{ marginTop: 4 }}>
               نظرة موحدة على جميع محافظ العملاء والشركاء والكباتن والميدانيين
             </Text>

@@ -9,7 +9,11 @@ import {
   useTheme,
   type BThwaniAppearanceMode,
 } from '@bthwani/ui-kit';
-import type { DshMySpaceSubScreenProps } from './DshWalletHubScreen';
+export type DshMySpaceSubScreenProps = {
+  readonly state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';
+  readonly onRetry?: () => void;
+  readonly onBack?: () => void;
+};
 
 export type DshAppearanceHubScreenProps = DshMySpaceSubScreenProps & {
   appearanceMode?: BThwaniAppearanceMode;
@@ -39,7 +43,7 @@ export function DshAppearanceHubScreen({
       />
 
       <MobileScrollView fill padding={4} gap={4}>
-        <Box gap={4} paddingVertical={2}>
+        <Box gap={4} paddingY={2}>
           <AppearanceOptionCard
             title="المظهر الفاتح الراقي"
             description="قاعدة بيضاء نقية مع لمسات زجاجية خفيفة وتفاصيل برتقالية ناصعة مناسبة للقراءة النهارية."

@@ -14,12 +14,13 @@ import {
   resolveRowDirection,
   useDirection,
   useTheme,
+  spacing,
 } from '@bthwani/ui-kit';
 import {
   type DshPartnerActivationStatus,
   getDshPartnerActivationStatusLabel,
-} from '../../shared/dsh-partner-activation.model';
-import { resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
+} from '../../shared/stores/partner/dsh-partner-activation.model';
+import { resolveDshStoreClientVisibility } from '../../shared/stores/dsh-client-visibility.model';
 
 export type StoreProfileScreenProps = {
   storeName: string;
@@ -62,8 +63,8 @@ function SectionBlock({ title, subtitle, actionLabel, expanded, onToggle, childr
   const { theme } = useTheme();
 
   return (
-    <Box gap={3} style={{ paddingVertical: 4 }}>
-      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 12 }}>
+    <Box gap={3} style={{ paddingVertical: spacing[1] }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[3] }}>
         <Box style={{ flex: 1, minWidth: 0, gap: 2 }}>
           <Text role="bodyStrong" align="start">
             {title}
@@ -75,7 +76,7 @@ function SectionBlock({ title, subtitle, actionLabel, expanded, onToggle, childr
         <Button label={actionLabel} tone="secondary" size="sm" fullWidth={false} onPress={onToggle} />
       </Box>
       {expanded ? (
-        <Box gap={3} style={{ marginTop: 4 }}>
+        <Box gap={3} style={{ marginTop: spacing[1] }}>
           {children}
         </Box>
       ) : null}
@@ -128,13 +129,13 @@ export function StoreProfileScreen({
   }, []);
 
   return (
-    <Box gap={4} style={{ padding: 4, paddingBottom: 160 }}>
+    <Box gap={4} style={{ padding: spacing[1], paddingBottom: 160 }}>
       {/* 1) Flat Brief Status */}
       <Box gap={2} paddingY={2}>
         <Text role="bodyStrong" align="start">
           الحالة المختصرة
         </Text>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <Chip label={`حالة المتجر: ${storeStateLabel}`} tone={storeOpen ? 'success' : 'default'} selected />
           <Chip label={`الظهور: ${visibilityLabel}`} tone={listingEnabled ? 'success' : 'warning'} selected />
           <Chip label="الهوية: معتمد" tone="brand" selected />
@@ -179,7 +180,7 @@ export function StoreProfileScreen({
         expanded={branchSectionOpen}
         onToggle={() => setBranchSectionOpen((current) => !current)}
       >
-        <Box gap={3} style={{ paddingHorizontal: 4 }}>
+        <Box gap={3} style={{ paddingHorizontal: spacing[1] }}>
           <TextField label="اسم الفرع" value={branchName} onChangeText={setBranchName} placeholder="اسم الفرع الحالي" />
           <TextField label="العنوان" value={branchAddress} onChangeText={setBranchAddress} placeholder="عنوان الفرع" multiline />
           <TextField label="رقم التواصل" value={branchContact} onChangeText={setBranchContact} placeholder="رقم الهاتف" keyboardType="phone-pad" />
@@ -199,7 +200,7 @@ export function StoreProfileScreen({
         expanded={identitySectionOpen}
         onToggle={() => setIdentitySectionOpen((current) => !current)}
       >
-        <Box gap={3} style={{ paddingHorizontal: 4 }}>
+        <Box gap={3} style={{ paddingHorizontal: spacing[1] }}>
           <KeyValueList
             dense
             items={[
@@ -210,7 +211,7 @@ export function StoreProfileScreen({
             ]}
           />
 
-          <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+          <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
             <Chip label="الرخصة مكتملة" tone="success" />
             <Chip label="التحقق الضريبي جاهز" tone="brand" />
             <Chip label="المراجعة اليومية نشطة" tone="info" />
@@ -218,8 +219,8 @@ export function StoreProfileScreen({
 
           <Box gap={0}>
             {identityDocuments.map((document) => (
-              <Box key={document.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: 8 }}>
-                <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', paddingHorizontal: 4 }}>
+              <Box key={document.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: spacing[2] }}>
+                <Box layoutDirection="row" style={{ alignItems: 'center', paddingHorizontal: spacing[1] }}>
                   <Box style={{ flex: 1, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
                     <Text role="bodyStrong" align="start">{document.title}</Text>
                     <Text role="bodySm" tone="muted" align="start">{document.subtitle}</Text>
@@ -248,7 +249,7 @@ export function StoreProfileScreen({
           onOpenStoreScope?.();
         }}
       >
-        <Box gap={3} style={{ paddingHorizontal: 4 }}>
+        <Box gap={3} style={{ paddingHorizontal: spacing[1] }}>
           <KeyValueList
             dense
             items={[
@@ -273,13 +274,13 @@ export function StoreProfileScreen({
             ]}
           />
 
-          <Box gap={2} style={{ paddingHorizontal: 4, marginTop: 4 }}>
+          <Box gap={2} style={{ paddingHorizontal: spacing[1], marginTop: spacing[1] }}>
             <Text role="caption" tone="muted" align="start">
               شروط الظهور للعملاء — القرار النهائي للعمليات
             </Text>
             {storeVisibility.checklist.map((check) => (
               <Box key={check.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '11', paddingVertical: 6 }}>
-                <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+                <Box layoutDirection="row" style={{ alignItems: 'center', gap: spacing[2] }}>
                   <Icon
                     name={check.satisfied ? 'checkmark-circle-outline' : 'close-circle-outline'}
                     size={16}
@@ -294,9 +295,9 @@ export function StoreProfileScreen({
                     {check.label}
                   </Text>
                   {check.satisfied ? (
-                    <Chip label="مكتمل" tone="success" size="sm" />
+                    <Chip label="مكتمل" tone="success" />
                   ) : (
-                    <Chip label="غير مكتمل" tone="danger" size="sm" />
+                    <Chip label="غير مكتمل" tone="danger" />
                   )}
                 </Box>
                 {!check.satisfied && check.blockedReason ? (

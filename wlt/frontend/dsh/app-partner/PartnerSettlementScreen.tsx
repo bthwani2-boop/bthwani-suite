@@ -15,9 +15,9 @@ import {
 	colorPalette,
 	radius,
 	spacing,
+  typographyRoles,
 } from '@bthwani/ui-kit';
-import { useWltDshPartnerWalletPreview } from './useWltDshPartnerWalletPreview';
-import { formatWltYer } from '../control-panel/financeContracts';
+import { useWltDshPartnerWalletSummary, formatWltDshAmountLabel } from '../shared';
 
 export type PartnerSettlementScreenProps = {
 	partnerId?: string;
@@ -26,7 +26,7 @@ export type PartnerSettlementScreenProps = {
 
 export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerToken }: PartnerSettlementScreenProps) {
 	const { theme } = useTheme();
-	const { partnerPreview, previewTransactions, warnings } = useWltDshPartnerWalletPreview(partnerId, bearerToken);
+	const { partnerSummary, summaryTransactions, warnings } = useWltDshPartnerWalletSummary(partnerId, bearerToken);
 	const [refreshing, setRefreshing] = React.useState<boolean>(false);
 
 	const handleRefresh = async () => {
@@ -46,7 +46,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 			<Box gap={4} style={{ padding: spacing[4] }}>
 				{/* Header */}
 				<View style={styles.headerRow}>
-					<Text role="title" style={{ textAlign: 'right', color: theme.text }}>
+					<Text role="titleMd" style={{ textAlign: 'right', color: theme.text }}>
 						تسويات المتجر والمالية
 					</Text>
 				</View>
@@ -54,7 +54,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 				{/* Errors/Warnings */}
 				{hasError && (
 					<Card tone="danger" padding={3}>
-						<Text role="body" style={{ color: colorPalette.red600, textAlign: 'right' }}>
+						<Text role="bodyMd" style={{ color: theme.danger, textAlign: 'right' }}>
 							{warnings[0]}
 						</Text>
 					</Card>
@@ -66,8 +66,8 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 						<Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
 							إجمالي المبيعات
 						</Text>
-						<Text role="bodyStrong" style={[styles.metricValue, { color: theme.brand }]}>
-							{formatWltYer(partnerPreview.grossSalesMinorUnits)}
+						<Text role="bodyStrong" weight="black" style={[styles.metricValue, { color: theme.brand }]}>
+							{formatWltDshAmountLabel(partnerSummary.grossSalesMinorUnits)}
 						</Text>
 					</Surface>
 
@@ -75,8 +75,8 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 						<Text role="caption" tone="muted" style={{ textAlign: 'right' }}>
 							صافي مستحقات التسوية
 						</Text>
-						<Text role="bodyStrong" style={[styles.metricValue, { color: colorPalette.green600 }]}>
-							{formatWltYer(partnerPreview.netSettlementMinorUnits)}
+						<Text role="bodyStrong" weight="black" style={[styles.metricValue, { color: theme.success }]}>
+							{formatWltDshAmountLabel(partnerSummary.netSettlementMinorUnits)}
 						</Text>
 					</Surface>
 				</View>
@@ -89,10 +89,10 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 					<Divider />
 					<View style={styles.cycleInfoRow}>
 						<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-							تاريخ البدء: {partnerPreview.cycleStartDate}
+							تاريخ البدء: {partnerSummary.cycleStartDate}
 						</Text>
 						<Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-							تاريخ الانتهاء: {partnerPreview.cycleEndDate}
+							تاريخ الانتهاء: {partnerSummary.cycleEndDate}
 						</Text>
 					</View>
 					<View style={styles.cycleStatusRow}>
@@ -101,13 +101,13 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 						</Text>
 						<Badge
 							label={
-								partnerPreview.cycleStatus === 'COMPLETED'
+								partnerSummary.cycleStatus === 'COMPLETED'
 									? 'مكتملة ومدفوعة'
-									: partnerPreview.cycleStatus === 'PENDING'
+									: partnerSummary.cycleStatus === 'PENDING'
 									? 'جاهزة للمراجعة'
 									: 'معلقة'
 							}
-							tone={partnerPreview.cycleStatus === 'COMPLETED' ? 'success' : 'warning'}
+							tone={partnerSummary.cycleStatus === 'COMPLETED' ? 'success' : 'warning'}
 						/>
 					</View>
 				</Surface>
@@ -117,7 +117,7 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 					<Text role="bodyStrong" style={{ textAlign: 'right', marginBottom: spacing[2] }}>
 						سجل التسويات والعمليات المكتملة
 					</Text>
-					{previewTransactions.length === 0 ? (
+					{summaryTransactions.length === 0 ? (
 						<StateView
 							kind="empty"
 							title="لا توجد تسويات سابقة"
@@ -125,30 +125,24 @@ export function PartnerSettlementScreen({ partnerId = 'partner-dev-001', bearerT
 						/>
 					) : (
 						<Surface tone="default" style={styles.listContainer}>
-							{previewTransactions.map((tx, idx) => {
-								const dateLabel = tx.date
-									? new Date(tx.date).toLocaleDateString('ar-YE', {
-											month: 'short',
-											day: 'numeric',
-											year: 'numeric',
-									  })
-									: 'تاريخ غير محدد';
+							{summaryTransactions.map((tx, idx) => {
 								return (
 									<React.Fragment key={tx.id}>
 										{idx > 0 && <Divider />}
 										<ListItem
-											title={tx.description || `تسوية الطلب #${tx.orderId || ''}`}
-											subtitle={`${dateLabel} • ${tx.typeLabel || 'مبيعات'}`}
+											title={tx.title}
+											subtitle={`${tx.timeLabel} • ${tx.subtitle}`}
 											meta={
 												<View style={{ alignItems: 'flex-start' }}>
-													<Text role="bodyStrong" style={{ color: colorPalette.green600 }}>
-														+ {formatWltYer(tx.amountMinorUnits)}
+													<Text role="bodyStrong" style={{ color: tx.amountTone === 'success' ? theme.success : theme.danger }}>
+														{tx.amountLabel}
 													</Text>
-													<Badge
-														label={tx.status === 'COMPLETED' ? 'مكتمل' : 'معلق'}
-														tone={tx.status === 'COMPLETED' ? 'success' : 'warning'}
-														size="sm"
-													/>
+													{tx.statusLabel ? (
+														<Badge
+															label={tx.statusLabel}
+															tone={tx.statusTone ?? 'warning'}
+														/>
+													) : null}
 												</View>
 											}
 										/>
@@ -182,8 +176,7 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 	},
 	metricValue: {
-		fontSize: 20,
-		fontWeight: '800',
+		fontSize: typographyRoles.titleMd.fontSize,
 		marginTop: spacing[1],
 	},
 	cycleCard: {

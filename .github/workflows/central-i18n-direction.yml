@@ -30,8 +30,5 @@ jobs:
       - name: Central guard before build (mobile + control-panel)
         run: pnpm run guard:i18n-direction:mobile-control-panel
 
-      - name: Generate mock media fixtures for build
-        run: node tools/scripts/generate-mock-media-fixtures.mjs
-
       - name: Build mobile apps + control-panel after guard
         run: pnpm run build:mobile-control-panel

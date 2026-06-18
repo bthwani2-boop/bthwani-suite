@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * CatalogTaxonomyGovernanceWorkspace — UI_PREVIEW_ONLY
+ * CatalogTaxonomyGovernanceWorkspace — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * API boundary: PATCH /catalog/categories (not yet bound)
  *
@@ -10,14 +10,17 @@
  *
  * Constraints:
  * - No direct Tamagui import. All UI via @bthwani/ui-kit.
- * - No dsh/frontend/data mutation.
+ * - No archived seed data mutation.
  * - No canonical category create/edit — proposals only.
  * - No Date.now() / Math.random() category ID generation.
  * - All actions produce CatalogPreviewProposal.
  */
 
 import React, { useState } from 'react';
-import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { generateLocalTempId } from '../../../shared/platform/local-temp-id';
+import { Box, Button, Surface, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import type { CatalogPreviewProposal } from '../catalogs.model';
 import { type ActionResult, WorkspacePreviewNotice, WorkspaceSuccessBanner } from '../catalogs.parts';
 import { dshCatalogCategories } from '../catalogs.data';
@@ -80,7 +83,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
     setActionResult(result);
 
     onProposal({
-      id: `taxonomy-${action}-${id}-${Date.now()}`, // draft proposal ID only
+      id: generateLocalTempId(`taxonomy-${action}-${id}`),
       type: 'taxonomy-mapping',
       label,
       status,
@@ -109,7 +112,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
     >
       {/* Header */}
       <Box layoutDirection="row" justify="space-between" align="center">
-        <Text role="titleLg" style={{ fontWeight: '800', fontSize: 18, color: theme.brandHeaderBackground }}>
+        <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
           🗂 حوكمة التصنيف والفئات
         </Text>
         <Button label="✕ إغلاق" tone="secondary" size="sm" onPress={onClose} />
@@ -117,13 +120,13 @@ export function CatalogTaxonomyGovernanceWorkspace({
 
       {/* Notice */}
       <WorkspacePreviewNotice
-        bannerTitle="UI_PREVIEW_ONLY — لا إضافة أو تعديل فعلي للفئات"
+        bannerTitle="لا إضافة أو تعديل فعلي للفئات"
         subtitle="كل الإجراءات هنا تُنتج طلب مقترح فقط. API boundary: PATCH /catalog/categories"
       />
 
       {/* Category tree selector */}
       <Box gap={2}>
-        <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+        <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
           اختر الفئة للمراجعة
         </Text>
 
@@ -164,8 +167,8 @@ export function CatalogTaxonomyGovernanceWorkspace({
                 >
                   <Text
                     role="caption"
+                    weight={selectedCatId === cat.id ? 'black' : 'semibold'}
                     style={{
-                      fontWeight: selectedCatId === cat.id ? '800' : '600',
                       color: selectedCatId === cat.id ? theme.brandHeaderBackground : theme.text,
                     }}
                   >
@@ -189,14 +192,14 @@ export function CatalogTaxonomyGovernanceWorkspace({
                       style={{
                         background: selectedSubId === sub.id ? theme.surfaceInset : 'transparent',
                         border: `1px solid ${selectedSubId === sub.id ? theme.brand : 'transparent'}`,
-                        borderRadius: 6,
+                        borderRadius: radius.xs,
                         cursor: 'pointer',
                         padding: '4px 8px',
                         textAlign: 'right',
                         width: '100%',
                       }}
                     >
-                      <Text role="caption" style={{ color: theme.text, fontSize: 12 }}>
+                      <Text role="caption" style={{ color: theme.text,}}>
                         └ {sub.label}
                       </Text>
                       {sub.mainClassifications && sub.mainClassifications.length > 0 && (
@@ -226,10 +229,10 @@ export function CatalogTaxonomyGovernanceWorkspace({
               borderStyle: 'solid',
             }}
           >
-            <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+            <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
               📌 الفئة المختارة
             </Text>
-            <Text role="bodyMd" style={{ fontWeight: '700', color: theme.text }}>
+            <Text role="bodyMd" weight="bold" style={{ color: theme.text }}>
               {selectedCat?.emojiFallback} {selectedCat?.label}
               {selectedSub ? ` > ${selectedSub.label}` : ''}
             </Text>
@@ -244,9 +247,9 @@ export function CatalogTaxonomyGovernanceWorkspace({
             <Surface
               tone="inset"
               padding={2}
-              style={{ borderRadius: 6, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
+              style={{ borderRadius: radius.xs, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
             >
-              <Text role="caption" style={{ color: theme.warning, fontWeight: '600', fontSize: 11 }}>
+              <Text role="caption" weight="semibold" style={{ color: theme.warning, fontSize: 11 }}>
                 ⚠️ لم تختر فئة فرعية — يُفضَّل اختيار فئة فرعية لاتخاذ إجراء دقيق
               </Text>
             </Surface>
@@ -254,7 +257,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
 
           {/* Actions */}
           <Box gap={2}>
-            <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+            <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
               الإجراءات المتاحة
             </Text>
 
@@ -306,7 +309,7 @@ export function CatalogTaxonomyGovernanceWorkspace({
       )}
 
       <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'center' }}>
-        UI_PREVIEW_ONLY • لا تعديل فعلي للفئات • API boundary: PATCH /catalog/categories
+        لا تعديل فعلي للفئات • API boundary: PATCH /catalog/categories
       </Text>
     </Surface>
   );

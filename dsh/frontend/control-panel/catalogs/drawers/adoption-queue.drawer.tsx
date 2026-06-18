@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * CatalogAdoptionQueueWorkspace — UI_PREVIEW_ONLY
+ * CatalogAdoptionQueueWorkspace — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * API boundary: GET /catalog/adoption-queue (not yet bound) · PATCH /catalog/products/:id/stage (not yet bound)
  *
@@ -17,17 +17,12 @@
  */
 
 import React from 'react';
-import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { generateLocalTempId } from '../../../shared/platform/local-temp-id';
+import { Box, Button, Surface, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader, WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
-import {
-  getCatalogAdoptionItems,
-  adoptCatalogCentral,
-  adoptCatalogException,
-  activateClientVisible,
-  returnToMarketing,
-  rejectFromCatalog,
-} from '../../../data/marketing.preview-data';
-import { type ApprovalRecord, type ApprovalStage, translateStage, translateEntityType, translateOwner } from '../../../shared/workflow';
+import { type ApprovalRecord, type ApprovalStage, translateStage, translateEntityType, translateOwner } from '../../../shared';
 import type { CatalogPreviewProposal } from '../catalogs.model';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -107,7 +102,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
   const [page, setPage] = React.useState(1);
   const [lastResult, setLastResult] = React.useState<CatalogQueueActionResult | null>(null);
 
-  const refresh = React.useCallback(() => setItems(getCatalogAdoptionItems()), []);
+  const refresh = React.useCallback(() => setItems([]), []);
 
   React.useEffect(() => { refresh(); }, [refresh]);
 
@@ -139,15 +134,6 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
     const item = items.find((i) => i.id === id);
     if (!item) return;
 
-    // Preview-state simulation (local only — no canonical mutation)
-    switch (action) {
-      case 'adopt-central':   adoptCatalogCentral(id); break;
-      case 'adopt-exception': adoptCatalogException(id); break;
-      case 'visible':         activateClientVisible(id); break;
-      case 'fix':             returnToMarketing(id); break;
-      case 'reject':          rejectFromCatalog(id); break;
-    }
-
     const result: CatalogQueueActionResult = {
       itemId: id,
       displayCaption: item.title,
@@ -161,13 +147,13 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
 
     // Emit proposal — proposal pattern (router-ready, matches all other workspaces)
     onProposal({
-      id: `adoption-${action}-${id}-${Date.now()}`,
+      id: generateLocalTempId(`adoption-${action}-${id}`),
       type: action === 'visible' ? 'visibility-change' : 'bulk-approve',
       productId: id,
       label: result.label,
       status: 'ready-for-api',
       owner: action === 'fix' ? 'control-panel-marketing' : 'control-panel-catalogs',
-      note: `UI_PREVIEW_ONLY | ${result.label} — "${item.title}"`,
+      note: `محاكاة محلية | ${result.label} — "${item.title}"`,
       apiBoundary: result.apiBoundary,
     });
 
@@ -214,7 +200,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
           <button
             type="button" onClick={onClose}
             style={{
-              appearance: 'none', border: `1px solid ${theme.line}`, borderRadius: 6,
+              appearance: 'none', border: `1px solid ${theme.line}`, borderRadius: radius.xs,
               backgroundColor: theme.surface, color: theme.textMuted,
               cursor: 'pointer', fontSize: 12, padding: '4px 10px', fontWeight: 700,
             }}
@@ -232,7 +218,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
             { label: 'يحتاج تعديل', value: needsFixCount,  color: theme.warning as string },
           ].map((k) => (
             <div key={k.label} style={{
-              borderRadius: 6, padding: '7px 6px', textAlign: 'center',
+              borderRadius: radius.xs, padding: '7px 6px', textAlign: 'center',
               backgroundColor: `${k.color}12`,
               border: `1px solid ${k.color}30`,
             }}>
@@ -277,7 +263,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
           border: `1px solid ${theme.warning as string}28`,
           fontSize: 9, color: theme.textMuted,
         }}>
-          <span style={{ fontWeight: 700, color: theme.warning as string }}>UI_PREVIEW_ONLY</span>
+          <span style={{ fontWeight: 700, color: theme.warning as string }}>ربط API قيد التنفيذ</span>
           {' · API: GET /catalog/adoption-queue · PATCH /catalog/products/:id/stage — not yet bound'}
         </div>
 
@@ -394,7 +380,7 @@ export function CatalogAdoptionQueueWorkspace({ onClose, onProposal }: CatalogAd
 
         {/* Footer */}
         <div style={{ fontSize: 9, color: theme.textMuted, textAlign: 'center', paddingTop: 8 }}>
-          UI_PREVIEW_ONLY · control-panel/catalogs هو السطح الوحيد المخوّل بالاعتماد النهائي
+          control-panel/catalogs هو السطح الوحيد المخوّل بالاعتماد النهائي
         </div>
       </div>
     </Surface>

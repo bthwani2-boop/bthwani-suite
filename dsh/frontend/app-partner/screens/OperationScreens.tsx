@@ -1,5 +1,7 @@
 import React from 'react';
-import { Box, Button, Chip, ListItem, Surface, Text, TextField } from '@bthwani/ui-kit';
+import { Box, Button, Chip, ListItem, Surface, Text, TextField,
+  spacing,
+} from '@bthwani/ui-kit';
 import {
   mapDshPartnerOperationalFlowToSupportRoute,
   type DshPartnerOperationalFlowId,
@@ -8,7 +10,7 @@ import {
 import {
   DSH_ORDER_LIFECYCLE_HANDOFFS,
   getSurfaceObservation,
-} from '../../shared/dsh-order-lifecycle-handoffs';
+} from '../../shared/orders';
 import { DshPartnerInventoryActionPanel, type PartnerInventoryFlowId } from '../parts/PartnerInventoryActionPanel';
 import { DshPartnerOnboardingActionPanel, type PartnerOnboardingFlowId } from '../parts/PartnerOnboardingActionPanel';
 import { DshPartnerOrderActionPanel, type PartnerOrderActionFlowId } from '../parts/PartnerOrderActionPanel';
@@ -110,7 +112,7 @@ export function AuctionStatusUpdateScreen({ onBack, onSecondaryAction }: Auction
       />
 
       <Surface tone="raised" padding={0} gap={0}>
-        <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 }}>
+        <Text role="label" tone="muted" style={{ paddingHorizontal: spacing[4], paddingTop: spacing[4], paddingBottom: spacing[2] }}>
           مراحل التحديث
         </Text>
         {auctionStatusItems.map((item) => (
@@ -222,13 +224,13 @@ export function ConversationScreen({ activeFlowId = 'chat-send', onBack, onOpenS
         onOpenFlow={(flowId) => {
           const routeId = mapDshPartnerOperationalFlowToSupportRoute(flowId);
           if (routeId) {
-            onOpenScreen?.(routeId);
+            onOpenScreen?.(routeId as PartnerConversationRouteId);
           }
         }}
       />
 
       <Surface tone="raised" padding={0} gap={0}>
-        <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: 8 }}>
+        <Text role="label" tone="muted" style={{ paddingHorizontal: spacing[4], paddingTop: spacing[4], paddingBottom: spacing[2] }}>
           الردود السريعة
         </Text>
         {quickReplyItems.map((item) => (

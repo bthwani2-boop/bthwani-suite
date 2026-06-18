@@ -9,11 +9,18 @@ import {
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerDisputes, updatePartnerDisputeStatus } from './workflow';
-import {
-  PARTNER_PERFORMANCE_METRICS,
-  PARTNER_VISIBILITY_TIMELINE_DATA,
-  type PartnerDispute,
-} from '../../data/partner.preview-data';
+import type { PartnerDispute } from '../../shared';
+const PARTNER_PERFORMANCE_METRICS: { id: string; capacity: string; compliance: string; kpis: { onTime: string; cancelRate: string; rating: string }; disputes: number }[] = [];
+type PartnerVisibilityTimelineEvent = {
+  id: string;
+  partnerId: string;
+  eventType: 'activated' | 'paused';
+  date: string;
+  reason: string;
+  actionBy: string;
+};
+
+const PARTNER_VISIBILITY_TIMELINE_DATA: PartnerVisibilityTimelineEvent[] = [];
 import styles from '../shared/control-panel-surface.module.css';
 
 function parseKpiPercent(value: string): number {
@@ -106,7 +113,7 @@ function PartnerOperationalPerformanceTab() {
                   : 'الضغط مرتفع، يوصى بالحد من تدفق الطلبات مؤقتاً.'
               }
               confidence="high"
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
             />
           </Surface>
         ) : (
@@ -114,7 +121,7 @@ function PartnerOperationalPerformanceTab() {
             title="مراقبة السعة"
             reason="اختر شريكاً من القائمة لعرض تفاصيل مؤشرات الأداء الخاصة به واتخاذ الإجراءات الاستباقية."
             confidence="high"
-            auditTag="UI_PREVIEW_ONLY"
+            auditTag="NEEDS_BINDING_LATER"
           />
         )}
       </Box>
@@ -242,7 +249,7 @@ function PartnerDisputesTab() {
               title="توجيه معالجة النزاع"
               reason="يحتاج استجابة من قسم الشركاء للتحقق من الأدلة والتواصل مع الطرفين قبل إغلاق النزاع."
               confidence="high"
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
             />
 
             <Box style={{ marginVertical: 8 }}>
@@ -260,7 +267,7 @@ function PartnerDisputesTab() {
             title="معالجة النزاعات"
             reason="اختر نزاعاً من القائمة لاستعراض تفاصيله وإدارة مساره ضمن مسار الامتثال المتخصص للشركاء."
             confidence="high"
-            auditTag="UI_PREVIEW_ONLY"
+            auditTag="NEEDS_BINDING_LATER"
           />
         )}
       </Box>
@@ -366,7 +373,7 @@ function PartnerVisibilityTab() {
               title="متابعة الظهور"
               reason="هذا السجل يمثل الأحداث التاريخية لإيقاف وتفعيل المتجر. لمزيد من الإجراءات، انتقل لمساحة إدارة التفعيل."
               confidence="high"
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
             />
           </Surface>
         ) : (
@@ -374,7 +381,7 @@ function PartnerVisibilityTab() {
             title="سجل الظهور"
             reason="اختر شريكاً من القائمة الجانبية لاستعراض الخط الزمني التاريخي للظهور والإخفاء على المنصة."
             confidence="high"
-            auditTag="UI_PREVIEW_ONLY"
+            auditTag="NEEDS_BINDING_LATER"
           />
         )}
       </Box>

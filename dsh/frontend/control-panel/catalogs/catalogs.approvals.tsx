@@ -1,19 +1,21 @@
 import React from 'react';
-import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader, WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import { FilterDropdown } from './catalogs.parts';
 import {
   type DshProductIdentityApprovalStatus,
   getDshProductApprovalStatusTone,
-} from '../../shared/dsh-product-identity.model';
+} from '../../shared';
 import {
   getAllApprovalRecords,
   moveApprovalRecordToStage,
   upsertApprovalRecord,
   type ApprovalRecord,
   type ApprovalStage,
-} from '../../shared/workflow';
-import { createDshProductApiHttpClient, resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
+} from '../../shared';
+import { getDshProductRuntimeClient, getDshProductRuntimeBaseUrl } from '../../shared';
 
 type ItemApprovalStatus = 'pending' | 'approved' | 'rejected' | 'needs-revision';
 
@@ -88,9 +90,44 @@ export function ItemApprovalScreen({
   onRequestRevision: propsOnRequestRevision,
 }: ItemApprovalScreenProps) {
   const { theme } = useTheme();
-  const client = React.useMemo(() => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()), []);
+  const client = React.useMemo(() => getDshProductRuntimeClient(), []);
 
-  // Connect to the shared global store if no props are provided
+  // Live products fetched from GET /products?approval_status=...
+  // Falls back to workflow store records when API is unreachable.
+  const [liveProducts, setLiveProducts] = React.useState<CatalogItemApprovalRecord[] | null>(null);
+
+  React.useEffect(() => {
+    const baseUrl = getDshProductRuntimeBaseUrl();
+    if (!baseUrl) return;
+    let cancelled = false;
+    client.listAllProducts({ limit: 100 })
+      .then((resp) => {
+        if (cancelled) return;
+        const mapped = resp.products.map((p): CatalogItemApprovalRecord => {
+          let status: ItemApprovalStatus = 'pending';
+          if (p.approval_status === 'needs_fix') status = 'needs-revision';
+          else if (p.approval_status === 'rejected') status = 'rejected';
+          else if (['partner_approved', 'marketing_approved', 'catalog_adopted', 'client_visible'].includes(p.approval_status)) {
+            status = 'approved';
+          }
+          return {
+            id: p.id,
+            displayCaption: p.name,
+            partnerLabel: 'تطبيق الشريك',
+            category: 'منتج كتالوج',
+            submittedAt: p.created_at ? p.created_at.split('T')[0] : '',
+            status,
+            approvalStatus: p.approval_status as import('../../shared').DshProductIdentityApprovalStatus,
+            auditRequired: false,
+          };
+        });
+        setLiveProducts(mapped);
+      })
+      .catch(() => { /* fallback to workflow records */ });
+    return () => { cancelled = true; };
+  }, [client]);
+
+  // Workflow store — populated by in-session product submissions (fallback when API unreachable)
   const [records, setRecords] = React.useState<ApprovalRecord[]>([]);
   const refresh = React.useCallback(() => {
     setRecords(getAllApprovalRecords());
@@ -103,7 +140,18 @@ export function ItemApprovalScreen({
   const items = React.useMemo(() => {
     if (propsItems) return propsItems;
 
-    // Filter records from the shared workflow SSoT based on sub-tab
+    // Prefer live API products when available
+    if (liveProducts !== null) {
+      if (activeSubTab === 'quality') {
+        return liveProducts.filter((p) => p.approvalStatus === 'partner_submitted' || p.approvalStatus === 'partner_review' || p.approvalStatus === 'field_draft');
+      }
+      if (activeSubTab === 'marketing') {
+        return liveProducts.filter((p) => p.approvalStatus === 'marketing_review' || p.approvalStatus === 'marketing_approved');
+      }
+      return liveProducts;
+    }
+
+    // Fallback: workflow store records
     let filteredRecords = records.filter(
       (r) => r.entityType === 'product' || r.entityType === 'product-media' || r.entityType === 'category-suggestion'
     );
@@ -148,7 +196,7 @@ export function ItemApprovalScreen({
         auditRequired: false,
       } satisfies CatalogItemApprovalRecord;
     });
-  }, [records, propsItems, activeSubTab]);
+  }, [liveProducts, records, propsItems, activeSubTab]);
 
   const [crossSurfaceNotification, setCrossSurfaceNotification] = React.useState<{
     itemCaption: string;
@@ -329,7 +377,7 @@ export function ItemApprovalScreen({
               الوجهة: <strong>{crossSurfaceNotification.targetSurface}</strong>
             </div>
             <div style={{ fontSize: 9, color: theme.textMuted, direction: 'ltr', textAlign: 'right', marginTop: 2 }}>
-              {crossSurfaceNotification.apiBoundary} — UI_PREVIEW_ONLY
+              {crossSurfaceNotification.apiBoundary}
             </div>
           </div>
           <button
@@ -515,13 +563,13 @@ export function ItemApprovalScreen({
                   }}
                 >
                   <td style={{ padding: '12px' }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 6, backgroundColor: theme.surfaceInset, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 32, height: 32, borderRadius: radius.xs, backgroundColor: theme.surfaceInset, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <span style={{ fontSize: 14 }}>📦</span>
                     </div>
                   </td>
                   <td style={{ padding: '12px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>{item.displayCaption}</Text>
+                      <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>{item.displayCaption}</Text>
                       {item.approvalNote && (
                         <Text role="caption" tone="warning" style={{ fontSize: 9 }}>{`ملاحظة سابقة: ${item.approvalNote}`}</Text>
                       )}
@@ -537,7 +585,7 @@ export function ItemApprovalScreen({
                     <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{item.submittedAt}</Text>
                   </td>
                   <td style={{ padding: '12px' }}>
-                    <WebControlPanelStatusTag label={statusLabel[item.status]} tone={(approvalTone === 'muted' || approvalTone === 'default') ? 'neutral' : approvalTone as 'success' | 'warning' | 'danger'} />
+                    <WebControlPanelStatusTag label={statusLabel[item.status]} tone={approvalTone === 'default' ? 'neutral' : approvalTone as 'success' | 'warning' | 'danger'} />
                   </td>
                   <td style={{ padding: '12px' }}>
                     {item.status === 'pending' ? (

@@ -1,32 +1,41 @@
 ---
 name: bthwani-graphify-query-first
-description: Use the local Graphify knowledge graph before broad raw-file searching for BThwani repository architecture, ownership, routing, dependency, and cross-surface questions.
-version: 2026.05.31-v1
+description: Use the local Graphify knowledge graph for context, navigation, and cross-file relationship discovery only. Graphify is not a toolchain leader. Use bthwani-evidence-gate-router-contract to select tools and guards.
+version: 2026.06.13-v3
 ---
 
 # bthwani-graphify-query-first
 
-## Purpose
+## Role
 
-Use `graphify-out/graph.json` as a local navigation layer before broad raw-file searching.
+Graphify is a **context and navigation layer only**.
 
-This skill reduces wasted token usage and helps agents find the smallest relevant file set before reading code.
+Graphify helps agents discover where things live, how files relate, and which files are in scope. It does not lead the toolchain, does not coordinate other tools, and does not prove acceptance.
+
+For tool and guard selection, use `bthwani-evidence-gate-router-contract` instead.
 
 ## Trigger contexts
 
-Use this skill when the task asks about:
+Use this skill when the task asks:
 
-1. where something lives in the repo,
-2. how two files, modules, screens, surfaces, routes, imports, exports, or governance areas connect,
-3. architecture, ownership, dependency, routing, UI-kit boundary, DSH data/media, or cross-surface impact.
+1. Where does something live in the repo?
+2. How do two files, modules, screens, surfaces, routes, imports, exports, or governance areas connect?
+3. What is the cross-surface impact of a change?
+4. Which files are in scope before reading code or running targeted analysis tools?
 
 ## Non-trigger contexts
 
-Do not use this skill when:
+Do NOT use this skill when:
 
-1. the user provided one exact file and only asks to rewrite text in that file,
-2. the task is pure UI visual review from a screenshot with no repo lookup,
-3. `graphify-out/graph.json` is missing or known stale and the task is to repair Graphify itself.
+1. The file scope is already known from the task or prior context.
+2. The task is text-only, docs-only, agents-only, or governance-only with no code impact.
+3. The task requires type proof → use `tsc`.
+4. The task requires security proof → use Semgrep / Trivy / Checkov / CodeQL (at PR/release).
+5. The task requires runtime proof → use Playwright / Cucumber.
+6. The task requires UI proof → use screenshots / react-scanner / Playwright.
+7. The task requires API contract proof → use Spectral / openapi-typescript.
+8. The task requires dependency safety proof → use dependency-cruiser / madge / sherif.
+9. `graphify-out/graph.json` is missing or known stale and the task is to repair Graphify itself.
 
 ## Required commands
 
@@ -48,24 +57,33 @@ For one concept:
 
 ## Rules
 
-- Use Graphify before broad `grep`, `rg`, or large file reads when the question is about repo structure or relationships.
-- Keep the query narrow and task-specific.
-- Treat Graphify as navigation only, not final proof.
-- Read exact owner files before recommending or implementing changes.
-- Do not claim PASS, CLOSED, READY, FINAL, SAFE, or 100% from Graphify output alone.
-- Final acceptance still requires Git evidence, verification output, and visual evidence for UI work when relevant.
-- Keep `graphify-out/` as local generated cache unless the human explicitly approves tracking it.
-- Do not run full semantic extraction unless explicitly requested.
-- For normal maintenance, use the local hook/update path based on `graphify update .`.
+- **Context only**: Graphify narrows scope. It does not lead or coordinate tools.
+- **Not for every task**: Use Graphify only when cross-file scope is unknown or a relationship question is present.
+- **No default update**: Do not run `graphify update .` by default. Run it only when code structure or imports changed AND subsequent steps in the same session need accurate graph navigation AND there is explicit justification.
+- **Navigation layer only**: Treat `graphify-out/` as a navigation layer only — not runtime source, not final evidence, not acceptance proof.
+- **No false closure**: Do not declare `PASS`, `READY`, `CLOSED`, `SAFE`, `FINAL`, or `100%` based on Graphify output alone.
+- **No tool orchestration**: Graphify does not determine which analysis tools run. Tool selection is done by `bthwani-evidence-gate-router-contract`.
+- **Limit Inputs**: Restrict input context before reading raw files or running any tool.
+
+## Tool selection after Graphify
+
+After using Graphify to narrow scope, route to `bthwani-evidence-gate-router-contract` to select the minimum correct tool set. Do not choose tools based on Graphify output alone.
 
 ## Output contract
 
-    skill: bthwani-graphify-query-first
-    scope:
-    graphify_question:
-    graphify_command:
-    graphify_result_summary:
-    exact_files_to_read_next:
-    unknowns:
-    decision: PASS / PASS_WITH_WARNINGS / FIX_REQUIRED / BLOCKED / NEEDS_EVIDENCE
-    next_action:
+```text
+skill: bthwani-graphify-query-first
+scope:
+graphify_question:
+graphify_commands:
+graphify_result_summary:
+impacted_files:
+impacted_relationships:
+scope_narrowed: yes | no
+next_skill: bthwani-evidence-gate-router-contract
+files_to_read_next:
+risks:
+blocked_or_unknown:
+decision: NEEDS_TOOL | NEEDS_FILE_READ | NEEDS_EVIDENCE | FIX_REQUIRED | BLOCKED | PASS_WITH_WARNINGS
+next_action:
+```

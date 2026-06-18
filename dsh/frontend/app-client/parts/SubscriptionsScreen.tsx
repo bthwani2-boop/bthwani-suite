@@ -11,13 +11,26 @@ import {
   TextField,
   ActionStrip,
   useTheme,
+  radius,
 } from '@bthwani/ui-kit';
-import { subscriptionHeroCopy, subscriptionPlanCards } from '../../data/subscriptions.preview-data';
+import type { SubscriptionClientCard } from '../../shared/marketing/commercial-contract';
 
-export type DshSubscriptionsScreenProps = {};
+export type DshSubscriptionsScreenProps = {
+  compact?: boolean;
+  plans?: SubscriptionClientCard[];
+  heroCopy?: { eyebrow?: string; title?: string; subtitle?: string; note?: string };
+  onStatusChange?: (message: string) => void;
+};
 
-export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
+export function DshSubscriptionsScreen({
+  compact = false,
+  plans = [],
+  heroCopy,
+  onStatusChange,
+}: DshSubscriptionsScreenProps = {}) {
   const { theme } = useTheme();
+  const subscriptionPlanCards = plans;
+  const subscriptionHeroCopy = heroCopy ?? { eyebrow: 'بثواني برو', title: 'الاشتراكات', subtitle: 'دفع وتبديل وإدارة من نفس الصفحة.', note: '' };
 
   // Core Plan States
   const initialCurrentPlanId = subscriptionPlanCards.find((plan) => plan.current)?.id ?? 'weekly';
@@ -53,6 +66,18 @@ export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
 
   const selectedPlan = subscriptionPlanCards.find((plan) => plan.id === selectedPlanId) ?? subscriptionPlanCards[0];
   const currentPlan = subscriptionPlanCards.find((plan) => plan.id === currentPlanId) ?? subscriptionPlanCards[0];
+
+  if (!selectedPlan || !currentPlan) {
+    return (
+      <View style={{ padding: spacing[4], alignItems: 'center', gap: spacing[2] }}>
+        <Icon name="cube-outline" tone="muted" size={40} />
+        <Text role="bodyStrong" style={{ color: theme.text, textAlign: 'center' }}>
+          لا توجد خطط اشتراك متاحة حاليًا.
+        </Text>
+      </View>
+    );
+  }
+
   const selectedPaymentProfile = paymentProfiles[paymentProfileIndex % paymentProfiles.length];
 
   // Price calculations
@@ -72,6 +97,7 @@ export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
     setCurrentPlanId(selectedPlanId);
     setExpandedSection(null);
     setSuccessMessage('تم تأكيد التغييرات وتحديث حالة الاشتراك بنجاح!');
+    onStatusChange?.('تم تأكيد التغييرات وتحديث حالة الاشتراك بنجاح!');
     setTimeout(() => setSuccessMessage(null), 6000);
   };
 
@@ -108,7 +134,7 @@ export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
     >
       {/* Success Message */}
       {successMessage && (
-        <View style={{ margin: spacing[4], backgroundColor: theme.successSurface, padding: spacing[3], borderRadius: 12, borderWidth: 1, borderColor: theme.success, flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
+        <View style={{ margin: spacing[4], backgroundColor: theme.successSurface, padding: spacing[3], borderRadius: radius.sm2, borderWidth: 1, borderColor: theme.success, flexDirection: 'row-reverse', alignItems: 'center', gap: spacing[2] }}>
           <Icon name="checkmark-circle" tone="success" size={20} />
           <Text role="bodyStrong" style={{ color: theme.success, textAlign: 'right', flex: 1 }}>
             {successMessage}
@@ -177,7 +203,7 @@ export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
                     </Pressable>
                     {isSelected && plan.id !== currentPlanId && (
                       <View style={{ alignItems: 'flex-start', marginTop: spacing[3], marginRight: 36 }}>
-                        <Button label="اختيار هذه الباقة" tone="brand" size="sm" onPress={() => setExpandedSection(null)} style={{ borderRadius: 8 }} />
+                        <Button label="اختيار هذه الباقة" tone="brand" size="sm" onPress={() => setExpandedSection(null)} style={{ borderRadius: radius.xs2 }} />
                       </View>
                     )}
                   </View>
@@ -316,7 +342,7 @@ export function DshSubscriptionsScreen({}: DshSubscriptionsScreenProps = {}) {
                   </View>
                </View>
             </View>
-            <Button label="تأكيد التغييرات" tone="brand" size="lg" onPress={applyChanges} style={{ marginTop: spacing[4], borderRadius: 12 }} />
+            <Button label="تأكيد التغييرات" tone="brand" size="lg" onPress={applyChanges} style={{ marginTop: spacing[4], borderRadius: radius.sm2 }} />
          </View>
       )}
 

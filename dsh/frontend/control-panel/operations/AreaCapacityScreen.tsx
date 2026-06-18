@@ -11,35 +11,17 @@ import {
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
 import { Box, KeyValueList } from '@bthwani/ui-kit';
-import { AREA_CAPACITY_OPERATIONAL_PREVIEW } from '../../data/orders.preview-data';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
+import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 
 export type AreaCapacityScreenProps = { hubHref: string; subGroup?: string; };
 
-const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  warning: 'warning',
-  danger: 'danger',
-  best: 'success',
-  brand: 'neutral',
-};
-
 export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: AreaCapacityScreenProps) {
   const router = useRouter();
-  const preview = AREA_CAPACITY_OPERATIONAL_PREVIEW;
 
-  // Stateful zones data list (extended to 10 zones for pagination demonstration)
+  // Stateful zones data list
   const [zones, setZones] = React.useState(() => [
-    ...preview.zones.map((z) => ({
-      ...z,
-      customZoneLoad: z.zoneLoad as string,
-      customStatusTone: z.statusTone as 'warning' | 'danger' | 'best' | 'brand',
-      customSurgeBonus: z.surgeBonus as string,
-      customProtectedZones: z.protectedZones as string,
-      customFreeZones: z.freeZones as string,
-      customNote: z.note as string,
-      customRecommendation: z.recommendation as string,
-    })),
     {
       id: 'AR-05',
       zone: 'غرب الرياض',
@@ -170,10 +152,10 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
 
   // Stateful KPIs summary
   const [kpis, setKpis] = React.useState<{ zoneLoad: string; protectedZones: number; freeZones: number; surgeBonus: string }>({
-    zoneLoad: preview.summary.zoneLoad,
-    protectedZones: preview.summary.protectedZones,
-    freeZones: preview.summary.freeZones,
-    surgeBonus: preview.summary.surgeBonus,
+    zoneLoad: '—',
+    protectedZones: 0,
+    freeZones: 0,
+    surgeBonus: '—',
   });
 
   // Pagination states
@@ -315,7 +297,7 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
   // Inspector Component details
   let inspectorContent: React.ReactNode = null;
   if (selectedZoneId && activeZone) {
-    const statusTone = TONE_MAP[activeZone.customStatusTone] ?? 'neutral';
+    const statusTone = DSH_CONTROL_PANEL_TONE_MAP[activeZone.customStatusTone] ?? 'neutral';
 
     inspectorContent = (
       <WebControlPanelInspectorShell
@@ -386,7 +368,7 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
                   width: '100%',
                   padding: '10px',
                   background: activeZone.customSurgeBonus === 'حافز مفعل' ? 'var(--bthwani-control-panel-surface)' : 'var(--bthwani-control-panel-success)',
-                  color: activeZone.customSurgeBonus === 'حافز مفعل' ? 'var(--bthwani-control-panel-text)' : 'white',
+                  color: activeZone.customSurgeBonus === 'حافز مفعل' ? 'var(--bthwani-control-panel-text)' : 'var(--bthwani-brand-contrast)',
                   border: activeZone.customSurgeBonus === 'حافز مفعل' ? '1px solid var(--bthwani-control-panel-border)' : 'none',
                   borderRadius: '8px',
                   cursor: 'pointer',
@@ -404,7 +386,7 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
                   width: '100%',
                   padding: '10px',
                   background: 'var(--bthwani-control-panel-brand)',
-                  color: 'white',
+                  color: 'var(--bthwani-brand-contrast)',
                   border: 'none',
                   borderRadius: '8px',
                   cursor: 'pointer',
@@ -422,7 +404,7 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
                   width: '100%',
                   padding: '10px',
                   background: 'var(--bthwani-control-panel-danger)',
-                  color: 'white',
+                  color: 'var(--bthwani-brand-contrast)',
                   border: 'none',
                   borderRadius: '8px',
                   cursor: 'pointer',
@@ -506,7 +488,7 @@ export function AreaCapacityScreen({ hubHref: _hubHref, subGroup: _subGroup }: A
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {paginatedZones.map((area) => {
-                  const statusTone = TONE_MAP[area.customStatusTone] ?? 'neutral';
+                  const statusTone = DSH_CONTROL_PANEL_TONE_MAP[area.customStatusTone] ?? 'neutral';
                   return (
                     <WebControlPanelDecisionRow
                       key={area.id}

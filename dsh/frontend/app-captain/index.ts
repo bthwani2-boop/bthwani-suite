@@ -8,19 +8,12 @@
 // Core Surface & Host
 export { DshCaptainSurface } from './DshCaptainSurface';
 
-/**
- * Compatibility alias for DshCaptainSurface.
- * @deprecated Use DshCaptainSurface instead.
- */
-export { DshCaptainSurface as DshSurfaceHost } from './DshCaptainSurface';
-
 // Public Types required by Composition/Shell
 export type {
 	DshCaptainCommandTarget,
 	DshCaptainNavigationCommand,
 	DshCaptainRoute,
 	DshCaptainSurfaceProps,
-	DshSurfaceHostProps,
 	DshCaptainState,
 	DshCaptainStateGroup,
 	DshCaptainStateMeta,

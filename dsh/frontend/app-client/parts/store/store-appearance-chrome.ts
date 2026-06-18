@@ -12,7 +12,9 @@ function hexToRgba(hex: string, alpha = 0.9) {
   return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
 
-export function useStoreAppearanceChrome({ isDarkGlass, tokens }: any) {
+type StoreAppearanceTokens = { colors: { accentOrange: string; surfaceRaised: string; surfacePrimary: string; glassBorder: string; borderSubtle: string; textPrimary: string; textSecondary: string; overlaySoft: string }; actionSelectedBackground: string; components: { commerce: { deliverySelectedBorder: string }; overlays: { modalBorder: string; modalSurface: string; modalBackdrop: string } }; glassSurface: string; appBackground: string };
+
+export function useStoreAppearanceChrome({ isDarkGlass, tokens }: { isDarkGlass: boolean; tokens: StoreAppearanceTokens }) {
   return React.useMemo(() => ({
     accent: tokens.colors.accentOrange,
     activeActionBackground: tokens.actionSelectedBackground,
@@ -32,7 +34,9 @@ export function useStoreAppearanceChrome({ isDarkGlass, tokens }: any) {
   }), [isDarkGlass, tokens]);
 }
 
-export function useStoreMeasurementAppearance({ appearanceChrome, isDarkGlass, theme, tokens }: any) {
+type AppearanceChrome = ReturnType<typeof useStoreAppearanceChrome>;
+
+export function useStoreMeasurementAppearance({ appearanceChrome, isDarkGlass, theme, tokens }: { appearanceChrome: AppearanceChrome; isDarkGlass: boolean; theme: { brandContrast: string }; tokens: { glassMutedText: string } }) {
   return React.useMemo(() => ({
     overlaySoft: appearanceChrome.overlaySoft,
     activeActionBackground: appearanceChrome.activeActionBackground,

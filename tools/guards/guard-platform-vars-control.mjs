@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
-import { createResult, isTextFile, lineOf, parseArgs, readText, walk, writeOutputs } from './common-v3.mjs';
+import { createResult, isTextFile, lineOf, parseArgs, readText, walk, writeOutputs } from './common-guard.mjs';
 
 const args = parseArgs();
 args.root = args.root || process.cwd();
@@ -39,6 +39,19 @@ function allowedFinancialOwner(relativePath, service) {
 function isBoundaryStatement(context) {
   return /PREVIEW_ONLY|read[- ]only|readOnly|reference only|visibility only|no\s+[^.\n]*(ledger|wallet|refund|settlement|reconciliation|mutation|write|update)|mutationForbidden|forbidden actions|forbiddenActions|WLT-only|لا يوجد|لا تنشئ|بدون|مرجعية|محاكاة/i.test(context);
 }
+
+const ALLOWED_VAR_UI_NAMES = new Set([
+  'VAR_UI_APPEARANCE_MODE',
+  'VAR_UI_FONT_PROFILE',
+  'VAR_UI_DENSITY_PROFILE',
+  'VAR_UI_RADIUS_PROFILE',
+  'VAR_UI_ELEVATION_PROFILE',
+  'VAR_UI_MOTION_PROFILE',
+  'VAR_UI_MARKETING_EMPHASIS',
+  'VAR_UI_CONTROL_PANEL_DENSITY',
+  'VAR_UI_MEDIA_LOADING_POLICY',
+  'VAR_UI_DATA_DENSITY_POLICY'
+]);
 
 const config = loadConfig();
 const serviceEntries = Object.entries(config.services ?? {})
@@ -88,8 +101,34 @@ for (const [serviceId, service] of serviceEntries) {
       result.add('INFO', 'control_panel_route_sprawl_signal', file, `Potential control-panel route/page sprawl signal for service "${serviceId}".`, null, 'Verify control-room ownership and progressive disclosure before adding new routes.');
     }
 
+    // Enforce allowed VAR_UI_* variable names
+    const varUiRegex = /\bVAR_UI_[A-Z_0-9]+\b/g;
+    let varMatch;
+    while ((varMatch = varUiRegex.exec(text))) {
+      const varName = varMatch[0];
+      if (!ALLOWED_VAR_UI_NAMES.has(varName)) {
+        result.add(
+          'FAIL',
+          'forbidden_var_ui_name',
+          file,
+          `Forbidden VAR_UI_* variable name detected: "${varName}". Only approved presets are allowed.`,
+          lineOf(text, varMatch.index),
+          'Align design variable names to the central allowlist in governance/08_UI_KIT_AND_BRAND.md.'
+        );
+      }
+    }
+
     // Zero scattered process.env reads enforcement (DSH-SLICE-008A)
-    if (/\.(tsx|ts)$/.test(relativePath) && relativePath.startsWith('dsh/frontend/') && relativePath !== 'dsh/frontend/shared/platform/PlatformVarsProvider.tsx' && relativePath !== 'dsh/frontend/shared/platform/FeatureFlagProvider.tsx') {
+    const PLATFORM_ENV_CANONICAL = new Set([
+      'dsh/frontend/shared/platform/PlatformVarsProvider.tsx',
+      'dsh/frontend/shared/platform/FeatureFlagProvider.tsx',
+      'dsh/frontend/shared/platform/platform-vars.ts',
+      'dsh/frontend/shared/platform/feature-flags.ts',
+      'dsh/frontend/shared/media/useDshEntityMedia.ts',
+      'dsh/frontend/shared/dev-fixtures-isolation-guard.ts',
+      'dsh/frontend/shared/runtime/dev-fixtures-isolation-guard.ts',
+    ]);
+    if (/\.(tsx|ts)$/.test(relativePath) && relativePath.startsWith('dsh/frontend/') && !PLATFORM_ENV_CANONICAL.has(relativePath)) {
       const processEnvRegex = /process\.env|env\?\.(EXPO_PUBLIC_|NEXT_PUBLIC_)/g;
       let envMatch;
       while ((envMatch = processEnvRegex.exec(text))) {
@@ -101,6 +140,37 @@ for (const [serviceId, service] of serviceEntries) {
           lineOf(text, envMatch.index),
           'Refactor to use PlatformVarsRegistry or usePlatformVars Hook.'
         );
+      }
+    }
+
+    if (relativePath.startsWith('dsh/frontend/control-panel/platform/Vars/')) {
+      const forbiddenRuntimeVarsTerms = /\b(?:preview-only|currentPreviewValue|proposedPreviewValue|DSH_PLATFORM_AUDIT_PREVIEW|DSH_PLATFORM_SIMULATION_PREVIEW|local-only)\b|معاينة محلية|تغيير محلي فقط|تعديل محلي فقط/g;
+      let forbiddenVarsMatch;
+      while ((forbiddenVarsMatch = forbiddenRuntimeVarsTerms.exec(text))) {
+        result.add(
+          'FAIL',
+          'platform_vars_preview_runtime_term',
+          file,
+          `Platform Vars runtime UI still contains preview/local-only terminology: "${forbiddenVarsMatch[0]}".`,
+          lineOf(text, forbiddenVarsMatch.index),
+          'Use runtime-bound, contract-required, read-only-reference, or disabled-by-policy language instead.'
+        );
+      }
+
+      const platformStatusRegex = /\bstatus:\s*['"]([^'"]+)['"]/g;
+      const allowedPlatformStatuses = new Set(['runtime-bound', 'contract-required', 'read-only-reference', 'disabled-by-policy']);
+      let statusMatch;
+      while ((statusMatch = platformStatusRegex.exec(text))) {
+        if (!allowedPlatformStatuses.has(statusMatch[1])) {
+          result.add(
+            'FAIL',
+            'platform_vars_forbidden_status',
+            file,
+            `Platform Vars status must be runtime-bound, contract-required, read-only-reference, or disabled-by-policy. Found "${statusMatch[1]}".`,
+            lineOf(text, statusMatch.index),
+            'Replace preview/local-only status vocabulary with the approved runtime policy states.'
+          );
+        }
       }
     }
   }

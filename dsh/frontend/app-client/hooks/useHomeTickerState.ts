@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { getMarketingTickerItems, buildMarketingTickerPlan } from '../../data/marketing.preview-data';
 
 export function useHomeTickerState({
   isTickerHidden,
@@ -19,29 +18,17 @@ export function useHomeTickerState({
   onOpenDiscovery?: () => void;
 }) {
   const tickerState = React.useMemo(() => {
+    void currentTime;
     if (isTickerHidden) {
       return null;
     }
 
-    const clientPlan = buildMarketingTickerPlan(currentTime, 'client', getMarketingTickerItems());
-    const activeItem = clientPlan.activeItem;
-
-    if (!activeItem) {
-      return {
-        isOpen: true,
-        statusLabel: currentLanguage === 'ar' ? 'مباشر' : 'Live',
-        message: currentLanguage === 'ar' ? 'استعرض المتاجر والطلبات النشطة' : 'Browse stores and active orders',
-        isMarketing: false,
-      };
-    }
-
+    // Marketing ticker items come from API — show neutral live status until endpoint is built.
     return {
       isOpen: true,
       statusLabel: currentLanguage === 'ar' ? 'مباشر' : 'Live',
-      message: activeItem.message,
-      isMarketing: true,
-      actionTarget: activeItem.actionTarget,
-      needsBinding: true,
+      message: currentLanguage === 'ar' ? 'استعرض المتاجر والطلبات النشطة' : 'Browse stores and active orders',
+      isMarketing: false,
     };
   }, [currentLanguage, currentTime, isTickerHidden]);
 
@@ -49,13 +36,7 @@ export function useHomeTickerState({
     if (!tickerState) return;
 
     if (tickerState.isMarketing) {
-      if (tickerState.actionTarget === 'orders') {
-        onOpenOrders?.();
-      } else if (tickerState.actionTarget === 'tracking') {
-        onOpenTracking?.();
-      } else if (tickerState.actionTarget === 'promo') {
-        onOpenDiscovery?.(); // Fallback for promo
-      }
+      onOpenDiscovery?.();
     } else if (tickerAction) {
       tickerAction();
     }

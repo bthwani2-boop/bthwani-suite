@@ -85,17 +85,14 @@ export function DshCheckoutFailureScreen({
     <Surface style={styles.root}>
       <TopBar title="فشل الدفع" />
       <StateView
-        stateId="error"
+        stateId="recoverableError"
         title="تعذّر إتمام الدفع"
         description={message}
       />
 
       {cartPreserved && (
         <Box
-          margin={spacing[4]}
-          padding={spacing[4]}
-          backgroundColor={colorPalette.lightSurface}
-          borderRadius={radius.md}
+          style={{ margin: spacing[4], padding: spacing[4], backgroundColor: colorPalette.surfacePrimary, borderRadius: radius.md }}
         >
           <Text role="bodySm" style={styles.cartNotice}>
             تم الاحتفاظ بعناصر سلتك — يمكنك إعادة المحاولة دون إعادة الإضافة.
@@ -104,10 +101,7 @@ export function DshCheckoutFailureScreen({
       )}
 
       <Box
-        margin={spacing[4]}
-        padding={spacing[4]}
-        backgroundColor={colorPalette.lightSurface}
-        borderRadius={radius.md}
+        style={{ margin: spacing[4], padding: spacing[4], backgroundColor: colorPalette.surfacePrimary, borderRadius: radius.md }}
       >
         <Text role="titleSm" style={styles.boundaryTitle}>حدود الدفع والاسترداد</Text>
         <Text role="bodySm" style={styles.boundaryBody}>
@@ -116,11 +110,11 @@ export function DshCheckoutFailureScreen({
       </Box>
 
       <Box padding={spacing[4]} style={styles.actions}>
-        <Button label="إعادة المحاولة" tone="primary" onPress={onRetry} style={styles.button} />
+        <Button label="إعادة المحاولة" tone="primary" onPress={onRetry} style={styles.actionButton} />
         {(failureReason === 'policy_block' || failureReason === 'fraud_hold') && (
-          <Button label="التواصل مع الدعم" tone="secondary" onPress={onContactSupport} style={styles.button} />
+          <Button label="التواصل مع الدعم" tone="secondary" onPress={onContactSupport} style={styles.actionButton} />
         )}
-        <Button label="إلغاء والعودة للسلة" tone="ghost" onPress={onCancel} style={styles.button} />
+        <Button label="إلغاء والعودة للسلة" tone="ghost" onPress={onCancel} style={styles.actionButton} />
       </Box>
     </Surface>
   );
@@ -132,21 +126,19 @@ const styles = StyleSheet.create({
     backgroundColor: colorPalette.white,
   },
   cartNotice: {
-    color: colorPalette.deepBlue,
-    lineHeight: 20,
+    color: colorPalette.brandStrong,
   },
   boundaryTitle: {
-    color: colorPalette.deepBlue,
+    color: colorPalette.brandStrong,
     marginBottom: spacing[1],
   },
   boundaryBody: {
-    color: colorPalette.deepBlueLighter,
-    lineHeight: 20,
+    color: colorPalette.textSecondary,
   },
   actions: {
     gap: spacing[3],
   },
-  button: {
+  actionButton: {
     width: '100%',
   },
 });

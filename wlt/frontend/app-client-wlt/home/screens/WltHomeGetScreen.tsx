@@ -1,8 +1,9 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, TopBar, amountToArabicText, useBThwaniAppearance, useI18n } from '@bthwani/ui-kit';
-import { financeProviders } from '../../../dsh/control-panel/financeContracts';
-import { createWltDshTypedClient } from '../../../dsh/contracts';
+import { ScreenWrapper, Card, Text, AmountInput, PaymentMethodList, Button, Icon, TopBar, amountToArabicText, useBThwaniAppearance, useI18n,
+  spacing,
+} from '@bthwani/ui-kit';
+import { financeProviders, createWltDshTypedClient, type FinanceProvider, generatePaymentSessionIds } from '../../../dsh/shared';
 
 export const WltHomeGetScreen: React.FC<{
   onBack?: () => void;
@@ -18,10 +19,12 @@ export const WltHomeGetScreen: React.FC<{
   };
 
   const [amount, setAmount] = useState('');
-  const [balance, setBalance] = useState<number>(0.0);
+  const [balance, setBalance] = useState<number | null>(null);
   const [method, setMethod] = useState<string | undefined>(undefined);
   const [state, setState] = useState<'content' | 'loading' | 'success' | 'error'>('content');
+  const [offline, setOffline] = useState(false);
   const [trigger, setTrigger] = useState(0);
+  const retry = React.useCallback(() => setTrigger((n) => n + 1), []);
 
   const activeClientId = dshClientId || 'client-demo';
 
@@ -32,14 +35,20 @@ export const WltHomeGetScreen: React.FC<{
 
   React.useEffect(() => {
     let active = true;
+    setOffline(false);
     client.getClientWalletSummary(activeClientId)
       .then((summary) => {
         if (active) {
           setBalance(summary.balance);
+          setOffline(false);
         }
       })
       .catch((err) => {
         console.error('Failed to fetch balance:', err);
+        if (active) {
+          const isOffline = !globalThis.navigator?.onLine || (err instanceof TypeError && /network|fetch/i.test(String(err)));
+          setOffline(isOffline);
+        }
       });
     return () => { active = false; };
   }, [client, activeClientId, trigger]);
@@ -48,23 +57,24 @@ export const WltHomeGetScreen: React.FC<{
   const canSubmit = topupAmount > 0 && !!method;
 
   const methods = useMemo(() => (
-    financeProviders.map((p) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
+    financeProviders.map((p: FinanceProvider) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
   ), [t]);
 
   const handleTopup = async () => {
     if (!canSubmit) return setState('error');
     setState('loading');
+    const { checkoutIntentId, idempotencyKey, confirmationRef } = generatePaymentSessionIds('topup');
     try {
       const session = await client.createClientPaymentSession({
-        checkout_intent_id: `topup-${Date.now()}`,
+        checkout_intent_id: checkoutIntentId,
         client_id: activeClientId,
         amount: topupAmount,
         currency: 'YER',
         payment_method: method ?? 'wallet',
-        idempotency_key: `topup-idem-${Date.now()}-${topupAmount}`,
+        idempotency_key: idempotencyKey,
       });
 
-      await client.confirmPaymentSession(session.id, `ref-topup-${Date.now()}`);
+      await client.confirmPaymentSession(session.id, confirmationRef);
 
       setState('success');
       setTrigger((t) => t + 1);
@@ -97,7 +107,10 @@ export const WltHomeGetScreen: React.FC<{
     }
   };
 
-  const formattedBalance = new Intl.NumberFormat('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(balance);
+  const isEmpty = balance === null && !offline;
+  const formattedBalance = balance !== null
+    ? new Intl.NumberFormat('ar-EG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(balance)
+    : '—';
 
   return (
     <View style={{ flex: 1 }}>
@@ -108,10 +121,19 @@ export const WltHomeGetScreen: React.FC<{
         <Card
           title={tr('wlt.home.balanceTitle', 'رصيدك')}
           subtitle={tr('wlt.home.balanceSubtitle', '')}
-          style={{ margin: 16, padding: 20 }}
+          style={{ margin: spacing[4], padding: spacing[5] }}
         >
-          <Text role="titleLg" style={{ textAlign: 'center', marginTop: 8 }}>{formattedBalance} {tr('wlt.currency', 'ريال')}</Text>
+          <Text role="titleLg" style={{ textAlign: 'center', marginTop: spacing[2] }}>{formattedBalance} {tr('wlt.currency', 'ريال')}</Text>
         </Card>
+
+        {offline && (
+          <Card title={tr('wlt.home.offlineTitle', 'لا يوجد اتصال بالشبكة')}>
+            <Button label={tr('wlt.home.retry', 'إعادة المحاولة')} tone="secondary" onPress={retry} size="sm" />
+          </Card>
+        )}
+        {isEmpty && !offline && (
+          <Card title={tr('wlt.home.emptyBalance', 'جارٍ تحميل الرصيد…')} subtitle="" />
+        )}
 
         {/* CTA below the card (pill) */}
         <View style={{ alignItems: 'center' }}>
@@ -122,23 +144,23 @@ export const WltHomeGetScreen: React.FC<{
             fullWidth={false}
             size="md"
             leadingAccessory={<Icon name="add-outline" size={18} color={tokens.components.buttons.primary.default.iconColor} />}
-            style={{ width: 220, marginTop: 8, alignSelf: 'center' }}
+            style={{ width: 220, marginTop: spacing[2], alignSelf: 'center' }}
           />
         </View>
 
         {isTopupOpen && (
           <View onLayout={(e) => setAmountY(e.nativeEvent.layout.y)}>
-            <Text role="titleSm" style={{ marginHorizontal: 16, marginTop: 12 }}>{tr('wlt.topup.inlineTitle', 'اشحن الآن')}</Text>
-            <View style={{ alignItems: 'center', marginTop: 8 }}>
+            <Text role="titleSm" style={{ marginHorizontal: 16, marginTop: spacing[3] }}>{tr('wlt.topup.inlineTitle', 'اشحن الآن')}</Text>
+            <View style={{ alignItems: 'center', marginTop: spacing[2] }}>
               <View style={{ width: 160 }}>
                 <AmountInput value={amount} onChange={setAmount} placeholder="0.00" currencyLabel={tr('wlt.currency', 'ريال')} />
               </View>
             </View>
             <PaymentMethodList methods={methods} selectedId={method} onSelect={setMethod} />
 
-            {topupAmount > 0 ? <Text role="caption" tone="muted" style={{ textAlign: 'center', marginTop: 8 }}>{amountToArabicText(topupAmount, (k) => tr(k))}</Text> : null}
+            {topupAmount > 0 ? <Text role="caption" tone="muted" style={{ textAlign: 'center', marginTop: spacing[2] }}>{amountToArabicText(topupAmount, (k) => tr(k))}</Text> : null}
 
-            <Button label={tr('wlt.topup.confirmCta', 'تأكيد الشحن')} onPress={handleTopup} disabled={!canSubmit} style={{ margin: 16 }} />
+            <Button label={tr('wlt.topup.confirmCta', 'تأكيد الشحن')} onPress={handleTopup} disabled={!canSubmit} style={{ margin: spacing[4] }} />
           </View>
         )}
       </ScrollView>

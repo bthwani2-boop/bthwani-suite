@@ -1,7 +1,10 @@
 import * as React from 'react';
 import { FlatList, Image, Modal, Pressable, StatusBar, StyleSheet, View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react-native';
-import { Box, Icon, Text, colorPalette } from '@bthwani/ui-kit';
-import type { MarketingVideoRecord } from '../../data/marketing.preview-data';
+import { Box, Icon, Text, colorPalette, shadowPresets,
+  radius,
+  spacing,
+} from '@bthwani/ui-kit';
+import type { MarketingVideoRecord } from '../../shared/marketing/marketing.types';
 
 import { usePlatformVars } from '../../shared';
 
@@ -76,7 +79,7 @@ function resolveExpoAv(): ExpoAvModule | null {
 	}
 }
 
-export function DshHomeApprovedVideoReelsViewer({
+function DshHomeApprovedVideoReelsViewer({
 	visible,
 	items,
 	initialIndex = 0,
@@ -149,7 +152,7 @@ export function DshHomeApprovedVideoReelsViewer({
 						<Icon name="close" size={20} color={colorPalette.white} />
 					</Pressable>
 					<Box gap={2} style={styles.emptyCard}>
-						<Text role="titleSm" style={styles.emptyTitle}>لا توجد فيديوهات معتمدة بعد</Text>
+						<Text role="titleSm" weight="black" style={styles.emptyTitle}>لا توجد فيديوهات معتمدة بعد</Text>
 						<Text role="bodySm" style={styles.emptyBody}>
 							يرفع الشريك الفيديوهات أولًا، ثم تعتمدها التسويق قبل أن تظهر هنا في تطبيق العميل.
 						</Text>
@@ -209,24 +212,24 @@ export function DshHomeApprovedVideoReelsViewer({
 
 										<View style={styles.mediaHeader}>
 											<View style={styles.mediaTag}>
-												<Text role="caption" style={styles.mediaTagText}>فيديو معتمد</Text>
+												<Text role="caption" weight="black" style={styles.mediaTagText}>فيديو معتمد</Text>
 											</View>
-											<Text role="caption" style={styles.mediaSwipeHint}>اسحب للأعلى أو للأسفل</Text>
+											<Text role="caption" weight="bold" style={styles.mediaSwipeHint}>اسحب للأعلى أو للأسفل</Text>
 										</View>
 
 										<View style={styles.mediaBody}>
 											<Box gap={2} style={styles.cardBody}>
-												<Text role="titleSm" style={styles.title} numberOfLines={2}>{item.title}</Text>
+												<Text role="titleSm" weight="black" style={styles.title} numberOfLines={2}>{item.title}</Text>
 												<Text role="bodySm" style={styles.subtitle} numberOfLines={3}>{item.subtitle}</Text>
-												<Text role="bodySm" style={styles.highlight} numberOfLines={2}>{item.highlight}</Text>
+												<Text role="bodySm" weight="bold" style={styles.highlight} numberOfLines={2}>{item.highlight}</Text>
 
 												<Pressable
-													style={[styles.ctaButton, { backgroundColor: item.accentColor }]}
+													style={[styles.ctaButton, { backgroundColor: (item as any).accentColor ?? colorPalette.accentOrange }]}
 													onPress={() => onCtaPress(item)}
 													accessibilityRole="button"
 													accessibilityLabel={item.ctaLabel}
 												>
-													<Text role="bodyMd" style={styles.ctaText}>{item.ctaLabel}</Text>
+													<Text role="bodyMd" weight="black" style={styles.ctaText}>{item.ctaLabel}</Text>
 													<Icon name="arrow-back" size={18} color={colorPalette.white} />
 												</Pressable>
 											</Box>
@@ -249,8 +252,8 @@ const styles = StyleSheet.create({
 	},
 	slideShell: {
 		width: '100%',
-		paddingHorizontal: 12,
-		paddingVertical: 12,
+		paddingHorizontal: spacing[3],
+		paddingVertical: spacing[3],
 	},
 	slideCard: {
 		flex: 1,
@@ -285,26 +288,24 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'space-between',
-		gap: 12,
+		gap: spacing[3],
 	},
 	mediaTag: {
 		paddingHorizontal: 10,
 		paddingVertical: 6,
-		borderRadius: 999,
+		borderRadius: radius.pill,
 		backgroundColor: applyAlpha(colorPalette.black, 0.58),
 		borderWidth: 1,
 		borderColor: applyAlpha(colorPalette.white, 0.14),
 	},
 	mediaTagText: {
 		color: colorPalette.white,
-		fontWeight: '800',
 	},
 	mediaSwipeHint: {
 		color: applyAlpha(colorPalette.white, 0.84),
-		fontWeight: '700',
 		textAlign: 'right',
 		backgroundColor: applyAlpha(colorPalette.black, 0.42),
-		borderRadius: 999,
+		borderRadius: radius.pill,
 		paddingHorizontal: 10,
 		paddingVertical: 6,
 	},
@@ -313,7 +314,7 @@ const styles = StyleSheet.create({
 		left: 0,
 		right: 0,
 		bottom: 0,
-		padding: 16,
+		padding: spacing[4],
 	},
 	cardBody: {
 		gap: 10,
@@ -333,44 +334,36 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		color: colorPalette.white,
-		fontWeight: '900',
 	},
 	subtitle: {
 		color: applyAlpha(colorPalette.white, 0.92),
-		lineHeight: 22,
 	},
 	highlight: {
 		color: applyAlpha(colorPalette.white, 0.86),
-		fontWeight: '700',
 	},
 	ctaButton: {
 		minHeight: 52,
-		borderRadius: 16,
+		borderRadius: radius.md2,
 		flexDirection: 'row-reverse',
 		alignItems: 'center',
 		justifyContent: 'center',
-		gap: 8,
-		shadowColor: colorPalette.black,
-		shadowOpacity: 0.22,
-		shadowRadius: 12,
-		shadowOffset: { width: 0, height: 6 },
-		elevation: 5,
+		gap: spacing[2],
+		...shadowPresets.raised,
 	},
 	ctaText: {
 		color: colorPalette.white,
-		fontWeight: '900',
 	},
 	emptyContainer: {
 		flex: 1,
 		backgroundColor: colorPalette.black,
 		justifyContent: 'center',
 		alignItems: 'center',
-		padding: 24,
+		padding: spacing[6],
 	},
 	emptyCard: {
 		width: '100%',
 		maxWidth: 420,
-		padding: 20,
+		padding: spacing[5],
 		borderRadius: 28,
 		backgroundColor: applyAlpha(colorPalette.black, 0.76),
 		borderWidth: 1,
@@ -378,11 +371,9 @@ const styles = StyleSheet.create({
 	},
 	emptyTitle: {
 		color: colorPalette.white,
-		fontWeight: '900',
 	},
 	emptyBody: {
 		color: applyAlpha(colorPalette.white, 0.88),
-		lineHeight: 22,
 	},
 });
 

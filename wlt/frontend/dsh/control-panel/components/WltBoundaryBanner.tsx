@@ -3,7 +3,7 @@
 // All financial truth (settlement / payout / refund / commission / platform-fee) is owned by WLT.
 import React from 'react';
 import { Box, Chip, KeyValueList, Text } from '@bthwani/ui-kit';
-import type { DshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/dshFinancePreviewModel';
+import type { DshWltFinanceBoundaryRecord } from '../../../../../dsh/frontend/shared/finance-boundary';
 
 const CONTRACT_STATUS_CHIP_TONES: Record<
   DshWltFinanceBoundaryRecord['contractStatus'],

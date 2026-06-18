@@ -1,6 +1,15 @@
 # BThwani Graphify Contract
 
-Graphify is an agent-neutral navigation layer for `C:\bthwani-suite`.
+Graphify is an agent-neutral **context and navigation layer** for `C:\bthwani-suite`.
+
+## Role
+
+Graphify = Context / Navigation / Impact Discovery.
+Graphify ≠ Toolchain leader.
+Graphify ≠ Acceptance evidence.
+Graphify ≠ Final proof of any kind.
+
+For tool and guard selection, use `bthwani-evidence-gate-router-contract` (`.agents/EVIDENCE_GATE_ROUTER.md`).
 
 ## Scope
 
@@ -9,23 +18,43 @@ Graphify is an agent-neutral navigation layer for `C:\bthwani-suite`.
 - Uses exact repository files as final proof.
 - Keeps `graphify-out/` untracked unless a human explicitly approves tracking generated graph output.
 
-## Required Use
+## Use Graphify when
 
-For repository architecture, ownership, route, dependency, import/export, UI-kit, DSH data/media, or cross-surface questions:
+- Where something lives in the repo
+- Dependency or path questions (import/export chains)
+- Cross-surface impact discovery before making a change
+- Narrowing the file set before running targeted analysis tools
 
-1. Start from `C:\bthwani-suite`.
-2. Run a focused Graphify command before broad raw-file search:
-   - `graphify query "<focused question>"`
-   - `graphify path "<A>" "<B>"`
-   - `graphify explain "<concept>"`
-3. Read the exact files surfaced by Graphify before recommending or editing.
-4. Treat Graphify as navigation only, not acceptance evidence.
+## Do NOT use Graphify when
+
+- Final acceptance decision → evidence pack only
+- Security proof → Semgrep / Trivy / Checkov / CodeQL (PR/release only)
+- Type proof → `tsc`
+- Runtime proof → Playwright / Cucumber
+- UI proof → screenshots / Playwright / react-scanner
+- API contract proof → Spectral / openapi-typescript
+- Dependency safety proof → dependency-cruiser / madge / sherif
+- Every task by default → Graphify is optional, not mandatory
+
+## Optional Use
+
+Graphify is **not required for every task**. Use it only when cross-file scope is unknown or a relationship question is present. Do not read Graphify docs or run Graphify commands on docs-only, agents-only, governance-only, or single-file tasks.
+
+## Focused Commands
+
+    Set-Location -LiteralPath "C:\bthwani-suite"
+    graphify query "<focused question>"
+    graphify path "<A>" "<B>"
+    graphify explain "<concept>"
 
 ## Update Path
 
-- After code changes, run `graphify update .` when the change affects code structure or imports.
-- Do not run full semantic extraction unless the human explicitly asks.
-- Existing Git hooks keep Graphify current after commit, checkout, and merge for any agent using this repo.
+- Do NOT run `graphify update .` by default after every code change.
+- Run `graphify update .` (or a focused update) only when:
+  1. The task modified code structure or imports, AND
+  2. Subsequent steps in the same session require accurate graph navigation, AND
+  3. There is explicit justification for the update.
+- Existing Git hooks keep Graphify current after commit, checkout, and merge for agents using this repo.
 - `.codex/hooks.json` is Codex-specific only; it does not replace this shared `.agents` contract.
 
 ## Acceptance

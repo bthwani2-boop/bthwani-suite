@@ -23,39 +23,31 @@ import {
   StoreHero,
   TopBar,
   ListItem,
+  radius,
+  spacing,
+  typographyRoles,
 } from '@bthwani/ui-kit';
 import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
 import {
   getWltDshPartnerCommissionLabel,
   getWltDshPartnerOperationalModeCommission,
   wltDshPartnerUiCopy,
-} from '../../../../wlt/frontend/dsh/app-partner/wlt-dsh-partner.ui-copy';
+} from '../../shared/wlt/generated/wlt_frontend_dsh_app_partner_wlt_dsh_partner_ui_copy.facade';
 import { useAppPartnerAppearance } from '../../../../app-partner/shell/appearance';
-import { canonicalPreviewStores, getCanonicalPreviewStoreCard } from '../../data/canonical.preview-data';
-import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/dsh-client-visibility.model';
-import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/workflow';
-import { WltDshPartnerBridge, wltDshPartnerPreviewData } from '../../../../wlt/frontend/dsh/app-partner';
-import type { DshFulfillmentDeliveryMode } from '../../app-client/contracts/dsh-client-binding.contracts';
+import type { DshCanonicalStoreCard } from '../../shared/products';
+import { mapPublishStageToPartnerActivationStatus, resolveDshStoreClientVisibility } from '../../shared/stores/dsh-client-visibility.model';
+import { dshPromotionCandidates, type DshPromotionCandidate } from '../../shared/stores/partner/partner.workflow';
+import { WltDshPartnerBridge } from '../../shared/wlt/generated/wlt_frontend_dsh_app_partner.facade';
+import type { DshFulfillmentDeliveryMode } from '../../shared/orders';
 import type { DshPartnerHubSurfaceProps, PartnerHubSection } from '../dsh-partner.types';
-import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared';
-import {
-  partnerTeamPreviewMembers,
-  partnerCoveragePreviewZones,
-  dshPartnerAnalyticsPreview,
-  type PartnerTeamMember,
-  type PartnerCoverageZone,
-  type PartnerTeamStatus,
-  type PartnerTeamRole,
-  type PartnerCoverageZoneStatus,
-} from '../../data';
+import { getDshControlPanelGovernanceEntry, resolveDshControlPanelSectionLabel } from '../../shared/runtime/dsh-control-panel-governance.map';
 import {
   getDshPartnerJourneyStep,
   resolveDshPartnerLifecycleStageLabel,
   type DshPartnerLifecycleStage,
-} from '../../shared/dsh-partner-onboarding-journey.map';
-import { getDshPartnerActivationStatusLabel } from '../../shared/dsh-partner-activation.model';
-import { createDshMediaApiHttpClient, type DshMediaAsset } from '../../shared/dsh-media-api.client';
-import { resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
+} from '../../shared/stores/partner/partner.journey';
+import { getDshPartnerActivationStatusLabel } from '../../shared/stores/partner/dsh-partner-activation.model';
+import { useDshEntityMedia } from '../../shared/media/useDshEntityMedia';
 import { InventoryCatalogScreen } from './InventoryCatalogScreen';
 import { PromotionsScreen } from './PromotionsScreen';
 import { StoreProfileScreen } from './StoreProfileScreen';
@@ -80,7 +72,7 @@ type SummaryItem = {
   id: string;
   label: string;
   value: string;
-  tone?: 'default' | 'brand' | 'success' | 'warning' | 'info';
+  tone?: 'default' | 'brand' | 'success' | 'warning' | 'info' | 'danger';
 };
 
 type NotificationPreferenceId =
@@ -95,6 +87,65 @@ type NotificationPreferenceId =
   | 'priorityOnly';
 
 type NotificationPreferenceState = Record<NotificationPreferenceId, boolean>;
+
+type PartnerTeamRole = 'owner' | 'supervisor' | 'staff' | 'courier';
+type PartnerTeamStatus = 'active' | 'paused' | 'invited' | 'blocked' | 'review-needed';
+
+type PartnerTeamMember = {
+  id: string;
+  name: string;
+  role: PartnerTeamRole;
+  roleLabel: string;
+  status: PartnerTeamStatus;
+  statusLabel: string;
+  branchAssignment: string;
+  permissionsSummary: string;
+  deliveryAssignment: string;
+  inviteLifecycle: string;
+  operationalImpact: string;
+  auditNote: string;
+  inlineActionLabel: string;
+};
+
+type PartnerCoverageZoneStatus = 'active' | 'pending' | 'blocked';
+
+type PartnerCoverageZone = {
+  id: string;
+  name: string;
+  status: PartnerCoverageZoneStatus;
+  statusLabel: string;
+  branchRelation: string;
+  serviceModeRelation: string;
+  policySummary: string;
+  policyReason: string;
+  operationalImpact: string;
+  pricingReference: string;
+  commissionReference: string;
+  payoutReference: string;
+  reviewActionLabel: string;
+  auditNote: string;
+};
+
+const runtimePartnerTeamMembers: readonly PartnerTeamMember[] = [];
+const runtimePartnerCoverageZones: readonly PartnerCoverageZone[] = [];
+
+const runtimePartnerAnalytics = {
+  storeFavoritesCount: 0,
+  productFavoritesCount: 0,
+  followersCount: 0,
+  totalRatings: 0,
+  averageRating: 0,
+  topOrderedProduct: { name: 'لا توجد بيانات تشغيلية', ordersCount: 0 },
+  topFavoritedProduct: { name: 'لا توجد بيانات تشغيلية', favoritesCount: 0 },
+  topViewedProduct: { name: 'لا توجد بيانات تشغيلية', viewsCount: 0 },
+  opportunityProduct: {
+    name: 'لا توجد بيانات تشغيلية',
+    favoritesCount: 0,
+    ordersCount: 0,
+    insight: 'اربط التحليلات بمسار API أو Control Panel قبل عرض فرص تسويقية تشغيلية.',
+  },
+  smartRecommendation: 'لا توجد توصية تشغيلية قبل ربط analytics runtime.',
+} as const;
 
 
 
@@ -289,6 +340,8 @@ function PromotionCandidateRow({
   selected: boolean;
   onPress: () => void;
 }) {
+  const { theme } = useTheme();
+  const { direction } = useDirection();
   const tone = item.eligibility === 'eligible' ? 'success' : item.eligibility === 'review' ? 'warning' : 'danger';
 
   const statusLabel =
@@ -304,25 +357,38 @@ function PromotionCandidateRow({
     'default';
 
   return (
-    <Surface tone="default" padding={3} gap={2} style={{ borderWidth: 1, borderColor: selected ? colorPalette.brand : undefined }}>
-      <Box gap={1}>
-        <Text role="bodyStrong">{item.title}</Text>
-        <Text role="bodySm" tone="muted">{item.subtitle}</Text>
-      </Box>
+    <Pressable onPress={onPress}>
+      <Box
+        padding={3}
+        gap={2}
+        background={selected ? 'surfaceRaised' : 'surface'}
+        radiusToken="md"
+        elevationToken={selected ? 'raised' : 'flat'}
+        border={false}
+        style={{
+          borderStartWidth: 4,
+          borderStartColor: selected ? theme.brand : 'transparent',
+        }}
+      >
+        <Box gap={1}>
+          <Text role="bodyStrong" align="start">{item.title}</Text>
+          <Text role="bodySm" tone="muted" align="start">{item.subtitle}</Text>
+        </Box>
 
-      <Box gap={1}>
-        <Text role="caption" tone="muted">{item.availability}</Text>
-        <Text role="caption" tone="muted">{item.offerHint}</Text>
-      </Box>
+        <Box gap={1}>
+          <Text role="caption" tone="muted" align="start">{item.availability}</Text>
+          <Text role="caption" tone="muted" align="start">{item.offerHint}</Text>
+        </Box>
 
-      <Box layoutDirection="row" style={{ flexWrap: 'wrap' }} gap={2}>
-        <Chip label={item.kind === 'product' ? 'منتج' : 'متجر'} tone="brand" selected />
-        <Chip label={item.eligibility === 'eligible' ? 'مؤهل' : item.eligibility === 'review' ? 'تحت المراجعة' : 'محجوب'} tone={tone} />
-        <Chip label={statusLabel} tone={statusTone} />
-      </Box>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap' }} gap={2}>
+          <Chip label={item.kind === 'product' ? 'منتج' : 'متجر'} tone="brand" selected />
+          <Chip label={item.eligibility === 'eligible' ? 'مؤهل' : item.eligibility === 'review' ? 'تحت المراجعة' : 'محجوب'} tone={tone} />
+          <Chip label={statusLabel} tone={statusTone} />
+        </Box>
 
-      <Button label={selected ? 'العنصر مفتوح' : 'اختيار العنصر'} tone={selected ? 'secondary' : 'ghost'} fullWidth={false} onPress={onPress} />
-    </Surface>
+        <Button label={selected ? 'العنصر مفتوح' : 'اختيار العنصر'} tone={selected ? 'secondary' : 'ghost'} fullWidth={false} onPress={onPress} />
+      </Box>
+    </Pressable>
   );
 }
 
@@ -365,7 +431,7 @@ function PromotionIntentPanel({
           هذه الشاشة تلتقط نية الترويج فقط: اختيار العنصر، وصف العرض، وتحديد حالة الإرسال.
         </Text>
 
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap' }} gap={2}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap' }} gap={2}>
           <Chip label={storeName} tone="brand" />
           <Chip label={branchLabel} tone="info" />
           <Chip label={activeZoneLabel} tone="success" />
@@ -403,7 +469,7 @@ function PromotionIntentPanel({
           <TextField label="ملاحظات النية" value={offerNote} onChangeText={setOfferNote} placeholder="وصف مختصر للعرض أو سبب الترويج" multiline />
         </Box>
 
-        <Box padding={3} gap={2} style={{ backgroundColor: colorPalette.line + '11', borderRadius: 12 }}>
+        <Box padding={3} gap={2} style={{ backgroundColor: colorPalette.line + '11', borderRadius: radius.sm2 }}>
           <Text role="bodyStrong">آخر رسالة</Text>
           <Text role="bodySm" tone="muted">{actionMessage}</Text>
         </Box>
@@ -431,11 +497,13 @@ function SummaryCell({ label, value, tone = 'default' }: Omit<SummaryItem, 'id'>
       ? theme.success
       : tone === 'warning'
         ? theme.warning
-        : tone === 'brand'
-          ? theme.brand
-          : tone === 'info'
-            ? theme.info
-            : theme.lineStrong;
+        : tone === 'danger'
+          ? theme.danger
+          : tone === 'brand'
+            ? theme.brand
+            : tone === 'info'
+              ? theme.info
+              : theme.lineStrong;
 
   return (
     <Box
@@ -489,7 +557,7 @@ function SettingsOptionRow({
       style={({ pressed }) => [
         {
           width: '100%',
-          paddingHorizontal: 16,
+          paddingHorizontal: spacing[4],
           paddingVertical: compact ? 10 : 14,
           backgroundColor: pressed ? theme.surfaceInset : theme.surface,
           borderBottomWidth: last ? 0 : 1,
@@ -507,7 +575,7 @@ function SettingsOptionRow({
               style={{
                 width: 40,
                 height: 40,
-                borderRadius: 14,
+                borderRadius: radius.md,
                 alignItems: 'center',
                 justifyContent: 'center',
                 backgroundColor: theme.surfaceInset,
@@ -583,18 +651,18 @@ function HubSectionShell({
         style={{
           flexDirection: rowDirection,
           alignItems: 'center',
-          gap: 12,
-          paddingBottom: 4,
+          gap: spacing[3],
+          paddingBottom: spacing[1],
           borderBottomWidth: 1,
           borderBottomColor: theme.line,
-          marginBottom: 4,
+          marginBottom: spacing[1],
         }}
       >
         <View
           style={{
             width: 40,
             height: 40,
-            borderRadius: 14,
+            borderRadius: radius.md,
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: theme.brandSurface,
@@ -612,7 +680,7 @@ function HubSectionShell({
         </Text>
       </View>
 
-      <View style={{ gap: 16 }}>
+      <View style={{ gap: spacing[4] }}>
         {children}
       </View>
     </MobileScrollView>
@@ -643,11 +711,11 @@ function HubNavRow({
       style={({ pressed }) => ({
         flexDirection: rowDirection,
         alignItems: 'center',
-        paddingHorizontal: 16,
+        paddingHorizontal: spacing[4],
         paddingVertical: 14,
-        borderRadius: 16,
+        borderRadius: radius.md2,
         backgroundColor: pressed ? theme.surfaceInset : theme.surfaceRaised,
-        gap: 12,
+        gap: spacing[3],
         borderWidth: 1,
         borderColor: theme.line,
       })}
@@ -657,7 +725,7 @@ function HubNavRow({
         style={{
           flexDirection: rowDirection,
           alignItems: 'center',
-          gap: 12,
+          gap: spacing[3],
           flex: 1,
           minWidth: 0,
         }}
@@ -666,7 +734,7 @@ function HubNavRow({
           style={{
             width: 44,
             height: 44,
-            borderRadius: 14,
+            borderRadius: radius.md,
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: theme.brandSurface,
@@ -750,7 +818,7 @@ function OperationsModeRow({
       style={({ pressed }) => [
         {
           width: '100%',
-          paddingHorizontal: 16,
+          paddingHorizontal: spacing[4],
           paddingVertical: 14,
           backgroundColor: pressed ? theme.surfaceInset : theme.surface,
           borderBottomWidth: 1,
@@ -799,7 +867,7 @@ function OperationsModeRow({
           </View>
         </View>
 
-        <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 4, marginEnd: 10 }}>
+        <View style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: spacing[1], marginEnd: 10 }}>
           <Chip label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
           <Text role="caption" tone="muted">
             {getWltDshPartnerCommissionLabel(mode.commission)}
@@ -841,9 +909,9 @@ function OperationsPanel({
 }) {
   const { direction } = useDirection();
   const { theme } = useTheme();
-  const teamMembers = partnerTeamPreviewMembers;
-  const coverageZones = partnerCoveragePreviewZones;
-  const [selectedModeId, setSelectedModeId] = React.useState<PartnerOperationalMode['id']>('pickup');
+  const teamMembers = runtimePartnerTeamMembers;
+  const coverageZones = runtimePartnerCoverageZones;
+  const [selectedModeId, setSelectedModeId] = React.useState<PartnerOperationalMode['id'] | ''>('pickup');
   const [modeOverrides, setModeOverrides] = React.useState<Partial<Record<PartnerOperationalMode['id'], boolean>>>({});
   const [teamPanelOpen, setTeamPanelOpen] = React.useState(false);
   const [coveragePanelOpen, setCoveragePanelOpen] = React.useState(false);
@@ -882,17 +950,10 @@ function OperationsPanel({
         title="المتجر والفريق"
         subtitle={`${storeName} · ${branchLabel}`}
         style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={{
-          id: 'back',
-          icon: <Icon name="arrow-back" size={24} tone="brand" />,
-          mirrorInRtl: true,
-          accessibilityLabel: 'رجوع',
-          onPress: onBack,
-        }}
       />
 
       <Box gap={3} paddingY={2}>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <Box layoutDirection="row" style={{ alignItems: 'flex-start', justifyContent: 'space-between', gap: spacing[3] }}>
           <Box style={{ gap: 2, flex: 1, minWidth: 0, alignItems: 'flex-start' }}>
             <Text role="label" tone="muted" align="start">
               الحالة التشغيلية
@@ -907,13 +968,13 @@ function OperationsPanel({
           <Badge label={storeOpen ? 'مفتوح الآن' : 'مغلق الآن'} tone={storeOpen ? 'success' : 'warning'} />
         </Box>
 
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <SummaryCell label="الحالة" value={storeOpen ? 'مفتوح' : 'مغلق'} tone={storeOpen ? 'success' : 'warning'} />
           <SummaryCell label="الظهور" value={visibilityLabel} tone={listingEnabled ? 'brand' : 'warning'} />
           <SummaryCell label="الأوضاع" value={`${activeModesCount}/3`} tone={activeModesCount > 0 ? 'info' : 'warning'} />
         </Box>
 
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <Chip label={`ساعات العمل: ${todayHoursLabel}`} tone="default" selected />
           <Chip label={`التغطية: ${zoneStatusSummary}`} tone="default" selected />
           {onOpenStoreCourierSetup ? (
@@ -922,7 +983,7 @@ function OperationsPanel({
         </Box>
 
         <Text role="caption" tone="muted" align="start">
-          UI_PREVIEW_ONLY · التنفيذ المحلي هنا. التسعير والتسويات مركزيًا في WLT/Finance.
+          التسعير والتسويات مركزيًا في WLT/Finance. (ربط WLT قيد التنفيذ — J-010)
         </Text>
       </Box>
 
@@ -930,7 +991,7 @@ function OperationsPanel({
 
       <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align="start">الظهور ونقاط الخدمة</Text>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <Chip label={`الظهور: ${visibilityLabel}`} tone={listingEnabled ? 'success' : 'warning'} />
           <Chip label={`النطاق: ${branchLabel}`} tone="default" />
           <Chip label={`المنطقة: ${activeZoneLabel}`} tone="default" />
@@ -938,9 +999,9 @@ function OperationsPanel({
           <Chip label={`الحالة: ${getDshPartnerActivationStatusLabel(storeVisibility.activationStatus)}`} tone={storeVisibility.visible ? 'success' : 'warning'} />
         </Box>
 
-        <Box gap={1} style={{ marginTop: 4 }}>
+        <Box gap={1} style={{ marginTop: spacing[1] }}>
           {storeVisibility.checklist.map((check) => (
-            <Box key={check.id} style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
+            <Box key={check.id} layoutDirection="row" style={{ alignItems: 'center', gap: spacing[2], paddingVertical: spacing[1] }}>
               <Icon
                 name={check.satisfied ? 'checkmark-circle-outline' : 'close-circle-outline'}
                 size={16}
@@ -973,12 +1034,12 @@ function OperationsPanel({
                   style={({ pressed }) => ({
                     flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
                     alignItems: 'center',
-                    paddingVertical: 12,
-                    paddingHorizontal: 4,
+                    paddingVertical: spacing[3],
+                    paddingHorizontal: spacing[1],
                     backgroundColor: pressed ? theme.surfaceInset : undefined,
                   })}
                 >
-                  <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, flex: 1 }}>
+                  <Box layoutDirection="row" style={{ alignItems: 'center', gap: 10, flex: 1 }}>
                     <Icon
                       name={mode.id === 'pickup' ? 'hand-left-outline' : mode.id === 'partner_delivery' ? 'car-outline' : 'bicycle-outline'}
                       size={18}
@@ -989,7 +1050,7 @@ function OperationsPanel({
                       <Text role="bodySm" tone="muted" align="start">{mode.subtitle}</Text>
                     </Box>
                   </Box>
-                  <Box style={{ alignItems: 'center', flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8, marginEnd: 8 }}>
+                  <Box style={{ alignItems: 'center', flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: spacing[2], marginEnd: spacing[2] }}>
                     <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2 }}>
                       <Badge label={mode.enabled ? 'مفعّل' : 'غير مفعّل'} tone={mode.enabled ? 'success' : 'warning'} />
                       <Text role="caption" tone="muted">
@@ -1001,11 +1062,11 @@ function OperationsPanel({
                 </Pressable>
 
                 {isSelected && (
-                  <Box paddingHorizontal={4} paddingBottom={3} gap={2} style={{ paddingTop: 2 }}>
+                  <Box paddingX={4} gap={2} style={{ paddingTop: 2, paddingBottom: spacing[3] }}>
                     <Text role="caption" tone="muted" align="start">
                       حالة الوضع: {mode.enabled ? 'نشط ويستقبل الطلبات' : 'موقف مؤقتًا'}.
                     </Text>
-                    <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 8 }}>
+                    <Box layoutDirection="row" style={{ gap: spacing[2] }}>
                       <Button
                         label={mode.enabled ? 'إيقاف الوضع' : 'تفعيل الوضع'}
                         tone="secondary"
@@ -1040,7 +1101,7 @@ function OperationsPanel({
 
       {/* 5) Flat Team Section with inline expansion */}
       <Box gap={3} paddingY={2}>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <Box style={{ gap: 2, alignItems: 'flex-start' }}>
             <Text role="bodyStrong" align="start">الفريق</Text>
             <Text role="caption" tone="muted" align="start">{teamRoleSummary} · {teamStatusSummary}</Text>
@@ -1054,18 +1115,18 @@ function OperationsPanel({
           />
         </Box>
 
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <SummaryCell label="نشط" value={String(activeTeamCount)} tone="success" />
           <SummaryCell label="موقوف" value={String(pausedTeamCount)} tone="warning" />
           <SummaryCell label="قيد المراجعة" value={String(reviewTeamCount)} tone="info" />
         </Box>
 
         {teamPanelOpen && (
-          <Box gap={3} style={{ paddingHorizontal: 4, marginTop: 4 }}>
-            <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+          <Box gap={3} style={{ paddingHorizontal: spacing[1], marginTop: spacing[1] }}>
+            <Box layoutDirection="row" style={{ alignItems: 'center', gap: 6 }}>
               <Icon name="information-circle-outline" size={14} tone="muted" />
               <Text role="caption" tone="muted" align="start" style={{ flex: 1 }}>
-                UI_PREVIEW_ONLY · الأدوار والدعوات هنا محلية حتى يتصل Control Panel.
+                الأدوار والدعوات هنا محلية حتى يتصل مسار إدارة الأعضاء في Control Panel.
               </Text>
             </Box>
 
@@ -1078,17 +1139,17 @@ function OperationsPanel({
                 const isLastSupervisor = member.role === 'supervisor' && member.status === 'active' && activeSupervisorCount <= 1;
 
                 return (
-                  <Box key={member.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: 8 }}>
+                  <Box key={member.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: spacing[2] }}>
                     <Pressable
                       onPress={() => setSelectedMemberId(isMemberSelected ? '' : member.id)}
                       style={({ pressed }) => ({
                         flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
                         alignItems: 'center',
                         backgroundColor: pressed ? theme.surfaceInset : undefined,
-                        padding: 4,
+                        padding: spacing[1],
                       })}
                     >
-                      <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flexShrink: 1, minWidth: 0 }}>
+                      <Box layoutDirection="row" style={{ alignItems: 'center', gap: spacing[2], flexShrink: 1, minWidth: 0 }}>
                         <Icon
                           name={member.role === 'courier' ? 'bicycle-outline' : member.role === 'owner' ? 'shield-checkmark-outline' : member.role === 'supervisor' ? 'person-circle-outline' : 'person-outline'}
                           size={16}
@@ -1099,16 +1160,16 @@ function OperationsPanel({
                           <Text role="caption" tone="muted" align="start">{member.branchAssignment}</Text>
                         </Box>
                       </Box>
-                      <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2, marginStart: 8 }}>
+                      <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2, marginStart: spacing[2] }}>
                         <Badge label={member.roleLabel} tone={roleTone} />
                         <Badge label={member.statusLabel} tone={statusTone} />
                         <Text role="caption" tone="muted">{memberActionLabel}</Text>
                       </Box>
-                      <Icon name={isMemberSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: 8 }} />
+                      <Icon name={isMemberSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: spacing[2] }} />
                     </Pressable>
 
                     {isMemberSelected && (
-                      <Box paddingHorizontal={4} paddingTop={2} gap={2}>
+                      <Box paddingX={4} gap={2} style={{ paddingTop: spacing[3] }}>
                         <KeyValueList
                           dense
                           items={[
@@ -1161,13 +1222,13 @@ function OperationsPanel({
               })}
             </Box>
 
-            <Box gap={3} style={{ marginTop: 8 }}>
+            <Box gap={3} style={{ marginTop: spacing[2] }}>
               <TextField
                 label="اسم العضو أو البريد"
                 placeholder="مثال: staff@bthwani.sa"
                 value={inviteDraft}
                 onChangeText={setInviteDraft}
-                hint="UI_PREVIEW_ONLY · إنشاء دعوة محلية حتى يتصل مسار العضوية المركزي."
+                hint="إنشاء دعوة محلية — مسار العضوية المركزي قيد الربط (J-006)."
               />
               <Button
                 label="إضافة عضو"
@@ -1197,7 +1258,7 @@ function OperationsPanel({
 
       {/* 6) Flat Coverage Zones Section with inline expansion */}
       <Box gap={3} paddingY={2}>
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box layoutDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <Box style={{ gap: 2, alignItems: 'flex-start' }}>
             <Text role="bodyStrong" align="start">مناطق التغطية</Text>
             <Text role="caption" tone="muted" align="start">{zoneStatusSummary}</Text>
@@ -1211,15 +1272,15 @@ function OperationsPanel({
           />
         </Box>
 
-        <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+        <Box layoutDirection="row" style={{ flexWrap: 'wrap', gap: spacing[2] }}>
           <SummaryCell label="نشطة" value={String(activeZoneCount)} tone="success" />
           <SummaryCell label="قيد المراجعة" value={String(pendingZoneCount)} tone="warning" />
           <SummaryCell label="محجوبة" value={String(blockedZoneCount)} tone="danger" />
         </Box>
 
         {coveragePanelOpen && (
-          <Box gap={3} style={{ paddingHorizontal: 4, marginTop: 4 }}>
-            <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6 }}>
+          <Box gap={3} style={{ paddingHorizontal: spacing[1], marginTop: spacing[1] }}>
+            <Box layoutDirection="row" style={{ alignItems: 'center', gap: 6 }}>
               <Icon name="information-circle-outline" size={14} tone="warning" />
               <Text role="caption" tone="warning" align="start" style={{ flex: 1 }}>
                 المناطق تُدار مركزيًا من لوحة التحكم وWLT/Finance. الشريك يطلب مراجعة فقط ولا يبدل السياسة محليًا.
@@ -1236,32 +1297,32 @@ function OperationsPanel({
                 const statusTone = resolveZoneStatusTone(zone.status);
 
                 return (
-                  <Box key={zone.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: 8 }}>
+                  <Box key={zone.id} style={{ borderBottomWidth: 1, borderBottomColor: theme.line + '22', paddingVertical: spacing[2] }}>
                     <Pressable
                       onPress={() => setSelectedZoneId(isZoneSelected ? '' : zone.id)}
                       style={({ pressed }) => ({
                         flexDirection: direction === 'rtl' ? 'row-reverse' : 'row',
                         alignItems: 'center',
                         backgroundColor: pressed ? theme.surfaceInset : undefined,
-                        padding: 4,
+                        padding: spacing[1],
                       })}
                     >
-                      <Box style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, flexShrink: 1, minWidth: 0 }}>
+                      <Box layoutDirection="row" style={{ alignItems: 'center', gap: spacing[2], flexShrink: 1, minWidth: 0 }}>
                         <Icon name="location-outline" size={16} tone="brand" />
                         <Box style={{ gap: 2, flexShrink: 1, minWidth: 0 }}>
                           <Text role="bodyStrong" align="start">{zone.name}</Text>
                           <Text role="caption" tone="muted" align="start">{zone.branchRelation}</Text>
                         </Box>
                       </Box>
-                      <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2, marginStart: 8 }}>
+                      <Box style={{ alignItems: direction === 'rtl' ? 'flex-start' : 'flex-end', gap: 2, marginStart: spacing[2] }}>
                         <Badge label={zone.statusLabel} tone={statusTone} />
                         <Text role="caption" tone="muted">{zone.reviewActionLabel}</Text>
                       </Box>
-                      <Icon name={isZoneSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: 8 }} />
+                      <Icon name={isZoneSelected ? 'chevron-down' : 'chevron-forward-outline'} mirrored tone="muted" size={14} style={{ marginStart: spacing[2] }} />
                     </Pressable>
 
                     {isZoneSelected && (
-                      <Box paddingHorizontal={4} paddingTop={2} gap={2}>
+                      <Box paddingX={4} gap={2} style={{ paddingTop: spacing[3] }}>
                         <KeyValueList
                           dense
                           items={[
@@ -1352,7 +1413,7 @@ function AnalyticsInsightMetric({ label, value, tone = 'default', icon }: { labe
 function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
   const { direction } = useDirection();
   const { theme } = useTheme();
-  const d = dshPartnerAnalyticsPreview;
+  const d = runtimePartnerAnalytics;
 
   return (
     <Box gap={4}>
@@ -1371,15 +1432,15 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
       {/* Engagement metrics grid */}
       <Box gap={3} paddingY={2}>
         <Text role="bodyStrong" align="start">مؤشرات التفاعل</Text>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
           <AnalyticsInsightMetric label="حفظ المتجر في المفضلة" value={d.storeFavoritesCount.toLocaleString('ar')} tone="brand" icon="heart-outline" />
           <AnalyticsInsightMetric label="متابعو المتجر" value={d.followersCount.toLocaleString('ar')} tone="info" icon="people-outline" />
         </View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
           <AnalyticsInsightMetric label="حفظ المنتجات في المفضلة" value={d.productFavoritesCount.toLocaleString('ar')} tone="success" icon="bookmark-outline" />
           <AnalyticsInsightMetric label="عدد التقييمات" value={d.totalRatings.toLocaleString('ar')} tone="default" icon="star-half-outline" />
         </View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] }}>
           <AnalyticsInsightMetric label="متوسط التقييم" value={`${d.averageRating} ⭐`} tone="brand" icon="star" />
         </View>
       </Box>
@@ -1404,10 +1465,17 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
       {/* Opportunity spotlight */}
       <Box
         padding={3}
-        gap={2}
-        style={{ backgroundColor: theme.warning + '11', borderRadius: 12 }}
+        gap={3}
+        background="surfaceRaised"
+        elevationToken="raised"
+        radiusToken="md"
+        border={false}
+        style={{
+          borderStartWidth: 4,
+          borderStartColor: theme.warning,
+        }}
       >
-        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2] }}>
           <Icon name="bulb-outline" size={18} tone="warning" />
           <Text role="bodyStrong" tone="warning">فرصة تسويقية</Text>
         </View>
@@ -1429,17 +1497,24 @@ function AnalyticsInsightsPanel({ storeName }: { storeName: string }) {
       {/* Smart recommendation */}
       <Box
         padding={3}
-        gap={2}
-        style={{ backgroundColor: theme.brand + '11', borderRadius: 12 }}
+        gap={3}
+        background="surfaceRaised"
+        elevationToken="raised"
+        radiusToken="md"
+        border={false}
+        style={{
+          borderStartWidth: 4,
+          borderStartColor: theme.brand,
+        }}
       >
-        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8 }}>
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: spacing[2] }}>
           <Icon name="trending-up-outline" size={18} tone="brand" />
           <Text role="bodyStrong" tone="brand">توصية ذكية</Text>
         </View>
         <Text role="bodySm" align="start">{d.smartRecommendation}</Text>
         <Button
           label="فعّل العرض"
-          tone="primary"
+          tone="brand"
           fullWidth={false}
           onPress={() => {/* promotion intent — UI only, no backend */}}
         />
@@ -1485,18 +1560,14 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
     canonicalStoreId,
     dshAuthBearerToken,
     dshClientId,
+    walletBalanceLabel,
     // ML-T1: partner lifecycle stage for readiness status summary (read-only, summary-only per on-demand contract)
     partnerLifecycleStage = 'partner-review' as DshPartnerLifecycleStage,
   } = props as DshPartnerHubSurfaceProps & { partnerLifecycleStage?: DshPartnerLifecycleStage; dshAuthBearerToken?: string | null; dshClientId?: string | null };
 
   const [isAvailable, setIsAvailable] = React.useState<boolean>(storeOpen);
 
-  const _mediaBaseUrl = React.useMemo(() => resolveDshProductApiBaseUrl(), []);
-  const _mediaClient = React.useMemo(
-    () => (_mediaBaseUrl ? createDshMediaApiHttpClient(_mediaBaseUrl) : null),
-    [_mediaBaseUrl],
-  );
-  const [storeMediaAssets, setStoreMediaAssets] = React.useState<DshMediaAsset[]>([]);
+  const _storeMediaId = activeCanonicalStore?.id ?? canonicalStoreId;
 
   const { direction } = useDirection();
   const { theme } = useTheme();
@@ -1516,25 +1587,12 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
   const [showAdvancedNotifications, setShowAdvancedNotifications] = React.useState<boolean>(false);
   const activeSection = section ?? internalSection;
   const updateSection = onSectionChange ?? setInternalSection;
-  const activeCanonicalStore = React.useMemo(() => {
-    const activeCanonicalStoreId = canonicalStoreId ?? canonicalPreviewStores[0]?.id;
-    return activeCanonicalStoreId ? getCanonicalPreviewStoreCard(activeCanonicalStoreId) : undefined;
-  }, [canonicalStoreId]);
+  const activeCanonicalStore = React.useMemo((): DshCanonicalStoreCard | undefined => {
+    return undefined;
+  }, []);
   const resolvedActiveZoneLabel = activeCanonicalStore?.zoneLabel ?? activeZoneLabel;
 
-  React.useEffect(() => {
-    const storeId = activeCanonicalStore?.id ?? canonicalStoreId;
-    if (!_mediaClient || !storeId) return;
-    let cancelled = false;
-    _mediaClient
-      .listMedia({ owner_type: 'store', owner_id: storeId })
-      .then((resp) => {
-        if (!cancelled) setStoreMediaAssets(resp.items.filter((a) => a.status === 'uploaded'));
-      })
-      .catch(() => undefined);
-    return () => { cancelled = true; };
-  }, [_mediaClient, activeCanonicalStore?.id, canonicalStoreId]);
-
+  const { assets: storeMediaAssets } = useDshEntityMedia('store', _storeMediaId);
   const storeCoverUrl = storeMediaAssets.find((a) => a.purpose === 'cover')?.public_url;
   const storeLogoUrl = storeMediaAssets.find((a) => a.purpose === 'logo')?.public_url;
 
@@ -1750,17 +1808,17 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   flexDirection: rowDirection,
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  paddingHorizontal: 16,
+                  paddingHorizontal: spacing[4],
                   paddingVertical: 14,
                   backgroundColor: theme.surface,
                 }}
               >
-                <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 12, flexShrink: 1, minWidth: 0 }}>
+                <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[3], flexShrink: 1, minWidth: 0 }}>
                   <View
                     style={{
                       width: 36,
                       height: 36,
-                      borderRadius: 10,
+                      borderRadius: radius.sm,
                       alignItems: 'center',
                       justifyContent: 'center',
                       backgroundColor: theme.surfaceInset,
@@ -1785,17 +1843,17 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   style={{
                     flexDirection: rowDirection,
                     backgroundColor: theme.surfaceInset,
-                    borderRadius: 12,
+                    borderRadius: radius.sm2,
                     padding: 3,
                     borderWidth: 1,
                     borderColor: theme.line,
-                    gap: 4,
+                    gap: spacing[1],
                   }}
                 >
                   <Pressable
                     onPress={() => setAppearanceMode('lightPremium')}
                     style={{
-                      paddingHorizontal: 12,
+                      paddingHorizontal: spacing[3],
                       paddingVertical: 6,
                       borderRadius: 9,
                       backgroundColor: appearanceMode === 'lightPremium' ? theme.brand : 'transparent',
@@ -1804,7 +1862,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                     <Text
                       role="bodyStrong"
                       style={{
-                        fontSize: 12,
+                        fontSize: typographyRoles.caption.fontSize,
                         color: appearanceMode === 'lightPremium' ? theme.brandContrast : theme.text,
                       }}
                     >
@@ -1814,7 +1872,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   <Pressable
                     onPress={() => setAppearanceMode('darkGlass')}
                     style={{
-                      paddingHorizontal: 12,
+                      paddingHorizontal: spacing[3],
                       paddingVertical: 6,
                       borderRadius: 9,
                       backgroundColor: appearanceMode === 'darkGlass' ? theme.brand : 'transparent',
@@ -1823,7 +1881,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                     <Text
                       role="bodyStrong"
                       style={{
-                        fontSize: 12,
+                        fontSize: typographyRoles.caption.fontSize,
                         color: appearanceMode === 'darkGlass' ? theme.brandContrast : theme.text,
                       }}
                     >
@@ -1838,31 +1896,31 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
             {/* Current Preferences */}
             <Box padding={0} gap={0}>
-              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+              <Text role="label" tone="muted" style={{ paddingHorizontal: spacing[4], paddingBottom: spacing[2] }}>
                 التفضيلات الحالية
               </Text>
-              {[
-                { label: 'مستوى التنبيه', value: notificationPreferences.priorityOnly ? 'العاجلة فقط' : 'كل التنبيهات', tone: (notificationPreferences.priorityOnly ? 'warning' : 'success') as const },
-                { label: 'الصوت والاهتزاز', value: notificationPreferences.sound ? 'مفعّل' : 'موقوف', tone: (notificationPreferences.sound ? 'success' : 'warning') as const },
-                { label: 'الملخص اليومي', value: notificationPreferences.dailyDigest ? 'مفعّل' : 'موقوف', tone: (notificationPreferences.dailyDigest ? 'info' : 'default') as const },
-                { label: 'الظهور في القائمة', value: listingEnabled ? 'مفعل' : 'موقوف', tone: (listingEnabled ? 'success' : 'warning') as const },
-                { label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: (storeOpen ? 'success' : 'warning') as const },
-                { label: 'ساعات العمل', value: todayHoursLabel, tone: 'default' as const },
-              ].map((item, index, arr) => (
+              {([
+                { label: 'مستوى التنبيه', value: notificationPreferences.priorityOnly ? 'العاجلة فقط' : 'كل التنبيهات', tone: notificationPreferences.priorityOnly ? 'warning' : 'success' },
+                { label: 'الصوت والاهتزاز', value: notificationPreferences.sound ? 'مفعّل' : 'موقوف', tone: notificationPreferences.sound ? 'success' : 'warning' },
+                { label: 'الملخص اليومي', value: notificationPreferences.dailyDigest ? 'مفعّل' : 'موقوف', tone: notificationPreferences.dailyDigest ? 'info' : 'default' },
+                { label: 'الظهور في القائمة', value: listingEnabled ? 'مفعل' : 'موقوف', tone: listingEnabled ? 'success' : 'warning' },
+                { label: 'حالة المتجر', value: storeOpen ? 'مفتوح الآن' : 'مغلق الآن', tone: storeOpen ? 'success' : 'warning' },
+                { label: 'ساعات العمل', value: todayHoursLabel, tone: 'default' },
+              ] as const).map((item, index, arr) => (
                 <View
                   key={item.label}
                   style={{
                     flexDirection: rowDirection,
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
+                    paddingHorizontal: spacing[4],
+                    paddingVertical: spacing[3],
                     backgroundColor: theme.surface,
                     borderBottomWidth: index === arr.length - 1 ? 0 : 1,
                     borderBottomColor: theme.line,
                   }}
                 >
-                  <Text role="body" style={{ color: theme.text }}>
+                  <Text role="bodyMd" style={{ color: theme.text }}>
                     {item.label}
                   </Text>
                   <Chip label={item.value} tone={item.tone} />
@@ -1874,7 +1932,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
             {/* Notification Preferences */}
             <Box padding={0} gap={0}>
-              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+              <Text role="label" tone="muted" style={{ paddingHorizontal: spacing[4], paddingBottom: spacing[2] }}>
                 إعدادات الإشعارات
               </Text>
               {primaryNotificationRows.map((item) => (
@@ -1896,7 +1954,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   flexDirection: rowDirection,
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  paddingHorizontal: 16,
+                  paddingHorizontal: spacing[4],
                   paddingVertical: 10,
                   backgroundColor: pressed ? theme.surfaceInset : theme.surface,
                   borderBottomWidth: showAdvancedNotifications ? 1 : 0,
@@ -1935,7 +1993,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
             {/* Quick Access */}
             <Box padding={0} gap={0}>
-              <Text role="label" tone="muted" style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+              <Text role="label" tone="muted" style={{ paddingHorizontal: spacing[4], paddingBottom: spacing[2] }}>
                 الوصول السريع
               </Text>
               {[
@@ -1965,8 +2023,8 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                     flexDirection: rowDirection,
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    paddingHorizontal: 16,
-                    paddingVertical: 12,
+                    paddingHorizontal: spacing[4],
+                    paddingVertical: spacing[3],
                     backgroundColor: pressed ? theme.surfaceInset : theme.surface,
                     borderBottomWidth: index === arr.length - 1 ? 0 : 1,
                     borderBottomColor: theme.line,
@@ -2067,9 +2125,9 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
                   alignItems: 'center',
                   gap: 6,
                   backgroundColor: pressed ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.3)',
-                  paddingVertical: 8,
-                  paddingHorizontal: 12,
-                  borderRadius: 20,
+                  paddingVertical: spacing[2],
+                  paddingHorizontal: spacing[3],
+                  borderRadius: radius.lg2,
                   borderWidth: 1,
                   borderColor: 'rgba(255, 255, 255, 0.2)',
                 },
@@ -2078,7 +2136,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
               accessibilityLabel="اختيار الفرع"
             >
               <Icon name="git-branch-outline" size={14} color={theme.textInverse} />
-              <Text style={{ fontSize: 12, fontWeight: '700', color: theme.textInverse, fontFamily: 'Outfit-Bold' }}>
+              <Text role="caption" weight="bold" style={{ color: theme.textInverse }}>
                 اختيار الفرع
               </Text>
             </Pressable>
@@ -2091,7 +2149,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
             <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <View style={{ gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
                 <Text role="caption" tone="muted">رصيد المتجر الحالي</Text>
-                <Text role="titleLg" tone="brand">{wltDshPartnerPreviewData.wallet.balanceLabel}</Text>
+                <Text role="titleLg" tone="brand">{walletBalanceLabel ?? '—'}</Text>
               </View>
               <Button
                 label="عرض المحفظة"
@@ -2104,7 +2162,7 @@ export function DshPartnerHubSurface(props: DshPartnerHubSurfaceProps) {
 
           <Divider />
           {/* 4) Main Sections Nav — icon + title + subtitle + chevron, RTL-correct */}
-          <View style={{ gap: 8 }}>
+          <View style={{ gap: spacing[2] }}>
             {activeHubNavigationItems.map((item) => (
               <HubNavRow
                 key={item.id}

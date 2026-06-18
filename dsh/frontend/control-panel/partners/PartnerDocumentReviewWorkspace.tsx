@@ -9,7 +9,7 @@ import {
   WebControlPanelActionCluster,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import { type DshPartnerActivationStatus } from '../../shared/dsh-partner-activation.model';
+import { type DshPartnerActivationStatus } from '../../shared/stores/partner/dsh-partner-activation.model';
 import {
   PARTNER_FULFILLMENT_AGREEMENTS,
   type DshPartnerDocumentVerification,
@@ -275,7 +275,7 @@ export function ControlPanelDshPartnerDocumentReviewScreen() {
               title="توجيهات التدقيق"
               reason={actionMessage}
               confidence="high"
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
             />
           )}
 

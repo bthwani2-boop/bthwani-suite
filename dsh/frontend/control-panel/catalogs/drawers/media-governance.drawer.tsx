@@ -1,4 +1,4 @@
-// UI_PREVIEW_ONLY — no backend/API/DB binding.
+// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Media ownership governance workspace — separates catalog-owned media from
 //   partner-exception and marketing-review items.
@@ -6,7 +6,9 @@
 //   All actions produce result banners or are disabled with reason.
 
 import React, { useState } from 'react';
-import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster, CatalogMediaPolicy } from '../catalogs.data';
 import { catalogMediaPolicyOptions } from '../catalogs.model';
@@ -103,7 +105,7 @@ function PolicyBadge({ policy }: { policy: CatalogMediaPolicy }) {
         paddingVertical: 3,
       }}
     >
-      <Text role="caption" style={{ fontSize: 11, fontWeight: '800', color }}>
+      <Text role="caption" weight="black" style={{ fontSize: 11, color }}>
         {config.label}
       </Text>
     </Box>
@@ -138,7 +140,7 @@ export function CatalogMediaGovernanceWorkspace({
     }
     setResult(item.id, {
       type: 'success',
-      message: `UI_PREVIEW_ONLY — تم تحويل "${item.name}" لمراجعة التسويق محلياً. الإجراء الفعلي يتطلب ربط API.`,
+      message: `تم تحويل "${item.name}" لمراجعة التسويق محلياً. الإجراء الفعلي يتطلب ربط API.`,
     });
   }
 
@@ -152,14 +154,14 @@ export function CatalogMediaGovernanceWorkspace({
     }
     setResult(item.id, {
       type: 'success',
-      message: `UI_PREVIEW_ONLY — تم اعتماد استثناء الشريك لـ "${item.name}" محلياً.`,
+      message: `تم اعتماد استثناء الشريك لـ "${item.name}" محلياً.`,
     });
   }
 
   function handleMarkCatalogOwned(item: Pick<CatalogProductMaster, 'id' | 'name'>) {
     setResult(item.id, {
       type: 'info',
-      message: `UI_PREVIEW_ONLY — تم تمييز "${item.name}" كمركزي (catalog-owned-media) محلياً.`,
+      message: `تم تمييز "${item.name}" كمركزي (catalog-owned-media) محلياً.`,
     });
   }
 
@@ -186,14 +188,14 @@ export function CatalogMediaGovernanceWorkspace({
     >
       <WebCompactSurfaceHeader
         title="حوكمة الوسائط"
-        subtitle="UI_PREVIEW_ONLY · المالك: control-panel/catalogs"
+        subtitle="المالك: control-panel/catalogs"
         onBack={onClose}
       />
 
       <Box gap={4} style={{ padding: 16 }}>
 
         {/* Owner notice */}
-        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 6, padding: 8 }}>
+        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: radius.xs, padding: 8 }}>
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
             المالك: control-panel/catalogs · لا نقل ملفات وسائط · لا صور · لا payload كامل
           </Text>
@@ -203,11 +205,11 @@ export function CatalogMediaGovernanceWorkspace({
         <Box layoutDirection="row" gap={6} style={{ flexWrap: 'wrap' }}>
           <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 8, padding: 10, flex: 1, minWidth: 80 }}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>إجمالي</Text>
-            <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>{items.length}</Text>
+            <Text role="label" weight="black" style={{ color: theme.brandHeaderBackground }}>{items.length}</Text>
           </Box>
           <Box style={{ backgroundColor: missingMedia.length > 0 ? theme.dangerSurface : theme.successSurface, borderRadius: 8, padding: 10, flex: 1, minWidth: 80 }}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>بدون وسائط</Text>
-            <Text role="label" style={{ fontWeight: '800', color: missingMedia.length > 0 ? theme.danger : theme.success }}>{missingMedia.length}</Text>
+            <Text role="label" weight="black" style={{ color: missingMedia.length > 0 ? theme.danger : theme.success }}>{missingMedia.length}</Text>
           </Box>
           {policyGroups.map(({ policy, items: groupItems }) => (
             <Box
@@ -218,8 +220,7 @@ export function CatalogMediaGovernanceWorkspace({
               }}
             >
               <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{mediaPolicyConfig[policy].label}</Text>
-              <Text role="label" style={{
-                fontWeight: '800',
+              <Text role="label" weight="black" style={{
                 color: getToneColor(mediaPolicyConfig[policy].toneKey, theme),
               }}>
                 {groupItems.length}
@@ -243,13 +244,13 @@ export function CatalogMediaGovernanceWorkspace({
 
         {/* Watermark/brand policy note */}
         <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 8, padding: 12 }}>
-          <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground, marginBottom: 4, fontSize: 12 }}>
+          <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground, marginBottom: 4,}}>
             ملاحظة سياسة العلامة التجارية
           </Text>
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
             جميع الصور الموافق عليها تخضع لسياسة العلامة التجارية المركزية (watermark/brand policy).{'\n'}
             الصور الإضافية من الشريك تمر على مراجعة تسويقية قبل الإقرار النهائي.{'\n'}
-            لا يمكن رفع أو نقل ملفات وسائط مباشرة من هذه الواجهة — UI_PREVIEW_ONLY.
+            لا يمكن رفع أو نقل ملفات وسائط مباشرة من هذه الواجهة — الربط قيد التنفيذ.
           </Text>
         </Box>
 
@@ -280,7 +281,7 @@ export function CatalogMediaGovernanceWorkspace({
                     }}
                   >
                     <Box layoutDirection="row" gap={8} style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text role="caption" style={{ fontWeight: '700', flexShrink: 1 }}>{item.name}</Text>
+                      <Text role="caption" weight="bold" style={{ flexShrink: 1 }}>{item.name}</Text>
                       <PolicyBadge policy={item.mediaPolicy} />
                     </Box>
 
@@ -326,7 +327,7 @@ export function CatalogMediaGovernanceWorkspace({
         })}
 
         <Text role="caption" tone="muted" style={{ fontSize: 10, marginTop: 4 }}>
-          UI_PREVIEW_ONLY — لا نقل وسائط · لا صور · لا payload كامل · جميع الإجراءات محاكاة محلية
+          لا نقل وسائط · لا صور · لا payload كامل · جميع الإجراءات محاكاة محلية — الربط قيد التنفيذ
         </Text>
 
         <Button label="إغلاق" tone="ghost" size="sm" onPress={onClose} style={{ marginTop: 8 }} />

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Button, KeyValueList, StateView, Surface, Text } from '@bthwani/ui-kit';
@@ -14,9 +14,8 @@ import {
   WebControlPanelWorkbench,
 } from '@bthwani/ui-kit/web';
 import { translateDshRuntimeBindingStatus } from '../shared';
-import { getMarketingReviewItems, approveMediaReviewItem, requestMediaFix, rejectMediaReviewItem, sendMediaToCatalog } from '../../data/marketing.preview-data';
-import { ApprovalRecord, ApprovalStage, isPartnerOwnedException, resolveNextOwner, translateEntityType, translateOwner, translateStage } from '../../shared/workflow';
-import { getMarketingPermissionResult } from '../../shared/dsh-role-permission.model';
+import { ApprovalRecord, ApprovalStage, isPartnerOwnedException, resolveApprovalStageMeta, resolveNextOwner, translateEntityType, translateOwner, translateStage } from '../../shared/stores/partner/partner.workflow';
+import { getMarketingPermissionResult } from '../../shared/identity-access/dsh-role-permission.model';
 
 
 
@@ -53,19 +52,9 @@ import { getMarketingPermissionResult } from '../../shared/dsh-role-permission.m
  * - retry: API-later
  * - guidance: HANDLED — توجيه نصي يظهر عند كل حالة فارغة أو محجوبة
  */
-function getStageMeta(stage: ApprovalStage): { tone: string; label: string } {
-  switch (stage) {
-    case 'marketing-review': return { tone: 'warning', label: 'قيد المراجعة التسويقية' };
-    case 'marketing-approved': return { tone: 'brand', label: 'معتمد تسويقياً' };
-    case 'catalog-adopted': return { tone: 'success', label: 'أُرسل للكتالوج' };
-    case 'needs-fix': return { tone: 'danger', label: 'يتطلب تعديل' };
-    case 'rejected': return { tone: 'default', label: 'مرفوض' };
-    default: return { tone: 'default', label: stage };
-  }
-}
 
 function resolveTone(stage: ApprovalStage): 'warning' | 'success' | 'danger' | 'neutral' {
-  const tone = getStageMeta(stage).tone;
+  const tone = resolveApprovalStageMeta(stage).tone;
   if (tone === 'warning') return 'warning';
   if (tone === 'success') return 'success';
   if (tone === 'danger') return 'danger';
@@ -121,7 +110,7 @@ export function MarketingReviewQueue() {
   const [actionMessage, setActionMessage] = React.useState('اختر عنصرًا من الصف لمراجعة قرار التسويق الحالي.');
   const [confirmPending, setConfirmPending] = React.useState<{ action: 'approve' | 'reject' | 'fix' | 'catalog'; label: string } | null>(null);
 
-  const refresh = () => setItems(getMarketingReviewItems());
+  const refresh = () => setItems([]);
 
   React.useEffect(() => {
     refresh();
@@ -133,16 +122,7 @@ export function MarketingReviewQueue() {
     }
   }, [items, selectedId]);
 
-  const handleAction = (id: string, action: 'approve' | 'reject' | 'fix' | 'catalog') => {
-    if (action === 'approve') {
-      approveMediaReviewItem(id);
-    } else if (action === 'reject') {
-      rejectMediaReviewItem(id);
-    } else if (action === 'fix') {
-      requestMediaFix(id);
-    } else if (action === 'catalog') {
-      sendMediaToCatalog(id);
-    }
+  const handleAction = (_id: string, _action: 'approve' | 'reject' | 'fix' | 'catalog') => {
     refresh();
   };
 
@@ -217,7 +197,7 @@ export function MarketingReviewQueue() {
       main={
         <Box gap={3}>
           <Box gap={2} layoutDirection="row" style={{ flexWrap: 'wrap' }}>
-            <WebControlPanelStatusTag label={getStageMeta(selectedItem?.stage ?? 'marketing-review').label} tone={resolveTone(selectedItem?.stage ?? 'marketing-review')} />
+            <WebControlPanelStatusTag label={resolveApprovalStageMeta(selectedItem?.stage ?? 'marketing-review').label} tone={resolveTone(selectedItem?.stage ?? 'marketing-review')} />
             <WebControlPanelStatusTag label={selectedItem ? translateEntityType(selectedItem.entityType) : 'غير محدد'} tone="info" />
             <WebControlPanelStatusTag label={selectedItem ? resolvePolicyLabel(selectedItem) : 'سياسة غير محددة'} tone="neutral" />
             <WebControlPanelStatusTag label={translateDshRuntimeBindingStatus('UI_PREVIEW_ONLY')} tone="neutral" />
@@ -233,7 +213,7 @@ export function MarketingReviewQueue() {
                 key={item.id}
                 entityId={item.id}
                 entityLabel={`${item.title} · ${translateEntityType(item.entityType)}`}
-                status={getStageMeta(item.stage).label}
+                status={resolveApprovalStageMeta(item.stage).label}
                 statusTone={resolveTone(item.stage)}
                 risk={resolveRisk(item.stage)}
                 recommendation={resolveRecommendation(item)}
@@ -258,7 +238,7 @@ export function MarketingReviewQueue() {
               items={[
                 { label: 'المعرف', value: selectedItem?.id ?? 'غير محدد', tone: 'brand' },
                 { label: 'نوع العنصر', value: selectedItem ? translateEntityType(selectedItem.entityType) : 'غير محدد', tone: 'default' },
-                { label: 'المرحلة', value: selectedItem ? translateStage(selectedItem.stage) : 'غير محدد', tone: getStageMeta(selectedItem?.stage ?? 'marketing-review').tone === 'danger' ? 'danger' : getStageMeta(selectedItem?.stage ?? 'marketing-review').tone === 'warning' ? 'warning' : getStageMeta(selectedItem?.stage ?? 'marketing-review').tone === 'success' ? 'success' : 'default' },
+                { label: 'المرحلة', value: selectedItem ? translateStage(selectedItem.stage) : 'غير محدد', tone: resolveApprovalStageMeta(selectedItem?.stage ?? 'marketing-review').tone === 'danger' ? 'danger' : resolveApprovalStageMeta(selectedItem?.stage ?? 'marketing-review').tone === 'warning' ? 'warning' : resolveApprovalStageMeta(selectedItem?.stage ?? 'marketing-review').tone === 'success' ? 'success' : 'default' },
                 { label: 'المصدر', value: selectedItem ? translateOwner(selectedItem.source) : 'غير محدد', tone: 'default' },
                 { label: 'المالك التالي', value: selectedItem ? translateOwner(resolveNextOwner(selectedItem.stage)) : 'غير محدد', tone: 'default' },
                 { label: 'السياسة', value: selectedItem ? resolvePolicyLabel(selectedItem) : 'غير محددة', tone: 'default' },
@@ -269,7 +249,7 @@ export function MarketingReviewQueue() {
               title="القرار الحالي"
               reason={selectedItem ? resolveRecommendation(selectedItem) : 'اختر عنصرًا من الصف لعرض القرار.'}
               confidence={selectedItem?.stage === 'marketing-approved' || selectedItem?.stage === 'catalog-adopted' ? 'high' : selectedItem?.stage === 'marketing-review' ? 'medium' : 'low'}
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
               primaryAction={selectedItem ? { id: `${selectedItem.id}-primary`, label: selectedItem.stage === 'marketing-review' ? 'اعتماد' : selectedItem.stage === 'marketing-approved' ? 'إرسال للكتالوج' : 'تثبيت المتابعة', onAction: handlePrimaryAction } : undefined}
               secondaryAction={selectedItem ? { id: `${selectedItem.id}-secondary`, label: selectedItem.stage === 'marketing-review' || selectedItem.stage === 'marketing-approved' ? 'طلب تعديل' : 'لا إجراء', onAction: handleSecondaryAction } : undefined}
             />

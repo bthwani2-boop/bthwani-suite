@@ -1,20 +1,22 @@
-// UI_PREVIEW_ONLY — no backend/API/DB binding.
+﻿// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Detail view for a single catalog product — identity, approval stage,
 //   client visibility gate, linked surfaces summary, and action result banner.
 // All CTAs are preview-only and produce result banners or are disabled with reason.
 
 import React, { useState } from 'react';
-import { Box, Button, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster } from '../catalogs.data';
 import {
   resolveDshProductClientVisibility,
   type DshClientVisibilityBlockedCode,
-} from '../../../shared/dsh-client-visibility.model';
+} from '../../../shared/stores/dsh-client-visibility.model';
 import {
   mapApprovalStageToPartnerActivationStatus,
-} from '../../../shared/dsh-client-visibility.model';
+} from '../../../shared/stores/dsh-client-visibility.model';
 import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -78,8 +80,8 @@ function InfoRow({ label, value, valueColor }: { label: string; value: string; v
   const { theme } = useTheme();
   return (
     <Box layoutDirection="row" gap={6} style={{ justifyContent: 'space-between', paddingVertical: 2 }}>
-      <Text role="caption" tone="muted" style={{ fontSize: 12 }}>{label}</Text>
-      <Text role="caption" style={{ fontWeight: '700', color: valueColor || theme.text, textAlign: 'right', flexShrink: 1 }}>{value}</Text>
+      <Text role="caption" tone="muted" style={{}}>{label}</Text>
+      <Text role="caption" weight="bold" style={{ color: valueColor || theme.text, textAlign: 'right', flexShrink: 1 }}>{value}</Text>
     </Box>
   );
 }
@@ -105,14 +107,14 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
   const isClientVisible = product.approvalStage === 'client-visible';
 
   function handleRequestFix() {
-    setActionResult({ type: 'info', message: 'UI_PREVIEW_ONLY — طلب التعديل سُجّل محلياً. الإجراء الفعلي يتطلب ربط API.' });
+    setActionResult({ type: 'info', message: 'طلب التعديل سُجّل محلياً. الإجراء الفعلي يتطلب ربط API.' });
   }
   function handleSendToMarketing() {
     if (product.mediaPolicy !== 'marketing-enhancement-required' && product.mediaPolicy !== 'partner-proposed-review') {
       setActionResult({ type: 'blocked', message: `محظور — سياسة الوسائط الحالية (${mediaPolicyLabel[product.mediaPolicy] || product.mediaPolicy}) لا تستلزم التحويل للتسويق.` });
       return;
     }
-    setActionResult({ type: 'success', message: 'UI_PREVIEW_ONLY — تم تحويل المنتج لمراجعة التسويق (محاكاة محلية).' });
+    setActionResult({ type: 'success', message: 'تم تحويل المنتج لمراجعة التسويق (محاكاة محلية).' });
   }
 
   return (
@@ -133,14 +135,14 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
       {/* Header */}
       <WebCompactSurfaceHeader
         title={product.name}
-        subtitle="تفاصيل عنصر الكتالوج — UI_PREVIEW_ONLY"
+        subtitle="تفاصيل عنصر الكتالوج"
         onBack={onClose}
       />
 
       <Box gap={4} style={{ padding: 16 }}>
 
         {/* Owner notice */}
-        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 6, padding: 8 }}>
+        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: radius.xs, padding: 8 }}>
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
             المالك: control-panel/catalogs · كل CTAs محاكاة محلية فقط
           </Text>
@@ -221,7 +223,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
             />
           )}
           {!visibility.visible && visibility.blockedReason && (
-            <Box style={{ backgroundColor: theme.dangerSurface, borderRadius: 6, padding: 8, marginTop: 4 }}>
+            <Box style={{ backgroundColor: theme.dangerSurface, borderRadius: radius.xs, padding: 8, marginTop: 4 }}>
               <Text role="caption" style={{ color: theme.danger, fontSize: 11 }}>{visibility.blockedReason}</Text>
             </Box>
           )}
@@ -231,7 +233,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
         <Box gap={2} style={{ backgroundColor: theme.surfaceInset, borderRadius: 8, padding: 12 }}>
           <SectionTitle>ملخص سجل التدقيق</SectionTitle>
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
-            UI_PREVIEW_ONLY — سجل التدقيق الفعلي يُربط من audit trail API.
+            سجل التدقيق الفعلي يُربط من audit trail API.
           </Text>
           <InfoRow label="المصدر" value={product.sourceSurface} />
           <InfoRow label="المالك الحالي" value="control-panel/catalogs" />
@@ -250,7 +252,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
           <SectionTitle>الأسطح المرتبطة</SectionTitle>
           {linkedSurfaces.map((s) => (
             <Box key={s.id} layoutDirection="row" gap={8} style={{ alignItems: 'flex-start', paddingVertical: 3 }}>
-              <Text role="caption" style={{ fontWeight: '700', color: theme.brand, minWidth: 120 }}>{s.label}</Text>
+              <Text role="caption" weight="bold" style={{ color: theme.brand, minWidth: 120 }}>{s.label}</Text>
               <Text role="caption" tone="muted" style={{ fontSize: 11, flexShrink: 1 }}>{s.description}</Text>
             </Box>
           ))}
@@ -280,7 +282,7 @@ export function CatalogItemDetailWorkspace({ product, onClose }: CatalogItemDeta
             />
           </Box>
           <Text role="caption" tone="muted" style={{ fontSize: 10, marginTop: 4 }}>
-            جميع الإجراءات محاكاة محلية — UI_PREVIEW_ONLY
+            جميع الإجراءات محاكاة محلية — الربط قيد التنفيذ
           </Text>
         </Box>
 

@@ -1,37 +1,87 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
-import { getAdaptedFinanceControlPanelRows } from '../adapters/dshFinanceFixture.adapter';
-import { formatWltYer } from '../financeContracts';
-import { buildWltAuditPackPreview } from '../models/auditPack.types';
-import { WLT_MAKER_CHECKER_STATE_LABELS } from '../models/makerChecker.types';
-import { getWltCloseGateSubledgers } from '../models/subledger.types';
-
+import { Box, Text,
+  radius,
+} from '@bthwani/ui-kit';
+import { buildWltFinancialCenter } from '../../shared';
+import { buildWltAuditPackPreview } from '../../shared';
+import { WLT_MAKER_CHECKER_STATE_LABELS } from '../../shared';
+import { getWltCloseGateSubledgers } from '../../shared';
+import {
+  buildWltRuntimeFinancialCenter,
+  loadWltDshFinanceRuntimeReadModel,
+  type WltDshFinanceRuntimeResult,
+} from '../../shared';
 export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string }) {
   const businessDate = new Date().toISOString().split('T')[0]!;
+  const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
 
-  const rows = React.useMemo(() => {
-    const s = getAdaptedFinanceControlPanelRows();
-    return [...s.overview, ...s['cod-reconciliation'], ...s.settlements];
+  React.useEffect(() => {
+    let cancelled = false;
+    void loadWltDshFinanceRuntimeReadModel().then((result) => {
+      if (!cancelled) setRuntimeFinance(result);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  const center = React.useMemo(() => {
+    if (runtimeFinance?.state === 'runtime') {
+      return buildWltRuntimeFinancialCenter(businessDate, runtimeFinance.data);
+    }
+    return buildWltFinancialCenter(businessDate, []);
+  }, [businessDate, runtimeFinance]);
+
+  const auditEntries = React.useMemo(() => {
+    const blockingVarianceByEntryId = new Map(
+      center.blockingVariances.map((variance) => [variance.entryId, variance.varianceMinorUnits]),
+    );
+
+    return center.allEntries.map((entry) => ({
+      id: entry.id,
+      evidenceStatus: entry.status === 'blocked' ? 'missing' : entry.isPending ? 'partial' : 'complete',
+      workflowState:
+        entry.status === 'posted'
+          ? 'approved'
+          : entry.status === 'pending'
+            ? 'checked'
+            : entry.status === 'disputed'
+              ? 'review_required'
+              : 'blocked_wlt',
+      varianceMinorUnits: blockingVarianceByEntryId.get(entry.id) ?? 0,
+      evidenceSource: 'audit-entry',
+      bankDepositRef: entry.sourceRef,
+    })) as ReadonlyArray<{
+      id: string;
+      evidenceStatus: 'complete' | 'partial' | 'missing';
+      workflowState: string;
+      varianceMinorUnits: number;
+      evidenceSource: string;
+      bankDepositRef?: string;
+      cashBagRef?: string;
+    }>;
+  }, [center]);
+
+  const expectedTotalMinorUnits = React.useMemo(
+    () => center.allEntries.reduce((sum, entry) => sum + entry.amountMinorUnits, 0),
+    [center],
+  );
+  const blockingVarianceTotalMinorUnits = React.useMemo(
+    () => center.blockingVariances.reduce((sum, variance) => sum + variance.varianceMinorUnits, 0),
+    [center],
+  );
+  const actualTotalMinorUnits = expectedTotalMinorUnits - blockingVarianceTotalMinorUnits;
 
   const auditPack = React.useMemo(() =>
     buildWltAuditPackPreview({
       businessDate,
-      expectedTotalMinorUnits: rows.reduce((s, r) => s + r.expectedMinorUnits, 0),
-      actualTotalMinorUnits: rows.reduce((s, r) => s + r.actualMinorUnits, 0),
-      entries: rows.map((r) => ({
-        id: r.id,
-        evidenceStatus: r.evidenceStatus,
-        workflowState: r.workflowState,
-        varianceMinorUnits: r.varianceMinorUnits,
-        evidenceSource: r.expectedSource,
-        bankDepositRef: r.bankDepositRef,
-        cashBagRef: r.cashBagRef,
-      })),
+      expectedTotalMinorUnits,
+      actualTotalMinorUnits,
+      entries: auditEntries,
     }),
-    [rows, businessDate],
+    [actualTotalMinorUnits, auditEntries, businessDate, expectedTotalMinorUnits],
   );
 
   const closeGateSubledgers = React.useMemo(() => getWltCloseGateSubledgers(), []);
@@ -39,8 +89,16 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
 
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
+      <div style={{ padding: '6px 12px', background: 'var(--bth-warning-surface)', border: '1px solid var(--bth-warning-border)', borderRadius: 7, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 10, color: 'var(--bth-warning-text)', fontWeight: '700' }}>
+          {runtimeFinance?.state === 'runtime'
+            ? `WLT runtime audit preparation · ${runtimeFinance.data.baseUrl} · ${runtimeFinance.data.closeStatus.status}`
+            : `Fallback preview · ${runtimeFinance?.state === 'blocked' ? runtimeFinance.error : 'loading runtime'}`}
+        </span>
+      </div>
+
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={1}>
-        <Text role="titleMd" style={{ fontWeight: 700 }}>التدقيق والإغلاق اليومي</Text>
+        <Text role="titleMd" weight="bold">التدقيق والإغلاق اليومي</Text>
         <Text role="bodySm" tone="soft">
           حزمة التدقيق المالي اليومي — نتيجة من المركز المالي + كشوف الحسابات + دورات التسوية.
           الإغلاق الفعلي يُنفّذه WLT runtime فقط.
@@ -50,7 +108,7 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
       {/* Audit Pack Status */}
       <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" gap={2}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text role="titleSm" style={{ fontWeight: 700 }}>حزمة الإغلاق · {auditPack.closingRunId}</Text>
+          <Text role="titleSm" weight="bold">حزمة الإغلاق · {auditPack.closingRunId}</Text>
           <span style={{
             fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 5,
             color: isReadyForClose ? 'var(--bth-success-text)' : 'var(--bth-warning-text)',
@@ -63,9 +121,9 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10 }}>
           {[
-            { label: 'الإجمالي المتوقع', value: formatWltYer(auditPack.expectedTotalMinorUnits), ok: true },
-            { label: 'الإجمالي الفعلي', value: formatWltYer(auditPack.actualTotalMinorUnits), ok: true },
-            { label: 'الفارق', value: formatWltYer(auditPack.varianceTotalMinorUnits), ok: auditPack.varianceTotalMinorUnits === 0 },
+            { label: 'الإجمالي المتوقع', value: auditPack.expectedTotalLabel, ok: true },
+            { label: 'الإجمالي الفعلي', value: auditPack.actualTotalLabel, ok: true },
+            { label: 'الفارق', value: auditPack.varianceTotalLabel, ok: auditPack.varianceTotalMinorUnits === 0 },
             { label: 'استثناءات', value: `${auditPack.exceptions.length} بند`, ok: auditPack.exceptions.length === 0 },
           ].map(({ label, value, ok }) => (
             <div key={label} style={{ padding: '10px 12px', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: 7, background: 'var(--bthwani-control-panel-surface)' }}>
@@ -78,12 +136,12 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
 
       {/* Close Gate Subledgers */}
       <Box gap={2}>
-        <Text role="titleSm" style={{ fontWeight: 700 }}>دفاتر الأستاذ المساعدة — شروط الإغلاق</Text>
+        <Text role="titleSm" weight="bold">دفاتر الأستاذ المساعدة — شروط الإغلاق</Text>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 10 }}>
           {closeGateSubledgers.map((sub) => (
             <Box key={sub.id} padding={2} background="surfaceInset" radiusToken="md" border borderTone="line" gap={1}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text role="label" style={{ fontWeight: 700 }}>{sub.label}</Text>
+                <Text role="label" weight="bold">{sub.label}</Text>
                 <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.06)', padding: '1px 5px', borderRadius: 3 }}>{sub.controlAccountCode}</code>
               </div>
               <Text role="caption" tone="muted">{sub.description}</Text>
@@ -95,7 +153,7 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
       {/* Exceptions */}
       {auditPack.exceptions.length > 0 && (
         <Box gap={2}>
-          <Text role="titleSm" style={{ fontWeight: 700, color: 'var(--bth-danger-text)' }}>
+          <Text role="titleSm" weight="bold" style={{ color: 'var(--bth-danger-text)' }}>
             استثناءات تمنع الإغلاق ({auditPack.exceptions.length})
           </Text>
           {auditPack.exceptions.map((ex) => (
@@ -104,7 +162,7 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
                 <code style={{ fontSize: 10, fontWeight: 700 }}>{ex.entryId}</code>
                 <span style={{ fontSize: 11, marginRight: 8, color: 'var(--bth-danger-text)' }}>{ex.reason}</span>
               </div>
-              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'var(--bth-danger-text)', color: '#ffffff' }}>
+              <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, background: 'var(--bth-danger-text)', color: 'var(--bthwani-brand-contrast)' }}>
                 {ex.severity === 'blocking' ? 'حاجب' : 'تحذير'}
               </span>
             </div>
@@ -114,10 +172,10 @@ export function AuditCloseScreen(_props: { hubHref: string; subGroup?: string })
 
       {/* Maker-Checker status */}
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <Text role="titleSm" style={{ fontWeight: 700 }}>مسار Maker-Checker</Text>
+        <Text role="titleSm" weight="bold">مسار Maker-Checker</Text>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {auditPack.approvals.slice(0, 5).map((ap) => (
-            <div key={ap.entryId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', background: 'var(--bthwani-control-panel-surface)', borderRadius: 6, border: '1px solid var(--bthwani-control-panel-border)' }}>
+            <div key={ap.entryId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', background: 'var(--bthwani-control-panel-surface)', borderRadius: radius.xs, border: '1px solid var(--bthwani-control-panel-border)' }}>
               <code style={{ fontSize: 10 }}>{ap.entryId}</code>
               <span style={{ fontSize: 10, fontWeight: 700, color: ap.state === 'approved' ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' }}>
                 {WLT_MAKER_CHECKER_STATE_LABELS[ap.state as keyof typeof WLT_MAKER_CHECKER_STATE_LABELS] ?? ap.state}

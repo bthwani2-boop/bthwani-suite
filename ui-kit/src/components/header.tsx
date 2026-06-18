@@ -125,6 +125,9 @@ export function MobileWorkspaceHeader({
   const resolvedIcon = iconSlot ?? (icon ? <Icon name={icon} size={20} tone="brand" /> : <Icon name="grid-outline" size={20} tone="brand" />);
 
   function renderAction(action: TopBarAction) {
+    if (action.id === 'back') {
+      return null;
+    }
     const badgeAnchorStyle = direction === 'rtl' ? { left: -spacing[1] } : { right: -spacing[1] };
     const iconStyle = action.mirrorInRtl && direction === 'rtl' ? { transform: [{ scaleX: -1 }] } : undefined;
     const actionBoxSize = action.size === 'sm' ? 36 : action.size === 'lg' ? 42 : 40;
@@ -583,6 +586,9 @@ export function TopBar({ title, subtitle, titleSlot, locationLabel, locationIcon
 
   function renderAction(action: TopBarAction) {
     const isBackAction = action.id === 'back';
+    if (isBackAction && !isMain) {
+      return null;
+    }
     const badgeAnchorStyle = direction === 'rtl' ? { left: -spacing[1] } : { right: -spacing[1] };
     const iconStyle = action.mirrorInRtl && direction === 'rtl' ? { transform: [{ scaleX: -1 }] } : undefined;
     const showBadge = typeof action.badgeCount === 'number' && action.badgeCount > 0;

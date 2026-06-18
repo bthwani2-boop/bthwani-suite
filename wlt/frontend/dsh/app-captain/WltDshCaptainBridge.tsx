@@ -1,10 +1,10 @@
 import React from 'react';
-import { WltDshCaptainFinancePreview } from './WltDshCaptainFinancePreview';
+import { WltDshCaptainFinanceSummary } from './WltDshCaptainFinanceSummary';
 
-export type WltDshCaptainBridgeProps = React.ComponentProps<typeof WltDshCaptainFinancePreview>;
+export type WltDshCaptainBridgeProps = React.ComponentProps<typeof WltDshCaptainFinanceSummary>;
 
 export function WltDshCaptainBridge(props: WltDshCaptainBridgeProps) {
-  return <WltDshCaptainFinancePreview {...props} />;
+  return <WltDshCaptainFinanceSummary {...props} />;
 }
 
 export default WltDshCaptainBridge;

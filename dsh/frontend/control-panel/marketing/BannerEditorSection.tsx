@@ -17,14 +17,8 @@ import {
   Text,
   TextField,
   useTheme,
+  radius,
 } from '@bthwani/ui-kit';
-import type {
-  MarketingBannerAudience,
-  MarketingBannerRecord,
-  MarketingBannerStatus,
-} from '../../data/marketing.preview-data';
-import { dshCategoryFixtures } from '../../data/categories.preview-data';
-import { dshDiscoveryStores, storeItemsByStoreId } from '../../data/stores.preview-data';
 import type { MarketingPermission } from './marketing-permissions.contract';
 import {
   BANNER_TEMPLATES,
@@ -33,7 +27,19 @@ import {
   SMART_TARGET_OPTIONS,
   SUBSCRIPTION_OPTIONS,
 } from './banner-types';
-import { normalizeSearchText, getProductsForStore, resolveSmartTargetSummary } from './banner-target-utils';
+import {
+  normalizeSearchText,
+  getProductsForStore,
+  resolveSmartTargetSummary,
+  dshCategoryData,
+  dshDiscoveryStores,
+  storeItemsByStoreId,
+} from '../../shared/marketing';
+import type {
+  MarketingBannerRecord,
+  MarketingBannerAudience,
+  MarketingBannerStatus,
+} from '../../shared/marketing';
 import type {
   BannerDraft,
   BannerImageFit,
@@ -98,10 +104,10 @@ export function BannerEditorSection({
 
   // --- Default IDs used when switching smart target type ---
   const firstStoreId = dshDiscoveryStores[0]?.id ?? 'store-1001';
-  const firstCategoryId = dshCategoryFixtures[0]?.id ?? 'restaurants';
+  const firstCategoryId = dshCategoryData[0]?.id ?? 'restaurants';
 
   const firstCategoryWithSubcategories = React.useMemo(
-    () => dshCategoryFixtures.find((c) => c.subcategories.length > 0) ?? dshCategoryFixtures[1],
+    () => dshCategoryData.find((c) => c.subcategories.length > 0) ?? dshCategoryData[1],
     [],
   );
   const firstSubcategoryId = firstCategoryWithSubcategories?.subcategories[0]?.id ?? '';
@@ -156,7 +162,7 @@ export function BannerEditorSection({
 
   const categoryOptions = React.useMemo(
     () =>
-      dshCategoryFixtures
+      dshCategoryData
         .filter((c) => {
           const query = normalizeSearchText(categorySearch);
           if (!query) return true;
@@ -168,7 +174,7 @@ export function BannerEditorSection({
 
   const selectedSubcategorySource = React.useMemo(
     () =>
-      dshCategoryFixtures.find((c) => c.id === draft.actionTarget) ??
+      dshCategoryData.find((c) => c.id === draft.actionTarget) ??
       firstCategoryWithSubcategories ??
       null,
     [draft.actionTarget, firstCategoryWithSubcategories],
@@ -176,7 +182,7 @@ export function BannerEditorSection({
 
   const parentCategoryOptions = React.useMemo(
     () =>
-      dshCategoryFixtures
+      dshCategoryData
         .filter((c) => c.subcategories.length > 0)
         .filter((c) => {
           const query = normalizeSearchText(subcategoryParentSearch);
@@ -285,10 +291,10 @@ export function BannerEditorSection({
       setDraft((current) => {
         const currentStoreIsValid = (id: string) => Boolean(dshDiscoveryStores.find((s) => s.id === id));
         const currentCategoryIsValid = (id: string) =>
-          Boolean(dshCategoryFixtures.find((c) => c.id === id));
+          Boolean(dshCategoryData.find((c) => c.id === id));
         const currentSubcategoryIsValid = (catId: string, subId: string) =>
           Boolean(
-            dshCategoryFixtures
+            dshCategoryData
               .find((c) => c.id === catId)
               ?.subcategories.find((s) => s.id === subId),
           );
@@ -463,7 +469,7 @@ export function BannerEditorSection({
     <Box gap={4}>
       {/* Smart Templates */}
       <Box gap={2}>
-        <Text role="titleSm" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+        <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
           القالب الذكي
         </Text>
         <View style={styles.templateRow}>
@@ -481,6 +487,7 @@ export function BannerEditorSection({
             >
               <Text style={{ fontSize: 18 }}>{tpl.icon}</Text>
               <Text
+                weight="black"
                 style={[
                   styles.templateBtnText,
                   draft.templateId === tpl.id && { color: tpl.accent },
@@ -495,7 +502,7 @@ export function BannerEditorSection({
 
       {/* Editor Tab Selector */}
       <Box gap={2}>
-        <Text role="titleSm" style={{ fontWeight: '900', color: theme.brandHeaderBackground }}>
+        <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>
           لوحة التحرير
         </Text>
         <Tabs<EditorWorkspaceTab>
@@ -871,14 +878,14 @@ export function BannerEditorSection({
               {(
                 ['home', 'stores', 'tracking', 'orders', 'loyalty'] as SmartBannerTargetType[]
               ).includes(draft.targetType) ? (
-                <Text role="caption" tone="muted" style={{ fontWeight: '700' }}>
+                <Text role="caption" tone="muted" weight="bold" style={{ }}>
                   هذا النوع محدد مسبقًا ولا يحتاج حقول ربط إضافية.
                 </Text>
               ) : null}
 
               {/* Smart Target Summary Card */}
               <View style={styles.smartSummaryCard}>
-                <Text role="caption" style={{ fontWeight: '900', color: theme.info }}>
+                <Text role="caption" weight="black" style={{ color: theme.info }}>
                   ملخص الربط النهائي
                 </Text>
                 <Text role="caption" style={{ color: theme.info, marginTop: 4 }}>
@@ -902,7 +909,7 @@ export function BannerEditorSection({
       {/* Action Bar */}
       <View style={styles.actionBar}>
         <Box gap={1} style={{ flex: 1 }}>
-          <Text role="bodySm" style={{ fontWeight: '900' }}>
+          <Text role="bodySm" weight="black" style={{ }}>
             حالة النشر
           </Text>
           <Tabs<MarketingBannerStatus>
@@ -1018,7 +1025,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       flex: 1,
       minWidth: 82,
       padding: 10,
-      borderRadius: 14,
+      borderRadius: radius.md,
       borderWidth: 2,
       borderColor: theme.line,
       alignItems: 'center',
@@ -1027,11 +1034,10 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
     },
     templateBtnText: {
       fontSize: 10,
-      fontWeight: '900',
       color: theme.textMuted,
     },
     editorCard: {
-      borderRadius: 18,
+      borderRadius: radius.lg,
       borderWidth: 1,
       borderColor: theme.line,
       backgroundColor: theme.surfaceInset,
@@ -1057,7 +1063,7 @@ function createStyles(theme: ReturnType<typeof useTheme>['theme']) {
       alignItems: 'center',
       gap: 12,
       padding: 12,
-      borderRadius: 18,
+      borderRadius: radius.lg,
       backgroundColor: theme.surfaceInset,
       borderWidth: 1,
       borderColor: theme.line,

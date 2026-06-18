@@ -53,7 +53,7 @@ export function AcceptanceTimerSheet({
   const isExpired = state === 'expired' || (state === 'countdown' && remaining <= 0);
 
   return (
-    <SheetFrame visible={visible} title="طلب جديد يحتاج قبولك" onClose={onClose}>
+    <SheetFrame visible={visible} title="طلب جديد يحتاج قبولك" onClose={onClose ?? (() => {})}>
       {state === 'loading' ? (
         <StateView stateId="loading" title="جاري تسجيل ردك..." description="" />
       ) : state === 'accepted' ? (

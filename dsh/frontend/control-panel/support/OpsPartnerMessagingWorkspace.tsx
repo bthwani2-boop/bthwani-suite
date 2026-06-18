@@ -2,11 +2,17 @@
 // Authority: control-panel/support owns this channel. Partner sees support linked to order/catalog only.
 // WLT boundary: financial-impact mentions are read-only preview tags — no mutation from this surface.
 import React from 'react';
+import { generateLocalTempId } from '../../shared/platform/local-temp-id';
 import { Box, Button, Chip, Surface, Text, TextField } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
-import { DSH_DEMO_SUPPORT_TICKETS, type DshSupportTicketMessage } from '../../data/support.preview-data';
-
-const DEMO_TICKET = DSH_DEMO_SUPPORT_TICKETS[1]; // catalog/partner-linked demo ticket
+type DshSupportTicketMessage = {
+  id: string;
+  senderKind: 'ops' | 'client' | 'captain' | 'partner';
+  senderLabel: string;
+  body: string;
+  timestampLabel: string;
+  isSystem?: boolean;
+};
 
 function OpsMessageBubble({ message }: { message: DshSupportTicketMessage }) {
   const isOps = message.senderKind === 'ops';
@@ -43,24 +49,32 @@ export type OpsPartnerMessagingWorkspaceProps = {
   partnerId?: string;
   partnerName?: string;
   orderId?: string;
+  ticketCode?: string;
+  slaLabel?: string;
+  ownerQueue?: string;
+  entityType?: string;
 };
 
 export function OpsPartnerMessagingWorkspace({
   partnerId = '—',
   partnerName,
   orderId,
+  ticketCode,
+  slaLabel,
+  ownerQueue,
+  entityType = 'طلب',
 }: OpsPartnerMessagingWorkspaceProps) {
   const [draft, setDraft] = React.useState('');
-  const [messages, setMessages] = React.useState<ReadonlyArray<DshSupportTicketMessage>>(DEMO_TICKET.messagesPreview);
-  const [isEscalated, setIsEscalated] = React.useState(DEMO_TICKET.status === 'escalated');
+  const [messages, setMessages] = React.useState<ReadonlyArray<DshSupportTicketMessage>>([]);
+  const [isEscalated, setIsEscalated] = React.useState(false);
 
-  const resolvedPartnerName = partnerName ?? DEMO_TICKET.actorName;
-  const resolvedEntityId = orderId ?? DEMO_TICKET.entityId;
+  const resolvedPartnerName = partnerName ?? '—';
+  const resolvedEntityId = orderId ?? null;
 
   const handleSend = () => {
     if (!draft.trim()) return;
     const newMessage: DshSupportTicketMessage = {
-      id: `msg-partner-custom-${Date.now()}`,
+      id: generateLocalTempId('msg-partner-custom'),
       senderKind: 'ops',
       senderLabel: 'فريق الدعم',
       body: draft.trim(),
@@ -73,7 +87,7 @@ export function OpsPartnerMessagingWorkspace({
   const handleEscalate = () => {
     if (isEscalated) return;
     const newSystemMsg: DshSupportTicketMessage = {
-      id: `msg-partner-system-${Date.now()}`,
+      id: generateLocalTempId('msg-partner-system'),
       senderKind: 'ops',
       senderLabel: 'النظام',
       body: 'تم تصعيد المحادثة إلى إدارة الدعم والالتزام لشؤون الشركاء.',
@@ -100,7 +114,7 @@ export function OpsPartnerMessagingWorkspace({
             </div>
             <p className={styles.surfaceHeaderSubtitle}>
               {resolvedPartnerName} — {partnerId}
-              {resolvedEntityId ? ` — ${DEMO_TICKET.entityType} ${resolvedEntityId}` : ''}
+              {resolvedEntityId ? ` — ${entityType} ${resolvedEntityId}` : ''}
             </p>
           </Box>
         </div>
@@ -110,9 +124,9 @@ export function OpsPartnerMessagingWorkspace({
           <Box padding={4} gap={4}>
             {/* Context strip */}
             <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <Chip label={DEMO_TICKET.ticketCode} tone="brand" />
-              <Chip label={`SLA: ${DEMO_TICKET.slaLabel}`} tone="default" />
-              <Chip label={`الصف: ${DEMO_TICKET.ownerQueue}`} />
+              <Chip label={ticketCode ? `تذكرة ${ticketCode}` : 'لا توجد تذكرة مرتبطة'} tone="brand" />
+              {slaLabel ? <Chip label={`SLA: ${slaLabel}`} tone="default" /> : null}
+              {ownerQueue ? <Chip label={`الصف: ${ownerQueue}`} /> : null}
               {isEscalated ? <Chip label="مصعد" tone="danger" /> : null}
             </Box>
 
@@ -151,7 +165,7 @@ export function OpsPartnerMessagingWorkspace({
                 />
               </Box>
               <Text role="caption" tone="muted">
-                الإرسال الفعلي يتطلب ربط مسار المراسلة. هذه مساحة معاينة فقط.
+                الإرسال غير متاح حتى يكتمل ربط مسار المراسلة الحقيقي.
               </Text>
             </Surface>
           </Box>

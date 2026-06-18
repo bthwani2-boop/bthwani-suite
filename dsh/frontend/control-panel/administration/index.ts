@@ -1,2 +1,2 @@
 export { ControlPanelDshAdministrationScreen } from './ControlPanelDshAdministrationScreen';
-export type { AdminRole, AdminRoleId, PlatformPermissionId, MockAdminUser, AdminUserStatus } from './administration.types';
+export type { AdminRole, AdminRoleId, PlatformPermissionId, DshAdminUser, AdminUserStatus } from './administration.types';

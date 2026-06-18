@@ -6,21 +6,20 @@ import {
   Chip,
   Divider,
   MobileStickyPrimaryAction,
+  StateView,
   Text,
   TextField,
   resolveRowDirection,
   useDirection,
   useTheme,
+  spacing,
+  radius,
 } from '@bthwani/ui-kit';
 import {
-  type DshCategoryRecord,
   type DshCreateCategoryRequest,
   type DshUpdateCategoryRequest,
-} from '../../shared/dsh-product-api.client';
-import {
-  createDshProductApiHttpClient,
-  resolveDshProductApiBaseUrl,
-} from '../../shared/dsh-product-api.transport';
+} from '../../shared/products/dsh-product-api.client';
+import { getDshProductRuntimeClient } from '../../shared/runtime/ui-only-runtime-clients';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -114,7 +113,7 @@ export function CategoryManagementScreen({
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const client = React.useMemo(
-    () => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()),
+    () => getDshProductRuntimeClient(),
     [],
   );
 
@@ -244,57 +243,31 @@ export function CategoryManagementScreen({
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (screenState === 'loading') {
-    return (
-      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-        <Text role="bodyStrong" tone="muted" align="center">
-          جارٍ تحميل الفئات…
-        </Text>
-      </Box>
-    );
+    return <StateView kind="loading" title="جارٍ تحميل الفئات…" />;
   }
 
   // ── Offline state ──────────────────────────────────────────────────────────
   if (screenState === 'offline') {
-    return (
-      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 16 }}>
-        <Text role="bodyStrong" tone="warning" align="center">
-          لا يوجد اتصال بالشبكة
-        </Text>
-        <Text role="bodySm" tone="muted" align="center">
-          تعذّر الاتصال بالخادم. تحقق من الاتصال وأعد المحاولة.
-        </Text>
-        <Button label="إعادة المحاولة" tone="primary" onPress={loadCategories} />
-      </Box>
-    );
+    return <StateView stateId="offline" actionLabel="إعادة المحاولة" onActionPress={loadCategories} />;
   }
 
   // ── Error state ────────────────────────────────────────────────────────────
   if (screenState === 'error') {
-    return (
-      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 16 }}>
-        <Text role="bodyStrong" tone="danger" align="center">
-          حدث خطأ غير متوقع
-        </Text>
-        <Text role="bodySm" tone="muted" align="center">
-          فشل تحميل قائمة الفئات. يرجى التحقق من الخادم وإعادة المحاولة.
-        </Text>
-        <Button label="إعادة المحاولة" tone="primary" onPress={loadCategories} />
-      </Box>
-    );
+    return <StateView stateId="recoverableError" title="حدث خطأ غير متوقع" description="فشل تحميل قائمة الفئات. يرجى التحقق من الخادم وإعادة المحاولة." actionLabel="إعادة المحاولة" onActionPress={loadCategories} />;
   }
 
   const flatTree = buildFlatTree(categories);
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: theme.bg }}
+      style={{ flex: 1, backgroundColor: theme.background }}
       contentContainerStyle={{ paddingBottom: 160 }}
       keyboardShouldPersistTaps="handled"
     >
-      <Box gap={4} style={{ padding: 16 }}>
+      <Box gap={4} style={{ padding: spacing[4] }}>
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
-        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 12 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[3] }}>
           {onBack && (screenState === 'list') ? (
             <Button label="رجوع" tone="ghost" size="sm" fullWidth={false} onPress={onBack} />
           ) : null}
@@ -310,8 +283,8 @@ export function CategoryManagementScreen({
         <Box
           style={{
             backgroundColor: theme.line + '18',
-            borderRadius: 8,
-            padding: 12,
+            borderRadius: radius.xs2,
+            padding: spacing[3],
             borderStartWidth: 3,
             borderStartColor: theme.brand,
           }}
@@ -326,8 +299,8 @@ export function CategoryManagementScreen({
           <Box
             style={{
               backgroundColor: theme.danger + '15',
-              borderRadius: 8,
-              padding: 12,
+              borderRadius: radius.xs2,
+              padding: spacing[3],
               borderStartWidth: 3,
               borderStartColor: theme.danger,
             }}
@@ -345,7 +318,7 @@ export function CategoryManagementScreen({
             </Box>
 
             {flatTree.length === 0 ? (
-              <Box style={{ padding: 32, alignItems: 'center', gap: 12 }}>
+              <Box style={{ padding: spacing[8], alignItems: 'center', gap: spacing[3] }}>
                 <Text role="bodySm" tone="muted" align="center">لا توجد فئات حالياً. ابدأ بإضافة فئة جديدة للمتجر.</Text>
                 <Button label="إضافة أول فئة" tone="secondary" size="sm" onPress={handleStartCreate} />
               </Box>
@@ -357,9 +330,9 @@ export function CategoryManagementScreen({
                     style={{
                       flexDirection: resolveRowDirection(direction),
                       alignItems: 'center',
-                      padding: 12,
+                      padding: spacing[3],
                       backgroundColor: theme.line + '08',
-                      borderRadius: 8,
+                      borderRadius: radius.xs2,
                       marginRight: direction === 'rtl' ? depth * 20 : 0,
                       marginLeft: direction === 'ltr' ? depth * 20 : 0,
                       borderStartWidth: depth > 0 ? 2 : 0,
@@ -421,7 +394,7 @@ export function CategoryManagementScreen({
             <Box gap={2}>
               <Text role="bodySm" tone="muted" align="start">الفئة الأب (لإدراجها كفئة فرعية)</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexDirection: resolveRowDirection(direction) }}>
-                <Box style={{ flexDirection: 'row', gap: 8 }}>
+                <Box style={{ flexDirection: 'row', gap: spacing[2] }}>
                   <Button
                     label="بلا فئة أب (رئيسية)"
                     tone={!form.parentId ? 'primary' : 'secondary'}
@@ -446,8 +419,8 @@ export function CategoryManagementScreen({
             </Box>
 
             {screenState === 'edit' && editingCategory && (
-              <Box style={{ marginTop: 16 }}>
-                <Text role="caption" tone="danger" align="start" style={{ marginBottom: 8 }}>
+              <Box style={{ marginTop: spacing[4] }}>
+                <Text role="caption" tone="danger" align="start" style={{ marginBottom: spacing[2] }}>
                   تنبيه: سيؤدي حذف الفئة إلى فك ارتباط المنتجات المنتمية إليها تلقائياً.
                 </Text>
                 <Button
@@ -463,7 +436,7 @@ export function CategoryManagementScreen({
 
         {/* ── SAVING / LOADING SPINNER STUB ──────────────────────────────── */}
         {screenState === 'saving' && (
-          <Box style={{ padding: 24, alignItems: 'center' }}>
+          <Box style={{ padding: spacing[6], alignItems: 'center' }}>
             <Text role="bodyStrong" tone="muted" align="center">جارٍ الحفظ والمزامنة…</Text>
           </Box>
         )}

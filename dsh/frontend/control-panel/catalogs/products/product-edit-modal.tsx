@@ -1,8 +1,8 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
-import { getActualPublicMediaPath } from '../../../shared/resolve-dsh-public-media-path';
+import { getActualPublicMediaPath } from '../../../shared/media/resolve-dsh-public-media-path';
 import type { CatalogProductMaster, CatalogMainCategory } from '../catalogs.data';
 import type { CatalogProductPreviewPatch } from '../catalogs.adapters';
 import {

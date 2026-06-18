@@ -14,6 +14,7 @@ import {
   Text,
   TopBar,
   useDirection,
+  spacing,
 } from '@bthwani/ui-kit';
 import type {
   DshPartnerOperationalFlowId,
@@ -22,11 +23,10 @@ import type {
   DshPartnerSupportRouteId,
 } from '../dsh-partner.types';
 import { getPartnerOrderIssueCategorySpec } from '../parts/PartnerOrderIssuePanel';
-import { getOperationsSupportFlowPreview } from '../../data/support.preview-data';
-import { isDshHiddenCompatFlow } from '../../shared/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
-import { DSH_ORDER_LIFECYCLE_HANDOFFS, getHandoffsForSurface, getSurfaceObservation } from '../../shared/dsh-order-lifecycle-handoffs';
-import { getSurfaceModeCapability } from '../../shared/dsh-fulfillment-surface-visibility';
+import { isDshHiddenCompatFlow } from '../../shared/runtime/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../shared/runtime/dsh-control-panel-governance.map';
+import { DSH_ORDER_LIFECYCLE_HANDOFFS, getHandoffsForSurface, getSurfaceObservation } from '../../shared/orders';
+import { getSurfaceModeCapability } from '../../shared/orders';
 
 export type PartnerSupportRouteId = DshPartnerSupportRouteId;
 
@@ -96,6 +96,8 @@ const commandCenterFilterItems = [
   { value: 'inventory-branch', label: 'مخزون' },
   { value: 'escalation', label: 'تصعيد' },
 ] as const;
+
+const runtimePartnerSupportCases: readonly OperationsSupportCase[] = [];
 
 function resolvePartnerCaseOwnerLabel(item: OperationsSupportCase): string {
   if (item.issueCategoryId === 'payment-refund-review') {
@@ -413,8 +415,8 @@ function InlineActionPanel({
   feedback?: string | null;
 }) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
 
   return (
     <Box padding={2} gap={2} background="surfaceInset" radiusToken="md" style={{ marginVertical: 4 }}>
@@ -482,7 +484,7 @@ function InlineActionPanel({
       </View>
 
       {feedback ? (
-        <Text role="caption" tone="success" style={{ textAlign, marginTop: 4 }}>
+        <Text role="caption" tone="success" style={{ textAlign, marginTop: spacing[1] }}>
           {feedback}
         </Text>
       ) : null}
@@ -492,8 +494,8 @@ function InlineActionPanel({
 
 function InlineDetailsPanel({ item }: { item: OperationsSupportCase }) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
 
   return (
     <Box padding={2} gap={2} background="surfaceInset" radiusToken="md" style={{ marginVertical: 4 }}>
@@ -512,7 +514,7 @@ function InlineDetailsPanel({ item }: { item: OperationsSupportCase }) {
 
       {/* SSoT handoff lookup */}
       {item.linkedFlowId ? (() => {
-        const handoff = DSH_ORDER_LIFECYCLE_HANDOFFS.find((h) => h.signalKind === item.linkedFlowId || h.handoffId === item.linkedFlowId || item.linkedFlowId.includes(h.handoffId));
+        const handoff = DSH_ORDER_LIFECYCLE_HANDOFFS.find((h) => h.signalKind === item.linkedFlowId || h.handoffId === item.linkedFlowId || item.linkedFlowId?.includes(h.handoffId));
         if (!handoff) return null;
         return (
           <Box padding={2} background="surface" border borderTone="info" radiusToken="sm" style={{ marginVertical: 4 }}>
@@ -523,7 +525,7 @@ function InlineDetailsPanel({ item }: { item: OperationsSupportCase }) {
         );
       })() : null}
 
-      <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: 4, alignItems: 'center' }}>
+      <View style={{ flexDirection: rowDirection, flexWrap: 'wrap', gap: spacing[1], alignItems: 'center' }}>
         <Text role="caption" tone="muted" style={{ textAlign }}>الأطراف:</Text>
         {item.linkedParties.map((party) => (
           <ReadOnlyMetaLabel key={party} label={party} tone="brand" />
@@ -568,14 +570,14 @@ function CommandCenterCaseRow({
   feedback?: string | null;
 }) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const category = getPartnerOrderIssueCategorySpec(item.issueCategoryId);
 
   return (
     <Box gap={1} style={{ width: '100%' }}>
       <Box paddingY={2}>
-        <View style={{ flexDirection: rowDirection, alignItems: 'flex-start', gap: 12 }}>
+        <View style={{ flexDirection: rowDirection, alignItems: 'flex-start', gap: spacing[3] }}>
           <Icon
             name={
               item.requiresProof
@@ -595,7 +597,7 @@ function CommandCenterCaseRow({
 
           <View style={{ flex: 1, minWidth: 0, gap: 2, alignItems: direction === 'rtl' ? 'flex-end' : 'flex-start' }}>
             <View style={{ width: '100%', flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
-              <Text role="bodyStrong" style={{ textAlign, fontSize: 15 }}>
+              <Text role="bodyStrong" style={{ textAlign,}}>
                 {item.headline}
               </Text>
               <ReadOnlyMetaLabel
@@ -614,7 +616,7 @@ function CommandCenterCaseRow({
               </Text>
             ) : null}
 
-            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 8, marginTop: 4 }}>
+            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing[2], marginTop: spacing[1] }}>
               <Button label="معالجة" size="sm" fullWidth={false} onPress={onToggleAction} />
               <Button label={isExpanded ? "إغلاق التفاصيل" : "تفاصيل"} size="sm" fullWidth={false} tone="secondary" onPress={onToggleDetails} />
             </View>
@@ -660,13 +662,24 @@ export function PartnerSupportScreen({
   initialSupportRouteId = null,
 }: PartnerSupportScreenProps) {
   const { direction } = useDirection();
-  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
   const textAlign = direction === 'rtl' ? 'right' : 'left';
+  const rowDirection = direction === 'rtl' ? 'row-reverse' : 'row';
 
   const [selectedFilterId, setSelectedFilterId] = React.useState<DshPartnerSupportCommandFilterId>(initialFilterId);
   const [supportQuery, setSupportQuery] = React.useState('');
   const [showSearch, setShowSearch] = React.useState(false);
-  const [expandedCaseId, setExpandedCaseId] = React.useState<string | null>(initialCaseId);
+  const [expandedCaseId, setExpandedCaseId] = React.useState<string | null>(() => {
+    if (initialCaseId) return initialCaseId;
+    if (initialSupportRouteId || initialIssueCategoryId) {
+      return findBestCaseIdForSelection({
+        filterId: initialFilterId,
+        caseId: initialCaseId,
+        supportRouteId: initialSupportRouteId,
+        issueCategoryId: initialIssueCategoryId,
+      });
+    }
+    return null;
+  });
 
   const [activeActionCaseId, setActiveActionCaseId] = React.useState<string | null>(null);
   const [activeActionType, setActiveActionType] = React.useState<'handle' | 'proof' | 'quick-message' | 'escalate' | 'reject' | null>(null);
@@ -677,13 +690,22 @@ export function PartnerSupportScreen({
     setSelectedFilterId(initialFilterId);
     if (initialCaseId) {
       setExpandedCaseId(initialCaseId);
+    } else if (initialSupportRouteId || initialIssueCategoryId) {
+      setExpandedCaseId(
+        findBestCaseIdForSelection({
+          filterId: initialFilterId,
+          caseId: initialCaseId,
+          supportRouteId: initialSupportRouteId,
+          issueCategoryId: initialIssueCategoryId,
+        })
+      );
     } else {
       setExpandedCaseId(null);
     }
-  }, [initialCaseId, initialFilterId]);
+  }, [initialCaseId, initialFilterId, initialSupportRouteId, initialIssueCategoryId]);
 
   const visibleItems = React.useMemo(() => {
-    let items = [...operationsSupportCases];
+    let items = [...runtimePartnerSupportCases];
 
     if (selectedFilterId === 'urgent') {
       items = items.filter((item) => item.hasSlaRisk || item.requiresDecision);
@@ -728,7 +750,7 @@ export function PartnerSupportScreen({
   }, [expandedCaseId, visibleItems]);
 
   const urgentCount = React.useMemo(
-    () => operationsSupportCases.filter((item) => item.hasSlaRisk || item.requiresDecision).length,
+    () => runtimePartnerSupportCases.filter((item) => item.hasSlaRisk || item.requiresDecision).length,
     []
   );
 
@@ -747,27 +769,16 @@ export function PartnerSupportScreen({
   const listCases = visibleItems.slice(1);
 
   return (
-    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: 48 }}>
+    <MobileScrollView fill padding={4} gap={4} contentContainerStyle={{ paddingBottom: spacing[12] }}>
       <TopBar
         variant="secondary"
         title="العمليات والدعم"
         subtitle="لوحة الأولوية"
         style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={
-          onBack
-            ? {
-                id: 'back',
-                icon: <Icon name="arrow-back" size={24} tone="brand" />,
-                mirrorInRtl: true,
-                accessibilityLabel: 'رجوع',
-                onPress: onBack,
-              }
-            : undefined
-        }
       />
 
       <Box gap={1} paddingY={1}>
-        <Text role="bodySm" tone="danger" style={{ textAlign, fontWeight: 'bold' }}>
+        <Text role="bodySm" tone="danger" weight="bold" style={{ textAlign }}>
           {`الأولوية الآن: ${urgentCount} حالات تحتاج إجراءً عاجلاً`}
         </Text>
       </Box>
@@ -775,7 +786,7 @@ export function PartnerSupportScreen({
       <Divider />
 
       <Box gap={2} paddingY={1}>
-        <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <View style={{ flexDirection: rowDirection, alignItems: 'center', justifyContent: 'space-between', gap: spacing[2] }}>
           <Tabs
             items={commandCenterFilterItems}
             value={selectedFilterId}
@@ -841,7 +852,7 @@ export function PartnerSupportScreen({
             ) : null}
           </View>
 
-          <View style={{ flexDirection: rowDirection, gap: 8, marginTop: 4, width: '100%' }}>
+          <View style={{ flexDirection: rowDirection, gap: spacing[2], marginTop: spacing[1], width: '100%' }}>
             <Button
               label="معالجة الآن"
               size="sm"
@@ -887,14 +898,14 @@ export function PartnerSupportScreen({
       <Box gap={3} paddingY={2}>
         <SectionHeader
           title="صف الأولوية"
-          subtitle="حالات تشغيلية مرتبة حسب الأولوية وتتم معالجتها بالكامل محليًا."
+          subtitle="تظهر الحالات هنا بعد تحميلها من DSH API وربط التصعيدات التشغيلية الحية."
         />
 
         {listCases.length === 0 && !focusCase ? (
           <StateView
             stateId="empty"
-            title="لا توجد نتائج مطابقة"
-            description="غيّر معايير البحث أو الفلتر للمتابعة."
+            title="لا توجد حالات دعم حية"
+            description="سيظهر صف الدعم بعد وصول الحالات الفعلية من DSH API. تم عزل الحالات التجريبية المحلية."
           />
         ) : (
           <Box gap={2}>

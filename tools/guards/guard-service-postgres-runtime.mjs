@@ -117,7 +117,9 @@ if (service) {
     migrationSqlTexts.push(sql);
     const tables = extractCreatedTables(sql);
     const isAlterOnly = tables.length === 0 && /ALTER\s+TABLE/i.test(sql);
-    if (tables.length === 0 && !isAlterOnly) {
+    const isIndexOnly = tables.length === 0 && /CREATE\s+(?:UNIQUE\s+)?INDEX/i.test(sql);
+    const isDataOnly = tables.length === 0 && /(?:UPDATE|INSERT\s+INTO)\s+/i.test(sql);
+    if (tables.length === 0 && !isAlterOnly && !isIndexOnly && !isDataOnly) {
       report.fail(rel, 'No CREATE TABLE or ALTER TABLE statement found.', 'Migration must define or extend the slice table.');
     }
     for (const table of tables) {

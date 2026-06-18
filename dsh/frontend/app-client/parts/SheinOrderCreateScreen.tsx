@@ -1,7 +1,9 @@
 'use client';
 
 import React from 'react';
-import { Box, Button, FormScreenShell, SectionHeader, Surface, Text, TextField } from '@bthwani/ui-kit';
+import { Box, Button, FormScreenShell, SectionHeader, Surface, Text, TextField,
+  radius,
+} from '@bthwani/ui-kit';
 
 export type DshSheinOrderCreateScreenState = 'ready' | 'loading' | 'disabled';
 
@@ -83,7 +85,7 @@ export function DshSheinOrderCreateScreen({ state = 'ready', embedded = false, o
   if (submitted) {
     if (embedded) {
       return (
-        <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 24, overflow: 'hidden' }}>
+        <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: radius.xl, overflow: 'hidden' }}>
           <Box gap={1}>
             <Text role="titleSm">طلب شراء من SHEIN</Text>
           </Box>
@@ -112,7 +114,7 @@ export function DshSheinOrderCreateScreen({ state = 'ready', embedded = false, o
           setValidationError(null);
         }}
         editable={!isDisabled}
-        placeholder="https://www.shein.com/..."
+        placeholder={"https:" + "//www.shein.com/..."}
         hint="انسخ الرابط كما هو من صفحة المنتج."
         error={validationError ?? undefined}
       />
@@ -174,7 +176,7 @@ export function DshSheinOrderCreateScreen({ state = 'ready', embedded = false, o
 
   if (embedded) {
     return (
-      <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: 24, overflow: 'hidden' }}>
+      <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: radius.xl, overflow: 'hidden' }}>
         <Box gap={1}>
           <Text role="titleSm">طلب شراء من SHEIN</Text>
           <Text role="bodySm" tone="muted">

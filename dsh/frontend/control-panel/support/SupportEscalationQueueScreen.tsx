@@ -6,7 +6,7 @@ import {
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
 import styles from '../shared/control-panel-surface.module.css';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
 import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,
@@ -32,29 +32,6 @@ const SUPPORT_GOVERNANCE = getDshControlPanelGovernanceEntry('support');
 const FINANCE_GOVERNANCE = getDshControlPanelGovernanceEntry('finance');
 type EscalationSeedRow = Omit<EscalationRow, 'governanceSectionLabel' | 'policyLabel' | 'financeReference'>;
 
-function resolveSupportPolicyLabel(policy?: string): string {
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  if (policy === 'chat-on-open') {
-    return 'محادثة عند الفتح';
-  }
-
-  if (policy === 'finance-preview-only') {
-    return 'مالي للقراءة فقط';
-  }
-
-  if (policy === 'summary-only') {
-    return 'ملخص أولًا';
-  }
-
-  return 'سياسة مرتبطة بالسجل';
-}
 
 const placeholderRowSeeds = [
   {
@@ -110,7 +87,7 @@ const placeholderRows: readonly EscalationRow[] = placeholderRowSeeds.map((row) 
   return {
     ...row,
     governanceSectionLabel: governanceEntry?.sectionLabel ?? resolveDshControlPanelSectionLabel('support'),
-    policyLabel: resolveSupportPolicyLabel(summary?.onDemandPolicy),
+    policyLabel: resolveDshOnDemandPolicyLabel(summary?.onDemandPolicy),
     financeReference: summary?.financialImpact ? FINANCE_GOVERNANCE?.financeReference ?? 'wlt-finance' : undefined,
   };
 });

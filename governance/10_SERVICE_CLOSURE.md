@@ -36,6 +36,23 @@ This file defines what it means to close a BThwani service or service-surface sl
 
 DSH is the first golden slice. Do not claim the platform is closed if DSH is not closed across client, partner, captain, field, and control-panel.
 
+## BThwani Full-Stack Closure Rule
+
+أي service-surface closure داخل DSH/WLT لا يقبل كإغلاق إذا لم يثبت full-stack coverage:
+
+```text
+UI + API + OpenAPI + backend + database + shared contracts + control-panel operation + WLT boundary + media runtime + evidence
+```
+
+الإغلاق النهائي داخل DSH/WLT يقبل مفردتين فقط:
+
+```text
+CLOSED_WITH_EVIDENCE
+HARD_BLOCKED_EXTERNAL_ONLY
+```
+
+المفردات الأخرى مثل `PASS_WITH_WARNINGS`, `FIX_REQUIRED`, `NEEDS_EVIDENCE`, و`NEEDS_VISUAL_EVIDENCE` مسموحة داخل discovery أو أثناء التنفيذ فقط، وليست قرار إغلاق نهائي.
+
 ## Required closure matrices
 
 ### Screen matrix
@@ -161,6 +178,13 @@ DEPRECATED
 This file owns closure protocol and the blueprint/catalog shape used to prove closure.
 
 ## Closure decision vocabulary
+
+Final closure vocabulary:
+
+- `CLOSED_WITH_EVIDENCE`
+- `HARD_BLOCKED_EXTERNAL_ONLY`
+
+Discovery/execution vocabulary only:
 
 - `PASS`
 - `PASS_WITH_WARNINGS`

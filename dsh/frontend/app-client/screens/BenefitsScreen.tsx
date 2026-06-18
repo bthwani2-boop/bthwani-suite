@@ -13,24 +13,29 @@ import {
   ActionStrip,
   Divider,
   Icon,
+  TopBar,
+  type IconName,
+  radius,
 } from '@bthwani/ui-kit';
-import { dshNotificationsFixtures } from '../../data/support.preview-data';
-import { subscriptionPlanCards } from '../../data/subscriptions.preview-data';
 import { DshLoyaltyRewardsScreen } from '../parts/LoyaltyRewardsScreen';
 import { DshOperationScreen, type DshOperationScreenProps } from '../parts/OperationScreen';
 import { DshSubscriptionsScreen } from '../parts/SubscriptionsScreen';
-import { getCampaignItems } from '../../data/marketing.preview-data';
 import {
   isClientVisibleStatus,
-} from '../../shared/commercial.preview-contract';
+  type LoyaltyTier,
+  type LoyaltyReward,
+  type CommercialEntitlement,
+  type SubscriptionClientCard,
+} from '../../shared/marketing/commercial-contract';
 import {
   DSH_LOYALTY_UI_BOUNDARY_NOTE,
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,
   isMarketingRenderable,
-} from '../../shared/marketing-visibility.contract';
-import { getEntitlements, getLoyaltyRewards, getLoyaltyTiers } from '../../data/subscriptions.preview-data';
-import { getPartnerOfferItems } from '../../data/offers.preview-data';
+} from '../../shared/marketing/marketing.visibility';
+import type { DshNotificationItem } from './NotificationsScreen';
+import type { CampaignRecord } from '../../shared/marketing/marketing.types';
+import type { PartnerOfferRecord } from '../../shared/stores/partner/dsh-partner-offer-types';
 
 type DshBenefitsSection = 'now' | 'loyalty' | 'subscription' | 'offers' | 'history';
 
@@ -40,6 +45,13 @@ export type DshBenefitsHubScreenProps = Omit<DshOperationScreenProps, 'title' | 
   initialSection?: DshBenefitsInitialSection;
   onBack?: () => void;
   screenId?: string;
+  loyaltyTiers?: LoyaltyTier[];
+  loyaltyRewards?: LoyaltyReward[];
+  entitlements?: CommercialEntitlement[];
+  subscriptionPlans?: SubscriptionClientCard[];
+  partnerOffers?: PartnerOfferRecord[];
+  campaigns?: CampaignRecord[];
+  notifications?: DshNotificationItem[];
 };
 
 type BenefitRow = {
@@ -120,29 +132,7 @@ function resolveStateSubtitle(section: DshBenefitsSection) {
   return 'أهم ما يمكنك الاستفادة منه الآن';
 }
 
-function ScreenHeader({ title }: { title: string }) {
-  const { theme } = useTheme();
 
-  return (
-    <Surface
-      tone="raised"
-      padding={3}
-      gap={0}
-      style={{
-        borderRadius: 0,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.line,
-        paddingTop: safeArea.comfortable + spacing[2],
-        minHeight: 44 + safeArea.comfortable + spacing[2],
-        justifyContent: 'flex-end',
-      }}
-    >
-      <Text role="titleMd" style={{ textAlign: 'right' }}>
-        {title}
-      </Text>
-    </Surface>
-  );
-}
 
 function ContentCard({
   hint,
@@ -158,7 +148,7 @@ function ContentCard({
       <Text role="bodySm" tone="muted" style={{ textAlign: 'right', paddingHorizontal: spacing[3] }}>
         {hint}
       </Text>
-      <View style={{ height: 1, backgroundColor: theme.line }} />
+      <Divider />
       {children}
     </View>
   );
@@ -175,7 +165,7 @@ function BenefitListRow({
 }) {
   const [expanded, setExpanded] = React.useState(false);
   const { theme } = useTheme();
-  const iconMap: Record<string, import('@bthwani/ui-kit/src/components/icons').IconName> = {
+  const iconMap: Record<string, IconName> = {
     subscription: 'star-outline',
     offers: 'pricetag-outline',
     loyalty: 'wallet-outline',
@@ -200,7 +190,7 @@ function BenefitListRow({
     >
       <View style={{ gap: spacing[3], paddingTop: spacing[1] }}>
         {row.helperText && (
-          <Text role="bodySm" tone="muted" style={{ textAlign: 'right', lineHeight: 20 }}>
+          <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
             {row.helperText}
           </Text>
         )}
@@ -211,7 +201,7 @@ function BenefitListRow({
               tone="brand"
               size="sm"
               fullWidth={false}
-              style={{ minWidth: 120, borderRadius: 8 }}
+              style={{ minWidth: 120, borderRadius: radius.xs2 }}
               onPress={() => {
                 onActionPress?.(row);
                 setExpanded(false);
@@ -226,11 +216,19 @@ function BenefitListRow({
 
 export function DshBenefitsHubScreen({
   initialSection,
+  onBack,
   onPrimaryAction,
   onRetry,
   onSecondaryAction,
   screenId,
   state = 'ready',
+  loyaltyTiers: loyaltyTiersProp = [],
+  loyaltyRewards: loyaltyRewardsProp = [],
+  entitlements: entitlementsProp = [],
+  subscriptionPlans = [],
+  partnerOffers = [],
+  campaigns = [],
+  notifications: notificationsProp = [],
 }: DshBenefitsHubScreenProps) {
   const { theme } = useTheme();
   const resolvedInitialSection = normalizeBenefitsSection(screenId, initialSection);
@@ -258,18 +256,18 @@ export function DshBenefitsHubScreen({
     );
   }
 
-  const loyaltyTiers = getLoyaltyTiers();
+  const loyaltyTiers = loyaltyTiersProp;
   const activeTier = loyaltyTiers[loyaltyTiers.length - 1];
-  const activeRewards = getLoyaltyRewards().filter((reward) => isClientVisibleStatus(reward.status));
-  const activeEntitlements = getEntitlements().filter((entitlement) => entitlement.status === 'active');
-  const currentPlan = subscriptionPlanCards.find((plan) => plan.current) ?? subscriptionPlanCards[0];
-  const liveOffers = getPartnerOfferItems().filter((offer) => (
+  const activeRewards = loyaltyRewardsProp.filter((reward) => isClientVisibleStatus(reward.status));
+  const activeEntitlements = entitlementsProp.filter((entitlement) => entitlement.status === 'active');
+  const currentPlan = subscriptionPlans.find((plan) => plan.current) ?? subscriptionPlans[0];
+  const liveOffers = partnerOffers.filter((offer) => (
     isMarketingRenderable(getPartnerOfferVisibilityRecord(offer, { targetSurface: 'benefits' }))
   ));
-  const liveCampaigns = getCampaignItems().filter((campaign) => (
+  const liveCampaigns = campaigns.filter((campaign) => (
     isMarketingRenderable(getCampaignVisibilityRecord(campaign, { targetSurface: 'benefits' }))
   ));
-  const commercialNotifications = dshNotificationsFixtures
+  const commercialNotifications = notificationsProp
     .filter((item) => item.category === 'offer' || item.category === 'subscription')
     .slice(0, 3);
   const couponReward = activeRewards.find((reward) => reward.title.includes('كوبون'));
@@ -401,7 +399,7 @@ export function DshBenefitsHubScreen({
     if (focusedSection === 'subscription') {
       return (
         <ContentCard hint={sectionHints.subscription}>
-          <DshSubscriptionsScreen compact onStatusChange={setFeedback} />
+          <DshSubscriptionsScreen compact plans={subscriptionPlans} onStatusChange={setFeedback} />
         </ContentCard>
       );
     }
@@ -458,7 +456,17 @@ export function DshBenefitsHubScreen({
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.surface }}>
-      <ScreenHeader title={sectionLabels[focusedSection] ?? 'مزاياي'} />
+      <TopBar
+        variant="surface"
+        title={sectionLabels[focusedSection] ?? 'مزاياي'}
+        subtitle={resolveStateSubtitle(focusedSection)}
+        actions={onBack ? [{
+          id: 'back',
+          icon: <Icon name="chevron-back" mirrored size={18} />,
+          accessibilityLabel: 'العودة',
+          onPress: onBack,
+        }] : []}
+      />
 
       <MobileScrollView
         fill
@@ -476,7 +484,7 @@ export function DshBenefitsHubScreen({
               marginBottom: spacing[2],
               backgroundColor: theme.successSurface,
               padding: spacing[3],
-              borderRadius: 12,
+              borderRadius: radius.sm2,
               borderWidth: 1,
               borderColor: theme.success,
               flexDirection: 'row-reverse',

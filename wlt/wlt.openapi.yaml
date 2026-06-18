@@ -11,8 +11,23 @@ info:
     or mutate financial state.
 
     Boundary: governance/22_DSH_GOLDEN_SLICE.md — "DSH must not own".
+  contact:
+    name: BThwani Platform Team
+    email: bthwani3@gmail.com
 
 x-bthwani-contract-state: WLT_SERVICE_V1_LIVE
+
+tags:
+  - name: Health
+    description: Service liveness and readiness probes.
+  - name: Payment
+    description: Payment session lifecycle — create, confirm, fail.
+  - name: Refund
+    description: Refund lifecycle — initiate, process, confirm, fail.
+  - name: Settlement
+    description: Partner/captain settlement lifecycle — create, process, complete, fail.
+  - name: Wallet
+    description: Wallet balance queries and ledger transaction history.
 
 servers:
   - url: http://localhost:18083
@@ -247,7 +262,10 @@ components:
 paths:
   /health:
     get:
+      tags:
+        - Health
       summary: Service health probe
+      description: Liveness probe — returns ok when the WLT service is running and accepting requests.
       operationId: getHealth
       responses:
         '200':
@@ -266,7 +284,10 @@ paths:
 
   /payment/sessions:
     post:
+      tags:
+        - Payment
       summary: Create payment session (DSH checkout handoff to WLT)
+      description: DSH calls this when the client confirms checkout. WLT creates a payment session and holds the funds.
       operationId: createPaymentSession
       security:
         - BearerAuth: []
@@ -313,7 +334,10 @@ paths:
 
   /payment/sessions/{id}:
     get:
+      tags:
+        - Payment
       summary: Get payment session status
+      description: Returns the current state and metadata of a payment session by ID.
       operationId: getPaymentSession
       security:
         - BearerAuth: []
@@ -340,6 +364,8 @@ paths:
 
   /payment/sessions/{id}/confirm:
     post:
+      tags:
+        - Payment
       summary: Confirm payment — provider webhook or operator test-confirm
       description: |
         WLT confirms payment and calls DSH POST /checkout/payment-callback:
@@ -386,7 +412,10 @@ paths:
 
   /payment/sessions/{id}/fail:
     post:
+      tags:
+        - Payment
       summary: Fail payment — provider webhook or operator
+      description: Transitions payment session to FAILED state and notifies DSH via payment callback.
       operationId: failPaymentSession
       security:
         - BearerAuth: []
@@ -417,7 +446,10 @@ paths:
 
   /refunds:
     post:
+      tags:
+        - Refund
       summary: Initiate refund (operator — WLT financial decision)
+      description: Creates a refund record in PENDING state. WLT is the sole owner of refund authorization and execution.
       operationId: createRefund
       security:
         - BearerAuth: []
@@ -461,7 +493,10 @@ paths:
 
   /refunds/{id}:
     get:
+      tags:
+        - Refund
       summary: Get refund status
+      description: Returns the current state of a refund by ID.
       operationId: getRefund
       security:
         - BearerAuth: []
@@ -482,7 +517,10 @@ paths:
 
   /refunds/{id}/process:
     post:
+      tags:
+        - Refund
       summary: Operator approves refund (PENDING → PROCESSING)
+      description: Operator moves a pending refund to PROCESSING state, authorizing the fund release.
       operationId: processRefund
       security:
         - BearerAuth: []
@@ -503,6 +541,8 @@ paths:
 
   /refunds/{id}/confirm:
     post:
+      tags:
+        - Refund
       summary: Confirm refund (PROCESSING → CONFIRMED) + notify DSH
       description: |
         WLT confirms refund and calls DSH POST /orders/{order_id}/refund-callback:
@@ -528,7 +568,10 @@ paths:
 
   /refunds/{id}/fail:
     post:
+      tags:
+        - Refund
       summary: Fail refund + notify DSH
+      description: Transitions refund to FAILED state and dispatches a failure callback to DSH.
       operationId: failRefund
       security:
         - BearerAuth: []
@@ -558,7 +601,10 @@ paths:
 
   /settlements:
     post:
+      tags:
+        - Settlement
       summary: Create settlement for a delivered order (operator)
+      description: Creates a settlement record for a delivered order. WLT calculates platform/captain fees and creates the payout record.
       operationId: createSettlement
       security:
         - BearerAuth: []
@@ -602,7 +648,10 @@ paths:
                 $ref: '#/components/schemas/Settlement'
 
     get:
+      tags:
+        - Settlement
       summary: List settlements (operator)
+      description: Returns a paginated list of settlement records, optionally filtered by status.
       operationId: listSettlements
       security:
         - BearerAuth: []
@@ -640,7 +689,10 @@ paths:
 
   /settlements/{id}:
     get:
+      tags:
+        - Settlement
       summary: Get settlement detail
+      description: Returns the full detail of a single settlement record including fee breakdown.
       operationId: getSettlement
       security:
         - BearerAuth: []
@@ -661,7 +713,10 @@ paths:
 
   /settlements/{id}/process:
     post:
+      tags:
+        - Settlement
       summary: Move settlement PENDING → PROCESSING
+      description: Operator initiates payout processing for a pending settlement.
       operationId: processSettlement
       security:
         - BearerAuth: []
@@ -682,7 +737,10 @@ paths:
 
   /settlements/{id}/complete:
     post:
+      tags:
+        - Settlement
       summary: Complete settlement PROCESSING → COMPLETED
+      description: Marks the settlement as fully disbursed. Triggers payout record finalization.
       operationId: completeSettlement
       security:
         - BearerAuth: []
@@ -703,7 +761,10 @@ paths:
 
   /settlements/{id}/fail:
     post:
+      tags:
+        - Settlement
       summary: Fail settlement
+      description: Marks the settlement as failed. Records the reason and unlocks retry eligibility.
       operationId: failSettlement
       security:
         - BearerAuth: []
@@ -733,6 +794,8 @@ paths:
 
   /wallets/{subject}/summary:
     get:
+      tags:
+        - Wallet
       summary: Wallet balance and aggregate stats for a subject
       description: |
         Operators can query any subject.
@@ -763,7 +826,10 @@ paths:
 
   /wallets/{subject}/transactions:
     get:
+      tags:
+        - Wallet
       summary: Paginated ledger entries for a subject
+      description: Returns paginated wallet transaction history (debits/credits) for a given subject (client, partner, captain).
       operationId: getWalletTransactions
       security:
         - BearerAuth: []

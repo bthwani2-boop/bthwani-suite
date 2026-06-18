@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Text, useTheme } from '@bthwani/ui-kit';
@@ -98,7 +98,7 @@ export function CatalogProductsTable({
                 <WatermarkedImage src={p.imageUri} mediaKey={p.mediaKey} fallback={p.emojiFallback} size={32} productName={p.name} />
               </td>
               <td style={{ padding: '8px' }}>
-                <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>{p.name}</Text>
+                <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>{p.name}</Text>
               </td>
               <td style={{ padding: '8px' }}>
                 <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{cat?.label}</Text>
@@ -107,10 +107,10 @@ export function CatalogProductsTable({
                 <Text role="caption" tone="muted" style={{ fontSize: 10 }}>{classif?.label || 'عام'}</Text>
               </td>
               <td style={{ padding: '8px' }}>
-                <Text role="caption" tone="muted" style={{ fontFamily: 'monospace', fontSize: 10 }}>{p.sku}</Text>
+                <Text role="code" tone="muted" style={{ fontSize: 10 }}>{p.sku}</Text>
               </td>
               <td style={{ padding: '8px' }}>
-                <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: 700 }}>{p.price}</Text>
+                <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground }}>{p.price}</Text>
               </td>
               <td style={{ padding: '8px' }}>
                 <PolicyBadge mediaPolicy={p.mediaPolicy} />

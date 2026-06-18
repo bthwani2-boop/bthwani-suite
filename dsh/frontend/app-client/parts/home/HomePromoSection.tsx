@@ -3,10 +3,23 @@ import { Image, Pressable, ScrollView, View } from 'react-native';
 import { BannerCarousel, Icon, Text, colorPalette, spacing } from '@bthwani/ui-kit';
 
 import { CategoryHubIcon, CategoryIconImage, CategorySelectorItem } from './HomeCategoryCarousel';
-import { normalizeHomePromoActionType } from '../../shared/home-promo-mappers';
-import type { DshHomeGetPromo } from '../../contracts/dsh-home-types';
+import { normalizeHomePromoActionType } from '../../../shared/discovery/home-promo-mappers';
+import type { DshHomeGetPromo } from '../../../shared/discovery/dsh-home-types';
+import type { HomeScreenShellProps } from './HomeScreenShell';
 
 const ACTIVE_PROMO_INTERVAL_MS = 5000;
+
+type HomePromoSectionProps = Pick<HomeScreenShellProps, 'props' | 'theme' | 'styles' | 'homeState' | 'promoHandlers' | 'activeHomePromo' | 'categoriesAnchorRef'> & {
+  bannerItems: HomeScreenShellProps['promoHandlers']['bannerItems'];
+  selectedCategory: HomeScreenShellProps['filterRail']['selectedCategory'];
+  selectedCategoryLabel: string;
+  selectedSubcategoryCards: Array<{ id: string; emoji?: string; title: string; subtitle?: string }>;
+  activeCategoryDialItem: HomeScreenShellProps['filterRail']['activeCategoryDialItem'];
+  openCategoriesDial: () => void;
+  containerWidth: number;
+  cardHeight: number;
+  resolvedItemGap: number;
+};
 
 export const HomePromoSection = React.memo(function HomePromoSection({
   props,
@@ -16,7 +29,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
   bannerItems,
   activeHomePromo,
   promoHandlers,
-  selectedCategoryFixture,
+  selectedCategory,
   selectedCategoryLabel,
   selectedSubcategoryCards,
   activeCategoryDialItem,
@@ -25,12 +38,12 @@ export const HomePromoSection = React.memo(function HomePromoSection({
   containerWidth,
   cardHeight,
   resolvedItemGap,
-}: any) {
+}: HomePromoSectionProps) {
   return (
     <>
       {homeState.inlineSearchVisible ? null : bannerItems.length ? (
         <BannerCarousel
-          banners={bannerItems}
+          banners={bannerItems as import('@bthwani/ui-kit').BannerCarouselItem[]}
           variant="secondary"
           height={cardHeight + spacing[6]}
           fullBleed={false}
@@ -71,7 +84,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
               />
             </View>
 
-            {selectedCategoryFixture && (
+            {selectedCategory && (
               <CategorySelectorItem
                 isSelected
                 label={selectedCategoryLabel}
@@ -94,7 +107,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
               style={styles.heroPromoCard}
               onPress={() => {
                 const promo = activeHomePromo;
-                const mockPromo: DshHomeGetPromo = {
+                const promoRecord: DshHomeGetPromo = {
                   id: promo.id,
                   title: promo.title,
                   subtitle: promo.subtitle,
@@ -102,7 +115,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
                   actionType: normalizeHomePromoActionType(promo.targetType),
                   actionTarget: promo.targetId,
                 };
-                promoHandlers.resolveBannerPress(mockPromo)();
+                promoHandlers.resolveBannerPress(promoRecord)();
               }}
             >
               {activeHomePromo.imageUrl && (
@@ -125,18 +138,18 @@ export const HomePromoSection = React.memo(function HomePromoSection({
                   )}
                 </View>
                 <View style={styles.heroPromoTextWrap}>
-                  <Text style={styles.heroPromoTitle} numberOfLines={1}>
+                  <Text weight="black" style={styles.heroPromoTitle} numberOfLines={1}>
                     بثواني برو
                   </Text>
-                  <Text style={styles.heroPromoSubtitle} numberOfLines={1}>
+                  <Text weight="bold" style={styles.heroPromoSubtitle} numberOfLines={1}>
                     {activeHomePromo.subtitle}
                   </Text>
                   {activeHomePromo.ctaText && (
                     <View style={styles.heroPromoCtaButton}>
-                      <Text style={styles.heroPromoCtaText}>
+                      <Text weight="black" style={styles.heroPromoCtaText}>
                         {activeHomePromo.ctaText}
                       </Text>
-                      <Icon name="chevron-back" size={10} color="white" />
+                      <Icon name="chevron-back" size={10} color="var(--bthwani-brand-contrast)" />
                     </View>
                   )}
                 </View>
@@ -152,7 +165,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
               contentContainerStyle={styles.categoriesSelectorScrollContent}
               style={styles.categoriesSelectorScroll}
             >
-              {selectedSubcategoryCards.map((subcategory: any) => (
+              {selectedSubcategoryCards.map((subcategory) => (
                 <Pressable
                   key={subcategory.id}
                   style={[
@@ -168,6 +181,7 @@ export const HomePromoSection = React.memo(function HomePromoSection({
                   </View>
                   <Text
                     role="bodySm"
+                    weight="bold"
                     style={[
                       styles.subcategoryName,
                       homeState.activeSubcategoryId === subcategory.id && styles.subcategoryNameActive,

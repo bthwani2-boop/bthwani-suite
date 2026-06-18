@@ -13,14 +13,13 @@ import {
   Button,
 } from '@bthwani/ui-kit';
 import {
-  fallbackOrderListItems,
   normalizeText,
   OrderRow,
   type DshOrdersListScreenProps,
 } from './parts/OrdersTrackingHelpers';
 
 export function DshOrdersListScreen({
-  items = fallbackOrderListItems,
+  items = [],
   query = '',
   onQueryChange,
   onOpenOrder,
@@ -38,7 +37,9 @@ export function DshOrdersListScreen({
     : items;
 
   const sortedItems = [...visibleItems].sort((a, b) => {
-    return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+    const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+    return timeB - timeA;
   });
 
   return (
@@ -97,8 +98,10 @@ export function DshOrdersListScreen({
         ) : (
           <View style={{ padding: spacing[4] }}>
             <Surface tone="raised" padding={4} radiusToken="xl" gap={2}>
-              <Text role="titleMd" style={{ textAlign: 'center', fontWeight: '700' }}>لا توجد طلبات</Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>لم نعثر على أي طلب يطابق بحثك.</Text>
+              <Text role="titleMd" weight="bold" style={{ textAlign: 'center' }}>لا توجد طلبات</Text>
+              <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>
+                {normalizedQuery ? 'لم نعثر على أي طلب يطابق بحثك.' : 'ستظهر الطلبات هنا بعد تحميلها من DSH API.'}
+              </Text>
               {onBack ? <Button label="العودة" tone="secondary" onPress={onBack} style={{ marginTop: spacing[2] }} /> : null}
               {onRetry ? <Button label="إعادة المحاولة" tone="ghost" onPress={onRetry} /> : null}
             </Surface>

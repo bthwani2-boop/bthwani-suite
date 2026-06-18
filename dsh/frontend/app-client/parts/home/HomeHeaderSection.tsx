@@ -1,5 +1,8 @@
 import * as React from 'react';
 import { SearchTopBar, ModernPremiumHeader } from '@bthwani/ui-kit';
+import type { HomeScreenShellProps } from './HomeScreenShell';
+
+type HomeHeaderSectionProps = Pick<HomeScreenShellProps, 'props' | 'homeState' | 'uiText' | 'styles' | 'isRtl' | 'ticker' | 'openInlineSearch' | 'closeInlineSearch' | 'openServiceDial' | 'handleOpenCartFromHeader' | 'handleOpenMySpace'>;
 
 export const HomeHeaderSection = React.memo(function HomeHeaderSection({
   props,
@@ -13,7 +16,7 @@ export const HomeHeaderSection = React.memo(function HomeHeaderSection({
   openServiceDial,
   handleOpenCartFromHeader,
   handleOpenMySpace,
-}: any) {
+}: HomeHeaderSectionProps) {
   if (homeState.inlineSearchVisible) {
     return (
       <SearchTopBar
@@ -36,7 +39,6 @@ export const HomeHeaderSection = React.memo(function HomeHeaderSection({
       onCartPress={handleOpenCartFromHeader}
       onNotificationsPress={props.onOpenNotifications}
       onProfilePress={handleOpenMySpace}
-      onLauncherPress={openServiceDial}
       notificationCount={props.notificationCount}
       cartCount={props.cartCount}
       searchPlaceholder="ماذا تريد أن تطلب اليوم؟"

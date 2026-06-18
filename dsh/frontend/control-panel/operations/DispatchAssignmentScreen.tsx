@@ -8,35 +8,23 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import {
-  DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW,
-} from '../../data/orders.preview-data';
-import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
-import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/dsh-order-preview.contract';
-import {
-  resolveDshOrderApiBaseUrl,
-  createDshOrderLifecycleHttpClient,
-} from '../../shared';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/operations/dsh-operational-runtime-adapter';
+import { DISPATCH_LIFECYCLE_STATE_MAP } from '../../shared/orders';
+import { getDshOrderLifecycleRuntimeClient } from '../../shared';
 import { Box, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
-import { getDshLifecycleStateMetadata } from '../../shared/dsh-order-journey.model';
+import { getDshLifecycleStateMetadata } from '../../shared/orders';
+import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 // SSoT: dispatch queue visibility is owned by dsh-fulfillment-surface-visibility.
 // Do not duplicate delivery-mode dispatch logic inline — use these helpers.
 import {
   shouldEnterDispatchQueueForMode,
   shouldShowCaptainAssignmentInCP,
   getSurfaceRoleSummaryForMode,
-} from '../../shared/dsh-fulfillment-surface-visibility';
+} from '../../shared/orders';
 
 export type DispatchAssignmentScreenProps = { hubHref: string; subGroup?: string };
-
-const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  warning: 'warning',
-  danger: 'danger',
-  best: 'success',
-  brand: 'neutral',
-};
 
 // SSoT: resolved once at module level — bthwani_delivery is the only mode
 // that enters the captain dispatch queue.
@@ -104,27 +92,32 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   const urlOrderId = searchParams.get('orderId') ?? null;
   const [selectedRowId, setSelectedRowId] = React.useState<string | null>(null);
   const [runtimeLoaded, setRuntimeLoaded] = React.useState(false);
+  const [runtimeOffline, setRuntimeOffline] = React.useState(false);
+  const [runtimeError, setRuntimeError] = React.useState<string | null>(null);
+  const [retryCount, setRetryCount] = React.useState(0);
+  const retry = React.useCallback(() => setRetryCount((n) => n + 1), []);
+  const client = React.useMemo(() => getDshOrderLifecycleRuntimeClient(), []);
 
-  const [rows, setRows] = React.useState<DispatchRowState[]>(() =>
-    DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.rows.map((row) => ({
-      ...row,
-      assignedCaptain: null as string | null,
-      customStatus: null as string | null,
-      customStatusTone: null as 'warning' | 'success' | 'danger' | 'neutral' | null,
-    }))
-  );
+  const [rows, setRows] = React.useState<DispatchRowState[]>(() => []);
 
   React.useEffect(() => {
     let cancelled = false;
     fetchDshRuntimeOrders({ status: 'CREATED', limit: 100 }).then((result) => {
       if (cancelled) return;
-      if (result.kind === 'ok' && result.orders.length > 0) {
-        setRows(result.orders.map(buildRuntimeDispatchRow));
+      if (result.kind === 'ok') {
+        const isEmpty = result.orders.length === 0;
+        if (!isEmpty) setRows(result.orders.map(buildRuntimeDispatchRow));
         setRuntimeLoaded(true);
+        setRuntimeError(null);
+        setRuntimeOffline(false);
+      } else if (result.kind === 'offline') {
+        setRuntimeOffline(true);
+      } else {
+        setRuntimeError(result.message);
       }
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [retryCount]);
 
   React.useEffect(() => {
     if (urlOrderId) {
@@ -146,9 +139,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
   const handleConfirmAssignment = React.useCallback((orderId: string, captainName: string) => {
     setActionStatus('pending');
 
-    const baseUrl = resolveDshOrderApiBaseUrl();
-    if (baseUrl) {
-      const client = createDshOrderLifecycleHttpClient(baseUrl);
+    if (client) {
       client.assignCaptain(orderId, { captain_id: captainName })
         .then(() => {
           setActionStatus('success');
@@ -201,7 +192,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
 
   const summaryKpi = [
     { id: 'waiting', label: 'بانتظار الإسناد', value: String(rows.filter(r => !r.assignedCaptain && r.statusTone !== 'danger').length), tone: 'danger' as const },
-    { id: 'captains', label: 'كباتن متاحون', value: runtimeLoaded ? '—' : String(DISPATCH_ASSIGNMENT_OPERATIONAL_PREVIEW.summary.availableCaptains), tone: 'success' as const },
+    { id: 'captains', label: 'كباتن متاحون', value: '—', tone: 'success' as const },
     { id: 'source', label: 'مصدر البيانات', value: runtimeLoaded ? 'DSH Runtime' : 'Preview', tone: runtimeLoaded ? 'success' as const : 'warning' as const },
     { id: 'blockers', label: 'معوقات الإسناد', value: String(rows.filter(r => r.statusTone === 'danger').length), tone: 'warning' as const },
   ];
@@ -342,7 +333,7 @@ export function DispatchAssignmentScreen({ subGroup }: DispatchAssignmentScreenP
               // Use dynamic states if they exist
               const resolvedCaptain = item.assignedCaptain || item.captain;
               const resolvedStatusLabel = item.customStatus || (lifecycleMetadata?.controlPanelLabel ?? item.status);
-              const resolvedStatusTone = item.customStatusTone || TONE_MAP[item.statusTone] || 'neutral';
+              const resolvedStatusTone = item.customStatusTone || DSH_CONTROL_PANEL_TONE_MAP[item.statusTone] || 'neutral';
 
               const primaryLabel = item.customStatus ? 'تم الإسناد' : (lifecycleMetadata?.primaryAction?.label ?? 'تأكيد الإسناد');
 

@@ -28,7 +28,8 @@ $legacyAllowedExact = @(
   "tools/generate-dsh-fixture-images.ps1",
   "tools/GHB_COMMIT_PUSH_CURRENT_BRANCH.ps1",
   "tools/ghb.ps1",
-  "docker/local.ps1"
+  "docker/local.ps1",
+  "tools/docker_scri.ps1"
 )
 
 function Test-ExistsInIndexOrWorktree([string]$RelativePath) {

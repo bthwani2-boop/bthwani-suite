@@ -16,7 +16,7 @@ import {
   getDshPartnerVisibilityBadgeLabel,
   getDshPartnerVisibilityBadgeTone,
   getDshPartnerActivationStatusLabel,
-} from '../../shared/dsh-partner-activation.model';
+} from '../../shared/stores/partner/dsh-partner-activation.model';
 import {
   PARTNER_FULFILLMENT_AGREEMENTS,
   getPartnerActivationStatus,
@@ -59,7 +59,8 @@ export function ControlPanelDshPartnerActivationScreen() {
 
   const currentPartner =
     PARTNER_FULFILLMENT_AGREEMENTS.find(p => p.partnerId === selectedPartnerId) ||
-    PARTNER_FULFILLMENT_AGREEMENTS[0];
+    PARTNER_FULFILLMENT_AGREEMENTS[0] ||
+    { partnerId: selectedPartnerId, storeName: 'شريك غير معروف', categoryLabel: '', modes: [] };
 
   const handlePartnerSelect = (id: string) => {
     setSelectedPartnerId(id);
@@ -263,7 +264,7 @@ export function ControlPanelDshPartnerActivationScreen() {
             title="تعليمات تفعيل الشريك"
             reason={actionMessage}
             confidence={allReady ? 'high' : 'low'}
-            auditTag="UI_PREVIEW_ONLY"
+            auditTag="NEEDS_BINDING_LATER"
           />
           <Surface tone="raised" padding={4} gap={2} radiusToken="lg">
             <Text role="titleSm" tone="default">ملاحظة تشغيلية</Text>

@@ -2,10 +2,9 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import {
-  getWltDshStoreSettlementStatementsPreview,
-  type WltDshStoreSettlementStatement as StoreStatement,
-} from '../financeContracts';
+import type { WltDshStoreSettlementStatement as StoreStatement } from '../../shared/settlements/storeSettlement.types';
+import { loadWltDshFinanceRuntimeReadModel, type WltDshFinanceRuntimeResult } from '../../shared/boundary/wltDshFinanceRuntime.adapter';
+import { buildRuntimeStoreStatements } from '../../shared/settlements/store-settlement.read-model';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 const STATUS_LABEL: Record<StoreStatement['status'], string> = {
@@ -26,6 +25,7 @@ const PAYMENT_METHOD_LABEL: Record<string, string> = {
   wallet: 'محفظة بثواني',
   cod: 'كاش عند الاستلام (COD)',
   card: 'بطاقة بنكية',
+  manual: 'WLT runtime',
 };
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -38,48 +38,81 @@ function Metric({ label, value }: { label: string; value: string }) {
 }
 
 export function WltDshStoreSettlementStatement() {
-  const statements = React.useMemo(() => getWltDshStoreSettlementStatementsPreview(), []);
+  const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void loadWltDshFinanceRuntimeReadModel().then((result) => {
+      if (!cancelled) setRuntimeFinance(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const runtimeStatements = React.useMemo(() => buildRuntimeStoreStatements(runtimeFinance), [runtimeFinance]);
+  const statements = runtimeStatements;
+  const usingRuntime = runtimeStatements.length > 0;
 
   const [activeStoreId, setActiveStoreId] = React.useState<string>(statements[0]?.storeId ?? '');
   const [selectedOrderId, setSelectedOrderId] = React.useState<string | null>(null);
 
+  React.useEffect(() => {
+    if (!statements.length) {
+      setActiveStoreId('');
+      setSelectedOrderId(null);
+      return;
+    }
+    if (!statements.some((entry) => entry.storeId === activeStoreId)) {
+      setActiveStoreId(statements[0]!.storeId);
+      setSelectedOrderId(null);
+    }
+  }, [activeStoreId, statements]);
+
   const statement = React.useMemo(() => {
-    return statements.find((s) => s.storeId === activeStoreId) || statements[0];
+    return statements.find((entry) => entry.storeId === activeStoreId) || statements[0];
   }, [statements, activeStoreId]);
 
   const selectedOrder = React.useMemo(() => {
     if (!statement) return null;
-    return statement.orders.find((o) => o.orderId === selectedOrderId) || null;
+    return statement.orders.find((order) => order.orderId === selectedOrderId) || null;
   }, [statement, selectedOrderId]);
 
   if (!statement) {
     return (
       <Box padding={5} background="surfaceInset" radiusToken="lg" border borderTone="line">
-        <Text role="titleSm">لا توجد تسويات متجر في معاينة WLT.</Text>
+        <Text role="titleSm">لا توجد تسويات متجر متاحة من WLT runtime أو preview fallback.</Text>
       </Box>
     );
   }
 
   return (
     <Box gap={4}>
-      {/* Store Selection Switcher */}
+      <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={1}>
+        <Text role="bodySm" tone="soft">
+          {usingRuntime
+            ? 'مرتبط بـ WLT runtime settlements. تفاصيل الرسوم والخصومات والاستردادات غير المتاحة في العقد الحالي تُعرض بصفر أو manual إلى أن يتوسع العقد.'
+            : 'Fallback preview عند تعذر WLT runtime.'}
+        </Text>
+      </Box>
+
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div className={wltStyles.storeSelectorHeaderFlex}>
           <div className={wltStyles.storeSelectorTitleFlex}>
-            <Text role="titleMd" style={{ fontWeight: 800 }}>كشف تسوية متجر</Text>
+            <Text role="titleMd" weight="black">كشف تسوية متجر</Text>
             <div className={wltStyles.storeSelectorButtonsFlex}>
-              {statements.map((s) => (
+              {statements.map((entry) => (
                 <button
-                  key={s.storeId}
+                  key={entry.storeId}
                   onClick={() => {
-                    setActiveStoreId(s.storeId);
+                    setActiveStoreId(entry.storeId);
                     setSelectedOrderId(null);
                   }}
                   className={`${wltStyles.storeSelectorBtn} ${
-                    s.storeId === activeStoreId ? wltStyles.storeSelectorBtnActive : ''
+                    entry.storeId === activeStoreId ? wltStyles.storeSelectorBtnActive : ''
                   }`}
                 >
-                  {s.storeName}
+                  {entry.storeName}
                 </button>
               ))}
             </div>
@@ -101,7 +134,6 @@ export function WltDshStoreSettlementStatement() {
         </div>
       </Box>
 
-      {/* Metrics strip */}
       <div className={wltStyles.metricsGrid}>
         <Metric label="بداية الدورة" value={statement.periodStart} />
         <Metric label="نهاية الدورة" value={statement.periodEnd} />
@@ -117,18 +149,12 @@ export function WltDshStoreSettlementStatement() {
         <Metric label="المتبقي" value={statement.remainingPayableLabel} />
       </div>
 
-      {/* Workbench Layout: Table + Inspector */}
-      <div
-        className={`${wltStyles.workbenchLayout} ${
-          selectedOrder ? wltStyles.workbenchLayoutWithInspector : ''
-        }`}
-      >
-        {/* Orders Table Container */}
+      <div className={`${wltStyles.workbenchLayout} ${selectedOrder ? wltStyles.workbenchLayoutWithInspector : ''}`}>
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
           <div className={wltStyles.tableHeaderFlex}>
-            <Text role="titleSm" style={{ fontWeight: 800 }}>الطلبات المرتبطة بالدورة الحالية</Text>
+            <Text role="titleSm" weight="black">الطلبات المرتبطة بالدورة الحالية</Text>
             <span className={wltStyles.readinessDesc}>
-              اضغط على أي صف لعرض تفاصيل العمولات المفرزة وقيود الأستاذ.
+              اضغط على أي صف لعرض تفاصيل الأثر المالي والقيد المرجعي المتاح.
             </span>
           </div>
 
@@ -150,8 +176,8 @@ export function WltDshStoreSettlementStatement() {
                     order.settlementStatus === 'included'
                       ? wltStyles.statusPosted
                       : order.settlementStatus === 'held'
-                      ? wltStyles.statusBlocked
-                      : wltStyles.statusPending;
+                        ? wltStyles.statusBlocked
+                        : wltStyles.statusPending;
 
                   return (
                     <tr
@@ -195,7 +221,6 @@ export function WltDshStoreSettlementStatement() {
           </div>
         </Box>
 
-        {/* Order Inspector Sidebar */}
         {selectedOrder && (
           <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" gap={3}>
             <div className={wltStyles.inspectorHeader}>
@@ -233,7 +258,7 @@ export function WltDshStoreSettlementStatement() {
                 <span className={wltStyles.inspectorImpactRowTabular}>{selectedOrder.deliveryFeeLabel}</span>
               </div>
               <div className={`${wltStyles.inspectorImpactRow} ${wltStyles.inspectorImpactRowDanger}`}>
-                <span>عمولة المنصة (8%):</span>
+                <span>عمولة المنصة:</span>
                 <span className={wltStyles.inspectorImpactRowTabular}>- {selectedOrder.platformCommissionLabel}</span>
               </div>
               <div className={`${wltStyles.inspectorImpactRow} ${wltStyles.inspectorImpactRowDanger}`}>
@@ -259,14 +284,13 @@ export function WltDshStoreSettlementStatement() {
                 {ORDER_STATUS_LABEL[selectedOrder.settlementStatus]}
               </span>
               <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <span className={wltStyles.inspectorMetaKey}>مرجع المستند / الحجز:</span>
-                <code className={wltStyles.inspectorEvidenceCode}>{selectedOrder.evidenceRef || 'HOLD-WLT-UNRESOLVED'}</code>
+                <span className={wltStyles.inspectorMetaKey}>مرجع المستند / القيد:</span>
+                <code className={wltStyles.inspectorEvidenceCode}>{selectedOrder.evidenceRef || 'WLT-RUNTIME-ENTRY'}</code>
               </div>
             </Box>
           </Box>
         )}
       </div>
-
     </Box>
   );
 }

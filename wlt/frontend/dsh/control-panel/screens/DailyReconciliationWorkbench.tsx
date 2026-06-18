@@ -1,9 +1,20 @@
 'use client';
 
 import React from 'react';
-import { Box, Text, Button } from '@bthwani/ui-kit';
-import { getAdaptedFinanceControlPanelRows, type DshFinancePreviewRow } from '../adapters/dshFinanceFixture.adapter';
-import { formatWltYer } from '../financeContracts';
+import { Box, Text, Button,
+  radius,
+} from '@bthwani/ui-kit';
+import {
+  loadWltDshFinanceRuntimeReadModel,
+  type WltDshFinanceRuntimeResult,
+} from '../../shared';
+import {
+  type WltDailyReconciliationRow,
+  buildInitialReconciliationRows,
+  buildRuntimeReconciliationRows,
+  buildReconciliationTotals,
+  recomputeRowAmountLabels,
+} from '../../shared';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 type DayLifecycleStage =
@@ -27,26 +38,26 @@ const LIFECYCLE_STAGES: ReadonlyArray<{ id: DayLifecycleStage; label: string }> 
   { id: 'day-close', label: 'إغلاق اليوم' },
 ] as const;
 
-function computeCurrentStage(rows: ReadonlyArray<DshFinancePreviewRow>): DayLifecycleStage {
+function computeCurrentStage(rows: ReadonlyArray<WltDailyReconciliationRow>): DayLifecycleStage {
   if (rows.length === 0) return 'open';
   if (rows.some((r) => r.workflowState === 'blocked_wlt')) return 'variances';
   if (rows.some((r) => r.varianceMinorUnits !== 0)) return 'variances';
   if (rows.some((r) => r.reconciliationStatus === 'unmatched' || r.reconciliationStatus === 'disputed')) return 'reconciliation';
   if (rows.some((r) => r.evidenceStatus !== 'complete')) return 'maker-review';
   if (rows.some((r) => r.workflowState !== 'checked' && r.workflowState !== 'approved')) return 'maker-review';
-  if (rows.some((r) => r.expectedSource === 'preview-seed' && r.id !== 'FIN-EMPTY-1')) return 'expected-registered';
-  if (rows.some((r) => r.actualSource === 'preview-seed' && r.id !== 'FIN-EMPTY-1')) return 'actual-registered';
+  if (rows.some((r) => r.expectedSource === 'unbound' && r.id !== 'FIN-EMPTY-1')) return 'expected-registered';
+  if (rows.some((r) => r.actualSource === 'unbound' && r.id !== 'FIN-EMPTY-1')) return 'actual-registered';
   return 'checker-approval';
 }
 
-function resolveRowTone(row: DshFinancePreviewRow) {
+function resolveRowTone(row: WltDailyReconciliationRow) {
   if (row.risk === 'danger') return 'danger' as const;
   if (row.risk === 'warning') return 'warning' as const;
   if (row.varianceMinorUnits !== 0 || row.evidenceStatus !== 'complete') return 'warning' as const;
   return 'success' as const;
 }
 
-const EVIDENCE_LABEL: Record<DshFinancePreviewRow['evidenceStatus'], string> = {
+const EVIDENCE_LABEL: Record<WltDailyReconciliationRow['evidenceStatus'], string> = {
   complete: 'مكتملة ✓',
   partial: 'جزئية ⚠️',
   missing: 'ناقصة 🚨',
@@ -77,7 +88,7 @@ const EXPECTED_SOURCE_LABEL: Record<string, string> = {
   'settlement-cycle': 'دورة التسوية',
   'commission-schedule': 'جدول العمولات',
   'eligibility-calc': 'حسب الأهلية',
-  'preview-seed': 'بيانات معاينة',
+  'unbound': 'بيانات معاينة',
 };
 
 const ACTUAL_SOURCE_LABEL: Record<string, string> = {
@@ -85,36 +96,33 @@ const ACTUAL_SOURCE_LABEL: Record<string, string> = {
   'wallet-debit': 'خصم محفظة',
   'cash-bag-delivery': 'حقيبة نقدية',
   'pos-receipt': 'إيصال دفع',
-  'preview-seed': 'بيانات معاينة',
+  'unbound': 'بيانات معاينة',
 };
 
+
 export function DailyReconciliationWorkbench() {
-  const [allRows, setAllRows] = React.useState<ReadonlyArray<DshFinancePreviewRow>>(() => {
-    const surfaces = getAdaptedFinanceControlPanelRows();
-    const seen = new Set<string>();
-    const combined: DshFinancePreviewRow[] = [];
-    for (const surface of [
-      surfaces.overview,
-      surfaces['cod-reconciliation'],
-      surfaces.settlements,
-      surfaces.payouts,
-      surfaces.refunds,
-    ] as const) {
-      for (const row of surface) {
-        if (!seen.has(row.id)) {
-          seen.add(row.id);
-          combined.push(row);
-        }
+  const [runtimeFinance, setRuntimeFinance] = React.useState<WltDshFinanceRuntimeResult | null>(null);
+  const [allRows, setAllRows] = React.useState<ReadonlyArray<WltDailyReconciliationRow>>(() => buildInitialReconciliationRows(null));
+
+  React.useEffect(() => {
+    let cancelled = false;
+    void loadWltDshFinanceRuntimeReadModel().then((result) => {
+      if (cancelled) {
+        return;
       }
-    }
-    return combined;
-  });
+      setRuntimeFinance(result);
+      setAllRows(buildInitialReconciliationRows(result));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const [auditTrails, setAuditTrails] = React.useState<Record<string, Array<{ timestamp: string; actor: string; action: string; note?: string }>>>({});
   const [expandedRowId, setExpandedRowId] = React.useState<string | null>(null);
   const [showCloseSimPreview, setShowCloseSimPreview] = React.useState(false);
 
-  const getInitialAuditLogs = React.useCallback((row: DshFinancePreviewRow) => {
+  const getInitialAuditLogs = React.useCallback((row: WltDailyReconciliationRow) => {
     const logs = [];
     logs.push({
       timestamp: '09:00 ص',
@@ -155,17 +163,14 @@ export function DailyReconciliationWorkbench() {
 
   const handleUpdateRow = (
     rowId: string,
-    updates: Partial<DshFinancePreviewRow>,
+    updates: Partial<WltDailyReconciliationRow>,
     actionText: string
   ) => {
     setAllRows((prev) =>
       prev.map((r) => {
         if (r.id === rowId) {
-          const nextRow = { ...r, ...updates };
-          if (updates.actualMinorUnits !== undefined || updates.expectedMinorUnits !== undefined) {
-            nextRow.varianceMinorUnits = nextRow.expectedMinorUnits - nextRow.actualMinorUnits;
-          }
-          return nextRow;
+          const recomputedUpdates = recomputeRowAmountLabels(r, updates);
+          return { ...r, ...recomputedUpdates };
         }
         return r;
       })
@@ -193,9 +198,8 @@ export function DailyReconciliationWorkbench() {
   const currentStage = computeCurrentStage(allRows);
   const stageIndex = LIFECYCLE_STAGES.findIndex((s) => s.id === currentStage);
 
-  const totalExpected = allRows.reduce((s, r) => s + r.expectedMinorUnits, 0);
-  const totalActual = allRows.reduce((s, r) => s + r.actualMinorUnits, 0);
-  const totalVariance = totalExpected - totalActual;
+  const totals = React.useMemo(() => buildReconciliationTotals(allRows), [allRows]);
+  const { totalExpected, totalActual, totalVariance } = totals;
   const allEvidenceComplete = allRows.every((r) => r.evidenceStatus === 'complete');
   const allRowsApproved = allRows.every((r) => r.workflowState === 'checked' || r.workflowState === 'approved');
   const noBlockedWlt = allRows.every((r) => r.workflowState !== 'blocked_wlt');
@@ -208,6 +212,13 @@ export function DailyReconciliationWorkbench() {
 
   return (
     <Box gap={4} style={{ direction: 'rtl', padding: 8, maxWidth: '100%' }}>
+      <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={1}>
+        <Text role="bodySm" tone="soft">
+          {runtimeFinance?.state === 'runtime'
+            ? `مرتبط بصفوف مشتقة من WLT runtime ledger · ${runtimeFinance.data.baseUrl}`
+            : 'Fallback preview rows عند تعذر WLT runtime أو قبل اكتمال التحميل.'}
+        </Text>
+      </Box>
 
       <div
         style={{
@@ -286,7 +297,7 @@ export function DailyReconciliationWorkbench() {
               onPress={() => setShowCloseSimPreview((v) => !v)}
             />
           ) : (
-            <span style={{ fontSize: 11, color: 'var(--bth-danger-text)', fontWeight: '700', background: 'var(--bth-danger-surface)', padding: '6px 12px', borderRadius: 6 }}>
+            <span style={{ fontSize: 11, color: 'var(--bth-danger-text)', fontWeight: '700', background: 'var(--bth-danger-surface)', padding: '6px 12px', borderRadius: radius.xs }}>
               🔒 ترحيل الإغلاق معلق
             </span>
           )}
@@ -312,33 +323,16 @@ export function DailyReconciliationWorkbench() {
 
       <Box gap={2}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginBottom: 4 }}>
-          <Text role="titleSm" style={{ fontWeight: '800', margin: 0 }}>ميزان مطابقة البنود والقيود اليومية ({allRows.length} قيد)</Text>
+          <Text role="titleSm" weight="black" style={{ margin: 0 }}>ميزان مطابقة البنود والقيود اليومية ({allRows.length} قيد)</Text>
           <button
             onClick={() => {
-              const surfaces = getAdaptedFinanceControlPanelRows();
-              const seen = new Set<string>();
-              const combined: DshFinancePreviewRow[] = [];
-              for (const surface of [
-                surfaces.overview,
-                surfaces['cod-reconciliation'],
-                surfaces.settlements,
-                surfaces.payouts,
-                surfaces.refunds,
-              ] as const) {
-                for (const row of surface) {
-                  if (!seen.has(row.id)) {
-                    seen.add(row.id);
-                    combined.push(row);
-                  }
-                }
-              }
-              setAllRows(combined);
+              setAllRows(buildInitialReconciliationRows(runtimeFinance));
               setAuditTrails({});
             }}
             style={{
               background: 'transparent',
               border: '1px solid var(--bthwani-control-panel-border)',
-              borderRadius: 6,
+              borderRadius: radius.xs,
               padding: '4px 10px',
               fontSize: 11,
               cursor: 'pointer',
@@ -365,7 +359,7 @@ export function DailyReconciliationWorkbench() {
                   background: 'var(--bthwani-control-panel-surface)',
                   border: '1px solid var(--bthwani-control-panel-border)',
                   borderRight: `4px solid ${toneColor}`,
-                  borderRadius: 10,
+                  borderRadius: radius.sm,
                   overflow: 'hidden',
                 }}
               >
@@ -374,7 +368,9 @@ export function DailyReconciliationWorkbench() {
                   style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', userSelect: 'none', flexWrap: 'wrap', gap: 12 }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 160 }}>
-                    <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: 4, fontFamily: 'monospace', fontWeight: '700' }}>{row.id}</span>
+                    <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: 4, fontWeight: '700' }}>
+                      <Text family="mono" style={{ fontSize: 10 }}>{row.id}</Text>
+                    </span>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                       <span style={{ fontSize: 13, fontWeight: '800', color: 'var(--bthwani-control-panel-text)' }}>{row.owner}</span>
                       <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>{EVENT_KIND_LABEL[row.eventKind] || row.eventKind}</span>
@@ -384,16 +380,16 @@ export function DailyReconciliationWorkbench() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexGrow: 1, justifyContent: 'center', maxWidth: 460 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', width: 120 }}>
                       <span style={{ fontSize: 12, fontWeight: '700', color: 'var(--bth-info-text)' }}>
-                        <span className={wltStyles.tabularNums}>{formatWltYer(row.expectedMinorUnits)}</span>
+                        <span className={wltStyles.tabularNums}>{row.expectedLabel}</span>
                       </span>
                       <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>{EXPECTED_SOURCE_LABEL[row.expectedSource] || row.expectedSource}</span>
                     </div>
                     <div style={{ fontSize: 10, fontWeight: '800', padding: '1px 6px', borderRadius: 4, background: hasVar ? 'var(--bth-danger-surface)' : 'var(--bth-success-surface)', color: hasVar ? 'var(--bth-danger-text)' : 'var(--bth-success-text)', whiteSpace: 'nowrap' }}>
-                      {hasVar ? `فارق: ${formatWltYer(row.varianceMinorUnits)}` : 'متطابق ✓'}
+                      {hasVar ? `فارق: ${row.varianceLabel}` : 'متطابق ✓'}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: 120 }}>
                       <span style={{ fontSize: 12, fontWeight: '700', color: 'var(--bth-brand-alt)' }}>
-                        <span className={wltStyles.tabularNums}>{formatWltYer(row.actualMinorUnits)}</span>
+                        <span className={wltStyles.tabularNums}>{row.actualLabel}</span>
                       </span>
                       <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-muted)' }}>{ACTUAL_SOURCE_LABEL[row.actualSource] || row.actualSource}</span>
                     </div>
@@ -435,15 +431,21 @@ export function DailyReconciliationWorkbench() {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px' }}>
                           <div>
                             <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>الحساب المدين (Debit)</span>
-                            <code style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, fontFamily: 'monospace', display: 'inline-block', marginTop: 2 }}>{row.debitAccountId || 'wlt:escrow'}</code>
+                            <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, display: 'inline-block', marginTop: 2 }}>
+                              <Text family="mono" style={{ fontSize: 10 }}>{row.debitAccountId || 'wlt:escrow'}</Text>
+                            </span>
                           </div>
                           <div>
                             <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>الحساب الدائن (Credit)</span>
-                            <code style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, fontFamily: 'monospace', display: 'inline-block', marginTop: 2 }}>{row.creditAccountId || 'wlt:payout'}</code>
+                            <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, display: 'inline-block', marginTop: 2 }}>
+                              <Text family="mono" style={{ fontSize: 10 }}>{row.creditAccountId || 'wlt:payout'}</Text>
+                            </span>
                           </div>
                           <div>
                             <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>رقم مرجع قيد اليومية</span>
-                            <code style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, fontFamily: 'monospace', display: 'inline-block', marginTop: 2 }}>{row.ledgerEntryRef || `LED-PRV-${row.id}`}</code>
+                            <span style={{ fontSize: 10, background: 'rgba(0,0,0,0.04)', padding: '2px 4px', borderRadius: 3, display: 'inline-block', marginTop: 2 }}>
+                              <Text family="mono" style={{ fontSize: 10 }}>{row.auditEntryRef || `LED-PRV-${row.id}`}</Text>
+                            </span>
                           </div>
                           <div>
                             <span style={{ fontSize: 9, color: 'var(--bthwani-control-panel-text-soft)', display: 'block' }}>سند المصدر المتوقع ➔ الفعلي</span>
@@ -465,14 +467,14 @@ export function DailyReconciliationWorkbench() {
                                     evidenceStatus: 'complete',
                                     bankDepositRef: row.bankDepositRef || `[معاينة] DEP-${row.id}`,
                                   },
-                                  `تسوية الفارق المالي وتحديث الفعلي المورد إلى ${formatWltYer(row.expectedMinorUnits)}`
+                                  `تسوية الفارق المالي وتحديث الفعلي المورد إلى ${row.expectedLabel}`
                                 );
                               }}
                               style={{
                                 width: '100%',
                                 background: 'var(--bth-warning-surface)',
                                 border: '1px solid var(--bth-warning-text)',
-                                borderRadius: 6,
+                                borderRadius: radius.xs,
                                 padding: '6px 10px',
                                 fontSize: 10,
                                 cursor: 'pointer',
@@ -512,7 +514,7 @@ export function DailyReconciliationWorkbench() {
                             <div style={{
                               background: 'var(--bthwani-control-panel-surface)',
                               border: '1px solid var(--bthwani-control-panel-border)',
-                              borderRadius: 6,
+                              borderRadius: radius.xs,
                               padding: '6px 10px',
                               display: 'flex',
                               alignItems: 'center',
@@ -548,7 +550,7 @@ export function DailyReconciliationWorkbench() {
                             <div style={{
                               background: 'var(--bth-danger-surface)',
                               border: '1px dashed var(--bth-danger-text)',
-                              borderRadius: 6,
+                              borderRadius: radius.xs,
                               padding: 8,
                               textAlign: 'center',
                               color: 'var(--bth-danger-text)',
@@ -791,7 +793,7 @@ export function DailyReconciliationWorkbench() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                         {(auditTrails[row.id] || getInitialAuditLogs(row)).map((log, index) => (
                           <div key={index} style={{ display: 'flex', gap: 6, fontSize: 9, alignItems: 'center' }}>
-                            <span style={{ color: 'var(--bthwani-control-panel-text-muted)', fontFamily: 'monospace' }}>[{log.timestamp}]</span>
+                            <Text family="mono" style={{ color: 'var(--bthwani-control-panel-text-muted)', fontSize: 9 }}>[{log.timestamp}]</Text>
                             <span style={{ fontWeight: '700', color: 'var(--bthwani-brand-primary)' }}>{log.actor}:</span>
                             <span style={{ color: 'var(--bthwani-control-panel-text)' }}>{log.action}</span>
                             {log.note && <span style={{ color: 'var(--bthwani-control-panel-text-muted)', fontStyle: 'italic' }}>({log.note})</span>}
@@ -810,14 +812,14 @@ export function DailyReconciliationWorkbench() {
 
       <div className={wltStyles.reconciliationSummaryGrid}>
         {[
-          { label: 'إجمالي المبالغ المتوقعة', value: formatWltYer(totalExpected), color: 'var(--bth-info-text)' },
-          { label: 'إجمالي المبالغ الفعلية الموردة', value: formatWltYer(totalActual), color: 'var(--bth-brand-alt)' },
-          { label: 'صافي الفارق المالي الإجمالي', value: totalVariance !== 0 ? `${formatWltYer(totalVariance)} ⚠` : '٠ ر.ي ✓', color: totalVariance !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' },
+          { label: 'إجمالي المبالغ المتوقعة', value: totals.totalExpectedLabel, color: 'var(--bth-info-text)' },
+          { label: 'إجمالي المبالغ الفعلية الموردة', value: totals.totalActualLabel, color: 'var(--bth-brand-alt)' },
+          { label: 'صافي الفارق المالي الإجمالي', value: totals.totalVarianceLabel, color: totalVariance !== 0 ? 'var(--bth-danger-text)' : 'var(--bth-success-text)' },
           { label: 'اكتمال مستندات المطابقة', value: `${allRows.filter((r) => r.evidenceStatus === 'complete').length}/${allRows.length} بند`, color: allEvidenceComplete ? 'var(--bth-success-text)' : 'var(--bth-warning-text)' },
         ].map(({ label, value, color }) => (
           <div key={label} className={wltStyles.reconciliationSummaryCard}>
             <Text role="caption" tone="muted" style={{ textAlign: 'right' }}>{label}</Text>
-            <Text role="bodyStrong" style={{ textAlign: 'right', fontWeight: '800', color, fontSize: 14 }}>
+            <Text role="bodyStrong" weight="black" style={{ textAlign: 'right', color, fontSize: 14 }}>
               <span className={wltStyles.tabularNums}>{value}</span>
             </Text>
           </div>

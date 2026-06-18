@@ -1,0 +1,32 @@
+{
+  "status": "CURRENT_REPO_PATHS",
+  "repo": "C:\\bthwani-suite",
+  "wrong_legacy_paths": [
+    ".\\packages\\ui-kit",
+    ".\\apps",
+    ".\\packages\\surfaces"
+  ],
+  "live_roots": [
+    ".\\ui-kit",
+    ".\\dsh",
+    ".\\wlt",
+    ".\\control-panel",
+    ".\\control-panel\\runtime",
+    ".\\app-client\\runtime",
+    ".\\app-partner\\runtime",
+    ".\\app-captain\\runtime",
+    ".\\app-field\\runtime",
+    ".\\webapp\\runtime",
+    ".\\website\\runtime"
+  ],
+  "contract_files": [
+    ".\\auth.openapi.yaml",
+    ".\\master.openapi.yaml"
+  ],
+  "generated_or_evidence_roots": [
+    ".\\graphify-out",
+    ".\\.tamagui",
+    ".\\tools\\registry\\runs"
+  ],
+  "rule": "Design Guard must discover existing paths dynamically and must not assume ui-kit, apps, or dsh."
+}

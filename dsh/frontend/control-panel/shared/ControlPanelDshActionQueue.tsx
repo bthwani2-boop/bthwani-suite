@@ -3,7 +3,8 @@ import {
   WebControlPanelDecisionRow,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import type { DshUnifiedRecommendation } from '../../data/platform.preview-data';
+import type { DshUnifiedRecommendation } from './dsh-control-panel-display';
+import { DSH_CONTROL_PANEL_TONE_MAP } from './dsh-control-panel-display';
 
 export type ControlPanelDshActionQueueItem = {
   id: string;
@@ -29,13 +30,6 @@ export type ControlPanelDshActionQueueProps = {
   secondaryAction: (item: ControlPanelDshActionQueueItem) => void;
   evidenceAction: (item: ControlPanelDshActionQueueItem) => void;
   emptyLabel?: string;
-};
-
-const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  best: 'success',
-  warning: 'warning',
-  danger: 'danger',
-  brand: 'neutral',
 };
 
 const QUEUE_HEADER_STYLE: React.CSSProperties = {
@@ -97,7 +91,7 @@ export function ControlPanelDshActionQueue({
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {items.map((item) => {
-            const tone = TONE_MAP[item.tone ?? 'brand'] ?? 'neutral';
+            const tone = DSH_CONTROL_PANEL_TONE_MAP[item.tone ?? 'brand'] ?? 'neutral';
             const isSelected = item.id === selectedId;
             return (
               <div

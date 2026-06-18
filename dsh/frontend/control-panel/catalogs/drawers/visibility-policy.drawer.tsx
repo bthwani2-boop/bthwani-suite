@@ -1,4 +1,4 @@
-// UI_PREVIEW_ONLY — no backend/API/DB binding.
+// SCAFFOLD — API binding pending. Actions are local simulations until backend endpoint is live.
 // Owner: control-panel/catalogs
 // Purpose: Client visibility policy gateway — shows why a product is visible/hidden
 //   and lists all prerequisites that must be satisfied.
@@ -6,16 +6,18 @@
 //   No actual publish action. All CTAs are preview-only.
 
 import React, { useState } from 'react';
-import { Box, Button, Text, TextField, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Text, TextField, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
 import type { CatalogProductMaster } from '../catalogs.data';
-import type { DshPartnerActivationStatus } from '../../../shared/dsh-partner-activation.model';
+import type { DshPartnerActivationStatus } from '../../../shared/stores/partner/dsh-partner-activation.model';
 import {
   resolveDshProductClientVisibility,
   resolveDshStoreClientVisibility,
   type DshClientVisibilityBlockedCode,
-} from '../../../shared/dsh-client-visibility.model';
-import type { DshProductCategoryMappingStatus, DshProductDuplicateStatus } from '../../../shared/dsh-product-identity.model';
+} from '../../../shared/stores/dsh-client-visibility.model';
+import type { DshProductCategoryMappingStatus, DshProductDuplicateStatus } from '../../../shared/products';
 import { SectionTitle, ResultBanner, type ActionResult } from '../catalogs.parts';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -69,7 +71,7 @@ function ChecklistRow({
         <Text role="caption" style={{ fontSize: 14, color: satisfied ? theme.success : theme.danger }}>
           {satisfied ? '✓' : '✗'}
         </Text>
-        <Text role="caption" style={{ fontWeight: '700', color: satisfied ? theme.text : theme.danger, flexShrink: 1 }}>
+        <Text role="caption" weight="bold" style={{ color: satisfied ? theme.text : theme.danger, flexShrink: 1 }}>
           {label}
         </Text>
       </Box>
@@ -134,7 +136,7 @@ export function CatalogVisibilityPolicyWorkspace({
       return;
     }
     setShowFixForm(false);
-    setActionResult({ type: 'info', message: `UI_PREVIEW_ONLY — طلب التعديل مُسجّل محلياً: "${fixNote.trim()}"` });
+    setActionResult({ type: 'info', message: `طلب التعديل مُسجّل محلياً: "${fixNote.trim()}"` });
     setFixNote('');
   }
 
@@ -148,13 +150,13 @@ export function CatalogVisibilityPolicyWorkspace({
       const first = productVisibility.publishingPrerequisites.find((p) => !p.satisfied);
       setActionResult({
         type: 'blocked',
-        message: `محظور — UI_PREVIEW_ONLY — ${first?.blockedReason || 'يوجد متطلب غير مستوفٍ قبل تمييز المنتج كجاهز.'}`,
+        message: `محظور — ${first?.blockedReason || 'يوجد متطلب غير مستوفٍ قبل تمييز المنتج كجاهز.'}`,
       });
       return;
     }
     // Local state transition preview
     setLocalStage('catalog-adopted');
-    setActionResult({ type: 'success', message: 'UI_PREVIEW_ONLY — تم تمييز المنتج كـ "جاهز للنشر" محلياً (catalog-adopted). الإجراء الفعلي يتطلب ربط API.' });
+    setActionResult({ type: 'success', message: 'تم تمييز المنتج كـ "جاهز للنشر" محلياً (catalog-adopted). الإجراء الفعلي يتطلب ربط API.' });
   }
 
   return (
@@ -174,14 +176,14 @@ export function CatalogVisibilityPolicyWorkspace({
     >
       <WebCompactSurfaceHeader
         title="سياسة ظهور العميل"
-        subtitle={`${product.name} — UI_PREVIEW_ONLY`}
+        subtitle={`${product.name} — ربط API قيد التنفيذ`}
         onBack={onClose}
       />
 
       <Box gap={4} style={{ padding: 16 }}>
 
         {/* Owner notice */}
-        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: 6, padding: 8 }}>
+        <Box style={{ backgroundColor: theme.surfaceInset, borderRadius: radius.xs, padding: 8 }}>
           <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
             المالك: control-panel/catalogs · لا نشر فعلي · جميع الإجراءات محاكاة محلية
           </Text>
@@ -197,18 +199,17 @@ export function CatalogVisibilityPolicyWorkspace({
         >
           <SectionTitle>ظهور المتجر</SectionTitle>
           <Box layoutDirection="row" gap={8} style={{ alignItems: 'center' }}>
-            <Text role="caption" style={{ fontSize: 18 }}>
+            <Text role="titleSm" style={{}}>
               {storeVisibility.visible ? '✅' : '❌'}
             </Text>
-            <Text role="bodyMd" style={{
-              fontWeight: '700',
-              color: storeVisibility.visible ? theme.success : theme.danger,
+            <Text role="bodyMd" weight="bold" style={{
+              color:storeVisibility.visible ? theme.success : theme.danger,
             }}>
               {storeVisibility.visible ? 'المتجر ظاهر للعميل' : 'المتجر محجوب عن العميل'}
             </Text>
           </Box>
           {storeVisibility.blockedCode && (
-            <Text role="caption" style={{ color: theme.danger, fontSize: 12 }}>
+            <Text role="caption" style={{ color: theme.danger,}}>
               {blockedCodeLabel[storeVisibility.blockedCode]}
             </Text>
           )}
@@ -229,18 +230,17 @@ export function CatalogVisibilityPolicyWorkspace({
         >
           <SectionTitle>ظهور المنتج</SectionTitle>
           <Box layoutDirection="row" gap={8} style={{ alignItems: 'center' }}>
-            <Text role="caption" style={{ fontSize: 18 }}>
+            <Text role="titleSm" style={{}}>
               {productVisibility.visible ? '✅' : '❌'}
             </Text>
-            <Text role="bodyMd" style={{
-              fontWeight: '700',
-              color: productVisibility.visible ? theme.success : theme.danger,
+            <Text role="bodyMd" weight="bold" style={{
+              color:productVisibility.visible ? theme.success : theme.danger,
             }}>
               {productVisibility.visible ? 'المنتج ظاهر للعميل' : 'المنتج محجوب عن العميل'}
             </Text>
           </Box>
           {productVisibility.blockedCode && (
-            <Text role="caption" style={{ color: theme.danger, fontSize: 12 }}>
+            <Text role="caption" style={{ color: theme.danger,}}>
               كود الحجب: {blockedCodeLabel[productVisibility.blockedCode]}
             </Text>
           )}
@@ -288,9 +288,9 @@ export function CatalogVisibilityPolicyWorkspace({
               blockedReason={item.blockedReason}
             />
           ))}
-          <Box style={{ marginTop: 8, backgroundColor: theme.surface, borderRadius: 6, padding: 8 }}>
+          <Box style={{ marginTop: 8, backgroundColor: theme.surface, borderRadius: radius.xs, padding: 8 }}>
             <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
-              المرحلة المطلوبة للنشر الفعلي: <Text role="caption" style={{ color: theme.success, fontWeight: '800' }}>client-visible</Text>
+              المرحلة المطلوبة للنشر الفعلي: <Text role="caption" weight="black" style={{ color: theme.success }}>client-visible</Text>
             </Text>
           </Box>
         </Box>
@@ -316,8 +316,8 @@ export function CatalogVisibilityPolicyWorkspace({
             />
           </Box>
 
-          <Box style={{ backgroundColor: theme.dangerSurface, borderRadius: 6, padding: 8 }}>
-            <Text role="caption" style={{ color: theme.danger, fontSize: 11, fontWeight: '700' }}>
+          <Box style={{ backgroundColor: theme.dangerSurface, borderRadius: radius.xs, padding: 8 }}>
+            <Text role="caption" weight="bold" style={{ color: theme.danger, fontSize: 11 }}>
               ممنوع: لا يوجد زر نشر فعلي — النشر يتطلب ربط API واستيفاء جميع المتطلبات أعلاه.
             </Text>
           </Box>

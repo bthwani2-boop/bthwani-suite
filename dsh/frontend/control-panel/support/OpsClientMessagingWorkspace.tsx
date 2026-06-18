@@ -2,11 +2,17 @@
 // Authority: control-panel/support owns this channel. Messages are on-demand; no bulk history load.
 // WLT boundary: any financial-impact mention is a read-only preview tag — no mutation from this surface.
 import React from 'react';
+import { generateLocalTempId } from '../../shared/platform/local-temp-id';
 import { Box, Button, Chip, Surface, Text, TextField } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
-import { DSH_DEMO_SUPPORT_TICKETS, type DshSupportTicketMessage } from '../../data/support.preview-data';
-
-const DEMO_TICKET = DSH_DEMO_SUPPORT_TICKETS[0];
+type DshSupportTicketMessage = {
+  id: string;
+  senderKind: 'ops' | 'client' | 'captain' | 'partner';
+  senderLabel: string;
+  body: string;
+  timestampLabel: string;
+  isSystem?: boolean;
+};
 
 function OpsMessageBubble({ message }: { message: DshSupportTicketMessage }) {
   const isOps = message.senderKind === 'ops';
@@ -43,24 +49,32 @@ export type OpsClientMessagingWorkspaceProps = {
   clientId?: string;
   clientName?: string;
   orderId?: string;
+  ticketCode?: string;
+  slaLabel?: string;
+  slaRisk?: 'normal' | 'at-risk';
+  ownerQueue?: string;
 };
 
 export function OpsClientMessagingWorkspace({
   clientId = '—',
   clientName,
   orderId,
+  ticketCode,
+  slaLabel,
+  slaRisk = 'normal',
+  ownerQueue,
 }: OpsClientMessagingWorkspaceProps) {
   const [draft, setDraft] = React.useState('');
-  const [messages, setMessages] = React.useState<ReadonlyArray<DshSupportTicketMessage>>(DEMO_TICKET.messagesPreview);
-  const [isEscalated, setIsEscalated] = React.useState(DEMO_TICKET.status === 'escalated');
+  const [messages, setMessages] = React.useState<ReadonlyArray<DshSupportTicketMessage>>([]);
+  const [isEscalated, setIsEscalated] = React.useState(false);
 
-  const resolvedClientName = clientName ?? DEMO_TICKET.actorName;
-  const resolvedOrderId = orderId ?? DEMO_TICKET.entityId;
+  const resolvedClientName = clientName ?? '—';
+  const resolvedOrderId = orderId ?? null;
 
   const handleSend = () => {
     if (!draft.trim()) return;
     const newMessage: DshSupportTicketMessage = {
-      id: `msg-client-custom-${Date.now()}`,
+      id: generateLocalTempId('msg-client-custom'),
       senderKind: 'ops',
       senderLabel: 'فريق الدعم',
       body: draft.trim(),
@@ -73,7 +87,7 @@ export function OpsClientMessagingWorkspace({
   const handleEscalate = () => {
     if (isEscalated) return;
     const newSystemMsg: DshSupportTicketMessage = {
-      id: `msg-client-system-${Date.now()}`,
+      id: generateLocalTempId('msg-client-system'),
       senderKind: 'ops',
       senderLabel: 'النظام',
       body: 'تم تصعيد المحادثة إلى إدارة الدعم والالتزام.',
@@ -110,9 +124,9 @@ export function OpsClientMessagingWorkspace({
           <Box padding={4} gap={4}>
             {/* Context strip */}
             <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <Chip label={`${DEMO_TICKET.ticketCode}`} tone="brand" />
-              <Chip label={`SLA: ${DEMO_TICKET.slaLabel}`} tone={DEMO_TICKET.slaRisk === 'at-risk' ? 'warning' : 'default'} />
-              <Chip label={`الصف: ${DEMO_TICKET.ownerQueue}`} />
+              <Chip label={ticketCode ? `تذكرة ${ticketCode}` : 'لا توجد تذكرة مرتبطة'} tone="brand" />
+              {slaLabel ? <Chip label={`SLA: ${slaLabel}`} tone={slaRisk === 'at-risk' ? 'warning' : 'default'} /> : null}
+              {ownerQueue ? <Chip label={`الصف: ${ownerQueue}`} /> : null}
               {isEscalated ? <Chip label="مصعد" tone="danger" /> : null}
             </Box>
 
@@ -151,7 +165,7 @@ export function OpsClientMessagingWorkspace({
                 />
               </Box>
               <Text role="caption" tone="muted">
-                الإرسال الفعلي يتطلب ربط مسار المراسلة. هذه مساحة معاينة فقط.
+                الإرسال غير متاح حتى يكتمل ربط مسار المراسلة الحقيقي.
               </Text>
             </Surface>
           </Box>

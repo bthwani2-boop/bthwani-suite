@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Button, Text, SearchField, useTheme } from '@bthwani/ui-kit';
@@ -67,7 +67,7 @@ export function TaxonomyScreen({ taxonomy, products }: TaxonomyScreenProps) {
 
         {addingMainCat && (
           <div style={{ marginBottom: 16, padding: '10px 12px', backgroundColor: theme.surfaceInset, borderRadius: '8px', border: '1px solid ' + theme.line, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <Text role="caption" style={{ fontWeight: 800, color: theme.brandHeaderBackground }}>إضافة فئة رئيسية جديدة</Text>
+            <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>إضافة فئة رئيسية جديدة</Text>
             <input type="text" placeholder="اسم الفئة *" value={formLabel} onChange={e => setFormLabel(e.target.value)} style={{ padding: '6px 10px', borderRadius: '4px', border: '1px solid ' + theme.lineStrong, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground, fontSize: '12px' }} />
             <input type="text" placeholder="وصف / ترجمة فرعية (اختياري)" value={formSubtitle} onChange={e => setFormSubtitle(e.target.value)} style={{ padding: '6px 10px', borderRadius: '4px', border: '1px solid ' + theme.lineStrong, direction: 'rtl', backgroundColor: theme.surface, color: theme.brandHeaderBackground, fontSize: '12px' }} />
             <div style={{ display: 'flex', gap: '6px' }}>

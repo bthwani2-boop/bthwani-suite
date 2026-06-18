@@ -8,19 +8,42 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary } from '../../shared/runtime/dsh-flow-registry';
 import {
   findDshControlPanelGovernanceSectionByFlowId,
   getDshControlPanelGovernanceEntry,
   resolveDshControlPanelSectionLabel,
 } from '../shared';
-import {
-  getDshSupportTicketById,
-  getDshSupportTicketStatusLabel,
-  getDshSupportTicketStatusTone,
-  type DshSupportTicketMessage,
-  DSH_DEMO_SUPPORT_TICKETS,
-} from '../../data/support.preview-data';
+type DshSupportTicketMessage = {
+  id: string;
+  senderKind: 'ops' | 'client' | 'captain' | 'partner';
+  senderLabel: string;
+  body: string;
+  timestampLabel: string;
+  isSystem?: boolean;
+};
+type DshSupportTicket = {
+  ticketCode: string; subject: string; status: string; priorityLabel: string;
+  actorKind: 'client' | 'partner' | 'captain'; actorName: string;
+  createdAtLabel: string; slaLabel: string; flowId: string | null;
+  messagesPreview: DshSupportTicketMessage[]; auditRequired: boolean;
+  categoryLabel: string;
+  outcomeLabel: string;
+  entityId?: string;
+  entityType: string;
+  ownerQueue: string;
+  allowedActions: readonly string[];
+};
+const EMPTY_TICKET: DshSupportTicket = {
+  ticketCode: '—', subject: '—', status: 'open', priorityLabel: '—',
+  actorKind: 'client', actorName: '—', createdAtLabel: '—', slaLabel: '—',
+  flowId: null, messagesPreview: [], auditRequired: false,
+  categoryLabel: '—', outcomeLabel: '—', entityType: '—', ownerQueue: '—',
+  allowedActions: [],
+};
+function getDshSupportTicketById(_id: string): DshSupportTicket { return EMPTY_TICKET; }
+function getDshSupportTicketStatusLabel(_status: string): string { return '—'; }
+function getDshSupportTicketStatusTone(_status: string): 'neutral' | 'warning' | 'danger' | 'success' { return 'neutral'; }
 
 function MessageBubble({ message }: { message: DshSupportTicketMessage }) {
   const isOps = message.senderKind === 'ops';
@@ -74,7 +97,7 @@ export type SupportTicketDetailWorkspaceProps = {
 };
 
 export function SupportTicketDetailWorkspace({
-  ticketId = 'TKT-001',
+  ticketId,
   registryFlowId = 'client-order-issue',
   ticketCode,
   subject,
@@ -88,27 +111,27 @@ export function SupportTicketDetailWorkspace({
   onResolve,
   onClose,
 }: SupportTicketDetailWorkspaceProps) {
-  // Resolve demo ticket for preview data; props override when provided.
-  const demoTicket = getDshSupportTicketById(ticketId) ?? DSH_DEMO_SUPPORT_TICKETS[0];
-  const resolvedCode = ticketCode ?? demoTicket.ticketCode;
-  const resolvedSubject = subject ?? demoTicket.subject;
-  const resolvedStatus = statusLabel ?? getDshSupportTicketStatusLabel(demoTicket.status);
-  const resolvedStatusTone = getDshSupportTicketStatusTone(demoTicket.status);
-  const resolvedPriority = priorityLabel ?? demoTicket.priorityLabel;
-  const resolvedActorKind = actorKind ?? demoTicket.actorKind;
+  const ticket = ticketId ? getDshSupportTicketById(ticketId) : EMPTY_TICKET;
+  const resolvedCode = ticketCode ?? ticket.ticketCode;
+  const resolvedSubject = subject ?? ticket.subject;
+  const resolvedStatus = statusLabel ?? getDshSupportTicketStatusLabel(ticket.status);
+  const resolvedStatusTone = getDshSupportTicketStatusTone(ticket.status);
+  const resolvedChipTone = resolvedStatusTone === 'neutral' ? 'default' : resolvedStatusTone;
+  const resolvedPriority = priorityLabel ?? ticket.priorityLabel;
+  const resolvedActorKind = actorKind ?? ticket.actorKind;
   const resolvedActorLabel =
     resolvedActorKind === 'client' ? 'عميل' : resolvedActorKind === 'partner' ? 'شريك' : 'كابتن';
-  const resolvedActorName = actorName ?? demoTicket.actorName;
-  const resolvedCreatedAt = createdAtLabel ?? demoTicket.createdAtLabel;
-  const resolvedSla = slaLabel ?? demoTicket.slaLabel;
-  const resolvedFlowId = demoTicket.flowId ?? registryFlowId;
+  const resolvedActorName = actorName ?? ticket.actorName;
+  const resolvedCreatedAt = createdAtLabel ?? ticket.createdAtLabel;
+  const resolvedSla = slaLabel ?? ticket.slaLabel;
+  const resolvedFlowId = ticket.flowId ?? registryFlowId;
 
   const policySummary = getDshFlowPolicySummary(resolvedFlowId ?? registryFlowId);
   const governanceEntry =
     findDshControlPanelGovernanceSectionByFlowId(resolvedFlowId ?? registryFlowId) ??
     getDshControlPanelGovernanceEntry('support');
   const financeEntry = getDshControlPanelGovernanceEntry('finance');
-  const messages = demoTicket.messagesPreview;
+  const messages = ticket.messagesPreview;
 
   return (
     <WebControlPanelInspectorShell
@@ -119,9 +142,9 @@ export function SupportTicketDetailWorkspace({
         {/* Ticket summary */}
         <Box gap={2}>
           <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <Chip label={resolvedStatus} tone={resolvedStatusTone} />
+            <Chip label={resolvedStatus} tone={resolvedChipTone} />
             <Chip label={`أولوية ${resolvedPriority}`} tone={resolvedPriority === 'عالية' ? 'danger' : 'default'} />
-            {demoTicket.auditRequired ? <Chip label="تدقيق مطلوب" tone="warning" /> : null}
+            {ticket.auditRequired ? <Chip label="تدقيق مطلوب" tone="warning" /> : null}
           </Box>
           <Text role="bodyStrong">{resolvedSubject}</Text>
         </Box>
@@ -130,12 +153,12 @@ export function SupportTicketDetailWorkspace({
           dense
           items={[
             { label: 'رقم التذكرة', value: resolvedCode, tone: 'brand' },
-            { label: 'التصنيف', value: demoTicket.categoryLabel },
-            { label: 'مخرج المعالجة', value: demoTicket.outcomeLabel },
+            { label: 'التصنيف', value: ticket.categoryLabel },
+            { label: 'مخرج المعالجة', value: ticket.outcomeLabel },
             { label: 'نوع الطرف', value: resolvedActorLabel },
             { label: 'الاسم', value: resolvedActorName },
-            { label: 'الكيان المرتبط', value: demoTicket.entityId ? `${demoTicket.entityType} · ${demoTicket.entityId}` : demoTicket.entityType },
-            { label: 'صف الملكية', value: demoTicket.ownerQueue },
+            { label: 'الكيان المرتبط', value: ticket.entityId ? `${ticket.entityType} · ${ticket.entityId}` : ticket.entityType },
+            { label: 'صف الملكية', value: ticket.ownerQueue },
             { label: 'تاريخ الإنشاء', value: resolvedCreatedAt },
             { label: 'SLA المتبقي', value: resolvedSla },
             { label: 'تدفق السجل', value: policySummary?.flowId ?? (resolvedFlowId ?? registryFlowId) },
@@ -176,11 +199,11 @@ export function SupportTicketDetailWorkspace({
         </Box>
 
         {/* Allowed actions */}
-        {demoTicket.allowedActions.length > 0 ? (
+        {ticket.allowedActions.length > 0 ? (
           <Box gap={1}>
             <Text role="caption" tone="muted">الإجراءات المسموحة:</Text>
             <Box style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-              {demoTicket.allowedActions.map((action) => (
+              {ticket.allowedActions.map((action) => (
                 <Chip key={action} label={action} />
               ))}
             </Box>
@@ -188,7 +211,7 @@ export function SupportTicketDetailWorkspace({
         ) : null}
 
         {/* Audit notice */}
-        {demoTicket.auditRequired ? (
+        {ticket.auditRequired ? (
           <Surface tone="inset" padding={2} gap={1}>
             <Text role="caption" tone="warning">
               ⚠ هذه التذكرة تستلزم مراجعة من فريق التدقيق بعد أي تحول في الحالة.

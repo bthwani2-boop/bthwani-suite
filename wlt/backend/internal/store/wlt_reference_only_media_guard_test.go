@@ -33,7 +33,7 @@ func TestWLT_ReferenceOnly_NoMediaAssetTable(t *testing.T) {
 	root := wltSourceRoot(t)
 	forbidden := []string{
 		"dsh_media_assets",
-		"media-fixtures",
+		"real-media-runtime",
 		"media_fixtures",
 	}
 

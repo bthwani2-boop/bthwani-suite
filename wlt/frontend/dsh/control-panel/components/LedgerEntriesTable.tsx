@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text,
+  radius,
+} from '@bthwani/ui-kit';
 import { useRouter } from 'next/navigation';
-import type { WltLedgerEntry } from '../models/financialCenter.types';
-import { getWltPostingRuleForEvent } from '../models/postingRules.types';
+import type { WltLedgerEntry } from '../../shared/control-panel/financialCenter.types';
+import { getWltPostingRuleForEvent } from '../../shared';
 
 const STATUS_LABELS: Record<string, string> = {
   posted: 'مرحّل',
@@ -31,7 +33,7 @@ export function LedgerEntriesTable({ entries, pageSize = 10 }: {
   return (
     <Box gap={2} style={{ direction: 'rtl' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text role="titleSm" style={{ fontWeight: 700 }}>قيود دفتر الأستاذ</Text>
+        <Text role="titleSm" weight="bold">قيود دفتر الأستاذ</Text>
         <span style={{ fontSize: 10, color: 'var(--bthwani-control-panel-text-muted)' }}>
           {entries.length} قيد · معاينة تشغيلية
         </span>
@@ -119,7 +121,7 @@ export function LedgerEntriesTable({ entries, pageSize = 10 }: {
       {entries.length > pageSize && (
         <button
           onClick={() => setShowAll(!showAll)}
-          style={{ background: 'transparent', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: 6, padding: '4px 12px', fontSize: 11, cursor: 'pointer', color: 'var(--bthwani-brand-primary)', fontWeight: 600 }}
+          style={{ background: 'transparent', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: radius.xs, padding: '4px 12px', fontSize: 11, cursor: 'pointer', color: 'var(--bthwani-brand-primary)', fontWeight: 600 }}
         >
           {showAll ? 'عرض أقل' : `عرض جميع القيود (${entries.length})`}
         </button>

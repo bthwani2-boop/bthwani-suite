@@ -1,5 +1,5 @@
 /**
- * PartnerCatalogReadinessPanel — UI_PREVIEW_ONLY
+ * PartnerCatalogReadinessPanel — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: app-partner surface
  * API boundary: GET /partner/:id/catalog-readiness (not yet bound)
  *
@@ -21,12 +21,15 @@
  */
 
 import React from 'react';
-import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, useTheme,
+  radius,
+  typographyRoles,
+} from '@bthwani/ui-kit';
 import {
   translateStage,
   translateOwner,
   canRenderInClientSurface,
-} from '../../shared/workflow';
+} from '../../shared';
 
 export type PartnerCatalogReadinessPanelProps = {
   productId: string;
@@ -148,16 +151,16 @@ export function PartnerCatalogReadinessPanel({
       padding={4}
       gap={4}
       border
-      style={{ borderRadius: 12, direction: 'rtl' }}
+      style={{ borderRadius: radius.sm2, direction: 'rtl' }}
     >
       {/* Header */}
       <Box layoutDirection="row" justify="space-between" align="center">
         <Box gap={0}>
-          <Text role="titleLg" style={{ fontWeight: '800', fontSize: 16, color: theme.brandHeaderBackground }}>
+          <Text role="titleLg" weight="black" style={{ fontSize: 16, color: theme.brandHeaderBackground }}>
             🚦 جاهزية الكتالوج
           </Text>
-          <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
-            UI_PREVIEW_ONLY — API boundary: GET /partner/catalog-readiness
+          <Text role="caption" tone="muted" style={{ fontSize: typographyRoles.overline.fontSize }}>
+            ربط API قيد التنفيذ — GET /partner/catalog-readiness
           </Text>
         </Box>
         {onClose && (
@@ -171,29 +174,30 @@ export function PartnerCatalogReadinessPanel({
         padding={3}
         gap={2}
         style={{
-          borderRadius: 8,
+          borderRadius: radius.xs2,
           borderWidth: 2,
           borderColor: isClientVisible ? theme.success : theme.warning,
           borderStyle: 'solid',
         }}
       >
-        <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+        <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
           {productName}
         </Text>
         <Box layoutDirection="row" gap={4} style={{ flexWrap: 'wrap' }}>
           <Box gap={0}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>المرحلة الحالية</Text>
-            <Text role="caption" style={{ fontWeight: '700', fontSize: 12 }}>{stageLabel}</Text>
+            <Text role="caption" weight="bold" style={{}}>{stageLabel}</Text>
           </Box>
           <Box gap={0}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>المالك الحالي</Text>
-            <Text role="caption" style={{ fontWeight: '700', fontSize: 12 }}>{ownerLabel}</Text>
+            <Text role="caption" weight="bold" style={{}}>{ownerLabel}</Text>
           </Box>
           <Box gap={0}>
             <Text role="caption" tone="muted" style={{ fontSize: 10 }}>ظاهر للعميل</Text>
             <Text
               role="caption"
-              style={{ fontWeight: '700', fontSize: 12, color: isClientVisible ? theme.success : theme.danger }}
+              weight="bold"
+              style={{ color: isClientVisible ? theme.success : theme.danger }}
             >
               {isClientVisible ? '✅ نعم' : '❌ لا'}
             </Text>
@@ -203,7 +207,7 @@ export function PartnerCatalogReadinessPanel({
 
       {/* Readiness rows */}
       <Box gap={2}>
-        <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+        <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
           متطلبات الجاهزية
         </Text>
         {rows.map((row) => (
@@ -213,29 +217,30 @@ export function PartnerCatalogReadinessPanel({
             style={{
               padding: 10,
               backgroundColor: row.satisfied ? theme.surfaceInset : theme.dangerSurface || theme.surfaceInset,
-              borderRadius: 8,
+              borderRadius: radius.xs2,
               borderWidth: 1,
               borderColor: row.satisfied ? theme.success : row.partnerCanFix ? theme.warning : theme.danger,
               borderStyle: 'solid',
             }}
           >
             <Box layoutDirection="row" align="center" justify="space-between">
-              <Text role="caption" style={{ fontWeight: '700', fontSize: 12, color: theme.brandHeaderBackground }}>
+              <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground }}>
                 {row.label}
               </Text>
               <Text
                 role="caption"
-                style={{ fontWeight: '700', fontSize: 11, color: row.satisfied ? theme.success : row.partnerCanFix ? theme.warning : theme.danger }}
+                weight="bold"
+                style={{ fontSize: typographyRoles.overline.fontSize, color: row.satisfied ? theme.success : row.partnerCanFix ? theme.warning : theme.danger }}
               >
                 {row.satisfied ? '✅' : row.partnerCanFix ? '⚠️ بإمكانك الإصلاح' : '🔒 خارج صلاحية الشريك'}
               </Text>
             </Box>
             {row.reason && (
-              <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
+              <Text role="caption" tone="muted" style={{ fontSize: typographyRoles.overline.fontSize }}>
                 {row.reason}
               </Text>
             )}
-            <Text role="caption" style={{ fontSize: 11, fontWeight: '600', color: theme.brandHeaderBackground }}>
+            <Text role="caption" weight="semibold" style={{ fontSize: typographyRoles.overline.fontSize, color: theme.brandHeaderBackground }}>
               {row.nextAction}
             </Text>
             <Text role="caption" tone="muted" style={{ fontSize: 10, direction: 'ltr' }}>
@@ -250,16 +255,16 @@ export function PartnerCatalogReadinessPanel({
         tone="inset"
         padding={3}
         gap={2}
-        style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.line, borderStyle: 'solid' }}
+        style={{ borderRadius: radius.xs2, borderWidth: 1, borderColor: theme.line, borderStyle: 'solid' }}
       >
-        <Text role="caption" style={{ fontWeight: '800', color: theme.brandHeaderBackground }}>
+        <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground }}>
           صلاحيات الشريك في هذا المنتج
         </Text>
         <Box gap={1}>
-          <Text role="caption" style={{ color: theme.success, fontWeight: '600', fontSize: 12 }}>
+          <Text role="caption" weight="semibold" style={{ color: theme.success,}}>
             ✅ يمكنك تعديل: المخزون، التوفر، سعر خاص، ملاحظة تحضير، ملاحظة داخلية
           </Text>
-          <Text role="caption" style={{ color: theme.danger, fontWeight: '600', fontSize: 12 }}>
+          <Text role="caption" weight="semibold" style={{ color: theme.danger,}}>
             ❌ لا يمكنك: اعتماد المنتج، النشر للعميل، تغيير هوية المنتج، تعديل فئته الأساسية
           </Text>
         </Box>
@@ -268,7 +273,7 @@ export function PartnerCatalogReadinessPanel({
       {/* Partner-fixable actions */}
       {partnerFixableRows.length > 0 && (
         <Box gap={2}>
-          <Text role="caption" style={{ fontWeight: '800', color: theme.warning }}>
+          <Text role="caption" weight="black" style={{ color: theme.warning }}>
             ⚠️ إجراءات بإمكانك تنفيذها
           </Text>
           {partnerFixableRows.map((row) => {
@@ -303,9 +308,9 @@ export function PartnerCatalogReadinessPanel({
         <Surface
           tone="inset"
           padding={3}
-          style={{ borderRadius: 8, borderWidth: 2, borderColor: theme.success, borderStyle: 'solid' }}
+          style={{ borderRadius: radius.xs2, borderWidth: 2, borderColor: theme.success, borderStyle: 'solid' }}
         >
-          <Text role="caption" style={{ fontWeight: '800', color: theme.success, textAlign: 'center' }}>
+          <Text role="caption" weight="black" style={{ color: theme.success, textAlign: 'center' }}>
             🎉 المنتج ظاهر للعميل ومتوفر للطلب
           </Text>
         </Surface>

@@ -1,13 +1,17 @@
 'use client';
 
 import React from 'react';
-import { Box, Text } from '@bthwani/ui-kit';
+import { Box, Text,
+  radius,
+} from '@bthwani/ui-kit';
 import {
-  getWltFieldCommissionStatementsPreview,
-  formatWltYer,
-  WltDshFieldCommissionStatement as WltFieldStatement,
-  WltDshFieldCommissionStoreLine as WltStoreLine,
-} from '../financeContracts';
+  type WltDshFieldCommissionStatement as WltFieldStatement,
+  type WltDshFieldCommissionStoreLine as WltStoreLine,
+} from '../../shared';
+import {
+  buildFieldStatementDisplayAmounts,
+  buildFieldStoreLineDisplayAmounts,
+} from '../../shared';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 const STATUS_LABEL: Record<WltFieldStatement['status'], string> = {
@@ -28,10 +32,15 @@ export function WltDshFieldCommissionStatement({
 }: {
   agentId?: string;
 }) {
-  const statements = React.useMemo(() => getWltFieldCommissionStatementsPreview(), []);
+  const statements: readonly WltFieldStatement[] = [];
   const statement = React.useMemo(
     () => statements.find((s) => s.fieldAgentId === agentId) || statements[0],
     [statements, agentId],
+  );
+
+  const statementAmounts = React.useMemo(
+    () => statement ? buildFieldStatementDisplayAmounts(statement) : null,
+    [statement],
   );
 
   const [selectedStoreId, setSelectedStoreId] = React.useState<string | null>(null);
@@ -41,7 +50,12 @@ export function WltDshFieldCommissionStatement({
     return statement.storeLines.find((line) => line.storeId === selectedStoreId) || null;
   }, [statement, selectedStoreId]);
 
-  if (!statement) {
+  const selectedStoreAmounts = React.useMemo(
+    () => selectedStore ? buildFieldStoreLineDisplayAmounts(selectedStore) : null,
+    [selectedStore],
+  );
+
+  if (!statement || !statementAmounts) {
     return (
       <Box padding={5} background="surfaceInset" radiusToken="lg" border borderTone="line" style={{ direction: 'rtl' }}>
         <Text role="titleSm" style={{ textAlign: 'right' }}>لا توجد تسويات عمولة للميدانيين في معاينة WLT.</Text>
@@ -55,16 +69,16 @@ export function WltDshFieldCommissionStatement({
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <Text role="titleMd" style={{ fontWeight: 800 }}>كشف عمولة الميداني</Text>
+            <Text role="titleMd" weight="black">كشف عمولة الميداني</Text>
             <Text role="bodySm" tone="soft" style={{ marginTop: 4 }}>
               {statement.fieldAgentName} ({statement.fieldAgentId}) · دورة {statement.commissionCycleId} · {STATUS_LABEL[statement.status]}
             </Text>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 11, background: 'rgba(0,0,0,0.06)', padding: '4px 10px', borderRadius: 6, fontWeight: 700 }}>
+            <span style={{ fontSize: 11, background: 'rgba(0,0,0,0.06)', padding: '4px 10px', borderRadius: radius.xs, fontWeight: 700 }}>
               دورة: {statement.cycleStart} إلى {statement.cycleEnd}
             </span>
-            <span style={{ fontSize: 11, background: 'var(--bth-success-surface)', color: 'var(--bth-success-text)', padding: '4px 10px', borderRadius: 6, fontWeight: 700 }}>
+            <span style={{ fontSize: 11, background: 'var(--bth-success-surface)', color: 'var(--bth-success-text)', padding: '4px 10px', borderRadius: radius.xs, fontWeight: 700 }}>
               موعد الصرف: {statement.expectedPayoutDate}
             </span>
           </div>
@@ -83,19 +97,19 @@ export function WltDshFieldCommissionStatement({
         </div>
         <div style={{ border: '1px solid var(--bth-control-panel-border)', borderRadius: 8, padding: '12px', background: 'var(--bth-control-panel-surface-raised)' }}>
           <div style={{ fontSize: 11, color: 'var(--bth-control-panel-text-muted)', marginBottom: 4 }}>إجمالي المستحق المكتسب</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--bth-control-panel-text)', fontVariantNumeric: 'tabular-nums' }}>{formatWltYer(statement.totalCommissionMinorUnits)}</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--bth-control-panel-text)', fontVariantNumeric: 'tabular-nums' }}>{statementAmounts.totalCommissionLabel}</div>
         </div>
         <div style={{ border: '1px solid var(--bth-control-panel-border)', borderRadius: 8, padding: '12px', background: 'var(--bth-control-panel-surface-raised)' }}>
           <div style={{ fontSize: 11, color: 'var(--bth-control-panel-text-muted)', marginBottom: 4 }}>ما تم صرفه</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--bth-success-text)', fontVariantNumeric: 'tabular-nums' }}>{formatWltYer(statement.paidMinorUnits)}</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--bth-success-text)', fontVariantNumeric: 'tabular-nums' }}>{statementAmounts.paidLabel}</div>
         </div>
         <div style={{ border: '1px solid var(--bth-control-panel-border)', borderRadius: 8, padding: '12px', background: 'var(--bth-control-panel-surface-raised)' }}>
           <div style={{ fontSize: 11, color: 'var(--bth-control-panel-text-muted)', marginBottom: 4 }}>المتبقي المعلق</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--bth-warning-text)', fontVariantNumeric: 'tabular-nums' }}>{formatWltYer(statement.remainingMinorUnits)}</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--bth-warning-text)', fontVariantNumeric: 'tabular-nums' }}>{statementAmounts.remainingLabel}</div>
         </div>
         <div style={{ border: '1px solid var(--bth-control-panel-border)', borderRadius: 8, padding: '12px', background: 'var(--bth-control-panel-surface-raised)' }}>
           <div style={{ fontSize: 11, color: 'var(--bth-control-panel-text-muted)', marginBottom: 4 }}>المحجوز المؤقت</div>
-          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--bth-danger-text)', fontVariantNumeric: 'tabular-nums' }}>{formatWltYer(statement.heldMinorUnits)}</div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--bth-danger-text)', fontVariantNumeric: 'tabular-nums' }}>{statementAmounts.heldLabel}</div>
         </div>
       </div>
 
@@ -104,7 +118,7 @@ export function WltDshFieldCommissionStatement({
         {/* Stores Table */}
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <Text role="titleSm" style={{ fontWeight: 800 }}>سجل المتاجر المستقطبة ومبالغ العمولات</Text>
+            <Text role="titleSm" weight="black">سجل المتاجر المستقطبة ومبالغ العمولات</Text>
             <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>اضغط على أي صف لعرض دليل التفعيل وقيود الأستاذ.</span>
           </div>
           <div style={{ overflowX: 'auto' }}>
@@ -119,6 +133,7 @@ export function WltDshFieldCommissionStatement({
             <tbody>
               {statement.storeLines.map((line) => {
                 const isSelected = selectedStoreId === line.storeId;
+                const lineAmounts = buildFieldStoreLineDisplayAmounts(line);
                 const statusColor = line.activationStatus === 'active' ? 'var(--bth-success-text)' : line.activationStatus === 'pending_review' ? 'var(--bth-warning-text)' : 'var(--bth-danger-text)';
                 return (
                   <tr
@@ -140,10 +155,10 @@ export function WltDshFieldCommissionStatement({
                       {ACTIVATION_STATUS_LABEL[line.activationStatus]}
                     </td>
                     <td style={{ padding: '10px 8px', fontSize: 11, fontVariantNumeric: 'tabular-nums' }}>{line.qualifiedOrderCount}</td>
-                    <td style={{ padding: '10px 8px', fontSize: 11, fontVariantNumeric: 'tabular-nums' }}>{formatWltYer(line.qualifiedOrderValueMinorUnits)}</td>
-                    <td style={{ padding: '10px 8px', fontSize: 11, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{formatWltYer(line.commissionMinorUnits)}</td>
-                    <td style={{ padding: '10px 8px', fontSize: 11, color: 'var(--bth-success-text)', fontVariantNumeric: 'tabular-nums' }}>{formatWltYer(line.paidMinorUnits)}</td>
-                    <td style={{ padding: '10px 8px', fontSize: 11, color: 'var(--bth-warning-text)', fontVariantNumeric: 'tabular-nums' }}>{formatWltYer(line.remainingMinorUnits)}</td>
+                    <td style={{ padding: '10px 8px', fontSize: 11, fontVariantNumeric: 'tabular-nums' }}>{lineAmounts.qualifiedOrderValueLabel}</td>
+                    <td style={{ padding: '10px 8px', fontSize: 11, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{lineAmounts.commissionLabel}</td>
+                    <td style={{ padding: '10px 8px', fontSize: 11, color: 'var(--bth-success-text)', fontVariantNumeric: 'tabular-nums' }}>{lineAmounts.paidLabel}</td>
+                    <td style={{ padding: '10px 8px', fontSize: 11, color: 'var(--bth-warning-text)', fontVariantNumeric: 'tabular-nums' }}>{lineAmounts.remainingLabel}</td>
                     <td style={{ padding: '10px 8px' }}>
                       <code style={{ fontSize: 9, background: 'rgba(0,0,0,0.05)', padding: '2px 6px', borderRadius: 4 }}>
                         {line.evidenceRef}
@@ -158,7 +173,7 @@ export function WltDshFieldCommissionStatement({
         </Box>
 
         {/* Store Inspector */}
-        {selectedStore && (
+        {selectedStore && selectedStoreAmounts && (
           <Box padding={3} background="surfaceRaised" radiusToken="lg" border borderTone="line" gap={3}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--bth-control-panel-text)' }}>تفاصيل دليل التفعيل المالي</span>
@@ -199,7 +214,7 @@ export function WltDshFieldCommissionStatement({
             <Box gap={1}>
               <span style={{ fontSize: 10, color: 'var(--bth-control-panel-text-muted)' }}>الطلبات المؤهلة للعمولة</span>
               <span style={{ fontSize: 11 }}>
-                تعتمد عمولة الميداني بنسبة 5% على تفعيل ربط المتجر. إجمالي قيمة طلبات الربط: {formatWltYer(selectedStore.qualifiedOrderValueMinorUnits)} (إجمالي {selectedStore.qualifiedOrderCount} طلب)
+                تعتمد عمولة الميداني بنسبة 5% على تفعيل ربط المتجر. إجمالي قيمة طلبات الربط: {selectedStoreAmounts.inspectorQualifiedOrderValueLabel} (إجمالي {selectedStore.qualifiedOrderCount} طلب)
               </span>
             </Box>
           </Box>

@@ -1,14 +1,21 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Badge, Box, colorPalette, Icon, Text, useDirection, useTheme, withAlpha } from '@bthwani/ui-kit';
+import { Badge, Box, colorPalette, Icon, Text, useDirection, useTheme, withAlpha,
+  radius,
+  spacing,
+} from '@bthwani/ui-kit';
 import {
-  resolveFieldCompletionPercent,
+  resolvePartnerCompletionPercent,
+} from '../../shared';
+import {
   resolveFieldStoreLifecycleLabel,
   resolveFieldStoreNextActionLabel,
   resolveFieldStoreStatusLabel,
   resolveFieldStoreStatusTone,
-  type FieldStoreFile,
-} from '../../data/stores.preview-data';
+} from '../field.surface-model';
+import type {
+  FieldStoreFile,
+} from '../dsh-field.routes';
 
 type FieldStoreCardProps = {
   store: FieldStoreFile;
@@ -18,18 +25,18 @@ type FieldStoreCardProps = {
 export function FieldStoreCard({ store, onPress }: FieldStoreCardProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
-  const progress = resolveFieldCompletionPercent(store.draft);
+  const progress = resolvePartnerCompletionPercent(store.draft);
 
   return (
     <Pressable onPress={onPress}>
       <Box
-        paddingVertical={3}
+        paddingY={3}
         gap={3}
         style={{ borderBottomWidth: 1, borderBottomColor: theme.line }}
       >
-        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing[3] }}>
           <Box gap={2} style={{ flex: 1, alignItems: 'flex-end' }}>
-            <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
+            <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: spacing[2] }}>
               <Badge label={resolveFieldStoreStatusLabel(store)} tone={resolveFieldStoreStatusTone(store)} />
               <Badge label={`اكتمال ${progress}%`} tone="brand" />
             </View>
@@ -37,7 +44,7 @@ export function FieldStoreCard({ store, onPress }: FieldStoreCardProps) {
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{store.location}</Text>
           </Box>
 
-          <View style={{ backgroundColor: colorPalette.brand, padding: 8, borderRadius: 999 }}>
+          <View style={{ backgroundColor: colorPalette.brand, padding: spacing[2], borderRadius: radius.pill }}>
             <Icon name="arrow-forward" size={16} color={colorPalette.white} />
           </View>
         </View>
@@ -47,7 +54,7 @@ export function FieldStoreCard({ store, onPress }: FieldStoreCardProps) {
           <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{store.stageLabelOverride ?? resolveFieldStoreLifecycleLabel(store)}</Text>
         </Box>
 
-        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: 12, flexWrap: 'wrap' }}>
+        <View style={{ flexDirection: direction === 'rtl' ? 'row-reverse' : 'row', gap: spacing[3], flexWrap: 'wrap' }}>
           <Box gap={1} style={{ flex: 1, minWidth: 128, alignItems: 'flex-end' }}>
             <Text role="label" tone="muted" style={{ textAlign: 'right' }}>الخطوة التالية</Text>
             <Text role="bodySm" style={{ textAlign: 'right' }}>{resolveFieldStoreNextActionLabel(store)}</Text>

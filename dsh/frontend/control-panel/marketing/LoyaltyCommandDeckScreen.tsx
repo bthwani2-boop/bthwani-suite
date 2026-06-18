@@ -11,6 +11,7 @@ import {
   Tabs,
   Text,
   useTheme,
+  radius,
 } from '@bthwani/ui-kit';
 import {
   getEntitlements,
@@ -19,14 +20,16 @@ import {
   getLoyaltyRewards,
   getLoyaltyTiers,
   getSubscriptionPlans,
-  type LoyaltyProgram,
-  type LoyaltyTier,
-  type LoyaltyReward,
-  type SubscriptionPlan,
-  type Entitlement,
-} from '../../data/subscriptions.preview-data';
-import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import { CommercialParityPreview } from './commercial-parity-preview';
+  mapStoreCommercialFeatures,
+} from '../../shared/marketing';
+import type {
+  Entitlement,
+  LoyaltyProgram,
+  LoyaltyReward,
+  LoyaltyTier,
+  SubscriptionPlan,
+} from '../../shared/marketing';
+import { CommercialParityPreview } from './commercial-parity-viewer';
 
 
 
@@ -140,12 +143,13 @@ function LoyaltyDetailPanel({ rowKey, tab, tiers, subscriptions, rewards, entitl
     if (tab === 'tiers' || tab === 'overview') {
       const tier = tiers.find(t => t.id === rowKey);
       if (tier) {
+        const tierBenefits = tier.benefits ?? [];
         return (
           <Box gap={2}>
             <Text role="bodyStrong" style={{ textAlign: 'right' }}>{tier.name}</Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>{tier.minimumPoints} نقطة للتأهل</Text>
-            {tier.benefits.length > 0 ? (
-              tier.benefits.map(b => (
+            {tierBenefits.length > 0 ? (
+              tierBenefits.map(b => (
                 <View key={b.id} style={{ flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: theme.line }}>
                   <Text role="caption" style={{ color: theme.textMuted }}>{b.description ?? ''}</Text>
                   <Badge label={b.label} tone="info" />
@@ -220,7 +224,7 @@ function LoyaltyDetailPanel({ rowKey, tab, tiers, subscriptions, rewards, entitl
         <Box layoutDirection="row" gap={2}>
           <Button label="إغلاق" tone="ghost" size="sm" fullWidth={false} onPress={onClose} />
         </Box>
-        <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: '800', textAlign: 'right' }}>تفاصيل العنصر</Text>
+        <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>تفاصيل العنصر</Text>
       </Box>
       <Divider />
       {renderBody()}
@@ -287,14 +291,17 @@ export function LoyaltyCommandDeckScreen() {
     },
   ];
 
-  const tierRows: DeckRow[] = tiers.map((tier) => ({
-    rowKey: tier.id,
-    rowHeading: tier.name,
-    subtitle: `${tier.minimumPoints} نقطة • ${tier.benefits.length ? tier.benefits.map((benefit) => benefit.label).join(' • ') : 'بدون مزايا إضافية'}`,
-    badgeLabel: 'مستوى',
-    badgeTone: currentTier?.id === tier.id ? 'brand' : 'default',
-    actionLabel: 'اختيار مستوى',
-  }));
+  const tierRows: DeckRow[] = tiers.map((tier) => {
+    const tierBenefits = tier.benefits ?? [];
+    return {
+      rowKey: tier.id,
+      rowHeading: tier.name,
+      subtitle: `${tier.minimumPoints} نقطة • ${tierBenefits.length ? tierBenefits.map((benefit) => benefit.label).join(' • ') : 'بدون مزايا إضافية'}`,
+      badgeLabel: 'مستوى',
+      badgeTone: currentTier?.id === tier.id ? 'brand' : 'default',
+      actionLabel: 'اختيار مستوى',
+    };
+  });
 
   const subscriptionRows: DeckRow[] = subscriptions.map((subscription) => ({
     rowKey: subscription.id,
@@ -307,7 +314,7 @@ export function LoyaltyCommandDeckScreen() {
 
   const rewardRows: DeckRow[] = activeRewards.map((reward) => ({
     rowKey: reward.id,
-    rowHeading: reward.title,
+    rowHeading: reward.title ?? reward.id,
     subtitle: reward.description ?? 'مكافأة قابلة للاسترداد.',
     badgeLabel: `${reward.pointsCost} نقطة`,
     badgeTone: 'warning',
@@ -344,7 +351,7 @@ export function LoyaltyCommandDeckScreen() {
         borderWidth: 1,
         borderColor: theme.line,
         backgroundColor: theme.surface,
-        borderRadius: 14,
+        borderRadius: radius.md,
         padding: 12,
       },
       layout: {
@@ -357,14 +364,14 @@ export function LoyaltyCommandDeckScreen() {
         minWidth: 420,
         borderWidth: 1,
         borderColor: theme.line,
-        borderRadius: 18,
+        borderRadius: radius.lg,
       },
       sidePanel: {
         flex: 1,
         minWidth: 280,
         borderWidth: 1,
         borderColor: theme.line,
-        borderRadius: 18,
+        borderRadius: radius.lg,
       },
     }),
     [theme],
@@ -434,7 +441,7 @@ export function LoyaltyCommandDeckScreen() {
                 />
               ))
             ) : (
-              <Surface tone="inset" style={{ padding: 20, borderRadius: 10, alignItems: 'center' }}>
+              <Surface tone="inset" style={{ padding: 20, borderRadius: radius.sm, alignItems: 'center' }}>
                 <Text style={{ fontSize: 24, marginBottom: 6 }}>◎</Text>
                 <Text role="bodySm" tone="muted" style={{ textAlign: 'center' }}>
                   لا توجد عناصر في هذا القسم حالياً.

@@ -1,18 +1,18 @@
-﻿import * as React from 'react';
+import * as React from 'react';
 import { PanResponder, FlatList } from 'react-native';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../shared/products';
 
 type UseStoreGestureHandlersParams = {
-  previewActiveIndex: number;
-  previewItems: DshStoreGetMenuItem[];
+  viewerActiveIndex: number;
+  viewerItems: DshStoreGetMenuItem[];
   isRTL: boolean;
   setPreviewActiveIndex: (index: number) => void;
   setPreviewItem: (item: DshStoreGetMenuItem | null) => void;
-  previewListRef: React.MutableRefObject<FlatList<DshStoreGetMenuItem> | null>;
+  menuListRef: React.MutableRefObject<FlatList<DshStoreGetMenuItem> | null>;
 };
 
 type UseStoreGestureHandlersResult = {
-  previewPanResponder: ReturnType<typeof PanResponder.create>;
+  panResponder: ReturnType<typeof PanResponder.create>;
 };
 
 /**
@@ -21,14 +21,14 @@ type UseStoreGestureHandlersResult = {
  * trigger re-renders of the store menu list.
  */
 export function useStoreGestureHandlers({
-  previewActiveIndex,
-  previewItems,
+  viewerActiveIndex,
+  viewerItems,
   isRTL,
   setPreviewActiveIndex,
   setPreviewItem,
-  previewListRef,
+  menuListRef,
 }: UseStoreGestureHandlersParams): UseStoreGestureHandlersResult {
-  const previewPanResponder = React.useMemo(
+  const panResponder = React.useMemo(
     () =>
       PanResponder.create({
         onStartShouldSetPanResponder: () => false,
@@ -44,18 +44,18 @@ export function useStoreGestureHandlers({
           if (Math.abs(dx) > threshold) {
             const direction = dx > 0 ? -1 : 1;
             const adjustedDirection = isRTL ? -direction : direction;
-            const nextIndex = previewActiveIndex + adjustedDirection;
+            const nextIndex = viewerActiveIndex + adjustedDirection;
 
-            if (nextIndex >= 0 && nextIndex < previewItems.length) {
+            if (nextIndex >= 0 && nextIndex < viewerItems.length) {
               setPreviewActiveIndex(nextIndex);
-              setPreviewItem(previewItems[nextIndex] ?? null);
-              previewListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+              setPreviewItem(viewerItems[nextIndex] ?? null);
+              menuListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
             }
           }
         },
       }),
-    [previewActiveIndex, previewItems, isRTL, setPreviewActiveIndex, setPreviewItem, previewListRef],
+    [viewerActiveIndex, viewerItems, isRTL, setPreviewActiveIndex, setPreviewItem, menuListRef],
   );
 
-  return { previewPanResponder };
+  return { panResponder };
 }

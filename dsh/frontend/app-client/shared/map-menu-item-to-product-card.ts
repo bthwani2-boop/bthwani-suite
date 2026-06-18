@@ -1,8 +1,8 @@
 import type { ProductCardProps } from '@bthwani/ui-kit';
 
-import type { DshStoreFixtureItem as DshStoreMenuItem } from '../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem } from '../../shared/products';
 
-import { resolveDshImageSource } from './resolve-image-source';
+import { resolveDshRuntimeImageSource } from '../../shared/media/resolve-runtime-image-source';
 
 function extractPriceValue(label?: string): number | undefined {
 	if (!label) return undefined;
@@ -17,7 +17,7 @@ export function mapMenuItemToProductCard(item: DshStoreMenuItem): ProductCardPro
 		id: item.id,
 		title: item.name ?? '',
 		subtitle: item.subtitle,
-		imageSource: resolveDshImageSource(item.imageUri),
+		imageSource: resolveDshRuntimeImageSource(item.imageUri),
 		showImage: Boolean(item.imageUri),
 		price: item.priceLabel ? { label: item.priceLabel, value: item.priceValue ?? extractPriceValue(item.priceLabel) } : undefined,
 		oldPrice: item.oldPriceLabel ? { label: item.oldPriceLabel, value: item.oldPriceValue ?? extractPriceValue(item.oldPriceLabel) } : undefined,

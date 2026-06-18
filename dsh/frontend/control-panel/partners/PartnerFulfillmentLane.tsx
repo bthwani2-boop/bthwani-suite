@@ -9,7 +9,7 @@ import {
   WebControlPanelDecisionRow
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS } from './workflow';
-import type { DshPartnerModeAgreement } from './workflow';
+import type { DshPartnerModeAgreement } from '../../shared/stores/partner/partner.types';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type PartnerFulfillmentLaneProps = {
@@ -74,7 +74,7 @@ export function PartnerFulfillmentLane({ state = 'ready', onRetry }: PartnerFulf
         title="مرجع الأرقام التشغيلية والمالية"
         reason="أرقام العمولة والتسوية المعروضة هنا مخصصة للوضوح التشغيلي فقط. نظام WLT المالي هو المالك الحقيقي والمرجع النهائي لجميع أرقام العمولات والتسويات، ولا توجد سلطة إدارية لتعديلها من هذه الشاشة."
         confidence="high"
-        auditTag="UI_PREVIEW_ONLY"
+        auditTag="NEEDS_BINDING_LATER"
       />
 
       <Surface tone="raised" padding={5} gap={5} radiusToken="lg">

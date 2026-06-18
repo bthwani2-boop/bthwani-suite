@@ -16,32 +16,19 @@ import {
   useTheme,
   spacing,
   radius,
+  borders,
 } from '@bthwani/ui-kit';
-import {
-  getOperationsSupportFlowPreview,
-  getOperationsSupportFlowsForSurface,
-} from '../../data/support.preview-data';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
+import { getOperationsSupportFlowSpec, getOperationsSupportFlowsForSurface } from '../../shared';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
+import { resolveDshControlPanelSectionLabel } from '../../shared/runtime/dsh-control-panel-governance.map';
 
-function resolveFieldPolicyLabel(policy?: string): string {
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  return policy ?? 'سياسة من السجل';
-}
 
 export type DshFieldReadinessEscalationScreenProps = {
   // ML-004: added pending-response / approved / rejected states for ops response tracking
-  state?: 'ready' | 'loading' | 'success' | 'error' | 'blocked' | 'pending-response' | 'approved' | 'rejected';
+  state?: 'ready' | 'loading' | 'success' | 'error' | 'blocked' | 'pending-response' | 'approved' | 'rejected' | 'offline';
   storeName: string;
   missingRequirements: string[];
-  escalationTargets: Array<{ id: string; label: string; isSelected: boolean }>;
+  escalationTargets: readonly { id: string; label: string; isSelected: boolean }[];
   onSelectTarget: (id: string) => void;
   onSubmit: (reason: string) => void;
   onBack?: () => void;
@@ -68,7 +55,7 @@ export function DshFieldReadinessEscalationScreen({
 }: DshFieldReadinessEscalationScreenProps) {
   const { theme } = useTheme();
   const [reason, setReason] = React.useState('');
-  const readinessFlow = getOperationsSupportFlowPreview('branch-readiness-escalation');
+  const readinessFlow = getOperationsSupportFlowSpec('branch-readiness-escalation');
   const registryFlowSummary = getDshFlowPolicySummary('field-readiness-escalation');
   const registryEscalationOwner = resolveDshControlPanelSectionLabel('partners');
   const fieldFollowUpFlows = getOperationsSupportFlowsForSurface('app-field').filter(
@@ -78,7 +65,7 @@ export function DshFieldReadinessEscalationScreen({
   if (state === 'pending-response') {
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
-        <TopBar variant="surface" title="تصعيد عدم الجاهزية" trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }} />
+        <TopBar variant="surface" title="تصعيد عدم الجاهزية" />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <StateView
             stateId="loading"
@@ -95,7 +82,7 @@ export function DshFieldReadinessEscalationScreen({
   if (state === 'approved') {
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
-        <TopBar variant="surface" title="تصعيد عدم الجاهزية" trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }} />
+        <TopBar variant="surface" title="تصعيد عدم الجاهزية" />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <StateView
             stateId="success"
@@ -112,13 +99,30 @@ export function DshFieldReadinessEscalationScreen({
   if (state === 'rejected') {
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
-        <TopBar variant="surface" title="تصعيد عدم الجاهزية" trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }} />
+        <TopBar variant="surface" title="تصعيد عدم الجاهزية" />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <StateView
             stateId="blockingError"
             title="تم رفض التصعيد"
             description="لم يتم قبول بلاغ عدم الجاهزية. يُرجى مراجعة المتطلبات وإعادة المحاولة."
             actionLabel="إعادة التصعيد"
+            onActionPress={onRetry}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  if (state === 'offline') {
+    return (
+      <View style={{ flex: 1, backgroundColor: theme.surface }}>
+        <TopBar variant="surface" title="تصعيد عدم الجاهزية" />
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <StateView
+            stateId="offline"
+            title="وضع عدم الاتصال"
+            description="تعذر إرسال البلاغ لعدم توفر اتصال بالشبكة. يرجى التحقق من الاتصال وإعادة المحاولة."
+            actionLabel="إعادة المحاولة"
             onActionPress={onRetry}
           />
         </View>
@@ -137,7 +141,7 @@ export function DshFieldReadinessEscalationScreen({
   if (state === 'success') {
     return (
       <View style={{ flex: 1, backgroundColor: theme.surface }}>
-        <TopBar variant="surface" title="تصعيد عدم الجاهزية" trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }} />
+        <TopBar variant="surface" title="تصعيد عدم الجاهزية" />
         <View style={{ flex: 1, justifyContent: 'center' }}>
           <StateView
             stateId="success"
@@ -157,7 +161,6 @@ export function DshFieldReadinessEscalationScreen({
         variant="surface"
         title="تصعيد عدم الجاهزية"
         subtitle="إبلاغ الفريق المختص بالعوائق الميدانية للمتجر"
-        trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
         <Box padding={4} gap={4}>
@@ -187,7 +190,7 @@ export function DshFieldReadinessEscalationScreen({
               items={[
                 { label: 'المالك الحالي', value: registryFlowSummary?.ownerSurface ?? readinessFlow.ownerLabel, tone: 'brand' as const },
                 { label: 'مالك التصعيد (السجل المركزي)', value: registryEscalationOwner, tone: 'brand' as const },
-                { label: 'سياسة فتح الأدلة', value: resolveFieldPolicyLabel(registryFlowSummary?.onDemandPolicy) },
+                { label: 'سياسة فتح الأدلة', value: resolveDshOnDemandPolicyLabel(registryFlowSummary?.onDemandPolicy) },
                 { label: 'الإجراء التالي', value: readinessFlow.nextAction, tone: 'brand' as const },
               ]}
             />
@@ -313,7 +316,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing[3],
     borderRadius: radius.md,
-    borderWidth: 1,
+    borderWidth: borders.hairline,
     gap: spacing[3],
   },
   targetLabel: {
@@ -323,8 +326,8 @@ const styles = StyleSheet.create({
   radioCircle: {
     width: 20,
     height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
+    borderRadius: radius.sm,
+    borderWidth: borders.strong,
     alignItems: 'center',
     justifyContent: 'center',
   },

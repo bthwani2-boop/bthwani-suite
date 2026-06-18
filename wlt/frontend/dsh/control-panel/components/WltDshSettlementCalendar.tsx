@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import { getWltDshSettlementCalendarPreview } from '../financeContracts';
+import type { WltDshFinanceRuntimeResult } from '../../shared/boundary/wltDshFinanceRuntime.adapter';
+import { buildRuntimeSettlementCycles } from '../../shared/settlements/settlement-calendar.read-model';
 
 const STATUS_LABEL: Record<string, string> = {
   open_preview: 'مفتوحة كمعاينة',
@@ -12,22 +13,27 @@ const STATUS_LABEL: Record<string, string> = {
   held: 'محجوزة',
 };
 
-export function WltDshSettlementCalendar() {
-  const cycles = React.useMemo(() => getWltDshSettlementCalendarPreview(), []);
+export function WltDshSettlementCalendar({
+  runtimeFinance = null,
+}: {
+  runtimeFinance?: WltDshFinanceRuntimeResult | null;
+} = {}) {
+  const runtimeCycles = React.useMemo(() => buildRuntimeSettlementCycles(runtimeFinance), [runtimeFinance]);
+  const cycles = runtimeCycles;
 
   return (
     <Box gap={4} style={{ direction: 'rtl', width: '100%' }}>
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-        <Text role="titleMd" style={{ fontWeight: 800 }}>تقويم التسويات</Text>
+        <Text role="titleMd" weight="black">تقويم التسويات</Text>
         <Text role="bodySm" tone="soft">
-          يوضح دورات القطع والدفع والحجز لكل مالك مالي. لا ينفذ دفعًا ولا يفتح ledger runtime.
+          يوضح دورات القطع والدفع والحجز لكل مالك مالي. البيانات من WLT runtime فقط.
         </Text>
       </Box>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 12 }}>
         {cycles.map((cycle) => (
           <Box key={cycle.cycleId} padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
-            <Text role="titleSm" style={{ fontWeight: 800 }}>{cycle.ownerLabel}</Text>
+            <Text role="titleSm" weight="black">{cycle.ownerLabel}</Text>
             <Text role="caption" tone="muted">{cycle.cycleId} · {cycle.frequency} · {STATUS_LABEL[cycle.status]}</Text>
             <div style={{ display: 'grid', gap: 7, marginTop: 6 }}>
               <div>الفترة: {cycle.periodStart} → {cycle.periodEnd}</div>

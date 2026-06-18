@@ -9,13 +9,13 @@ import { Box, KeyValueList, Surface, Text } from '@bthwani/ui-kit';
 import {
   WebControlPanelInspectorShell,
 } from '@bthwani/ui-kit/web';
-import type { DshAuditEntry } from '../../shared/dsh-role-permission.model';
+import type { DshAuditEntry } from '../../shared/identity-access/dsh-role-permission.model';
 import {
   getDshAuditEntryById,
   getDshRoleArabicName,
   getDshRolePermission,
-  DSH_AUDIT_PREVIEW_ENTRIES,
-} from '../../shared/dsh-role-permission.model';
+  DSH_AUDIT_ENTRIES,
+} from '../../shared/identity-access/dsh-role-permission.model';
 
 export type AuditTrailDetailWorkspaceProps = {
   orderId?: string;
@@ -46,7 +46,7 @@ export function AuditTrailDetailWorkspace({
 }: AuditTrailDetailWorkspaceProps) {
   const entry =
     auditEntryProp ??
-    (entryId ? getDshAuditEntryById(entryId) : DSH_AUDIT_PREVIEW_ENTRIES[0]);
+    (entryId ? getDshAuditEntryById(entryId) : DSH_AUDIT_ENTRIES[0]);
   const policy = entry ? getDshRolePermission(entry.section) : undefined;
 
   const shellTitle = entry

@@ -7,15 +7,19 @@ import {
   View,
   type ImageSourcePropType,
 } from 'react-native';
-import { ServiceOrbitCarousel, colorPalette, radius, spacing, useDirection, withAlpha } from '@bthwani/ui-kit';
+import { ServiceOrbitCarousel, colorPalette, radius, spacing, useDirection, withAlpha, shadowPresets,
+  typographyRoles,
+} from '@bthwani/ui-kit';
 import { Text } from '@bthwani/ui-kit';
 
-import type { DshServiceId } from '../../contracts/dsh-home-types';
-import { dshHomeServiceDialFixtures } from '../../../data/stores.preview-data';
-import { resolveDshImageSource } from '../../../shared/resolve-dsh-image-source';
+import type { DshServiceId } from '../../../shared/discovery/dsh-home-types';
+import type { HomeScreenShellProps } from './HomeScreenShell';
+import type { DshHomeServiceDialItem } from '../../../shared/discovery/home-service-config';
+import { DSH_HOME_SERVICE_DIAL_ITEMS as dshHomeServiceDialFixtures } from '../../../shared/discovery/home-service-config';
+import { resolveDshImageSource } from '../../../shared/media';
 
 // --------------------------------------------------------------------------
-// Local DSH category tile — uses resolveDshImageSource for media-fixtures PNGs
+// Local DSH category tile — uses runtime media resolution or emoji fallback.
 // Does NOT rely on getDshCategoryIconUrl (which needs an env var HTTP base URL).
 // --------------------------------------------------------------------------
 
@@ -44,7 +48,7 @@ function DshCategoryTile({
   return (
     <View style={tileStyles.slot}>
       <Pressable onPress={onPress} style={({ pressed }) => [tileStyles.pressable, { opacity: pressed ? 0.94 : 1 }]}>
-        <View style={tileStyles.card}>
+        <View style={tileStyles.tileCard}>
           <View style={tileStyles.iconBox}>
             {imageSource ? (
               <Image source={imageSource} style={tileStyles.icon} resizeMode="cover" />
@@ -145,11 +149,10 @@ export const HomeCategoryDialSection = React.memo(function HomeCategoryDialSecti
   homeState,
   categoriesDialItems,
   selectCategoryPage,
-}: any) {
+}: Pick<HomeScreenShellProps, 'props' | 'homeState' | 'selectCategoryPage'> & { categoriesDialItems: DshCategoryDialItem[] }) {
   return (
     <DshCategoryOrbitCarouselBase
       visible={homeState.categoriesSheetVisible}
-      anchorLayout={homeState.categoriesDialLayout}
       items={categoriesDialItems}
       onClose={() => homeState.setCategoriesSheetVisible(false)}
       onSelect={(item: DshCategoryDialItem) => {
@@ -170,7 +173,7 @@ export const HomeCategoryDialSection = React.memo(function HomeCategoryDialSecti
 export const HomeServiceDialSection = React.memo(function HomeServiceDialSection({
   props,
   homeState,
-}: any) {
+}: Pick<HomeScreenShellProps, 'props' | 'homeState'>) {
   return (
     <ServiceOrbitCarousel
       visible={homeState.serviceDialVisible}
@@ -182,7 +185,7 @@ export const HomeServiceDialSection = React.memo(function HomeServiceDialSection
       }}
       items={dshHomeServiceDialFixtures}
       onClose={() => homeState.setServiceDialVisible(false)}
-      onSelect={(item: any) => {
+      onSelect={(item: { key: string }) => {
         homeState.setServiceDialVisible(false);
         if (item.key === 'dsh') return;
         if (item.key === 'wlt') {
@@ -208,7 +211,7 @@ const tileStyles = StyleSheet.create({
   pressable: {
     flex: 1,
   },
-  card: {
+  tileCard: {
     flex: 1,
     borderRadius: radius.lg,
     backgroundColor: colorPalette.white,
@@ -230,7 +233,7 @@ const tileStyles = StyleSheet.create({
     borderRadius: radius.sm,
   },
   emoji: {
-    fontSize: 30,
+    fontSize: typographyRoles.hero.fontSize,
   },
   textContent: {
     alignItems: 'center',
@@ -265,11 +268,7 @@ const carouselStyles = StyleSheet.create({
     width: '90%',
     maxWidth: 560,
     maxHeight: 520,
-    shadowColor: colorPalette.black,
-    shadowOpacity: 0.16,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 16,
+    ...shadowPresets.floating,
   },
   hubHeader: {
     paddingTop: spacing[5],
@@ -281,7 +280,7 @@ const carouselStyles = StyleSheet.create({
     alignSelf: 'center',
     width: 42,
     height: 4,
-    borderRadius: 999,
+    borderRadius: radius.pill,
     backgroundColor: colorPalette.brand,
     marginBottom: spacing[1],
   },

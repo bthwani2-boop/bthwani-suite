@@ -1,8 +1,8 @@
 export type {
   ApprovalRecord,
   ApprovalStage,
-} from '../../shared/workflow';
-export { moveApprovalRecordToStage, getPartnerIntakeItems, translateEntityType, translateOwner, translateStage } from '../../shared/workflow';
+} from '../../shared/stores/partner/partner.workflow';
+export { moveApprovalRecordToStage, getPartnerIntakeItems, translateEntityType, translateOwner, translateStage } from '../../shared/stores/partner/partner.workflow';
 
 export { ControlPanelDshPartnerApprovalsScreen } from './ControlPanelDshPartnerApprovalsScreen';
 export { DshPartnerPromotionEligibilityScreen } from './DshPartnerPromotionEligibilityScreen';
@@ -15,7 +15,11 @@ export type { PartnerDeactivationWorkspaceProps } from './PartnerDeactivationWor
 
 export { PartnerFulfillmentLane } from './PartnerFulfillmentLane';
 export type { PartnerFulfillmentLaneProps } from './PartnerFulfillmentLane';
-export type { DshPartnerFulfillmentAgreement, DshPartnerFulfillmentMode, DshPartnerModeAgreement } from './workflow';
+export type {
+  DshPartnerFulfillmentAgreement,
+  DshPartnerFulfillmentMode,
+  DshPartnerModeAgreement,
+} from '../../shared/stores/partner/partner.types';
 export {
   PARTNER_PRIMARY_TABS,
   PARTNER_SUB_TAB_DEFINITIONS,
@@ -23,3 +27,6 @@ export {
   type PartnerWorkspaceTabId,
   type PartnerWorkspaceTabItem,
 } from './partners.types';
+
+export { PartnerIntakeLane } from './PartnerIntakeLane';
+export type { PartnerIntakeLaneProps } from './PartnerIntakeLane';

@@ -15,7 +15,7 @@ import {
   CENTRAL_PRODUCT_DETAIL_LOOKUP,
   deriveProductSku,
   deriveProductGtin,
-} from '../../shared/catalog-central-adapter';
+} from '../../shared/catalog';
 import {
   PARTNER_FULFILLMENT_AGREEMENTS,
   getPartnerCatalogOverrides,
@@ -334,7 +334,7 @@ export function PartnerCatalogOverridesWorkspace() {
               title="توجيه التجاوزات"
               reason={actionMessage}
               confidence="high"
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
             />
           )}
 

@@ -2,7 +2,13 @@
 
 | Skill | Purpose | Governance dependency | Output |
 |---|---|---|---|
-| `bthwani-graphify-query-first` | Use Graphify before broad raw-file search for repo architecture, ownership, dependency, routing, UI-kit, DSH data/media, and cross-surface questions. | local `graphify-out/graph.json` cache + exact owner files | focused file set + evidence-aware next action |
+| `bthwani-evidence-gate-router-contract` | **Primary tool and guard selector.** Classify the task, select the minimum gate tier (Fast / Scoped / Heavy), choose the minimum tool set, and produce normalized evidence. Use before any guard or analysis tool selection. | `guard-manifest.json`, `package.json` scripts, task classification | gate-tier decision + tool-selection.json + evidence path |
+| `bthwani-graphify-query-first` | **Optional context / navigation only.** Use when cross-file scope is unknown or a relationship/impact question is present. Not a toolchain leader. Not required for every task. Do not run `graphify update .` by default. | local `graphify-out/graph.json` cache + exact owner files | scoped files/relationships → route to evidence-gate-router-contract |
+| `bthwani-logic-graph-guard-tooling-contract` | Route feature, journey, screen, API, state, Cucumber/Spectral/Playwright, and cross-surface logic gap diagnostics. | feature/journey manifests + OpenAPI + existing guards | logic gap matrix + evidence-aware next action |
+| `bthwani-design-guard-tooling-contract` | Route installed design tooling, generated-output safety, UI-kit ownership, Tamagui boundary, design-token drift, and visual evidence checks. | `ui-kit`, `tools/guards`, generated/cache outputs | design tooling decision + guard/evidence requirements |
+| `bthwani-structure-organization-guard-tooling-contract` | Use structure, duplication, monorepo, file-size, performance-bloat, and security-hygiene tooling to diagnose organization gaps. | `package.json`, `tools/guards` | organization decision + next action |
+
+
 | `bthwani-current-workspace-authority` | Resolve active roots and block stale/donor paths. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-agent-governance-execution` | Enforce scoped execution, forensics, dry-run, apply, verification, and evidence. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-local-evidence-pack` | Collect human-requested or workflow-justified local evidence; ZIP only when explicitly requested or when one upload artifact is practically needed. | `governance/` according to task domain | structured decision + evidence requirements |
@@ -30,7 +36,10 @@
 | `bthwani-observability-performance-contract` | Review logs, metrics, traces, performance and failure visibility. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-agent-skill-authoring-contract` | Create/update skills with evals, trigger clarity, and minimal context burden. | `governance/` according to task domain | structured decision + evidence requirements |
 | `bthwani-agent-registry-validator` | Validate skill registry coverage, frontmatter, duplication, and risk terms. | `governance/` according to task domain | structured decision + evidence requirements |
+| `bthwani-full-stack-clean-code-skill` | Enforce evidence-based full-stack clean code across current BThwani roots without historical assumptions. | `governance/` according to task domain | structured clean-code decision + evidence requirements |
 | `bthwani-frontend-design-excellence-contract` | Guard premium frontend design quality, visual hierarchy, responsive web/mobile UX, interaction states, accessibility, and visual evidence requirement. | `governance/` according to task domain | frontend design decision + visual evidence requirement |
 | `bthwani-stop-slop-prose-contract` | Remove AI-sounding prose, filler, vague claims, noisy writing, and weak Arabic/English copy from prompts, reports, UI copy, governance text, and marketing text. | `governance/` according to task domain | prose cleanup + remaining TBD + final text |
+| `bthwani-dynamic-workflow-execution-contract` | Use dynamic task classification, tool/skill routing, alternative comparison, stakeholder-view review, adversarial verification, and evidence-grounded execution control. | `governance/` according to task domain | structured decision + evidence requirements |
+
 
 All skills require evidence before acceptance. External skills may be preserved, but BThwani rules override generic examples.

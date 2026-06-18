@@ -184,6 +184,9 @@ INSERT INTO dsh_order_items (id, order_id, product_id, quantity, price)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING id, order_id, product_id, quantity, price`
 
+	// Fetch catalog prices (base_price_minor_units) for all requested products.
+	// Price authority is the catalog; client-sent prices are ignored.
+	catalogPrices := make(map[string]int64) // product_id → minor_units
 	if len(req.Items) > 0 {
 		uniqueProductIDs := make(map[string]bool)
 		var productIDs []string
@@ -194,36 +197,41 @@ RETURNING id, order_id, product_id, quantity, price`
 			}
 		}
 
-		rows, err := tx.QueryContext(ctx, "SELECT id FROM dsh_catalog_products WHERE store_id = $1 AND id = ANY($2)", storeID, productIDs)
+		rows, err := tx.QueryContext(ctx, "SELECT id, base_price_minor_units FROM dsh_catalog_products WHERE store_id = $1 AND id = ANY($2)", storeID, productIDs)
 		if err != nil {
 			return domain.OrderRecord{}, nil, fmt.Errorf("failed to verify products: %w", err)
 		}
 		defer rows.Close()
 
-		verifiedProducts := make(map[string]bool)
 		for rows.Next() {
 			var pid string
-			if err := rows.Scan(&pid); err != nil {
-				return domain.OrderRecord{}, nil, fmt.Errorf("failed to scan verified product ID: %w", err)
+			var priceMinor int64
+			if err := rows.Scan(&pid, &priceMinor); err != nil {
+				return domain.OrderRecord{}, nil, fmt.Errorf("failed to scan product row: %w", err)
 			}
-			verifiedProducts[pid] = true
+			catalogPrices[pid] = priceMinor
 		}
 		if err := rows.Err(); err != nil {
 			return domain.OrderRecord{}, nil, fmt.Errorf("failed to scan verified products: %w", err)
 		}
 
 		for _, it := range req.Items {
-			if !verifiedProducts[it.ProductID] {
+			if _, ok := catalogPrices[it.ProductID]; !ok {
 				return domain.OrderRecord{}, nil, fmt.Errorf("product %s not found or does not belong to store %s", it.ProductID, storeID)
 			}
 		}
 	}
 
+	// Compute total from catalog prices and insert items.
+	var computedTotal float64
 	for _, it := range req.Items {
 		itemID := generateOrderItemID()
+		// YER has no sub-unit in practice: minor_units == major units.
+		itemPrice := float64(catalogPrices[it.ProductID]) * float64(it.Quantity)
+		computedTotal += itemPrice
 		var item domain.OrderItemRecord
 		err = tx.QueryRowContext(ctx, itemQuery,
-			itemID, orderID, it.ProductID, it.Quantity, it.Price,
+			itemID, orderID, it.ProductID, it.Quantity, itemPrice,
 		).Scan(
 			&item.ID, &item.OrderID, &item.ProductID, &item.Quantity, &item.Price,
 		)
@@ -232,6 +240,12 @@ RETURNING id, order_id, product_id, quantity, price`
 		}
 		items = append(items, item)
 	}
+
+	// Patch the order total_price with the computed value now that we know it.
+	if _, err := tx.ExecContext(ctx, "UPDATE dsh_orders SET total_price = $1 WHERE id = $2", computedTotal, orderID); err != nil {
+		return domain.OrderRecord{}, nil, fmt.Errorf("failed to update order total_price: %w", err)
+	}
+	order.TotalPrice = computedTotal
 
 	// Insert initial event status
 	eventID := generateStatusEventID()

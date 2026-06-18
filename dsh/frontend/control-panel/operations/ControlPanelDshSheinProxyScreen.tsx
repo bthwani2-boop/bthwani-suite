@@ -6,39 +6,33 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelDecisionRow,
 } from '@bthwani/ui-kit/web';
-import { SHEIN_PROXY_OPERATIONAL_PREVIEW } from '../../data/orders.preview-data';
-import { SHEIN_PROXY_STAGE_LABELS } from '../../shared/dsh-order-preview.contract';
+import { SHEIN_PROXY_STAGE_LABELS } from '../../shared/orders';
 import { buildOperationsHref } from './operations.registry';
 import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
+import { DSH_CONTROL_PANEL_TONE_MAP } from '../shared/dsh-control-panel-display';
 
 export type ControlPanelDshSheinProxyScreenProps = {
   hubHref?: string;
   subGroup?: string;
 };
 
-const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  warning: 'warning',
-  danger: 'danger',
-  best: 'success',
-  brand: 'neutral',
-};
-
 const STAGE_ORDER = Object.keys(SHEIN_PROXY_STAGE_LABELS) as Array<keyof typeof SHEIN_PROXY_STAGE_LABELS>;
 
 export function ControlPanelDshSheinProxyScreen({ hubHref: _hubHref, subGroup }: ControlPanelDshSheinProxyScreenProps) {
   const router = useRouter();
-  const preview = SHEIN_PROXY_OPERATIONAL_PREVIEW;
 
   const summaryKpi = STAGE_ORDER.map((stage) => ({
     id: stage,
     label: SHEIN_PROXY_STAGE_LABELS[stage],
-    value: String(preview.summary[stage]),
+    value: '0',
     tone: stage === 'exception' ? ('danger' as const)
       : stage === 'intake_review' || stage === 'quote_pending' || stage === 'customer_approval' ? ('neutral' as const)
       : stage === 'delivered' ? ('success' as const)
       : ('neutral' as const),
   }));
+
+  const requests: { id: string; customer: string; statusLabel: string; statusTone: string; nextStep: string; note: string; owner: string; sla: string; total: string }[] = [];
 
   return (
     <Box gap={3}>
@@ -49,13 +43,13 @@ export function ControlPanelDshSheinProxyScreen({ hubHref: _hubHref, subGroup }:
       <WebControlPanelKpiStrip items={summaryKpi} />
 
       <Box gap={2} style={{}}>
-        {preview.requests.map((request) => (
+        {requests.map((request) => (
           <WebControlPanelDecisionRow
             key={request.id}
             entityId={request.id}
             entityLabel={request.customer}
             status={request.statusLabel}
-            statusTone={TONE_MAP[request.statusTone] ?? 'neutral'}
+            statusTone={DSH_CONTROL_PANEL_TONE_MAP[request.statusTone] ?? 'neutral'}
             risk={request.statusTone === 'danger' ? 'danger' : request.statusTone === 'warning' ? 'warning' : 'neutral'}
             recommendation={request.nextStep}
             reason={request.note}

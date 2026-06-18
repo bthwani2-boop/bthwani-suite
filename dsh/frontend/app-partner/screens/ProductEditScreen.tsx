@@ -6,26 +6,26 @@ import {
   Chip,
   Divider,
   MobileStickyPrimaryAction,
+  StateView,
   Text,
   TextField,
   resolveRowDirection,
   useDirection,
   useTheme,
+  spacing,
+  radius,
 } from '@bthwani/ui-kit';
 import {
-  type DshProductApprovalStatus,
+  type DshProductIdentityApprovalStatus,
   getDshProductApprovalStatusLabel,
   getDshProductApprovalStatusTone,
-} from '../../shared/dsh-product-identity.model';
+} from '../../shared';
 import {
   type DshProductRecord,
   type DshCreateProductRequest,
   type DshUpdateProductRequest,
-} from '../../shared/dsh-product-api.client';
-import {
-  createDshProductApiHttpClient,
-  resolveDshProductApiBaseUrl,
-} from '../../shared/dsh-product-api.transport';
+} from '../../shared/products/dsh-product-api.client';
+import { getDshProductRuntimeClient } from '../../shared';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -103,10 +103,10 @@ export function ProductEditScreen({
   const [form, setForm] = React.useState<ProductFormState>(emptyForm);
   const [savedRecord, setSavedRecord] = React.useState<DshProductRecord | null>(null);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
-  const [approvalStatus, setApprovalStatus] = React.useState<DshProductApprovalStatus>('partner_submitted');
+  const [approvalStatus, setApprovalStatus] = React.useState<DshProductIdentityApprovalStatus>('partner_submitted');
 
   const client = React.useMemo(
-    () => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()),
+    () => getDshProductRuntimeClient(),
     [],
   );
 
@@ -224,45 +224,17 @@ export function ProductEditScreen({
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (screenState === 'loading') {
-    return (
-      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
-        <Text role="bodyStrong" tone="muted" align="center">
-          جارٍ تحميل بيانات المنتج…
-        </Text>
-      </Box>
-    );
+    return <StateView kind="loading" title="جارٍ تحميل بيانات المنتج…" />;
   }
 
   // ── Not-found state ────────────────────────────────────────────────────────
   if (screenState === 'not_found') {
-    return (
-      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 16 }}>
-        <Text role="bodyStrong" tone="danger" align="center">
-          المنتج غير موجود
-        </Text>
-        <Text role="bodySm" tone="muted" align="center">
-          لم يُعثر على المنتج المطلوب. قد يكون محذوفاً أو أن الرابط غير صحيح.
-        </Text>
-        {onBack ? (
-          <Button label="العودة" tone="secondary" onPress={onBack} />
-        ) : null}
-      </Box>
-    );
+    return <StateView stateId="notFound" title="المنتج غير موجود" description="لم يُعثر على المنتج المطلوب. قد يكون محذوفاً أو أن الرابط غير صحيح." actionLabel={onBack ? 'العودة' : undefined} onActionPress={onBack} />;
   }
 
   // ── Offline state ──────────────────────────────────────────────────────────
   if (screenState === 'offline') {
-    return (
-      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 16 }}>
-        <Text role="bodyStrong" tone="warning" align="center">
-          لا يوجد اتصال بالشبكة
-        </Text>
-        <Text role="bodySm" tone="muted" align="center">
-          تعذّر الاتصال بالخادم. تحقق من الاتصال وأعد المحاولة.
-        </Text>
-        <Button label="إعادة المحاولة" tone="primary" onPress={handleRetry} />
-      </Box>
-    );
+    return <StateView stateId="offline" actionLabel="إعادة المحاولة" onActionPress={handleRetry} />;
   }
 
   // ── Main form / saved / error states ──────────────────────────────────────
@@ -272,14 +244,14 @@ export function ProductEditScreen({
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: theme.bg }}
+      style={{ flex: 1, backgroundColor: theme.background }}
       contentContainerStyle={{ paddingBottom: 160 }}
       keyboardShouldPersistTaps="handled"
     >
-      <Box gap={4} style={{ padding: 16 }}>
+      <Box gap={4} style={{ padding: spacing[4] }}>
 
         {/* ── Header ─────────────────────────────────────────────────────── */}
-        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 12 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[3] }}>
           {onBack ? (
             <Button label="رجوع" tone="ghost" size="sm" fullWidth={false} onPress={onBack} />
           ) : null}
@@ -295,7 +267,7 @@ export function ProductEditScreen({
 
         {/* ── Approval status badge (edit mode only) ─────────────────────── */}
         {mode === 'edit' ? (
-          <Box style={{ flexDirection: resolveRowDirection(direction), gap: 8, flexWrap: 'wrap' }}>
+          <Box style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2], flexWrap: 'wrap' }}>
             <Chip label={`حالة الاعتماد: ${approvalLabel}`} tone={approvalTone} selected />
             {savedRecord ? (
               <Chip label={`معرف المنتج: ${savedRecord.id}`} tone="default" />
@@ -309,8 +281,8 @@ export function ProductEditScreen({
         <Box
           style={{
             backgroundColor: theme.line + '18',
-            borderRadius: 8,
-            padding: 12,
+            borderRadius: radius.xs2,
+            padding: spacing[3],
             borderStartWidth: 3,
             borderStartColor: theme.brand,
           }}
@@ -327,11 +299,11 @@ export function ProductEditScreen({
           <Box
             style={{
               backgroundColor: theme.danger + '15',
-              borderRadius: 8,
-              padding: 12,
+              borderRadius: radius.xs2,
+              padding: spacing[3],
               borderStartWidth: 3,
               borderStartColor: theme.danger,
-              gap: 8,
+              gap: spacing[2],
             }}
           >
             <Text role="bodySm" tone="danger" align="start">
@@ -352,11 +324,11 @@ export function ProductEditScreen({
           <Box
             style={{
               backgroundColor: theme.success + '15',
-              borderRadius: 8,
-              padding: 12,
+              borderRadius: radius.xs2,
+              padding: spacing[3],
               borderStartWidth: 3,
               borderStartColor: theme.success,
-              gap: 8,
+              gap: spacing[2],
             }}
           >
             <Text role="bodyStrong" tone="success" align="start">

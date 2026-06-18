@@ -10,12 +10,12 @@ import { useHomeFilterRail } from '../hooks/useHomeFilterRail';
 import { useHomeVideoHandlers } from '../hooks/useHomeVideoHandlers';
 import { useHomeTickerState } from '../hooks/useHomeTickerState';
 import { useDebounce } from '../hooks/useDebounce';
-import { resolveDshImageSource } from '../shared/resolve-image-source';
+import { resolveDshImageSource } from '../../shared/media';
 import { HomeScreenShell } from '../parts/home/HomeScreenShell';
-import { createStyles } from '../parts/home/home-screen.styles';
-import type { DshHomeGetPromo, DshHomeGetStore } from '../contracts/dsh-home-types';
+import { buildHomeScreenStyles } from '../parts/home/home-screen.styles';
+import type { DshHomeGetPromo, DshHomeGetStore } from '../../shared/discovery/dsh-home-types';
 import type { DshHomeGetScreenProps } from '../contracts/dsh-home-screen-props';
-function resolveDshHomeBannerImageSource(imageUrl?: string): any {
+function resolveDshHomeBannerImageSource(imageUrl?: string): ReturnType<typeof resolveDshImageSource> {
   return resolveDshImageSource(imageUrl);
 }
 
@@ -36,8 +36,8 @@ export const DshHomeGetScreen = React.memo(function DshHomeGetScreenComponent(
   const { width: viewportWidth } = useWindowDimensions();
   const { theme } = useTheme();
   const uiText = useUiText();
-  const styles = React.useMemo(() => createStyles(direction, theme), [direction, theme]);
-  const categoriesAnchorRef = React.useRef<any>(null);
+  const styles = React.useMemo(() => buildHomeScreenStyles(direction, theme), [direction, theme]);
+  const categoriesAnchorRef = React.useRef<null>(null);
 
   const homeState = useHomeState();
   const favoriteToggles = favoriteOverrides ?? homeState.localFavoriteToggles;

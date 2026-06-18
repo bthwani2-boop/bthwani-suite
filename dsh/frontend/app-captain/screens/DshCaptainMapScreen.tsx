@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Badge, Box, Button, KeyValueList, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
+import { Badge, Box, Button, KeyValueList, SectionHeader, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary } from '../../shared/runtime/dsh-flow-registry';
 
-import { DshOrderLifecycleClient } from '../../shared/dsh-order-lifecycle-client';
-import { type DshOperationScreenState } from '../../app-client/parts/OperationScreen';
+import type { DshCaptainLifecycleStatus } from '../../shared/delivery/captain/use-captain-order-runtime';
+import { type DshOperationScreenState } from '../parts/OperationScreen';
 
 type CaptainFieldStage = 'to-store' | 'to-customer' | 'near-customer' | 'at-door' | 'bell-rang' | 'proof';
 type CaptainHeartbeatState = { lastUpdateMinutesAgo: number; etaMinutes: number | null };
@@ -98,14 +98,21 @@ export interface DshCaptainMapScreenProps {
   readonly orderId: string;
   readonly captainId?: string;
   readonly onBack: () => void;
-  readonly orderLifecycleClient: DshOrderLifecycleClient;
+  readonly onPushLocation: (push: {
+    readonly orderId: string;
+    readonly captainId: string;
+    readonly latitude: number;
+    readonly longitude: number;
+    readonly lifecycleStatus: string;
+    readonly orderStatus?: DshCaptainLifecycleStatus;
+  }) => Promise<unknown>;
 }
 
 export function DshCaptainMapScreen({
   orderId,
   captainId = 'captain-1',
   onBack,
-  orderLifecycleClient,
+  onPushLocation,
 }: DshCaptainMapScreenProps) {
   const [taskStage, setTaskStage] = React.useState<CaptainFieldStage>('to-store');
   const [stagesVisible, setStagesVisible] = React.useState(false);
@@ -134,12 +141,13 @@ export function DshCaptainMapScreen({
     }
 
     try {
-      await orderLifecycleClient.pushLocation(orderId, {
-        captain_id: captainId,
+      await onPushLocation({
+        orderId,
+        captainId,
         latitude: STAGE_COORDINATES[next].lat,
         longitude: STAGE_COORDINATES[next].lng,
-        lifecycle_status: STAGE_CONFIG[next].lifecycleStatus,
-        order_status: nextOrderStatus,
+        lifecycleStatus: STAGE_CONFIG[next].lifecycleStatus,
+        orderStatus: nextOrderStatus,
       });
       setTaskStage(next);
       setScreenState('ready');
@@ -163,12 +171,13 @@ export function DshCaptainMapScreen({
     }
 
     try {
-      await orderLifecycleClient.pushLocation(orderId, {
-        captain_id: captainId,
+      await onPushLocation({
+        orderId,
+        captainId,
         latitude: STAGE_COORDINATES[stage].lat,
         longitude: STAGE_COORDINATES[stage].lng,
-        lifecycle_status: STAGE_CONFIG[stage].lifecycleStatus,
-        order_status: nextOrderStatus,
+        lifecycleStatus: STAGE_CONFIG[stage].lifecycleStatus,
+        orderStatus: nextOrderStatus,
       });
       setTaskStage(stage);
       setScreenState('ready');
@@ -196,12 +205,12 @@ export function DshCaptainMapScreen({
         <Box gap={3}>
           {errorMessage && (
             <Surface tone="danger" padding={3} radiusToken="md">
-              <Text role="bodySm" style={{ color: 'red', textAlign: 'right' }}>{errorMessage}</Text>
+              <Text role="bodySm" tone="danger" style={{ textAlign: 'right' }}>{errorMessage}</Text>
             </Surface>
           )}
           {successMessage && (
             <Surface tone="brand" padding={3} radiusToken="md">
-              <Text role="bodySm" style={{ color: 'green', textAlign: 'right' }}>{successMessage}</Text>
+              <Text role="bodySm" tone="success" style={{ textAlign: 'right' }}>{successMessage}</Text>
             </Surface>
           )}
 

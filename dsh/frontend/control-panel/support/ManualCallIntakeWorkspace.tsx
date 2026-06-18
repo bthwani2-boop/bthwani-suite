@@ -4,17 +4,63 @@ import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box } from '@bthwani/ui-kit';
 import { WebControlPanelDecisionRow, WebControlPanelKpiStrip } from '@bthwani/ui-kit/web';
-import {
-  DSH_CALL_INTAKE_PREVIEW,
-  getDshCallIntakeByContext,
-  getDshCallIntakePreview,
-  type DshCallIntakePreview,
-} from '../../data/support.preview-data';
 import type {
   DshGlobalControlLink,
   DshRouteHintedAction,
-} from '../../shared/dsh-order-preview.contract';
+  DshSignalRoute,
+  DshVerificationStatus,
+  DshVerificationStep,
+} from '../../shared/orders';
+import type { SupportVerificationStatus } from './support.types';
+
+type DshCallIntakePreview = {
+  intakeId: string;
+  customerId: string;
+  customerName: string;
+  issueSummary: string;
+  source: string;
+  orderContext?: string;
+  ticketContext?: string;
+  onDemandPolicy: string;
+  auditRequired: boolean;
+  lookupPanel: {
+    inputs: ReadonlyArray<{ key: string; label: string; value: string }>;
+  };
+  callReasonSelector: {
+    selectedReason: string;
+    options: readonly string[];
+    previewClassification: string;
+  };
+  identityVerificationResult: {
+    verificationStatus: DshVerificationStatus | SupportVerificationStatus;
+    previewClassification: string;
+    sensitiveFieldsLocked: readonly string[];
+    verificationSteps: readonly DshVerificationStep[];
+  };
+  forbiddenActions: readonly string[];
+  ticketPreview: {
+    mode: string;
+    auditRequired: boolean;
+    ticketId: string;
+    summary: string;
+    routeHint: string;
+  };
+  transferContextToOperations: readonly DshRouteHintedAction[];
+  closeCallOutcome: {
+    outcome: string;
+    auditRequired: boolean;
+    summary: string;
+    signal: DshSignalRoute;
+  };
+  quickActions: readonly DshGlobalControlLink[];
+  nextAction: string;
+};
+
+const DSH_CALL_INTAKE_PREVIEW: DshCallIntakePreview[] = [];
+function getDshCallIntakeByContext(_ctx: unknown): DshCallIntakePreview | null { return null; }
+function getDshCallIntakePreview(_id: string): DshCallIntakePreview | undefined { return undefined; }
 import styles from '../shared/control-panel-surface.module.css';
+import { SUPPORT_VERIFICATION_STATUS_META } from './support.types';
 
 export type ManualCallIntakeRouteContext = {
   intakeId: string;
@@ -29,12 +75,6 @@ export type ManualCallIntakeWorkspaceProps = {
   onOpenOrderRescue?: (context: ManualCallIntakeRouteContext) => void;
   onOpenSupportEscalation?: (context: ManualCallIntakeRouteContext) => void;
 };
-
-const VERIFICATION_STATUS_META = {
-  verified: { label: 'موثق', tone: 'success' as const },
-  required: { label: 'مطلوب', tone: 'warning' as const },
-  blocked: { label: 'محظور', tone: 'danger' as const },
-} as const;
 
 type ManualSectionHeading = string;
 type ManualSectionNote = string;
@@ -113,7 +153,7 @@ export function ManualCallIntakeWorkspace({
   }
 
   const selectedContext = buildCallRouteContext(selectedRecord);
-  const verificationMeta = VERIFICATION_STATUS_META[selectedRecord.identityVerificationResult.verificationStatus];
+  const verificationMeta = SUPPORT_VERIFICATION_STATUS_META[selectedRecord.identityVerificationResult.verificationStatus];
 
   function openRouteHint(routeHint: string) {
     router.push(routeHint);
@@ -192,7 +232,7 @@ export function ManualCallIntakeWorkspace({
         <div className={styles.surfaceListColumn}>
           <Box gap={2}>
             {DSH_CALL_INTAKE_PREVIEW.map((record) => {
-              const recordVerificationMeta = VERIFICATION_STATUS_META[record.identityVerificationResult.verificationStatus];
+              const recordVerificationMeta = SUPPORT_VERIFICATION_STATUS_META[record.identityVerificationResult.verificationStatus];
 
               return (
                 <WebControlPanelDecisionRow

@@ -1,16 +1,40 @@
-// P0-05: Catalog publishing gate — control-panel/catalogs is the ONLY surface that can publish.
+﻿// P0-05: Catalog publishing gate — control-panel/catalogs is the ONLY surface that can publish.
 // All prerequisites must be satisfied before the publish CTA is enabled.
 // Prerequisites: partner active + all items approved + delivery modes ready + category mapped + no duplicates.
 // Audit note is shown when the gate record flags auditRequired = true.
-// UI_PREVIEW_ONLY: gate actions produce visible result state but no backend/API binding.
+// SCAFFOLD: gate actions produce visible result state but no backend/API binding yet.
 import React from 'react';
 import { Box, Button, Chip, KeyValueList, Text, useTheme } from '@bthwani/ui-kit';
 import { WebCompactSurfaceHeader } from '@bthwani/ui-kit/web';
-import { resolveDshProductClientVisibility } from '../../shared/dsh-client-visibility.model';
-import { PublishGateStatus, CatalogPublishGateRecord, demoPublishGateRecord } from '../../data/publishing-gates.preview-data';
+import { resolveDshProductClientVisibility } from '../../shared/stores/dsh-client-visibility.model';
+import type {
+  DshProductIdentityApprovalStatus,
+  DshProductCategoryMappingStatus,
+  DshProductDuplicateStatus,
+  DshPartnerActivationStatus,
+} from '../../shared';
+
+type PublishGateStatus = 'not-started' | 'in-review' | 'approved' | 'rejected' | 'published';
+type CatalogPublishGateRecord = {
+  id: string;
+  catalogLabel: string;
+  partnerLabel: string;
+  status: PublishGateStatus;
+  itemCount: number;
+  approvedItemCount: number;
+  auditRequired: boolean;
+  approvalStatus?: DshProductIdentityApprovalStatus;
+  partnerActivationStatus?: DshPartnerActivationStatus;
+  deliveryModesReady?: boolean;
+  serviceabilityAvailable?: boolean;
+  catalogPublished?: boolean;
+  categoryMappingStatus?: DshProductCategoryMappingStatus;
+  duplicateStatus?: DshProductDuplicateStatus;
+  mediaPolicySatisfied?: boolean;
+};
 
 
-// Gate action result — UI_PREVIEW_ONLY
+// Gate action result — SCAFFOLD
 type GateActionResult = {
   action: 'publish' | 'request-revision' | 'reject';
   label: string;
@@ -51,13 +75,17 @@ export type ListingGovernanceScreenProps = {
 };
 
 export function ListingGovernanceScreen({
-  record = demoPublishGateRecord,
+  record,
   onApproveForPublish,
   onReject,
   onRequestRevision,
 }: ListingGovernanceScreenProps) {
   const { theme } = useTheme();
   const [gateActionResult, setGateActionResult] = React.useState<GateActionResult>(null);
+
+  if (!record) {
+    return null;
+  }
 
   const readinessPercent = Math.round((record.approvedItemCount / record.itemCount) * 100);
 
@@ -95,7 +123,7 @@ export function ListingGovernanceScreen({
         label: 'معاينة النشر',
         status: 'preview-only',
         owner: 'control-panel-catalog',
-        note: 'UI_PREVIEW_ONLY — لا يعني نشرًا فعليًا في runtime/API',
+        note: 'محاكاة محلية — لا يعني نشرًا فعليًا في runtime/API',
       });
     }
   }, [record.id, onApproveForPublish]);
@@ -107,7 +135,7 @@ export function ListingGovernanceScreen({
       label: 'تم طلب المراجعة',
       status: onRequestRevision ? 'sent' : 'preview-only',
       owner: 'control-panel-marketing',
-      note: onRequestRevision ? 'تم الإرسال للمالك' : 'UI_PREVIEW_ONLY — لا يعني إرسالًا فعليًا',
+      note: onRequestRevision ? 'تم الإرسال للمالك' : 'محاكاة محلية — الربط قيد التنفيذ',
     });
   }, [record.id, onRequestRevision]);
 
@@ -118,7 +146,7 @@ export function ListingGovernanceScreen({
       label: 'تم الرفض',
       status: onReject ? 'sent' : 'preview-only',
       owner: 'control-panel-operations',
-      note: onReject ? 'تم الإرسال للمالك' : 'UI_PREVIEW_ONLY — لا يعني رفضًا فعليًا',
+      note: onReject ? 'تم الإرسال للمالك' : 'محاكاة محلية — الربط قيد التنفيذ',
     });
   }, [record.id, onReject]);
 
@@ -150,7 +178,7 @@ export function ListingGovernanceScreen({
       >
         <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: theme.line, paddingBottom: 16, marginBottom: 8 }}>
           <Box gap={1}>
-            <Text role="titleSm" style={{ fontWeight: 'bold' }}>{record.catalogLabel}</Text>
+            <Text role="titleSm" weight="bold" style={{ }}>{record.catalogLabel}</Text>
             <Text role="bodySm" tone="muted">{record.partnerLabel}</Text>
           </Box>
           <Chip
@@ -178,7 +206,7 @@ export function ListingGovernanceScreen({
 
         {/* Publishing prerequisites checklist — styled as a premium grid of cards */}
         <Box gap={2} style={{ backgroundColor: theme.surfaceInset, padding: 16, borderRadius: 8, marginTop: 8 }}>
-          <Text role="label" tone="muted" style={{ fontWeight: 'bold' }}>شروط بوابة النشر</Text>
+          <Text role="label" tone="muted" weight="bold" style={{ }}>شروط بوابة النشر</Text>
           <Box style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 8 }}>
             {prerequisites.map((prereq) => (
               <Box
@@ -215,7 +243,7 @@ export function ListingGovernanceScreen({
                   </Text>
                 </Box>
                 <Box style={{ flex: 1, gap: 2 }}>
-                  <Text role="bodySm" tone={prereq.satisfied ? 'default' : 'danger'} style={{ fontWeight: '500' }}>
+                  <Text role="bodySm" tone={prereq.satisfied ? 'default' : 'danger'} weight="medium" style={{ }}>
                     {prereq.label}
                   </Text>
                   {!prereq.satisfied && prereq.blockedReason ? (
@@ -269,14 +297,14 @@ export function ListingGovernanceScreen({
               />
             </Box>
 
-            {/* Gate action result banner — UI_PREVIEW_ONLY */}
+            {/* Gate action result banner — SCAFFOLD */}
             {gateActionResult ? (
               <div
                 role="status"
                 aria-live="polite"
                 style={{ display: 'flex', flexDirection: 'column', gap: 4, padding: 12, backgroundColor: theme.surfaceInset, borderRadius: 8, marginTop: 12, borderRightWidth: 3, borderRightColor: theme.brand }}
               >
-                <Text role="bodySm" style={{ fontWeight: 'bold' }}>{gateActionResult.label}</Text>
+                <Text role="bodySm" weight="bold" style={{ }}>{gateActionResult.label}</Text>
                 <Text role="caption" tone="muted">
                   {`المالك: ${resolveGateOwnerLabel(gateActionResult.owner)} · ${gateActionResult.note}`}
                 </Text>
@@ -287,7 +315,7 @@ export function ListingGovernanceScreen({
 
         {record.status === 'published' ? (
           <Box style={{ backgroundColor: 'rgba(46, 125, 50, 0.08)', padding: 16, borderRadius: 8, marginTop: 12 }}>
-            <Text role="bodySm" tone="success" style={{ fontWeight: 'bold' }}>تم النشر بنجاح — الكتالوج مرئي للعملاء.</Text>
+            <Text role="bodySm" tone="success" weight="bold" style={{ }}>تم النشر بنجاح — الكتالوج مرئي للعملاء.</Text>
           </Box>
         ) : null}
       </Box>

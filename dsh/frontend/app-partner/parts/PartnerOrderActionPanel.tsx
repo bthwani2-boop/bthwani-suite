@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Button, ListItem, SectionHeader, Surface, Text } from '@bthwani/ui-kit';
-import type { DshPartnerPreparationStage } from '../../shared/dsh-order-journey.model';
-import type { DshFulfillmentDeliveryMode } from '../../shared/dsh-delivery-mode.model';
-import { getSurfaceModeCapability } from '../../shared/dsh-fulfillment-surface-visibility';
+import type { DshPartnerPreparationStage } from '../../shared/orders';
+import type { DshFulfillmentDeliveryMode } from '../../shared/orders';
+import { getSurfaceModeCapability } from '../../shared/orders';
 
 type PartnerFulfillmentMode = DshFulfillmentDeliveryMode;
 
@@ -66,7 +66,7 @@ export function DshPartnerOrderActionPanel({ activeFlowId, fulfillmentMode, onSe
         <Surface tone="raised" gap={2}>
           <SectionHeader
             title="موصل الشريك"
-            subtitle="UI_PREVIEW_ONLY — تعيين الموصل يتم عبر إعدادات الفريق لاحقًا."
+            subtitle="تعيين الموصل يتم عبر إعدادات الفريق لاحقًا."
           />
           <ListItem
             title="اسم الموصل"

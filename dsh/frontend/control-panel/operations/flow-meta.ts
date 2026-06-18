@@ -1,14 +1,1 @@
-import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
-
-const governance = getDshControlPanelGovernanceEntry('operations');
-
-export const flowMeta = {
-  id: 'dsh',
-  owner: 'operations',
-  ownerKind: 'section',
-  placeholder: false,
-  policyOwner: governance.policyOwner,
-  escalationOwner: governance.escalationOwner,
-  relatedRegistryFlowIds: governance.relatedRegistryFlowIds,
-  notes: governance.notes,
-} as const;
+export { operationsFlowMeta as flowMeta } from '../../shared/operations/operations-flow-meta';

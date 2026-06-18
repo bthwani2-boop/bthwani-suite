@@ -8,13 +8,17 @@ import { HomeCategoryDialSection, HomeServiceDialSection } from './HomeOrbitSect
 import { HomePromoSection } from './HomePromoSection';
 import { HomeStoreFeedSection, type HomeStoreCardEntry } from './HomeStoreFeedSection';
 import { HomeVideoReelsSection } from './HomeVideoReelsSection';
-import type { DshHomeGetScreenProps, DshHomeCategory } from '../../contracts/dsh-home-types';
+import type { useTheme, useUiText } from '@bthwani/ui-kit';
+import type { DshHomeCategory } from '../../../shared/discovery/dsh-home-types';
+import type { DshHomeGetScreenProps } from '../../contracts/dsh-home-screen-props';
 import type { useHomeState } from '../../hooks/useHomeState';
 import type { useHomeDerivedStores } from '../../hooks/useHomeDerivedStores';
 import type { useHomePromoHandlers } from '../../hooks/useHomePromoHandlers';
 import type { useHomeFilterRail } from '../../hooks/useHomeFilterRail';
 import type { useHomeVideoHandlers } from '../../hooks/useHomeVideoHandlers';
 import type { useHomeTickerState } from '../../hooks/useHomeTickerState';
+import type { buildHomeScreenStyles } from './home-screen.styles';
+import type { HomePromoRecord } from '../../../shared/marketing/marketing.types';
 
 export interface HomeScreenShellProps {
   props: DshHomeGetScreenProps;
@@ -22,10 +26,10 @@ export interface HomeScreenShellProps {
   onRetry?: () => void;
   isRtl: boolean;
   viewportWidth: number;
-  theme: any;
-  uiText: any;
-  styles: any;
-  categoriesAnchorRef: React.RefObject<any>;
+  theme: ReturnType<typeof useTheme>['theme'];
+  uiText: ReturnType<typeof useUiText>;
+  styles: ReturnType<typeof buildHomeScreenStyles>;
+  categoriesAnchorRef: React.RefObject<InstanceType<typeof View> | null>;
   homeState: ReturnType<typeof useHomeState>;
   derivedStores: ReturnType<typeof useHomeDerivedStores>;
   promoHandlers: ReturnType<typeof useHomePromoHandlers>;
@@ -36,7 +40,7 @@ export interface HomeScreenShellProps {
   handleOpenMySpace: () => void;
   handleOpenCartFromHeader: () => void;
   selectCategoryPage: (categoryId: string, animated?: boolean) => void;
-  activeHomePromo: any;
+  activeHomePromo: HomePromoRecord | null;
   openInlineSearch: () => void;
   closeInlineSearch: () => void;
   openServiceDial: () => void;
@@ -93,7 +97,7 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
   closeInlineSearch,
   openServiceDial,
 }: HomeScreenShellProps) {
-  const fallbackCategoriesDialLayout = React.useMemo(() => ({
+  const defaultCategoriesDialLayout = React.useMemo(() => ({
     x: isRtl ? Math.max(spacing[3], viewportWidth - spacing[3] - 54) : spacing[3],
     y: spacing[14],
     width: 54,
@@ -102,7 +106,7 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
 
   const openCategoriesDial = React.useCallback(() => {
     const openSheet = (layout?: { x: number; y: number; width: number; height: number }) => {
-      homeState.setCategoriesDialLayout(layout ?? fallbackCategoriesDialLayout);
+      homeState.setCategoriesDialLayout(layout ?? defaultCategoriesDialLayout);
       homeState.setCategoriesSheetVisible(true);
     };
     if (!categoriesAnchorRef.current?.measureInWindow) {
@@ -111,12 +115,12 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
     }
     categoriesAnchorRef.current.measureInWindow((x: number, y: number, width: number, height: number) => {
       const hasValidLayout = [x, y, width, height].every((value) => Number.isFinite(value)) && width > 0 && height > 0;
-      openSheet(hasValidLayout ? { x, y, width, height } : fallbackCategoriesDialLayout);
+      openSheet(hasValidLayout ? { x, y, width, height } : defaultCategoriesDialLayout);
     });
-  }, [fallbackCategoriesDialLayout, homeState, categoriesAnchorRef]);
+  }, [defaultCategoriesDialLayout, homeState, categoriesAnchorRef]);
 
   const listData = React.useMemo(
-    () => derivedStores.activeHomeStoreCards.length ? derivedStores.activeHomeStoreCards : ['empty'],
+    () => derivedStores.activeHomeStoreCards.length ? derivedStores.activeHomeStoreCards : (['empty'] as const),
     [derivedStores.activeHomeStoreCards],
   );
   const containerWidth = viewportWidth;
@@ -178,7 +182,7 @@ export const HomeScreenShell = React.memo(function HomeScreenShellComponent({
               bannerItems={promoHandlers.bannerItems}
               activeHomePromo={activeHomePromo}
               promoHandlers={promoHandlers}
-              selectedCategoryFixture={filterRail.selectedCategoryFixture}
+              selectedCategory={filterRail.selectedCategory}
               selectedCategoryLabel={filterRail.selectedCategoryLabel}
               selectedSubcategoryCards={filterRail.selectedSubcategoryCards}
               activeCategoryDialItem={filterRail.activeCategoryDialItem}

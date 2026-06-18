@@ -3,6 +3,12 @@ info:
   title: Bthwani Master API Index
   version: 1.0.0
   description: Root index of service OpenAPI documents. No endpoints are defined here.
+  contact:
+    name: BThwani Platform Team
+    email: bthwani3@gmail.com
+servers:
+  - url: http://localhost
+    description: Local dev (service-specific ports defined in each sub-contract)
 paths: {}
 x-bthwani-service-contracts:
   auth: ./auth.openapi.yaml

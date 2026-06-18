@@ -1,15 +1,17 @@
-'use client';
+﻿'use client';
 
 /**
- * CatalogPublicationReadinessMatrix — UI_PREVIEW_ONLY
+ * CatalogPublicationReadinessMatrix — SCAFFOLD: ربط API قيد التنفيذ
  * Owner: control-panel/catalogs
  * API boundary: GET /catalog/readiness/:storeId (not yet bound)
  */
 
 import React, { useMemo } from 'react';
-import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, Surface, Text, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import type { CatalogProductMaster } from '../catalogs.data';
-import { mapApprovalStageToPartnerActivationStatus } from '../../../shared/dsh-client-visibility.model';
+import { mapApprovalStageToPartnerActivationStatus } from '../../../shared/stores/dsh-client-visibility.model';
 
 export type CatalogPublicationReadinessMatrixProps = {
   products: readonly CatalogProductMaster[];
@@ -206,7 +208,7 @@ export function CatalogPublicationReadinessMatrix({
             onClick={onClose}
             aria-label="إغلاق"
             style={{
-              appearance: 'none', border: `1px solid ${theme.line}`, borderRadius: 6,
+              appearance: 'none', border: `1px solid ${theme.line}`, borderRadius: radius.xs,
               backgroundColor: theme.surface, color: theme.textMuted, cursor: 'pointer',
               fontSize: 12, padding: '4px 10px', fontWeight: 700,
             }}
@@ -265,12 +267,12 @@ export function CatalogPublicationReadinessMatrix({
 
         {/* UI_PREVIEW notice — compact */}
         <div style={{
-          padding: '7px 12px', borderRadius: 6,
+          padding: '7px 12px', borderRadius: radius.xs,
           backgroundColor: `${theme.warning}12`,
           border: `1px solid ${theme.warning}30`,
           fontSize: 10, color: theme.textMuted, lineHeight: 1.5,
         }}>
-          <span style={{ fontWeight: 700, color: theme.warning }}>UI_PREVIEW_ONLY</span>
+          <span style={{ fontWeight: 700, color: theme.warning }}>ربط API قيد التنفيذ</span>
           {' '}· visibility mapping: shared resolver ·{' '}
           <span style={{ direction: 'ltr', display: 'inline-block' }}>GET /catalog/readiness — not yet bound</span>
         </div>
@@ -383,7 +385,7 @@ export function CatalogPublicationReadinessMatrix({
 
         {/* Final gate CTA */}
         <div style={{
-          borderRadius: 10,
+          borderRadius: radius.sm,
           padding: '14px 16px',
           background: allReady
             ? `linear-gradient(135deg, ${theme.success}18, ${theme.success}08)`
@@ -420,7 +422,7 @@ export function CatalogPublicationReadinessMatrix({
 
         {/* Footer note */}
         <div style={{ fontSize: 9, color: theme.textMuted, textAlign: 'center', paddingBottom: 4 }}>
-          UI_PREVIEW_ONLY · visibility via shared resolver · POST /catalog/publish — not yet bound
+          visibility via shared resolver · POST /catalog/publish — not yet bound
         </div>
       </div>
     </Surface>

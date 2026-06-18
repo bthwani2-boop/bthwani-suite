@@ -5,7 +5,7 @@ import { StoreScreenShell, type DshStoreGetScreenProps, type DshStoreGetScreenSh
 import { useStoreState } from '../hooks/useStoreState';
 import { useStoreDerivedItems } from '../hooks/useStoreDerivedItems';
 import { useDebounce } from '../hooks/useDebounce';
-import { resolveStoreItemsForCategory } from '../shared/store-search-helpers';
+import { resolveStoreItemsForCategory } from '../../shared/stores';
 
 export const DshStoreGetScreen = React.memo(function DshStoreGetScreenComponent(props: DshStoreGetScreenProps) {
   const storeState = useStoreState();
@@ -34,7 +34,7 @@ export const DshStoreGetScreen = React.memo(function DshStoreGetScreenComponent(
     () => resolveItemsForCategory(storeState.selectedCategory),
     [resolveItemsForCategory, storeState.selectedCategory]
   );
-  const previewItems = visibleItems;
+  const viewerItems = visibleItems;
 
   const appearanceMode = props.appearanceMode ?? 'lightPremium';
 
@@ -45,7 +45,7 @@ export const DshStoreGetScreen = React.memo(function DshStoreGetScreenComponent(
     storeState,
     derivedItems,
     visibleItems,
-    previewItems,
+    viewerItems,
   };
 
   return <StoreScreenShell {...shellProps} />;

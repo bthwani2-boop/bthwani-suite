@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
-import { getDshSignalSummaries, getDshSignalUnreadCount } from '../../shared/dsh-signal-layer.model';
+import { getDshSignalSummaries, getDshSignalUnreadCount } from '../../shared/marketing/dsh-signal-layer.model';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type ControlPanelDshMarketingScreenProps = {
@@ -32,7 +32,7 @@ export function ControlPanelDshMarketingScreen({
 			{/* Sleek DSH Header (Unified Style) */}
 			<div className={styles.surfaceTopBar} style={{ padding: '12px 16px', border: `1px solid var(--bthwani-control-panel-border)`, borderRadius: '16px', backgroundColor: 'var(--bthwani-control-panel-surface)' }}>
 				<Box gap={0} style={{ flex: 1 }}>
-					<Text role="caption" tone="muted" style={{ fontWeight: '800' }}>غرفة قيادة الإشارات الذكية</Text>
+					<Text role="caption" tone="muted" weight="black" style={{ }}>غرفة قيادة الإشارات الذكية</Text>
 					<h2 className={styles.surfaceHeaderTitle} style={{ margin: '4px 0 0 0', fontSize: '18px', color: 'var(--bthwani-control-panel-text)' }}>لوحة الإشارات التسويقية ومنظومة المفضلة المشتركة</h2>
 					<p className={styles.surfaceHeaderSubtitle} style={{ marginTop: '2px', fontSize: '11px' }}>طبقة مضغوطة لمراقبة نية الشراء، والطلب الكامن، وأداء الحملات التلقائية الموجهة بالمفضلة.</p>
 				</Box>
@@ -57,12 +57,12 @@ export function ControlPanelDshMarketingScreen({
 				<div className={styles.commandKpi} style={{ flex: 1, minWidth: '180px' }}>
 					<span className={styles.commandKpiLabel}>إجمالي الوصول</span>
 					<span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>1.2M</span>
-					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>تقدير معاينة · UI_PREVIEW_ONLY</span>
+					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>ربط API قيد التنفيذ</span>
 				</div>
 				<div className={styles.commandKpi} style={{ flex: 1, minWidth: '180px' }}>
 					<span className={styles.commandKpiLabel}>إشارات الاهتمام (المفضلة)</span>
 					<span className={`${styles.commandKpiValue} ${styles.commandKpiValueSuccess}`}>12.4K</span>
-					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>تقدير معاينة · UI_PREVIEW_ONLY</span>
+					<span className={styles.surfaceHeaderSubtitle} style={{ marginTop: '4px' }}>ربط API قيد التنفيذ</span>
 				</div>
 				<div className={styles.commandKpi} style={{ flex: 1, minWidth: '180px' }}>
 					<span className={styles.commandKpiLabel}>إشارات التسويق والكتالوج</span>

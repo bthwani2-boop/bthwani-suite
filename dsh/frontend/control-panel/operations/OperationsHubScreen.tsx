@@ -9,14 +9,13 @@ import {
   WebControlPanelWorkbench,
   WebControlPanelDenseHeader,
 } from '@bthwani/ui-kit/web';
-import { OPERATIONS_PULSE_METRICS } from '../../data/orders.preview-data';
 import type {
   CanonicalOperationsGroupId,
   OperationsFocusParams,
   OperationsPanelId,
   OperationsViewState,
 } from './operations.types';
-import { getDshControlPanelGovernanceEntry } from '../shared/dsh-control-panel-governance.map';
+import { getDshControlPanelGovernanceEntry } from '../../shared/runtime/dsh-control-panel-governance.map';
 import styles from '../shared/control-panel-surface.module.css';
 import {
   getOperationsGroupMeta,
@@ -123,15 +122,7 @@ export function ControlPanelDshOperationsScreen({
     ?? screenConfig.default) as any;
 
   const governance = getDshControlPanelGovernanceEntry('operations');
-  const kpiItems = React.useMemo(
-    () =>
-      OPERATIONS_PULSE_METRICS.slice(0, 4).map((metric) => ({
-        id: metric.title,
-        label: metric.title,
-        value: String(metric.value),
-      })),
-    [],
-  );
+  const kpiItems = React.useMemo<{ id: string; label: string; value: string }[]>(() => [], []);
   const tabItems = React.useMemo(
     () =>
       OPERATIONS_CANONICAL_GROUPS.map((item) => {

@@ -1,7 +1,10 @@
 import React from 'react';
 import { View } from 'react-native';
-import { Badge, Box, Divider, Icon, MobileScrollView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
-import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel, type FieldStoreFile } from '../../data/stores.preview-data';
+import { Badge, Box, Divider, Icon, MobileScrollView, Text, TopBar, useTheme,
+  spacing,
+} from '@bthwani/ui-kit';
+import { resolveFieldStoreLifecycleLabel, resolveFieldStoreStatusLabel } from '../field.surface-model';
+import type { FieldStoreFile } from '../dsh-field.routes';
 
 type DshFieldStoresHistoryScreenProps = {
   stores: readonly FieldStoreFile[];
@@ -17,15 +20,14 @@ export function DshFieldStoresHistoryScreen({ stores, onBack }: DshFieldStoresHi
         variant="surface"
         title="سجل المتاجر"
         subtitle="آخر حالة لكل متجر مرتبط بالميدان"
-        trailingAction={{ id: 'back', icon: <Icon name="arrow-back" size={24} tone="brand" />, mirrorInRtl: true, accessibilityLabel: 'العودة', onPress: onBack }}
       />
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 96 }}>
         <Box padding={4} gap={0}>
           {stores.map((store, index) => (
             <View key={store.id}>
               {index > 0 && <Divider style={{ marginVertical: 8 }} />}
-              <Box gap={2} paddingVertical={2}>
-                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <Box gap={2} paddingY={2}>
+                <View style={{ flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', gap: spacing[3] }}>
                   <View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
                     <Text role="bodyStrong" style={{ textAlign: 'right' }}>
                       {store.name}

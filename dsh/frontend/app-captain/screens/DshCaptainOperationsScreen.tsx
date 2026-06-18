@@ -1,13 +1,12 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { Badge, Box, Button, Divider, KeyValueList, MobileScrollView, Text, TextField, useTheme } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Divider, KeyValueList, MobileScrollView, Text, TextField, useTheme,
+  spacing,
+} from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
-import type { DshCaptainOrderStage } from '../../shared/dsh-order-preview.contract';
-import type { DshCaptainProfileSnapshot } from '../../data/operational-statuses.preview-data';
-import {
-	getOperationsSupportFlowsForSurface,
-	type DshOperationsSupportFlowId,
-} from '../../data/support.preview-data';
+import type { DshCaptainOrderStage } from '../../shared/orders';
+import type { DshCaptainProfileSnapshot } from '../dsh-captain.types';
+import { getOperationsSupportFlowsForSurface, type DshOperationsSupportFlowId } from '../../shared';
 import { type DshCaptainRegistryFlowId } from '../contracts/dshCaptainBinding.contracts';
 
 
@@ -88,10 +87,10 @@ function SimpleSupportScreen({
 										key={`${title}-${item.title}`}
 										style={{
 											paddingHorizontal: 0,
-											paddingVertical: 12,
+											paddingVertical: spacing[3],
 											borderBottomWidth: index === arr.length - 1 ? 0 : 1,
 											borderBottomColor: theme.line,
-											gap: 4,
+											gap: spacing[1],
 										}}
 									>
 										<Box layoutDirection="row" justify="space-between" align="center" style={{ flexDirection: 'row-reverse' }}>
@@ -268,7 +267,7 @@ function FlatRow({
 				backgroundColor: pressed ? theme.surfaceInset : theme.surface,
 				borderBottomWidth: isLast ? 0 : 1,
 				borderBottomColor: theme.line,
-				gap: 12,
+				gap: spacing[3],
 			})}
 		>
 			<View style={{ flex: 1, gap: 3, alignItems: 'flex-end' }}>
@@ -299,7 +298,7 @@ function FlatSection({
 			<Text
 				role="label"
 				tone="muted"
-				style={{ paddingBottom: 8, textAlign: 'right', color: theme.textMuted }}
+				style={{ paddingBottom: spacing[2], textAlign: 'right', color: theme.textMuted }}
 			>
 				{label}
 			</Text>
@@ -313,7 +312,7 @@ export function DshCaptainSupportDirectoryScreen({ onOpenScreen }: { onOpenScree
 	const currentActionScreenId = resolvePrimaryActionScreen(ACTIVE_ORDER_PREVIEW.stage);
 
 	return (
-		<MobileScrollView padding={4} gap={6} contentContainerStyle={{ paddingBottom: 40 }}>
+		<MobileScrollView padding={4} gap={6} contentContainerStyle={{ paddingBottom: spacing[10] }}>
 
 			{/* ─── Active mission summary ──────────────────────────────── */}
 			<Box gap={3}>

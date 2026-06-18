@@ -54,39 +54,39 @@ export type {
 export { CATALOG_WORKSPACE_OWNERS } from './catalogs.model';
 
 // Workspace orchestration router — extracted from monolith
-// UI_PREVIEW_ONLY / router-ready
+// SCAFFOLD / router-ready
 export { CatalogWorkspaceRouter } from './drawers/catalog-workspace-router';
 export type { CatalogWorkspaceRouterProps } from './drawers/catalog-workspace-router';
 
 // CAT-S08: Quick entry drafts — replaces inline add-product modal (no local product mutation)
-// UI_PREVIEW_ONLY: emits CatalogPreviewProposal — not yet bound to API
+// SCAFFOLD: emits CatalogPreviewProposal — not yet bound to API
 export { CatalogQuickEntryDraftWorkspace } from './drawers/quick-entry-draft.drawer';
 export type { CatalogQuickEntryDraftWorkspaceProps } from './drawers/quick-entry-draft.drawer';
 
 // CAT-S09: Taxonomy governance — category tree governance (extracted from monolith)
-// UI_PREVIEW_ONLY: all actions produce proposals — not yet bound to API
+// SCAFFOLD: all actions produce proposals — not yet bound to API
 export { CatalogTaxonomyGovernanceWorkspace } from './drawers/taxonomy-governance.drawer';
 export type { CatalogTaxonomyGovernanceWorkspaceProps } from './drawers/taxonomy-governance.drawer';
 
 // CAT-S10: Bulk operations — controlled batch actions with selectedProductIds
 // Carbon batch action principle: disabled when no selection, rollback note per action
-// UI_PREVIEW_ONLY: emits CatalogPreviewProposal — not yet bound to API
+// SCAFFOLD: emits CatalogPreviewProposal — not yet bound to API
 export { CatalogBulkOperationsWorkspace } from './drawers/bulk-operations.drawer';
 export type { CatalogBulkOperationsWorkspaceProps } from './drawers/bulk-operations.drawer';
 
 // CAT-S11: Audit trail — derivation summary + detail-on-open
-// UI_PREVIEW_ONLY: derived from product state — not yet bound to audit API
+// SCAFFOLD: derived from product state — not yet bound to audit API
 export { CatalogAuditTrailWorkspace } from './drawers/audit-trail.drawer';
 export type { CatalogAuditTrailWorkspaceProps } from './drawers/audit-trail.drawer';
 
 // CAT-S12: Publication readiness matrix — full gate before client-facing publish
 // Uses shared resolver mapApprovalStageToPartnerActivationStatus (no local visibility mapping)
-// UI_PREVIEW_ONLY: derived from product state — not yet bound to readiness API
+// SCAFFOLD: derived from product state — not yet bound to readiness API
 export { CatalogPublicationReadinessMatrix } from './drawers/publication-readiness.drawer';
 export type { CatalogPublicationReadinessMatrixProps } from './drawers/publication-readiness.drawer';
 
 // CAT-S13: Adoption queue — final catalog adoption step (marketing-approved → catalog-adopted → client-visible)
 // The ONLY workspace that controls final client-visibility activation
-// UI_PREVIEW_ONLY: emits CatalogPreviewProposal — not yet bound to adoption API
+// SCAFFOLD: emits CatalogPreviewProposal — not yet bound to adoption API
 export { CatalogAdoptionQueueWorkspace } from './drawers/adoption-queue.drawer';
 export type { CatalogAdoptionQueueWorkspaceProps } from './drawers/adoption-queue.drawer';

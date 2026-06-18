@@ -8,6 +8,7 @@ import (
 
 type StoreRepository interface {
 	ListStores(ctx context.Context, query domain.StoreDiscoveryQuery) (domain.DiscoveryStoresResponse, error)
+	ListPendingStores(ctx context.Context) ([]domain.CreateFieldStoreResponse, error)
 	UpdatePartnerReadiness(ctx context.Context, id string, status string) (domain.StoreVisibilityGateResponse, error)
 	UpdateCatalogApproval(ctx context.Context, id string, qualityStatus string, pricingStatus string) (domain.StoreVisibilityGateResponse, error)
 	UpdateMarketingVisibility(ctx context.Context, id string, status string) (domain.StoreVisibilityGateResponse, error)
@@ -20,6 +21,7 @@ type CatalogRepository interface {
 	UpdateProduct(ctx context.Context, productID string, req domain.UpdateProductRequest) (domain.ProductRecord, error)
 	GetProduct(ctx context.Context, productID string) (domain.ProductRecord, error)
 	ListProducts(ctx context.Context, storeID string, approvalStatus string, limit int, offset int) (domain.ListProductsResponse, error)
+	ListAllProducts(ctx context.Context, approvalStatus string, limit int, offset int) (domain.ListProductsResponse, error)
 	// Category structure (J-002 / DSH-SLICE-002B)
 	CreateCategory(ctx context.Context, storeID string, req domain.CreateCategoryRequest) (domain.CategoryRecord, error)
 	UpdateCategory(ctx context.Context, categoryID string, req domain.UpdateCategoryRequest) (domain.CategoryRecord, error)
@@ -118,6 +120,13 @@ type FieldRepository interface {
 	GetLatestFieldReadinessApproval(ctx context.Context, storeID string) (domain.FieldReadinessApprovalRecord, error)
 }
 
+type NotificationRepository interface {
+	// ListNotifications (J-013): returns notifications for a recipient, optionally filtered to unread only.
+	ListNotifications(ctx context.Context, query domain.ListNotificationsQuery) (domain.ListNotificationsResponse, error)
+	// MarkNotificationRead (J-013): marks a single notification as read (idempotent).
+	MarkNotificationRead(ctx context.Context, id string, recipientID string) error
+}
+
 type Repository interface {
 	StoreRepository
 	CatalogRepository
@@ -126,4 +135,5 @@ type Repository interface {
 	DeliveryRepository
 	SupportRepository
 	FieldRepository
+	NotificationRepository
 }

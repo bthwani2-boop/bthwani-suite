@@ -7,7 +7,7 @@
 
 export { DshFieldSurface } from './DshFieldSurface';
 export { DshFieldSurface as FieldSurfaceHost } from './DshFieldSurface';
-export { default } from './mobile-entry';
+export { DshFieldSurface as default } from './DshFieldSurface';
 
 export type {
 	DshFieldCommandTarget,
@@ -16,14 +16,16 @@ export type {
 	DshFieldRouteState,
 	DshFieldSurfaceHostProps,
 	DshFieldSurfaceProps,
-} from './dsh-field.types';
+} from './dsh-field.routes';
 
-export { dshFieldRoutes } from './dsh-field.routes';
+export {
+	dshFieldRoutes,
+	dshFieldScreenRegistry,
+} from './dsh-field.routes';
+
 export type {
 	DshFieldLegacyRoute,
 	DshFieldRouteId,
 	DshFieldRouteRecord,
+	DshFieldScreenRegistryItem,
 } from './dsh-field.routes';
-
-export { dshFieldScreenRegistry } from './dsh-field.screen-registry';
-export type { DshFieldScreenRegistryItem } from './dsh-field.screen-registry';

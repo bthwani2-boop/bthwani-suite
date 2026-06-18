@@ -1,0 +1,21 @@
+ls:
+  dsh/frontend/app-captain:
+    .tsx: PascalCase
+  dsh/frontend/app-client/screens:
+    .tsx: PascalCase
+  dsh/frontend/app-field/screens:
+    .tsx: PascalCase
+  dsh/frontend/app-partner/screens:
+    .tsx: PascalCase
+  dsh/frontend/shared:
+    .ts: kebab-case | camelCase
+  wlt/frontend:
+    .ts: kebab-case | camelCase
+
+ignore:
+  - node_modules
+  - .git
+  - dist
+  - graphify-out
+  - tools
+  - .agents

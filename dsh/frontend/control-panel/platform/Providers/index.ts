@@ -1,2 +1,2 @@
 export { DshPlatformProvidersWorkspace } from './DshPlatformProvidersWorkspace';
-export type { ProviderRecord, ProviderCategory, ProviderEnvironment, ProviderStatus, ProviderOwner } from './providers.types';
+export type { ProviderRecord, ProviderEnvironment, ProviderStatus, ProviderOwner } from './providers.types';

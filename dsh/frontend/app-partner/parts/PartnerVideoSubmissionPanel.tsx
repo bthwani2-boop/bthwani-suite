@@ -1,6 +1,8 @@
 import React from 'react';
-import { Button, SectionHeader, Surface, Text, TextField, Chip, Box } from '@bthwani/ui-kit';
-import { ApprovalStage } from '../shared/workflow';
+import { Button, SectionHeader, Surface, Text, TextField, Chip, Box,
+  spacing,
+} from '@bthwani/ui-kit';
+import { ApprovalStage } from '../../shared';
 import type { DshPartnerOperationalFlowId } from '../dsh-partner.types';
 
 export type DshPartnerVideoSubmissionPanelProps = {
@@ -15,7 +17,7 @@ export function DshPartnerVideoSubmissionPanel({ onSelectFlow }: DshPartnerVideo
 
   return (
     <Surface tone="raised" gap={3}>
-      <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box layoutDirection="row" justify="space-between" align="center">
         <SectionHeader title="رفع فيديو الشريك" subtitle="يجهز مسار الفيديو بوضوح داخل تصنيف الفيديو فقط." />
         <Chip label={videoOwner === 'catalog' ? 'ملكية الكتالوج' : 'ملكية العروض'} tone={videoOwner === 'catalog' ? 'brand' : 'warning'} />
       </Box>
@@ -25,7 +27,7 @@ export function DshPartnerVideoSubmissionPanel({ onSelectFlow }: DshPartnerVideo
         <Text role="bodySm" tone="muted">
           حدّد المالك قبل فتح المسار: فيديو الاكتشاف المرتبط بمتجر/قسم/منتج منشور يذهب إلى الكتالوج، أما فيديو القصة التسويقية أو الولاء فيذهب إلى promotions.
         </Text>
-        <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+        <Box layoutDirection="row" gap={2} style={{ flexWrap: 'wrap' }}>
           <Chip label="Promotions" selected={videoOwner === 'promotions'} onPress={() => setVideoOwner('promotions')} tone={videoOwner === 'promotions' ? 'brand' : 'default'} />
           <Chip label="Catalog" selected={videoOwner === 'catalog'} onPress={() => setVideoOwner('catalog')} tone={videoOwner === 'catalog' ? 'brand' : 'default'} />
         </Box>

@@ -1,26 +1,25 @@
 import React from 'react';
-import { ScrollView, ActivityIndicator } from 'react-native';
+import { ScrollView } from 'react-native';
 import {
   Box,
   Button,
   Chip,
   Divider,
   MobileStickyPrimaryAction,
+  StateView,
   Text,
   TextField,
   resolveRowDirection,
   useDirection,
   useTheme,
   Surface,
+  spacing,
 } from '@bthwani/ui-kit';
 import {
   type DshProductRecord,
   type DshCatalogOverrideInput,
-} from '../../shared/dsh-product-api.client';
-import {
-  createDshProductApiHttpClient,
-  resolveDshProductApiBaseUrl,
-} from '../../shared/dsh-product-api.transport';
+} from '../../shared/products/dsh-product-api.client';
+import { getDshProductRuntimeClient } from '../../shared';
 
 export type ProductOverridesScreenProps = {
   productId: string;
@@ -60,7 +59,7 @@ export function ProductOverridesScreen({
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const client = React.useMemo(
-    () => createDshProductApiHttpClient(resolveDshProductApiBaseUrl()),
+    () => getDshProductRuntimeClient(),
     [],
   );
 
@@ -144,38 +143,22 @@ export function ProductOverridesScreen({
   const isRTL = direction === 'rtl';
 
   if (screenState === 'loading') {
-    return (
-      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.bg, padding: 24 }}>
-        <ActivityIndicator size="large" color={theme.brand} />
-        <Text role="bodyStrong" tone="muted" align="center" style={{ marginTop: 12 }}>
-          جارٍ تحميل تفاصيل الكتالوج والتجاوزات…
-        </Text>
-      </Box>
-    );
+    return <StateView kind="loading" title="جارٍ تحميل تفاصيل الكتالوج والتجاوزات…" />;
   }
 
   if (screenState === 'offline') {
-    return (
-      <Box style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme.bg, padding: 24, gap: 16 }}>
-        <Text role="bodyStrong" tone="warning" align="center">لا يوجد اتصال بالشبكة</Text>
-        <Text role="bodySm" tone="muted" align="center">
-          يرجى التحقق من اتصال الإنترنت وإعادة المحاولة.
-        </Text>
-        <Button label="إعادة المحاولة" tone="primary" onPress={handleRetry} />
-        {onBack && <Button label="رجوع" tone="ghost" onPress={onBack} />}
-      </Box>
-    );
+    return <StateView stateId="offline" actionLabel="إعادة المحاولة" onActionPress={handleRetry} />;
   }
 
   return (
     <ScrollView
-      style={{ flex: 1, backgroundColor: theme.bg }}
+      style={{ flex: 1, backgroundColor: theme.background }}
       contentContainerStyle={{ paddingBottom: 160 }}
       keyboardShouldPersistTaps="handled"
     >
-      <Box gap={4} style={{ padding: 16 }}>
+      <Box gap={4} style={{ padding: spacing[4] }}>
         {/* Header */}
-        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 12 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[3] }}>
           {onBack && (
             <Button label="رجوع" tone="ghost" size="sm" fullWidth={false} onPress={onBack} />
           )}
@@ -191,12 +174,12 @@ export function ProductOverridesScreen({
         {product && (
           <Surface tone="inset" padding={3} gap={2} radiusToken="md">
             <Text role="bodyStrong" align="start">هوية المنتج المركزي</Text>
-            <Box style={{ flexDirection: resolveRowDirection(direction), gap: 8, flexWrap: 'wrap' }}>
+            <Box style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2], flexWrap: 'wrap' }}>
               <Chip label={product.name} tone="info" selected />
               <Chip label={`السعر المركزي: ${product.base_price_label}`} tone="default" />
               {product.sku && <Chip label={`SKU: ${product.sku}`} tone="default" />}
             </Box>
-            <Text role="caption" tone="muted" align="start" style={{ marginTop: 4 }}>
+            <Text role="caption" tone="muted" align="start" style={{ marginTop: spacing[1] }}>
               * هوية المنتج والوسائط مملوكة مركزياً للكتالوج. الأسعار والتوافر المعدلة هنا لا تؤثر على الكتالوج العام.
             </Text>
           </Surface>
@@ -219,7 +202,7 @@ export function ProductOverridesScreen({
             <Text role="bodySm" tone="muted" align="start">
               تنعكس التحديثات الحالية على منتجات هذا الفرع في واجهة المتجر.
             </Text>
-            <Box style={{ flexDirection: resolveRowDirection(direction), gap: 8 }}>
+            <Box style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2] }}>
               <Button label="تعديل مجدداً" tone="secondary" size="sm" fullWidth={false} onPress={handleEditAgain} />
               {onBack && <Button label="العودة للكتالوج" tone="primary" size="sm" fullWidth={false} onPress={onBack} />}
             </Box>
@@ -237,7 +220,7 @@ export function ProductOverridesScreen({
               onChangeText={(v) => setForm((prev) => ({ ...prev, priceOverride: v }))}
               placeholder="مثال: 15.00"
               keyboardType="decimal-pad"
-              dir="ltr"
+              style={{ textAlign: 'left' }}
               editable={screenState !== 'saving'}
             />
 
@@ -247,11 +230,11 @@ export function ProductOverridesScreen({
               onChangeText={(v) => setForm((prev) => ({ ...prev, stockOverride: v.replace(/[^0-9]/g, '') }))}
               placeholder="مثال: 100"
               keyboardType="numeric"
-              dir="ltr"
+              style={{ textAlign: 'left' }}
               editable={screenState !== 'saving'}
             />
 
-            <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8 }}>
+            <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', justifyContent: 'space-between', paddingVertical: spacing[2] }}>
               <Box style={{ gap: 2 }}>
                 <Text role="bodyStrong" align="start">حالة التوفر المحلية</Text>
                 <Text role="caption" tone="muted" align="start">تحديد ما إذا كان هذا المنتج متاحاً للشراء في هذا الفرع</Text>

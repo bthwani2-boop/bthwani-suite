@@ -3,11 +3,23 @@
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard } from '@bthwani/ui-kit/web';
-import { useDemoPlatformState } from '../useDemoPlatformState';
+import { usePlatformAuditState } from '../usePlatformAuditState';
 import styles from '../../shared/control-panel-surface.module.css';
 
-import { PREVIEW_ROLLOUT_RECORDS, type RolloutLevel, type RolloutRecord } from '../../../data/platform.preview-data';
-import { FeatureFlagsRegistry } from '../../../shared';
+type RolloutLevel = 'service' | 'capability';
+
+type RolloutRecord = {
+  key: string;
+  title: string;
+  level: RolloutLevel;
+  parentService?: string;
+  scope: string;
+  initialStage: string;
+  stageOptions: readonly string[];
+};
+
+const PREVIEW_ROLLOUT_RECORDS: RolloutRecord[] = [];
+import { FeatureFlagsRegistry } from '../../../shared/platform/feature-flags';
 
 function RolloutLevelBadge({ level }: { level: RolloutLevel }) {
   return (
@@ -24,10 +36,20 @@ function RolloutLevelBadge({ level }: { level: RolloutLevel }) {
   );
 }
 
-export function DshPlatformRolloutsWorkspace() {
-  const { addAuditEvent } = useDemoPlatformState();
+export function DshPlatformRolloutsWorkspace({ activeFilter }: { activeFilter: string }) {
+  const { addAuditEvent } = usePlatformAuditState();
   const [selectedKey, setSelectedKey] = React.useState<string>('DSH:sanaa-pilot');
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const filtered = PREVIEW_ROLLOUT_RECORDS.filter((record) => {
+      if (activeFilter === 'all') return true;
+      return record.level === activeFilter;
+    });
+    if (filtered.length > 0) {
+      setSelectedKey(filtered[0].key);
+    }
+  }, [activeFilter]);
 
   const [rolloutStates, setRolloutStates] = React.useState<Record<string, {
     activeStage: string;
@@ -47,6 +69,7 @@ export function DshPlatformRolloutsWorkspace() {
   });
 
   const selectedRecord = PREVIEW_ROLLOUT_RECORDS.find((r) => r.key === selectedKey) || PREVIEW_ROLLOUT_RECORDS[0];
+  if (!selectedRecord) return null;
   const currentState = rolloutStates[selectedRecord.key] || { activeStage: selectedRecord.initialStage };
 
   const isKillSwitch = currentState.activeStage.includes('Kill') || currentState.activeStage.includes('موقوف');
@@ -106,7 +129,10 @@ export function DshPlatformRolloutsWorkspace() {
           {/* Left Column: Rollouts List */}
           <div className={styles.surfaceListColumn}>
             <Box gap={2}>
-              {PREVIEW_ROLLOUT_RECORDS.map((record) => {
+              {PREVIEW_ROLLOUT_RECORDS.filter((record) => {
+                if (activeFilter === 'all') return true;
+                return record.level === activeFilter;
+              }).map((record) => {
                 const rState = rolloutStates[record.key] || { activeStage: record.initialStage };
                 const isActive = record.key === selectedKey;
                 const rIsKill = rState.activeStage.includes('Kill') || rState.activeStage.includes('موقوف');

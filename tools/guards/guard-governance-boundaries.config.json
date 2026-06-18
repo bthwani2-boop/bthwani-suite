@@ -10,7 +10,10 @@
     "tools/guards/lib/guard-utils.mjs"
   ],
   "allowedDirectories": [
-    "lib"
+    "lib",
+    "design",
+    "logic",
+    "organization"
   ],
   "allowContextPatterns": [
     "legacy",

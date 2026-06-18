@@ -589,13 +589,15 @@ INSERT INTO dsh_store_discovery_stores (
   distance_label, delivery_label, service_label, status_label,
   status_tone, has_offer, publish_stage,
   supports_pickup, supports_partner_delivery,
+  contact_number, opening_hours, catalog_summary,
   search_text, created_at, updated_at
 ) VALUES (
   $1, $2, $3, $4,
   '—', '—', '—', 'قيد المراجعة',
   'closed', FALSE, 'pending_review',
   $5, $6,
-  $7, NOW(), NOW()
+  NULLIF($7, ''), NULLIF($8, ''), NULLIF($9, ''),
+  $10, NOW(), NOW()
 )
 RETURNING id, name, address, category_id, publish_stage, created_at`
 
@@ -605,6 +607,7 @@ RETURNING id, name, address, category_id, publish_stage, created_at`
 	err := repo.db.QueryRowContext(ctx, query,
 		id, req.Name, req.Address, categoryID,
 		req.SupportsPickup, req.SupportsPartnerDelivery,
+		req.ContactNumber, req.OpeningHours, req.CatalogSummary,
 		searchText,
 	).Scan(&res.ID, &res.Name, &res.Address, &catIDResult, &res.PublishStage, &res.CreatedAt)
 	if err != nil {
@@ -615,6 +618,40 @@ RETURNING id, name, address, category_id, publish_stage, created_at`
 	}
 	return res, nil
 }
+
+// ListPendingStores returns all stores in the pending_review stage for control panel review queue.
+func (repo *PostgresRepository) ListPendingStores(ctx context.Context) ([]domain.CreateFieldStoreResponse, error) {
+	query := `
+SELECT id, name, address, category_id, publish_stage, created_at
+FROM dsh_store_discovery_stores
+WHERE publish_stage = 'pending_review'
+ORDER BY created_at DESC`
+
+	rows, err := repo.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []domain.CreateFieldStoreResponse
+	for rows.Next() {
+		var res domain.CreateFieldStoreResponse
+		var catID sql.NullString
+		err := rows.Scan(&res.ID, &res.Name, &res.Address, &catID, &res.PublishStage, &res.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		if catID.Valid {
+			res.CategoryID = catID.String
+		}
+		result = append(result, res)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 
 // CreateFieldVisit — field agent submits visit notes and evidence media references (J-006B).
 // Raw media upload/document handling remains J-006C; this stores references only.

@@ -1,30 +1,7 @@
 import type { DshHomeApprovedVideoReelsViewerProps } from './parts/ApprovedVideoReelsViewer';
+import type { DshRoute as SharedDshRoute } from '../shared/checkout/dsh-client-binding.contracts';
 
-export type DshRoute =
-  | 'home'
-  | 'entry'
-  | 'my-space'
-  | 'wlt-home'
-  | 'preferences'
-  | 'notifications'
-  | 'store-items'
-  | 'cart-get'
-  | 'checkout-intent'
-  | 'search'
-  | 'store-get'
-  | 'bell'
-  | 'benefits'
-  | 'conversation-workspace'
-  | 'listing-status-update'
-  | 'order-issue-workspace'
-  | 'proxy-workspace'
-  | 'service-settings'
-  | 'zone-set'
-  | 'orders-list'
-  | 'addresses-location'
-  | 'identity'
-  | 'appearance'
-  | 'tracking';
+export type DshRoute = SharedDshRoute;
 
 export type DshCommandTarget = 'home' | 'orders-list' | 'tracking' | 'bell' | 'create-order' | 'cart-get';
 
@@ -42,9 +19,8 @@ export type DshClientSurfaceProps = {
   renderApprovedVideoReelsViewer?: (props: DshHomeApprovedVideoReelsViewerProps) => React.ReactNode;
 };
 
-export type DshSurfaceHostProps = DshClientSurfaceProps;
 
-export type { DshClientState } from '../data/operational-statuses.preview-data';
+export type { DshClientState } from '../shared/orders/orders.client-state';
 export type {
 	DshClientBindingError,
 	DshClientCartLine,

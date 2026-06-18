@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Text, useTheme } from '@bthwani/ui-kit';
@@ -49,7 +49,7 @@ export function CatalogCategoryChips({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
       {/* Main category chips */}
       <div style={{ display: 'flex', gap: '4px', overflowX: 'auto', scrollbarWidth: 'none', alignItems: 'center' }}>
-        <Text role="caption" numberOfLines={1} style={{ fontSize: 10, fontWeight: 800, color: theme.textMuted }}>الفئة:</Text>
+        <Text role="caption" numberOfLines={1} weight="black" style={{ fontSize: 10, color: theme.textMuted }}>الفئة:</Text>
         <button onClick={() => handleMainCategorySelect(null)} style={chipStyle(!activeMainCategory, theme)}>الكل</button>
         {effectiveCategories.map(cat => (
           <button
@@ -66,7 +66,7 @@ export function CatalogCategoryChips({
       {/* Sub-category chips */}
       {activeMainCategory && activeMainCategory.subcategories.length > 0 && (
         <div style={{ display: 'flex', gap: '4px', overflowX: 'auto', scrollbarWidth: 'none', alignItems: 'center', paddingRight: '12px' }}>
-          <Text role="caption" numberOfLines={1} style={{ fontSize: 9, fontWeight: 800, color: theme.textMuted }}>└ الفرعية:</Text>
+          <Text role="caption" numberOfLines={1} weight="black" style={{ fontSize: 9, color: theme.textMuted }}>└ الفرعية:</Text>
           <button onClick={() => handleSubCategorySelect(null)} style={{ ...chipStyle(!activeSubCategory, theme), padding: '1px 6px', borderRadius: '8px', fontSize: '9px' }}>الكل</button>
           {activeMainCategory.subcategories.map(sub => (
             <button
@@ -84,7 +84,7 @@ export function CatalogCategoryChips({
       {/* Main classification chips */}
       {activeMainCategory && activeSubCategory && activeSubCategory.mainClassifications && activeSubCategory.mainClassifications.length > 0 && (
         <div style={{ display: 'flex', gap: '4px', overflowX: 'auto', scrollbarWidth: 'none', alignItems: 'center', paddingRight: '24px' }}>
-          <Text role="caption" numberOfLines={1} style={{ fontSize: 8, fontWeight: 800, color: theme.textMuted }}>└─ الرئيسي:</Text>
+          <Text role="caption" numberOfLines={1} weight="black" style={{ fontSize: 8, color: theme.textMuted }}>└─ الرئيسي:</Text>
           <button onClick={() => { setActiveMainClassifId(null); setActiveSubClassifId(null); }} style={chipStyle(!activeMainClassifId, theme, 'xs')}>الكل</button>
           {activeSubCategory.mainClassifications.map(mc => (
             <button
@@ -101,7 +101,7 @@ export function CatalogCategoryChips({
       {/* Sub-classification chips */}
       {currentMC && currentMC.subClassifications && currentMC.subClassifications.length > 0 && (
         <div style={{ display: 'flex', gap: '4px', overflowX: 'auto', scrollbarWidth: 'none', alignItems: 'center', paddingRight: '36px' }}>
-          <Text role="caption" numberOfLines={1} style={{ fontSize: 8, fontWeight: 800, color: theme.textMuted }}>└─ الفرعي:</Text>
+          <Text role="caption" numberOfLines={1} weight="black" style={{ fontSize: 8, color: theme.textMuted }}>└─ الفرعي:</Text>
           <button onClick={() => setActiveSubClassifId(null)} style={{ ...chipStyle(!activeSubClassifId, theme, 'xs'), padding: '1px 4px', borderRadius: '5px' }}>الكل</button>
           {currentMC.subClassifications.map(sc => (
             <button

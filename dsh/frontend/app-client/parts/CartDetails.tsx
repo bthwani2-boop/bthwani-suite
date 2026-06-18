@@ -1,6 +1,7 @@
 import React from 'react';
 import { FlatList, View } from 'react-native';
 import { Button, Card, SheetFrame, Surface, Text, colorPalette, spacing } from '@bthwani/ui-kit';
+import { formatDshPrice } from '../../shared/runtime/dsh-price-format';
 
 export type DshCartLine = {
 	id: string;
@@ -21,21 +22,6 @@ export type DshCartDetailsProps = {
 	onCheckout?: () => void;
 };
 
-function toEnglishDigits(str: string): string {
-	return str
-		.replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 1632))
-		.replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 1776));
-}
-
-function formatAmount(value: number, currency: string) {
-	try {
-		const formatted = new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value);
-		const displayCurrency = currency === 'YER' ? 'ر.ي.' : currency;
-		return `${formatted} ${displayCurrency}`;
-	} catch {
-		return `${value} ${currency}`;
-	}
-}
 
 export function DshCartDetails({ visible, onClose, items, currency = 'YER', onChangeQty, onRemove, onCheckout }: DshCartDetailsProps) {
 	const total = items.reduce((sum, item) => sum + (item.subtotal ?? item.price * item.qty), 0);
@@ -50,7 +36,7 @@ export function DshCartDetails({ visible, onClose, items, currency = 'YER', onCh
 	}
 
 	return (
-		<SheetFrame visible={visible} onClose={onClose} title={`مراجعة السلة — ${formatAmount(total, currency)}`}>
+		<SheetFrame visible={visible} onClose={onClose} title={`مراجعة السلة — ${formatDshPrice(total, currency)}`}>
 			<View style={{ gap: spacing[2] }}>
 				<FlatList
 					data={items}
@@ -72,8 +58,8 @@ export function DshCartDetails({ visible, onClose, items, currency = 'YER', onCh
 							footer={(
 								<View style={{ gap: spacing[2] }}>
 									<View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', gap: spacing[2] }}>
-										<Text role="caption" tone="muted">سعر الوحدة {formatAmount(item.price, currency)}</Text>
-										<Text role="bodySm" tone="soft">{formatAmount(item.subtotal ?? item.price * item.qty, currency)}</Text>
+										<Text role="caption" tone="muted">سعر الوحدة {formatDshPrice(item.price, currency)}</Text>
+										<Text role="bodySm" tone="soft">{formatDshPrice(item.subtotal ?? item.price * item.qty, currency)}</Text>
 									</View>
 
 									<View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', gap: spacing[2] }}>
@@ -116,7 +102,7 @@ export function DshCartDetails({ visible, onClose, items, currency = 'YER', onCh
 
 				<Surface tone="default" gap={1} style={{ backgroundColor: colorPalette.surfaceSecondary, borderColor: colorPalette.borderSubtle }}>
 					<Text role="bodyMd">إجمالي السلة</Text>
-					<Text role="titleSm">{formatAmount(total, currency)}</Text>
+					<Text role="titleSm">{formatDshPrice(total, currency)}</Text>
 					<View style={{ flexDirection: 'row-reverse', gap: spacing[2], flexWrap: 'wrap' }}>
 						<Button
 							label="تأكيد الطلب"

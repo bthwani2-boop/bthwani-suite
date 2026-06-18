@@ -1,15 +1,10 @@
 import React from 'react';
 import { View, Platform } from 'react-native';
-import { Text, colorPalette } from '@bthwani/ui-kit';
+import { Text, colorPalette, spacing } from '@bthwani/ui-kit';
 
 import { DshEntryScreen } from './screens/EntryScreen';
 import { DshClientBellScreen } from './screens/BellScreen';
-import {
-  DshHomeGetScreen,
-  type DshHomeCategory,
-  type DshHomeGetPromo,
-  type DshHomeGetStore,
-} from './screens/HomeScreen';
+import { DshHomeGetScreen } from './screens/HomeScreen';
 import { DshMySpaceScreen } from './screens/MySpaceScreen';
 import { DshNotificationsScreen } from './screens/NotificationsScreen';
 import { DshBenefitsHubScreen } from './screens/BenefitsScreen';
@@ -19,6 +14,7 @@ import { DshStoreGetScreen } from './screens/StoreScreen';
 import { DshStoreItemsScreen } from './screens/StoreItemsScreen';
 import { DshCartGetScreen } from './screens/CartScreen';
 import { DshCheckoutIntentScreen } from './screens/DshCheckoutIntentScreen';
+import { DshCheckoutFailureScreen, type DshCheckoutFailureReason } from './screens/DshCheckoutFailureScreen';
 import { DshConversationHubScreen } from './screens/DshConversationHubScreen';
 import { DshOrderIssueHubScreen } from './screens/DshOrderIssueHubScreen';
 import { DshProxyHubScreen } from './screens/DshProxyHubScreen';
@@ -29,196 +25,125 @@ import { DshAddressLocationScreen } from './screens/AddressLocationScreen';
 import { DshIdentityHubScreen } from './screens/DshIdentityHubScreen';
 import { DshPreferencesHubScreen } from './screens/DshPreferencesHubScreen';
 import { DshAppearanceHubScreen } from './screens/DshAppearanceHubScreen';
-import { WltHomeGetScreen } from '../../../wlt/frontend/app-client-wlt';
-
-import { dshCategoryListFixtures } from '../data/categories.preview-data';
-import type { ClientOperationScreenId } from './screens/parts/OperationScreenView';
-import type { DshFulfillmentDeliveryMode } from './contracts/dsh-client-binding.contracts';
-import { hostClientStates, type CreateOrderValues, type HostCartItem } from './dsh-client.navigation-bridge';
-import { buildPaymentMethodsList } from './adapters/dshClientCheckoutAdapters';
-import type { DshRoute } from './dsh-client.types';
-
-function parsePrice(priceLabel?: string): number {
-  if (!priceLabel) return 10.0;
-  const match = priceLabel.match(/\d+(\.\d+)?/);
-  return match ? parseFloat(match[0]) : 10.0;
-}
-
-type DshClientRouteRendererProps = {
-  route: DshRoute;
-  setRoute: React.Dispatch<React.SetStateAction<DshRoute>>;
-  dshAuthBearerToken: string | null | undefined;
-  dshClientId: string | null | undefined;
-  cartItems: HostCartItem[];
-  selectedFulfillmentMode: DshFulfillmentDeliveryMode;
-  walletPreview: any;
-  selectedPaymentMethod: string;
-  setSelectedPaymentMethod: (method: string) => void;
-  paymentErrorMessage: string | undefined;
-  checkoutState: any;
-  setCheckoutState: (state: 'ready' | 'loading' | 'payment-failed') => void;
-  createOrderValues: CreateOrderValues;
-  setCreateOrderValues: React.Dispatch<React.SetStateAction<CreateOrderValues>>;
-  handleConfirmCheckout: () => void;
-  appearanceHydrated: boolean;
-  appearanceMode: any;
-  setAppearanceMode: (mode: any) => void;
-  liveMarketingPrograms: any[];
-  setSelectedOperationScreen: React.Dispatch<React.SetStateAction<ClientOperationScreenId>>;
-  openTrackedOrder: any;
-  openCreateOrderJourney: any;
-  returnHome: () => void;
-  storeDetailState: any;
-  activeStoreScreenStore: any;
-  activeStoreItems: any[];
-  addItemToHostCart: any;
-  handleOpenActiveStoreItems: () => void;
-  handleOpenActiveStoreCart: (mode?: DshFulfillmentDeliveryMode) => void;
-  fetchStoreDetail: any;
-  activeStoreId: string;
-  activeStore: any;
-  itemsQuery: string;
-  setItemsQuery: (q: string) => void;
-  itemsCategory: string;
-  setItemsCategory: (c: string) => void;
-  storeItemsEntryOrigin: string;
-  setSelectedItemId: (id: string) => void;
-  checkoutClientMemo: any;
-  checkoutAuth: any;
-  onOpenService: any;
-  selectedOperationScreen: ClientOperationScreenId;
-  returnOrdersList: () => void;
-  filteredOrders: any[];
-  ordersQuery: string;
-  setOrdersQuery: (q: string) => void;
-  handleReorderClick: (orderId: string) => void;
-  trackingClientState: any;
-  activeTrackedOrder: any;
-  trackingWltIntent: any;
-  liveOrderDetails: any;
-  trackingOrderValues: any;
-  trackingTimeline: any;
-  reopenTracking: () => void;
-  handleCancelOrder: () => void;
-  handleSupportEscalation: (issueType: string, description: string) => Promise<void>;
-  clientDiscoveryStoresBridge: any;
-  serviceDialTrigger: number;
-  favoriteOverrides: Record<string, boolean>;
-  handleToggleFavorite: (storeId: string) => void;
-  homeMarketingPromos: any[];
-  homePromos: any[];
-  liveMarketingShorts: any[];
-  clientVisibleHomeStores: any[];
-  homeRecentOrders: any[];
-  onExit: any;
-  handleOpenHomeCategory: (categoryId: string) => void;
-  handleOpenHomeStoreCategory: (storeId: string, categoryId: string) => void;
-  handleOpenHomeProduct: (storeId: string, itemId: string) => void;
-  handleOpenHomeBenefits: (screenId?: string) => void;
-  openHomeInlineSearch: () => void;
-  recordMarketingBannerClick: any;
-  recordMarketingBannerImpression: any;
-  recordMarketingGrowthClick: any;
-  recordMarketingGrowthImpression: any;
-  sheinInlineOpen: boolean;
-  setSheinInlineOpen: (open: boolean) => void;
-  awnakInlineOpen: boolean;
-  setAwnakInlineOpen: (open: boolean) => void;
-  handleOpenHomeStore: (storeId: string) => void;
-  homeSearchAutoOpenToken: any;
-  handleRegisterBackHandler: any;
-  renderApprovedVideoReelsViewer: any;
-  setHomeRetryToken: React.Dispatch<React.SetStateAction<number>>;
-  openSupportFlow: () => void;
-};
+import { WltHomeGetScreen } from '../shared/wlt/generated/wlt_frontend_app_client_wlt.facade';
+import { hostClientStates } from './dsh-client.navigation-bridge';
+import { buildDshClientCheckoutPresenterModel } from '../shared/checkout';
+import { mapLiveOrderStatusToClientState } from '../shared/orders';
+import { getDshClientStateMeta } from '../shared/orders/orders.client-state';
+import type { DshClientRouteRendererProps } from './contracts/dsh-client-renderer.contracts';
 
 export function DshClientRouteRenderer({
-  route,
-  setRoute,
-  dshAuthBearerToken,
-  dshClientId,
-  cartItems,
-  selectedFulfillmentMode,
-  walletPreview,
-  selectedPaymentMethod,
-  setSelectedPaymentMethod,
-  paymentErrorMessage,
-  checkoutState,
-  setCheckoutState,
-  createOrderValues,
-  setCreateOrderValues,
-  handleConfirmCheckout,
-  appearanceHydrated,
-  appearanceMode,
-  setAppearanceMode,
-  liveMarketingPrograms,
-  setSelectedOperationScreen,
-  openTrackedOrder,
-  openCreateOrderJourney,
-  returnHome,
-  storeDetailState,
-  activeStoreScreenStore,
-  activeStoreItems,
-  addItemToHostCart,
-  handleOpenActiveStoreItems,
-  handleOpenActiveStoreCart,
-  fetchStoreDetail,
-  activeStoreId,
-  activeStore,
-  itemsQuery,
-  setItemsQuery,
-  itemsCategory,
-  setItemsCategory,
-  storeItemsEntryOrigin,
-  setSelectedItemId,
-  checkoutClientMemo,
-  checkoutAuth,
-  onOpenService,
-  selectedOperationScreen,
-  returnOrdersList,
-  filteredOrders,
-  ordersQuery,
-  setOrdersQuery,
-  handleReorderClick,
-  trackingClientState,
-  activeTrackedOrder,
-  trackingWltIntent,
-  liveOrderDetails,
-  trackingOrderValues,
-  trackingTimeline,
-  reopenTracking,
-  handleCancelOrder,
-  handleSupportEscalation,
-  clientDiscoveryStoresBridge,
-  serviceDialTrigger,
-  favoriteOverrides,
-  handleToggleFavorite,
-  homeMarketingPromos,
-  homePromos,
-  liveMarketingShorts,
-  clientVisibleHomeStores,
-  homeRecentOrders,
-  onExit,
-  handleOpenHomeCategory,
-  handleOpenHomeStoreCategory,
-  handleOpenHomeProduct,
-  handleOpenHomeBenefits,
-  openHomeInlineSearch,
-  recordMarketingBannerClick,
-  recordMarketingBannerImpression,
-  recordMarketingGrowthClick,
-  recordMarketingGrowthImpression,
-  sheinInlineOpen,
-  setSheinInlineOpen,
-  awnakInlineOpen,
-  setAwnakInlineOpen,
-  handleOpenHomeStore,
-  homeSearchAutoOpenToken,
-  handleRegisterBackHandler,
-  renderApprovedVideoReelsViewer,
-  setHomeRetryToken,
-  openSupportFlow,
+  session,
+  routeContext,
+  home,
+  store,
+  checkout,
+  orders,
+  marketing,
 }: DshClientRouteRendererProps) {
+  const {
+    dshAuthBearerToken,
+    dshClientId,
+    appearanceHydrated,
+    appearanceMode,
+    setAppearanceMode,
+    bellSignalEvents,
+    walletSession,
+  } = session;
+  const {
+    route,
+    setRoute,
+    returnHome,
+    openCreateOrderJourney,
+    openTrackedOrder,
+    setSelectedOperationScreen,
+    selectedOperationScreen,
+    onExit,
+    openSupportFlow,
+    handleRegisterBackHandler,
+    serviceDialTrigger,
+    onOpenService,
+  } = routeContext;
+  const {
+    categories,
+    homeScreenState,
+    homeMarketingPromos,
+    homePromos,
+    liveMarketingShorts,
+    clientVisibleHomeStores,
+    homeRecentOrders,
+    homeSearchAutoOpenToken,
+    favoriteOverrides,
+    handleToggleFavorite,
+    handleOpenHomeCategory,
+    handleOpenHomeStoreCategory,
+    handleOpenHomeProduct,
+    handleOpenHomeBenefits,
+    openHomeInlineSearch,
+    handleOpenHomeStore,
+    setHomeRetryToken,
+    sheinInlineOpen,
+    setSheinInlineOpen,
+    awnakInlineOpen,
+    setAwnakInlineOpen,
+    renderApprovedVideoReelsViewer,
+    clientDiscoveryStoresBridge,
+  } = home;
+  const {
+    storeDetailState,
+    activeStoreScreenStore,
+    activeStoreItems,
+    activeStoreId,
+    activeStore,
+    itemsQuery,
+    setItemsQuery,
+    itemsCategory,
+    setItemsCategory,
+    storeItemsEntryOrigin,
+    setSelectedItemId,
+    addItemToHostCart,
+    handleOpenActiveStoreItems,
+    handleOpenActiveStoreCart,
+    fetchStoreDetail,
+  } = store;
+  const {
+    cartItems,
+    selectedFulfillmentMode,
+    selectedPaymentMethod,
+    setSelectedPaymentMethod,
+    paymentErrorMessage,
+    checkoutState,
+    setCheckoutState,
+    createOrderValues,
+    setCreateOrderValues,
+    handleConfirmCheckout,
+    handleConfirmedOrderExecution,
+    checkoutClientMemo,
+    checkoutAuth,
+  } = checkout;
+  const {
+    filteredOrders,
+    ordersQuery,
+    setOrdersQuery,
+    handleReorderClick,
+    trackingClientState,
+    activeTrackedOrder,
+    trackingWltIntent,
+    liveOrderDetails,
+    trackingOrderValues,
+    trackingTimeline,
+    reopenTracking,
+    handleCancelOrder,
+    handleSupportEscalation,
+    returnOrdersList,
+  } = orders;
+  const {
+    liveMarketingPrograms,
+    recordMarketingBannerClick,
+    recordMarketingBannerImpression,
+    recordMarketingGrowthClick,
+    recordMarketingGrowthImpression,
+  } = marketing;
   // Sanity check
   const importedScreens: Array<[string, unknown]> = [
     ['DshEntryScreen', DshEntryScreen as unknown],
@@ -246,8 +171,8 @@ export function DshClientRouteRenderer({
   const missing = importedScreens.filter(([, v]) => typeof v === 'undefined').map(([n]) => String(n));
   if (missing.length > 0) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <Text style={{ color: colorPalette.brandStrong, fontSize: 18, fontWeight: '700', marginBottom: 12 }}>مكوّنات مفقودة</Text>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing[6] }}>
+        <Text role="headingSm" weight="bold" style={{ color: colorPalette.brandStrong, marginBottom: spacing[3] }}>مكوّنات مفقودة</Text>
         <Text style={{ color: colorPalette.brandStrong }}>{missing.join(', ')}</Text>
       </View>
     );
@@ -264,31 +189,44 @@ export function DshClientRouteRenderer({
   }
 
   if (route === 'checkout-intent') {
-    const cartSubtotal = cartItems.reduce(
-      (sum, item) => sum + parsePrice(item.priceLabel) * item.qty,
-      0
-    );
-    const deliveryFeeNum = selectedFulfillmentMode === 'pickup' ? 0 : 1500;
-    const cartTotal = cartSubtotal + deliveryFeeNum;
-
-    const formattedBalance = walletPreview.balance !== null ? `${walletPreview.balance} ر.ي` : '...';
-    const paymentMethods = buildPaymentMethodsList(formattedBalance, selectedPaymentMethod);
+    const checkoutPresenter = buildDshClientCheckoutPresenterModel({
+      cartItems,
+      createOrderValues,
+      selectedFulfillmentMode,
+      selectedPaymentMethod,
+      walletSession,
+    });
 
     return (
       <DshCheckoutIntentScreen
         state={checkoutState}
-        address={createOrderValues.dropoffAddress || 'مسقط، الخوير، شارع المها، بناية رقم 123'}
-        subtotal={`${cartSubtotal} ر.ي`}
-        deliveryFee={`${deliveryFeeNum} ر.ي`}
-        total={`${cartTotal} ر.ي`}
-        eta={selectedFulfillmentMode === 'pickup' ? '15 - 20 دقيقة' : '30 - 45 دقيقة'}
-        paymentMethods={paymentMethods}
+        address={checkoutPresenter.addressLabel}
+        subtotal={checkoutPresenter.subtotalLabel}
+        deliveryFee={checkoutPresenter.deliveryFeeLabel}
+        total={checkoutPresenter.totalLabel}
+        eta={checkoutPresenter.etaLabel}
+        paymentMethods={checkoutPresenter.paymentMethods}
         paymentErrorMessage={paymentErrorMessage}
         onBack={() => setRoute('cart-get')}
         onConfirm={handleConfirmCheckout}
         onSelectPaymentMethod={(id) => setSelectedPaymentMethod(id)}
         onChangeAddress={() => setRoute('addresses-location')}
         onRetry={() => setCheckoutState('ready')}
+      />
+    );
+  }
+
+  if (route === 'checkout-failure') {
+    const failureReason: DshCheckoutFailureReason =
+      (checkoutAuth as unknown as { failureReason?: DshCheckoutFailureReason })?.failureReason ?? 'unknown';
+    return (
+      <DshCheckoutFailureScreen
+        state="error"
+        failureReason={failureReason}
+        cartPreserved
+        onRetry={() => { setCheckoutState('ready'); setRoute('checkout-intent'); }}
+        onCancel={() => setRoute('cart-get')}
+        onContactSupport={() => setRoute('conversation-workspace')}
       />
     );
   }
@@ -395,6 +333,24 @@ export function DshClientRouteRenderer({
     const cartClientState = cartItems.length > 0 ? hostClientStates.cartReady : hostClientStates.cartEmpty;
     const cartClientStateMeta = getDshClientStateMeta(cartClientState);
 
+    const handleCartOrderPayload = async (payload: Parameters<NonNullable<React.ComponentProps<typeof DshCartGetScreen>['onOpenOrder']>>[0]) => {
+      if (payload) {
+        setSelectedPaymentMethod(payload.paymentMethod);
+        setCreateOrderValues((current) => ({
+          ...current,
+          fulfillmentMode: payload.orderDraft.fulfillmentMode,
+          pickupAddress: payload.orderDraft.pickupAddress,
+          dropoffAddress: payload.orderDraft.dropoffAddress,
+          note: payload.orderDraft.note ?? current.note,
+        }));
+        handleConfirmedOrderExecution({
+          fulfillmentMode: payload.fulfillmentMode,
+          orderDraft: payload.orderDraft,
+          wltPaymentRefId: payload.wltPaymentRefId,
+        });
+      }
+    };
+
     return (
       <DshCartGetScreen
         clientState={cartClientState}
@@ -409,7 +365,7 @@ export function DshClientRouteRenderer({
         }}
         items={cartItems}
         activeOrder={{
-          id: cartItems[0]?.id ?? 'cart-preview',
+          id: cartItems[0]?.id ?? activeStore.id ?? 'cart-empty',
           title: cartItems[0] ? `تتضمن السلة ${cartItems[0].title}` : 'السلة جاهزة للدفع',
           subtitle: cartItems[0]
             ? `عناصر من ${cartItems[0].storeName}`
@@ -424,12 +380,8 @@ export function DshClientRouteRenderer({
         bearerToken={checkoutAuth.bearerToken}
         onOpenStore={() => setRoute('store-get')}
         onOpenService={onOpenService}
-        onOpenOrder={async () => {
-          setRoute('checkout-intent');
-        }}
-        onContinue={async () => {
-          setRoute('checkout-intent');
-        }}
+        onOpenOrder={handleCartOrderPayload}
+        onContinue={handleCartOrderPayload}
         onRetry={() => setRoute('cart-get')}
       />
     );
@@ -563,22 +515,10 @@ export function DshClientRouteRenderer({
     let liveStatusLabel = activeTrackedOrder?.statusLabel ?? trackingWltIntent?.clientUiHint;
 
     if (liveOrderDetails) {
-      const order = liveOrderDetails.order;
-      if (order.status === 'CREATED') {
-        liveClientState = hostClientStates.orderCreated;
-        liveStatusLabel = 'قيد المراجعة';
-      } else if (order.status === 'ACCEPTED') {
-        liveClientState = hostClientStates.orderConfirmed;
-        liveStatusLabel = 'تم القبول';
-      } else if (order.status === 'READY_FOR_PICKUP') {
-        liveClientState = hostClientStates.trackingActive;
-        liveStatusLabel = 'جاهز للاستلام';
-      } else if (order.status === 'DELIVERED') {
-        liveClientState = hostClientStates.delivered;
-        liveStatusLabel = 'تم التوصيل';
-      } else if (order.status === 'CANCELLED') {
-        liveClientState = hostClientStates.cancelled;
-        liveStatusLabel = 'تم الإلغاء';
+      const mapped = mapLiveOrderStatusToClientState(liveOrderDetails.order.status);
+      if (mapped) {
+        liveClientState = mapped.clientState;
+        liveStatusLabel = mapped.statusLabel;
       }
     }
 
@@ -602,6 +542,7 @@ export function DshClientRouteRenderer({
   if (route === 'bell') {
     return (
       <DshClientBellScreen
+        signalEvents={bellSignalEvents}
         onOpenTracking={reopenTracking}
         onOpenOrders={() => setRoute('orders-list')}
         onBack={reopenTracking}
@@ -613,11 +554,11 @@ export function DshClientRouteRenderer({
   // Fallback / default DshHomeGetScreen
   return (
     <DshHomeGetScreen
-      state={clientDiscoveryStoresBridge.state}
+      state={homeScreenState}
       serviceDialTrigger={serviceDialTrigger}
       favoriteOverrides={favoriteOverrides}
       onToggleFavorite={handleToggleFavorite}
-      categories={dshCategoryListFixtures as DshHomeCategory[]}
+      categories={categories}
       promos={homeMarketingPromos}
       homePromos={homePromos}
       approvedVideoShorts={liveMarketingShorts}
@@ -663,6 +604,3 @@ export function DshClientRouteRenderer({
     />
   );
 }
-
-// Private helper to lookup operational states
-import { getDshClientStateMeta } from '../data/operational-statuses.preview-data';

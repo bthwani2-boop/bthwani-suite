@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { Pressable, StyleSheet, View, Image } from 'react-native';
-import { Box, Button, SelectField, Surface, Tabs, Text, TextField, useTheme } from '@bthwani/ui-kit';
+import { Box, Button, SelectField, Surface, Tabs, Text, TextField, useTheme,
+  radius,
+} from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import {
   getHomePromoItems,
@@ -11,13 +13,12 @@ import {
   upsertHomePromoItem,
   removeHomePromoItem,
   toggleHomePromoStatus,
-  type HomePromoRecord,
-  type HomePromoSummary,
-} from '../../data/marketing.preview-data';
-import { dshCategoryFixtures } from '../../data/categories.preview-data';
-import { dshDiscoveryStores } from '../../data/stores.preview-data';
-import { storeItemsByStoreId } from '../../data/stores.preview-data';
-import { resolveDshImageSource } from '../../app-client/shared/resolve-image-source';
+  dshCategoryData as dshCategoryFixtures,
+  dshDiscoveryStores,
+  storeItemsByStoreId,
+} from '../../shared/marketing';
+import type { HomePromoRecord, HomePromoSummary } from '../../shared/marketing';
+import { resolveDshImageSource } from '../../shared/media/resolve-dsh-image-source';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
@@ -252,7 +253,7 @@ export function PromosCommandDeckScreen() {
       if (editorSection === 'identity') {
          return (
             <Box gap={6}>
-               <Text style={{ fontSize: 11, fontWeight: '900', color: theme.brandHeaderBackground }}>1. الهوية والمحتوى</Text>
+               <Text weight="black" style={{ fontSize: 11, color: theme.brandHeaderBackground }}>1. الهوية والمحتوى</Text>
                <TextField label="العنوان الرئيسي" value={draft.title} onChangeText={t => setDraft(d => ({ ...d, title: t }))} />
                <TextField label="الوصف الجذاب" value={draft.subtitle} onChangeText={t => setDraft(d => ({ ...d, subtitle: t }))} />
                <View style={{ flexDirection: 'row', gap: 12 }}>
@@ -266,7 +267,7 @@ export function PromosCommandDeckScreen() {
       if (editorSection === 'logic') {
          return (
             <Box gap={6}>
-               <Text style={{ fontSize: 11, fontWeight: '900', color: theme.brandHeaderBackground }}>2. قواعد الربط الذكي</Text>
+               <Text weight="black" style={{ fontSize: 11, color: theme.brandHeaderBackground }}>2. قواعد الربط الذكي</Text>
                <View style={{ flexDirection: 'row', gap: 12 }}>
                   <SelectField style={{ flex: 1 }} label="نوع الوجهة" value={draft.targetType} onValueChange={v => setDraft(d => ({ ...d, targetType: v }))} options={[{value:'store',label:'متجر'},{value:'category',label:'فئة'},{value:'product',label:'منتج'}]} />
                   <SelectField style={{ flex: 1 }} label="الوجهة المحددة" value={draft.targetId} onValueChange={v => setDraft(d => ({ ...d, targetId: v, targetLabel: getTargetOptions().find(o => o.value === v)?.label ?? '' }))} options={getTargetOptions()} />
@@ -277,7 +278,7 @@ export function PromosCommandDeckScreen() {
 
       return (
          <Box gap={6}>
-            <Text style={{ fontSize: 11, fontWeight: '900', color: theme.brandHeaderBackground }}>3. الوسائط والترتيب</Text>
+            <Text weight="black" style={{ fontSize: 11, color: theme.brandHeaderBackground }}>3. الوسائط والترتيب</Text>
             <View style={{ flexDirection: 'row', gap: 12 }}>
                <TextField style={{ flex: 1 }} label="خلفية القالب" value={draft.imageUrl} onChangeText={t => setDraft(d => ({ ...d, imageUrl: t }))} />
                <TextField style={{ flex: 1 }} label="أيقونة الشخصية" value={draft.thumbnail} onChangeText={t => setDraft(d => ({ ...d, thumbnail: t }))} />
@@ -297,8 +298,8 @@ export function PromosCommandDeckScreen() {
       {/* Header Bar */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderBottomWidth: 1, borderBottomColor: theme.line, paddingBottom: 8 }}>
          <Box gap={0}>
-            <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: '900', letterSpacing: 0.5 }}>إدارة البروموهات والظهور</Text>
-            <Text role="titleLg" style={{ fontWeight: '900', color: theme.brandHeaderBackground, fontSize: 18 }}>استوديو البروموهات</Text>
+            <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground, letterSpacing: 0.5 }}>إدارة البروموهات والظهور</Text>
+            <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground,}}>استوديو البروموهات</Text>
          </Box>
              <Button label="+ برومو جديد" onPress={() => { setSelectedId(null); setDraft(createDraft(null)); setEditorSection('identity'); }} tone="secondary" size="sm" style={{ width: 120 }} disabled={!hasPermission('marketing.edit')} />
       </View>
@@ -306,14 +307,14 @@ export function PromosCommandDeckScreen() {
       <View style={{ flexDirection: 'row', gap: 16, flex: 1 }}>
 
         {/* Column 1: Selection Rail (Left) */}
-        <Surface tone="raised" style={{ width: 180, borderRadius: 14, overflow: 'hidden', backgroundColor: theme.surfaceInset }}>
+        <Surface tone="raised" style={{ width: 180, borderRadius: radius.md, overflow: 'hidden', backgroundColor: theme.surfaceInset }}>
            <View style={{ padding: 8, backgroundColor: theme.surfaceSecondary }}>
-              <Text style={{ fontSize: 10, fontWeight: '900', color: theme.textMuted }}>العروض النشطة</Text>
+              <Text weight="black" style={{ fontSize: 10, color: theme.textMuted }}>العروض النشطة</Text>
            </View>
            <Box style={{ flex: 1, minHeight: 0 }}>
               {visibleItems.length === 0 ? (
                 <View style={{ padding: 16, alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ fontSize: 10, color: theme.textMuted, fontWeight: '800', textAlign: 'center' }}>لا توجد عروض مطابقة للبحث أو الفلتر المختار.</Text>
+                  <Text weight="black" style={{ fontSize: 10, color: theme.textMuted, textAlign: 'center' }}>لا توجد عروض مطابقة للبحث أو الفلتر المختار.</Text>
                 </View>
               ) : (
                 visibleItems.map(item => (
@@ -323,7 +324,7 @@ export function PromosCommandDeckScreen() {
                     borderBottomWidth: 1,
                     borderBottomColor: theme.line
                   }}>
-                    <Text style={{ fontSize: 11, fontWeight: '800', color: selectedId === item.id ? theme.textInverse : theme.text }} numberOfLines={1}>{item.title || 'بدون عنوان'}</Text>
+                    <Text weight="black" style={{ fontSize: 11, color: selectedId === item.id ? theme.textInverse : theme.text }} numberOfLines={1}>{item.title || 'بدون عنوان'}</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
                         <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: item.status === 'published' ? theme.success : theme.textSoft }} />
                         <Text style={{ fontSize: 9, color: selectedId === item.id ? theme.brandHeaderSurfaceStrong : theme.textMuted }}>{getPromoStatusLabel(item.status)}</Text>
@@ -348,7 +349,7 @@ export function PromosCommandDeckScreen() {
            <Surface tone="raised" style={{ flex: 1, borderRadius: 16, padding: 16, overflow: 'hidden' }}>
               <Box gap={12} style={{ flex: 1, minHeight: 0 }}>
                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-                    <Text style={{ fontSize: 11, fontWeight: '900', color: theme.textMuted }}>استوديو التحرير</Text>
+                    <Text weight="black" style={{ fontSize: 11, color: theme.textMuted }}>استوديو التحرير</Text>
                     <View style={{ flexDirection: 'row', gap: 8 }}>
                       {selectedId && deleteConfirmId === selectedId ? (
                         <>
@@ -376,7 +377,7 @@ export function PromosCommandDeckScreen() {
                  />
 
                  {saveError ? (
-                   <View style={{ paddingVertical: 4, paddingHorizontal: 8, backgroundColor: theme.dangerSurface ?? theme.surfaceInset, borderRadius: 6 }}>
+                   <View style={{ paddingVertical: 4, paddingHorizontal: 8, backgroundColor: theme.dangerSurface ?? theme.surfaceInset, borderRadius: radius.xs }}>
                      <Text role="caption" style={{ color: theme.danger }}>{saveError}</Text>
                    </View>
                  ) : null}
@@ -390,36 +391,36 @@ export function PromosCommandDeckScreen() {
         {/* Column 3: Insights & Preview (Right) */}
         <Box style={{ width: 240 }} gap={12}>
            <Surface tone="raised" style={{ borderRadius: 16, padding: 12, backgroundColor: theme.brandHeaderBackground }}>
-              <Text style={{ color: theme.textInverse, fontSize: 11, fontWeight: '900', marginBottom: 12 }}>معاينة مباشرة</Text>
+              <Text weight="black" style={{ color: theme.textInverse, fontSize: 11, marginBottom: 12 }}>معاينة مباشرة</Text>
               <View style={{ height: 70, backgroundColor: theme.surface, borderRadius: 12, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8 }}>
                  {draft.imageUrl && <Image source={resolveDshImageSource(draft.imageUrl)} style={{ ...StyleSheet.absoluteFillObject, opacity: 0.4 }} resizeMode="cover" />}
                  <View style={{ width: 40, height: 50, zIndex: 2 }}>
-                    {draft.thumbnail ? <Image source={resolveDshImageSource(draft.thumbnail)} style={{ width: '100%', height: '100%' }} resizeMode="contain" /> : <View style={{ flex:1, backgroundColor: theme.surfaceSecondary, borderRadius:6 }} />}
+                    {draft.thumbnail ? <Image source={resolveDshImageSource(draft.thumbnail)} style={{ width: '100%', height: '100%' }} resizeMode="contain" /> : <View style={{ flex:1, backgroundColor: theme.surfaceSecondary, borderRadius: radius.xs }} />}
                  </View>
                  <Box style={{ flex:1, alignItems:'center', zIndex:2 }}>
-                    <Text style={{ color: theme.brandHeaderBackground, fontSize:11, fontWeight:'900', textAlign:'center' }}>{draft.title || 'العنوان'}</Text>
-                    <Text style={{ color: theme.brand, fontSize:9, fontWeight:'800', textAlign:'center' }}>{draft.subtitle || 'الوصف'}</Text>
+                    <Text weight="black" style={{ color: theme.brandHeaderBackground, fontSize:11, textAlign:'center' }}>{draft.title || 'العنوان'}</Text>
+                    <Text weight="black" style={{ color: theme.brand, fontSize:9, textAlign:'center' }}>{draft.subtitle || 'الوصف'}</Text>
                  </Box>
               </View>
               <Text style={{ color: theme.brandHeaderSurfaceStrong, fontSize: 9, marginTop: 12, textAlign: 'center' }}>معاينة محلية داخل غرفة التحكم</Text>
            </Surface>
 
             <Surface tone="raised" style={{ flex: 1, borderRadius: 16, padding: 16 }}>
-               <Text style={{ fontWeight: '900', fontSize: 11, color: theme.textMuted, marginBottom: 12 }}>الرؤى</Text>
+               <Text weight="black" style={{ fontSize: 11, color: theme.textMuted, marginBottom: 12 }}>الرؤى</Text>
                <Box gap={8}>
-                  <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: theme.surfaceInset }}>
+                  <View style={{ gap: 4, padding: 8, borderRadius: radius.sm, backgroundColor: theme.surfaceInset }}>
                      <Text style={{ fontSize: 9, color: theme.textMuted }}>إجمالي البروموهات</Text>
-                     <Text style={{ fontSize: 14, fontWeight: '900', color: theme.brandHeaderBackground }}>{totalItems}</Text>
+                     <Text weight="black" style={{ fontSize: 14, color: theme.brandHeaderBackground }}>{totalItems}</Text>
                   </View>
-                  <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: theme.surfaceInset }}>
+                  <View style={{ gap: 4, padding: 8, borderRadius: radius.sm, backgroundColor: theme.surfaceInset }}>
                      <Text style={{ fontSize: 9, color: theme.textMuted }}>منشور الآن</Text>
-                     <Text style={{ fontSize: 14, fontWeight: '900', color: theme.success }}>{getHomePromoItems().filter(i => i.status === 'published').length}</Text>
+                     <Text weight="black" style={{ fontSize: 14, color: theme.success }}>{getHomePromoItems().filter(i => i.status === 'published').length}</Text>
                   </View>
-                  <View style={{ gap: 4, padding: 8, borderRadius: 10, backgroundColor: theme.surfaceInset }}>
+                  <View style={{ gap: 4, padding: 8, borderRadius: radius.sm, backgroundColor: theme.surfaceInset }}>
                      <Text style={{ fontSize: 9, color: theme.textMuted }}>جاهزية الربط</Text>
                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                         <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: draft.targetId ? theme.success : theme.danger }} />
-                        <Text style={{ fontSize: 10, fontWeight: '800' }}>{draft.targetId ? 'جاهز تقنياً' : 'مطلوب وجهة'}</Text>
+                        <Text weight="black" style={{ fontSize: 10 }}>{draft.targetId ? 'جاهز تقنياً' : 'مطلوب وجهة'}</Text>
                      </View>
                   </View>
                </Box>

@@ -200,10 +200,15 @@ export const rawSpacingScale = {
 
 export const rawRadiusScale = {
 	none: 0,
+	xxs: 4,
 	xs: 6,
+	xs2: 8,
 	sm: 10,
+	sm2: 12,
 	md: 14,
+	md2: 16,
 	lg: 18,
+	lg2: 20,
 	xl: 24,
 	pill: 999
 } as const;
@@ -334,9 +339,11 @@ export const rawTypographyScale = {
 		bodySm: { fontSize: 14, lineHeight: 20, fontWeight: '400', letterSpacing: 0 },
 		bodyStrong: { fontSize: 15, lineHeight: 23, fontWeight: '600', letterSpacing: 0 },
 		labelLg: { fontSize: 14, lineHeight: 18, fontWeight: '600', letterSpacing: 0.2 },
+		labelMd: { fontSize: 13, lineHeight: 17, fontWeight: '600', letterSpacing: 0.2 },
 		label: { fontSize: 13, lineHeight: 17, fontWeight: '600', letterSpacing: 0.2 },
 		caption: { fontSize: 12, lineHeight: 16, fontWeight: '500', letterSpacing: 0.2 },
 		overline: { fontSize: 11, lineHeight: 15, fontWeight: '600', letterSpacing: 0.4, textTransform: 'uppercase' as const },
+		headingSm: { fontSize: 18, lineHeight: 24, fontWeight: '700', letterSpacing: 0 },
 		code: { fontSize: 13, lineHeight: 18, fontWeight: '500', letterSpacing: 0 }
 	}
 } as const;

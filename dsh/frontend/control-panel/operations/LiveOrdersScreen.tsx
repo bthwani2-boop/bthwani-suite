@@ -8,18 +8,22 @@ import {
   WebControlPanelInspectorShell,
   WebControlPanelStatusTag,
 } from '@bthwani/ui-kit/web';
-import { LIVE_ORDERS_OPERATIONAL_PREVIEW, FULFILLMENT_MODE_ORDER_QUEUES } from '../../data/orders.preview-data';
 import { Box, KeyValueList, useTheme } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
-import type { DshOperationsDecisionKind, DshOrderLifecycleStatus } from '../../shared/dsh-order-journey.model';
-import { mapOperationsDecisionToLifecycle } from '../../shared/dsh-order-journey.model';
+import type { DshOperationsDecisionKind, DshOrderLifecycleStatus } from '../../shared/orders';
+import { mapOperationsDecisionToLifecycle } from '../../shared/orders';
 import { buildOperationsHref } from './operations.registry';
-import { getLiveOrderDecisions, updateLiveOrderDecision } from '../../shared/workflow';
+import { getLiveOrderDecisions, updateLiveOrderDecision } from '../../shared/stores/partner/partner.workflow';
 import { OpsOrderDetailPanel, PENDING_APPROVAL_ORDERS } from './OpsOrderDetailPanel';
 import { getOperationsActorLabel } from './FulfillmentModeQueueSection';
 import type { DshFulfillmentOperationalMode } from './operations.types';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
-import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/dsh-operational-runtime-adapter';
+import { fetchDshRuntimeOrders, type DshRuntimeOrderRow } from '../../shared/operations/dsh-operational-runtime-adapter';
+import {
+  DSH_CONTROL_PANEL_TONE_MAP,
+  resolveRuntimeOrderStatusTone,
+  type DshControlPanelTone,
+} from '../shared/dsh-control-panel-display';
 
 export type LiveOrdersScreenProps = {
   state?: 'ready' | 'loading' | 'error' | 'empty';
@@ -27,20 +31,6 @@ export type LiveOrdersScreenProps = {
   subGroup?: string;
   onRetry?: () => void;
 };
-
-const TONE_MAP: Record<string, 'neutral' | 'success' | 'warning' | 'danger'> = {
-  warning: 'warning',
-  danger: 'danger',
-  best: 'success',
-  brand: 'neutral',
-};
-
-function resolveRuntimeOrderTone(status: string): 'neutral' | 'success' | 'warning' | 'danger' {
-  if (status === 'FAILED_DELIVERY' || status === 'CANCELLED') return 'danger';
-  if (status === 'CREATED' || status === 'RETURNING_TO_STORE') return 'warning';
-  if (status === 'DELIVERED' || status === 'RETURNED') return 'success';
-  return 'neutral';
-}
 
 type OpsDecision = DshOperationsDecisionKind;
 type DecisionState = Record<string, { decision: OpsDecision; note: string; submitted: boolean; nextLifecycleStatus: DshOrderLifecycleStatus }>;
@@ -55,32 +45,40 @@ const FULFILLMENT_MODE_IDS: readonly DshFulfillmentOperationalMode[] = ['bthwani
 export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrdersScreenProps) {
   const router = useRouter();
   const { theme } = useTheme();
-  const preview = LIVE_ORDERS_OPERATIONAL_PREVIEW;
+  const PREVIEW_ROWS: { id: string; destination: string; captain: string; status: string; statusTone: DshControlPanelTone; suggestion: { label: string; reason: string; action: string; secondary: string }; eta: string; ringLabel: string; fulfillmentMode: DshFulfillmentOperationalMode; arrivalTimeline: string[]; actionPlans: string[] }[] = [];
   const activeMode = FULFILLMENT_MODE_IDS.find((m) => m === subGroup) ?? null;
   const [selectedItemId, setSelectedItemId] = React.useState<SelectedItem>(null);
-  const [decisions, setDecisions] = React.useState<DecisionState>(() => getLiveOrderDecisions() as any);
+  const [decisions, setDecisions] = React.useState<DecisionState>(() => getLiveOrderDecisions());
   const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
+  const [retryCount, setRuntimeRetryCount] = React.useState(0);
+  const retry = React.useCallback(() => setRuntimeRetryCount((n) => n + 1), []);
   const [runtimeState, setRuntimeState] = React.useState<{
     orders: readonly DshRuntimeOrderRow[];
     total: number;
     loaded: boolean;
-  }>({ orders: [], total: 0, loaded: false });
+    offline: boolean;
+    error: string | null;
+  }>({ orders: [], total: 0, loaded: false, offline: false, error: null });
 
   React.useEffect(() => {
     let cancelled = false;
     fetchDshRuntimeOrders({ limit: 100 }).then((result) => {
       if (cancelled) return;
       if (result.kind === 'ok') {
-        setRuntimeState({ orders: result.orders, total: result.total, loaded: true });
+        setRuntimeState({ orders: result.orders, total: result.total, loaded: true, offline: false, error: null });
+      } else if (result.kind === 'offline') {
+        setRuntimeState((s) => ({ ...s, offline: true, loaded: false }));
+      } else {
+        setRuntimeState((s) => ({ ...s, error: result.message, loaded: false }));
       }
     });
     return () => { cancelled = true; };
-  }, []);
+  }, [retryCount]);
 
   const handleDecision = React.useCallback((orderId: string, decision: OpsDecision, note: string) => {
     const nextStatus = mapOperationsDecisionToLifecycle(decision);
     updateLiveOrderDecision(orderId, decision, note, nextStatus);
-    setDecisions(getLiveOrderDecisions() as any);
+    setDecisions(getLiveOrderDecisions());
     setSelectedItemId(null);
   }, []);
 
@@ -123,15 +121,15 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
   }
 
   const runtimeActive = runtimeState.loaded;
-  const liveOrderCount = runtimeActive ? runtimeState.total : preview.rows.length;
-  const dataSourceLabel = runtimeActive ? 'DSH Runtime' : 'Preview';
+  const liveOrderCount = runtimeActive ? runtimeState.total : PREVIEW_ROWS.length;
+  const dataSourceLabel = runtimeActive ? 'DSH Runtime' : '—';
   const dataSourceTone: 'success' | 'warning' = runtimeActive ? 'success' : 'warning';
 
   const summaryKpi = [
     { id: 'live', label: 'الطلبات النشطة', value: String(liveOrderCount), tone: 'neutral' as const },
     { id: 'pending-approval', label: 'قيد الموافقة', value: String(PENDING_APPROVAL_ORDERS.filter((o) => !decisions[o.id]).length), tone: 'warning' as const },
     { id: 'source', label: 'مصدر البيانات', value: dataSourceLabel, tone: dataSourceTone },
-    { id: 'blocked', label: 'رنينات محجوبة', value: runtimeActive ? '—' : String(preview.summary.blockedRings), tone: 'danger' as const },
+    { id: 'blocked', label: 'رنينات محجوبة', value: '—', tone: 'danger' as const },
   ];
 
   const pendingApprovalsCount = PENDING_APPROVAL_ORDERS.filter((o) => !decisions[o.id]).length;
@@ -154,7 +152,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
         );
       }
     } else if (selectedItemId.type === 'live') {
-      const order = preview.rows.find((r) => r.id === selectedItemId.id);
+      const order = PREVIEW_ROWS.find((r) => r.id === selectedItemId.id);
       if (order) {
         inspectorContent = (
           <WebControlPanelInspectorShell
@@ -166,7 +164,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                 <span style={{ fontSize: '12px', fontWeight: 800 }}>الحالة الحالية:</span>
                 <WebControlPanelStatusTag
                   label={order.status}
-                  tone={TONE_MAP[order.statusTone] ?? 'neutral'}
+                  tone={DSH_CONTROL_PANEL_TONE_MAP[order.statusTone] ?? 'neutral'}
                 />
               </div>
 
@@ -176,7 +174,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                   { label: 'الكابتن', value: order.captain },
                   { label: 'ETA المتوقع', value: order.eta },
                   { label: 'تنبيه الوصول', value: order.ringLabel },
-                  { label: 'توجيه الإجراء', value: order.actionHint },
+                  { label: 'توجيه الإجراء', value: order.suggestion.action },
                 ].map(({ label, value }) => (
                   <div key={label} style={{ background: 'var(--bthwani-control-panel-surface-inset)', borderRadius: '6px', padding: '6px 10px' }}>
                     <div style={{ fontSize: '10px', color: 'var(--bthwani-control-panel-text-muted)', marginBottom: '2px' }}>{label}</div>
@@ -224,7 +222,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                     flex: 1,
                     padding: '8px 12px',
                     background: 'var(--bthwani-control-panel-brand)',
-                    color: 'white',
+                    color: 'var(--bthwani-brand-contrast)',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -265,7 +263,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
         );
       }
     } else if (selectedItemId.type === 'fulfillment') {
-      const rows = FULFILLMENT_MODE_ORDER_QUEUES[selectedItemId.mode] || [];
+      const rows: { id: string; storeName: string; customerName: string; slaLabel: string; statusTone: DshControlPanelTone; statusLabel: string; nextAction: string; fulfillmentMode: DshFulfillmentOperationalMode }[] = [];
       const order = rows.find((r) => r.id === selectedItemId.id);
       if (order) {
         inspectorContent = (
@@ -278,7 +276,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                 <span style={{ fontSize: '12px', fontWeight: 800 }}>الحالة:</span>
                 <WebControlPanelStatusTag
                   label={order.statusLabel}
-                  tone={order.statusTone as any}
+                  tone={order.statusTone}
                 />
               </div>
 
@@ -300,7 +298,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                     flex: 1,
                     padding: '8px 12px',
                     background: 'var(--bthwani-control-panel-brand)',
-                    color: 'white',
+                    color: 'var(--bthwani-brand-contrast)',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -391,7 +389,7 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                     entityId={order.id}
                     entityLabel={`متجر: ${order.storeId} — عميل: ${order.clientId}${order.captainId ? ` — كابتن: ${order.captainId}` : ''}`}
                     status={order.status}
-                    statusTone={resolveRuntimeOrderTone(order.status)}
+                    statusTone={resolveRuntimeOrderStatusTone(order.status)}
                     sla={`تاريخ الإنشاء: ${new Date(order.createdAt).toLocaleString('ar-SA', { hour: '2-digit', minute: '2-digit' })}`}
                     onInspect={() => router.push(`/operations?group=exceptions&orderId=${order.id}`)}
                     primaryAction={order.status === 'CREATED' ? {
@@ -401,14 +399,14 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
                     } : undefined}
                   />
                 ))
-              : preview.rows.map((order) => (
+              : PREVIEW_ROWS.map((order) => (
                   <WebControlPanelDecisionRow
                     key={order.id}
                     entityId={order.id}
                     entityLabel={`${order.destination} — ${getOperationsActorLabel(order.fulfillmentMode)}: ${order.captain}`}
                     status={order.status}
-                    statusTone={TONE_MAP[order.statusTone] ?? 'neutral'}
-                    risk={TONE_MAP[order.statusTone] === 'danger' ? 'danger' : TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}
+                    statusTone={DSH_CONTROL_PANEL_TONE_MAP[order.statusTone] ?? 'neutral'}
+                    risk={DSH_CONTROL_PANEL_TONE_MAP[order.statusTone] === 'danger' ? 'danger' : DSH_CONTROL_PANEL_TONE_MAP[order.statusTone] === 'warning' ? 'warning' : 'neutral'}
                     recommendation={order.suggestion.label}
                     reason={order.suggestion.reason}
                     sla={`ETA: ${order.eta} | ${order.ringLabel}`}
@@ -434,13 +432,13 @@ export function LiveOrdersScreen({ state = 'ready', subGroup, onRetry }: LiveOrd
               title={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.label || activeMode}
               meta={DSH_FULFILLMENT_OPERATIONAL_MODE_META[activeMode]?.operationalOwner}
             >
-              {(FULFILLMENT_MODE_ORDER_QUEUES[activeMode] || []).map((row) => (
+              {([] as { id: string; customerName: string; storeName: string; statusLabel: string; statusTone: DshControlPanelTone; slaLabel: string; nextAction: string }[]).map((row) => (
                 <WebControlPanelDecisionRow
                   key={row.id}
                   entityId={row.id}
                   entityLabel={`${row.customerName} — ${row.storeName}`}
                   status={row.statusLabel}
-                  statusTone={row.statusTone as any}
+                  statusTone={row.statusTone}
                   sla={row.slaLabel}
                   onInspect={() => setSelectedItemId({ type: 'fulfillment', id: row.id, mode: activeMode })}
                   primaryAction={{

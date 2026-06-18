@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { CancelOrderSheet } from '../sheets/CancelOrderSheet';
-import { getDshClientStateMeta } from '../../data/operational-statuses.preview-data';
+import { getDshClientStateMeta } from '../../shared/orders/orders.client-state';
 import {
   defaultCreateOrderValues,
   FULL_JOURNEY_STEPS,
@@ -26,7 +26,7 @@ export function DshTrackingScreen({
 }: DshTrackingScreenProps) {
   const [cancelSheetVisible, setCancelSheetVisible] = React.useState(false);
   const trackingStateMeta = getDshClientStateMeta(clientState);
-  const fallbackTimeline: DshTrackingTimelineItem[] = timeline.length
+  const resolvedTimeline: DshTrackingTimelineItem[] = timeline.length
     ? timeline
     : clientState === 'tracking_active'
       ? FULL_JOURNEY_STEPS.map((step, index) => ({ id: step.id, title: step.title, detail: step.detail, done: index === 0 }))
@@ -36,7 +36,7 @@ export function DshTrackingScreen({
     return (
       <CreateOrderJourneyScreen
         values={values}
-        timeline={fallbackTimeline}
+        timeline={resolvedTimeline}
         clientState={clientState}
         fulfillmentMode={fulfillmentMode}
         initialPhase="received"
@@ -51,14 +51,14 @@ export function DshTrackingScreen({
   }
 
   if (clientState !== 'tracking_active') {
-    return renderTracking(clientState, currentStatusLabel ?? trackingStateMeta.label, fallbackTimeline, onSupport, onNextAction, onReorder);
+    return renderTracking(clientState, currentStatusLabel ?? trackingStateMeta.label, resolvedTimeline, onSupport, onNextAction, onReorder);
   }
 
   return (
     <View style={{ flex: 1 }}>
       <CreateOrderJourneyScreen
         values={values}
-        timeline={fallbackTimeline}
+        timeline={resolvedTimeline}
         clientState={clientState}
         fulfillmentMode={fulfillmentMode}
         initialPhase="route"

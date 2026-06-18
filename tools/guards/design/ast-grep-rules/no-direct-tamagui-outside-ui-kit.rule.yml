@@ -1,0 +1,9 @@
+id: no-direct-tamagui-outside-ui-kit
+language: TypeScript
+rule:
+  any:
+    - pattern: import $$$ from 'tamagui'
+    - pattern: import { $$$ } from 'tamagui'
+    - pattern: import $$$ from '@tamagui/$PKG'
+message: Direct Tamagui imports are allowed only inside ui-kit.
+severity: error

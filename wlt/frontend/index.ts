@@ -9,4 +9,4 @@ export * from './dsh/contracts';
 export * as wltCaptainDsh from './dsh/app-captain';
 export * as wltFieldDsh from './dsh/app-field';
 export * from './dsh/control-panel';
-export { financeProviders, type FinanceProvider } from './dsh/control-panel/financeContracts';
+export { financeProviders, type FinanceProvider } from './dsh/shared';

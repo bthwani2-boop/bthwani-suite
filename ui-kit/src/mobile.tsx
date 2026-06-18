@@ -1,5 +1,6 @@
 import React, { type ReactNode } from 'react'; // Re-built
-import { SafeAreaView, StatusBar } from 'react-native';
+import { StatusBar } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { getBThwaniAppearanceThemeMode, type BThwaniAppearanceMode } from './appearance';
 import { BThwaniAppearanceProvider, RootProviders, type RootProvidersProps, useTheme } from './providers';
 
@@ -18,7 +19,7 @@ function MobileRootFrame({ children }: { children: ReactNode }) {
         barStyle={mode === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={theme.background}
       />
-      <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={{ flex: 1, backgroundColor: theme.background }}>
         {children}
       </SafeAreaView>
     </>
@@ -36,8 +37,10 @@ export function MobileRoot({ children, appearanceMode, ...rootProps }: MobileRoo
     : <MobileRootFrame>{children}</MobileRootFrame>;
 
   return (
-    <RootProviders {...rootProps} themeMode={resolvedThemeMode}>
-      {content}
-    </RootProviders>
+    <SafeAreaProvider>
+      <RootProviders {...rootProps} themeMode={resolvedThemeMode}>
+        {content}
+      </RootProviders>
+    </SafeAreaProvider>
   );
 }

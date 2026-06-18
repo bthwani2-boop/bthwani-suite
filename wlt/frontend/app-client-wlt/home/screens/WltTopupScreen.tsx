@@ -1,11 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { ScrollView } from 'react-native';
-import { ScreenWrapper, ScreenState, Text, useI18n, Dialog } from '@bthwani/ui-kit';
+import { ScreenWrapper, ScreenState, Text, useI18n, Dialog,
+  spacing,
+} from '@bthwani/ui-kit';
 import { AmountInput, PaymentMethodList, SummaryCard, QuickAmountGrid, Button, TextField, amountToArabicText } from '@bthwani/ui-kit';
-import { financeProviders } from '../../../dsh/control-panel/financeContracts';
-import { createWltDshTypedClient } from '../../../dsh/contracts';
+import { financeProviders, createWltDshTypedClient, type FinanceProvider, generatePaymentSessionIds } from '../../../dsh/shared';
 
-export const WltTopupScreen: React.FC = () => {
+export const WltTopupScreen: React.FC<{
+  dshClientId?: string | null;
+  dshAuthBearerToken?: string | null;
+}> = ({ dshClientId, dshAuthBearerToken }) => {
   const { t } = useI18n();
   const tr = (key: string, fallback?: string) => {
     const v = t(key);
@@ -16,10 +20,15 @@ export const WltTopupScreen: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<string | undefined>(undefined);
   const [dialogVisible, setDialogVisible] = useState(false);
 
-  const client = useMemo(() => createWltDshTypedClient({ devClientId: 'client-demo' }), []);
+  const activeClientId = dshClientId || 'client-demo';
+
+  const client = useMemo(
+    () => createWltDshTypedClient({ devClientId: activeClientId, bearerToken: dshAuthBearerToken || undefined }),
+    [activeClientId, dshAuthBearerToken],
+  );
 
   const methods = useMemo(() => (
-    financeProviders.map((p) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
+    financeProviders.map((p: FinanceProvider) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
   ), [t]);
 
   const topupAmount = Math.floor(parseFloat(amount.replace(/,/g, '')) || 0);
@@ -28,17 +37,18 @@ export const WltTopupScreen: React.FC = () => {
   const handleTopup = async () => {
     if (!canSubmit) return setDialogVisible(true);
     setState('loading');
+    const { checkoutIntentId, idempotencyKey, confirmationRef } = generatePaymentSessionIds('topup');
     try {
       const session = await client.createClientPaymentSession({
-        checkout_intent_id: `topup-${Date.now()}`,
-        client_id: 'client-demo',
+        checkout_intent_id: checkoutIntentId,
+        client_id: activeClientId,
         amount: topupAmount,
         currency: 'YER',
         payment_method: paymentMethod ?? 'wallet',
-        idempotency_key: `topup-idem-${Date.now()}-${topupAmount}`,
+        idempotency_key: idempotencyKey,
       });
 
-      await client.confirmPaymentSession(session.id, `ref-topup-${Date.now()}`);
+      await client.confirmPaymentSession(session.id, confirmationRef);
 
       setState('success');
       setAmount('');
@@ -63,11 +73,11 @@ export const WltTopupScreen: React.FC = () => {
 
         <QuickAmountGrid amounts={[50,100,200]} onSelect={(n) => setAmount(String(n))} selected={topupAmount} />
 
-        <Text role="label" tone="muted" style={{ marginTop: 12, marginHorizontal: 16 }}>{t('wlt.topup.instruction')}</Text>
+        <Text role="label" tone="muted" style={{ marginTop: spacing[3], marginHorizontal: 16 }}>{t('wlt.topup.instruction')}</Text>
 
         <PaymentMethodList methods={methods} selectedId={paymentMethod} onSelect={setPaymentMethod} />
 
-        {topupAmount > 0 ? <Text role="caption" tone="muted" style={{ textAlign: 'center', marginTop: 8 }}>{amountToArabicText(topupAmount, (k) => t(k))}</Text> : null}
+        {topupAmount > 0 ? <Text role="caption" tone="muted" style={{ textAlign: 'center', marginTop: spacing[2] }}>{amountToArabicText(topupAmount, (k) => t(k))}</Text> : null}
 
         <SummaryCard items={summaryItems} totalLabel={t('wlt.summary.total')} totalValue={amount || '0.00'} />
 

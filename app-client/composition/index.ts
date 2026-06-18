@@ -31,5 +31,5 @@ export function useServiceLabels() {
   return appClientServiceLabels;
 }
 
-export { DshClientSurface, DshClientSurface as DshSurfaceHost, DshHomeApprovedVideoReelsViewer };
+export { DshClientSurface, DshHomeApprovedVideoReelsViewer };
 export type { DshCommandTarget, DshHomeApprovedVideoReelsViewerProps };

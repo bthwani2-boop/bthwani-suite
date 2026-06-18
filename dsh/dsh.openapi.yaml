@@ -42,6 +42,10 @@ tags:
     description: Order status, captain assignment, delivery progress, and support transitions.
   - name: Support Escalation
     description: Support ticket creation and escalation references.
+  - name: Notifications
+    description: Actor-scoped notification events for the DSH bell screen (J-013).
+  - name: DEV_ONLY
+    description: Development-only fixture routes gated by DSH_ENABLE_DEV_FIXTURE_MEDIA flag. Not for runtime use.
   - name: WLT Finance
     description: WLT-owned read-only finance references, callbacks, and settlement candidate signals.
 paths:
@@ -131,6 +135,51 @@ paths:
                 $ref: '#/components/schemas/ListProductsResponse'
         '400':
           description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products:
+    get:
+      tags:
+        - Product Identity
+      summary: List all products (operator view)
+      description: >
+        Returns all product records across all stores. Operator role required.
+        Supports filtering by approval_status for the catalog review queue.
+      operationId: listAllProducts
+      parameters:
+        - name: approval_status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by approval status (e.g. partner_submitted)
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Products list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListProductsResponse'
+        '403':
+          description: Operator role required
           content:
             application/json:
               schema:
@@ -465,6 +514,7 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '503':
           description: Media storage unavailable — MinIO/S3 not configured
+          x-error-code: MEDIA_STORAGE_UNAVAILABLE
           content:
             application/json:
               schema:
@@ -510,6 +560,7 @@ paths:
       tags:
         - Product Media
       summary: Get media asset by ID
+      description: Retrieve a single media asset record by its DSH-assigned media_id.
       operationId: getMediaAsset
       parameters:
         - name: media_id
@@ -908,6 +959,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /stores/pending-review:
+    get:
+      tags:
+        - Store Discovery
+      summary: List stores pending review
+      description: Retrieve all stores in the pending_review stage for control panel review queue.
+      operationId: listPendingStores
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreateFieldStoreResponse'
         '500':
           description: Internal Server Error
           content:
@@ -2474,6 +2543,91 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: List notifications for the authenticated actor (J-013)
+      description: |
+        Returns paginated notification events for the authenticated actor.
+        The `actor_type` filter is optional — defaults to the role from the session token.
+        Used by DSH bell screen to show live notification events.
+      operationId: listNotifications
+      security:
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: unread_only
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: kind
+          in: query
+          description: Filter by notification kind (matches DshSignalEventKind)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification list returned
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [notifications, total]
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DshNotificationRecord'
+                  total:
+                    type: integer
+                  unread_count:
+                    type: integer
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /notifications/{id}/read:
+    post:
+      tags:
+        - Notifications
+      summary: Mark a notification as read
+      description: Marks the specified notification as read for the authenticated actor. Idempotent.
+      operationId: markNotificationRead
+      security:
+        - BearerAuth: []
+        - DevClientId: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification marked as read
+        '404':
+          description: Notification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   securitySchemes:
     BearerAuth:
@@ -2955,6 +3109,44 @@ components:
           type: string
         message:
           type: string
+
+    # ─── J-013: Notifications / Signal Layer ──────────────────────────────────
+
+    DshNotificationRecord:
+      type: object
+      required: [id, kind, title, created_at, is_read, recipient_id, recipient_role]
+      properties:
+        id:
+          type: string
+        kind:
+          type: string
+          description: Maps to DshSignalEventKind in the frontend signal layer model
+        title:
+          type: string
+        subtitle:
+          type: string
+        entity_id:
+          type: string
+          description: Related entity ID (order_id, store_id, etc.)
+        entity_type:
+          type: string
+        priority:
+          type: string
+          enum: [normal, important, urgent]
+          default: normal
+        is_read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        recipient_id:
+          type: string
+        recipient_role:
+          type: string
+          enum: [client, partner, captain, field, operator]
+        action_route:
+          type: string
+          description: Frontend route to navigate to when the notification is pressed
 
     # ─── J-002 / DSH-SLICE-002A: Product Identity ─────────────────────────────
 

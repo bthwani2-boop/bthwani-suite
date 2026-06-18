@@ -3,14 +3,24 @@
 import React from 'react';
 import { Box, Surface, Text, Button } from '@bthwani/ui-kit';
 import { WebSectionCard, WebControlPanelWorkspaceTabs } from '@bthwani/ui-kit/web';
-import { useDemoPlatformState } from '../useDemoPlatformState';
-import { PREVIEW_TOP_SERVICES, type PlatformTopService } from '../../../data/platform.preview-data';
+import { usePlatformAuditState } from '../usePlatformAuditState';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type PlatformTopService = Record<string, any>;
+const PREVIEW_TOP_SERVICES: PlatformTopService[] = [];
 import styles from '../../shared/control-panel-surface.module.css';
 
-export function DshPlatformServicesWorkspace() {
-  const { addAuditEvent } = useDemoPlatformState();
-  const [activeFilter, setActiveFilter] = React.useState('all');
+export function DshPlatformServicesWorkspace({ activeFilter }: { activeFilter: string }) {
+  const { addAuditEvent } = usePlatformAuditState();
   const [selectedServiceCode, setSelectedServiceCode] = React.useState<string>('DSH');
+
+  React.useEffect(() => {
+    const filtered = activeFilter === 'all'
+      ? PREVIEW_TOP_SERVICES
+      : PREVIEW_TOP_SERVICES.filter((s) => s.filterGroup === activeFilter);
+    if (filtered.length > 0) {
+      setSelectedServiceCode(filtered[0].code);
+    }
+  }, [activeFilter]);
   const [showConfirm, setShowConfirm] = React.useState<string | null>(null);
 
   // Maintain local states for live statuses
@@ -36,6 +46,7 @@ export function DshPlatformServicesWorkspace() {
     : PREVIEW_TOP_SERVICES.filter((s) => s.filterGroup === activeFilter);
 
   const selectedService = PREVIEW_TOP_SERVICES.find((s) => s.code === selectedServiceCode) || PREVIEW_TOP_SERVICES[0];
+  if (!selectedService) return null;
   const serviceState = serviceStates[selectedService.code] || {
     status: selectedService.sovereignStatus,
     visibility: selectedService.customerVisibility,
@@ -106,22 +117,7 @@ export function DshPlatformServicesWorkspace() {
         <div className={styles.surfaceSplitGrid}>
           {/* Left Column: Services list */}
           <div className={styles.surfaceListColumn}>
-            <Box gap={2}>
-              <Text role="titleMd">تصفية الخدمات</Text>
-              <WebControlPanelWorkspaceTabs
-                ariaLabel="تصفية الخدمات العليا"
-                items={filterTabs}
-                onSelect={(id) => {
-                  setActiveFilter(id);
-                  const filtered = id === 'all'
-                    ? PREVIEW_TOP_SERVICES
-                    : PREVIEW_TOP_SERVICES.filter((s) => s.filterGroup === id);
-                  if (filtered.length > 0) {
-                    setSelectedServiceCode(filtered[0].code);
-                  }
-                }}
-              />
-            </Box>
+
 
             <Box gap={2} style={{ marginTop: 8 }}>
               {filteredServices.map((service) => {

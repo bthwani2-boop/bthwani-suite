@@ -2,6 +2,9 @@ openapi: 3.1.0
 info:
   title: BThwani Auth API
   version: 0.3.0
+  contact:
+    name: BThwani Platform Team
+    email: bthwani3@gmail.com
   description: |
     Auth contract for BThwani platform. Covers session verification, actor
     identification, and the role-based permission matrix used by DSH and WLT
@@ -70,6 +73,18 @@ info:
     | GET /settlements | ✗ | ✗ | ✗ | ✗ | ✓ |
     | POST /settlements | ✗ | ✗ | ✗ | ✗ | ✓ |
 
+servers:
+  - url: http://localhost:18082
+    description: Local dev host port (Auth service port 18082)
+
+tags:
+  - name: Session
+    description: Token verification and actor identity resolution.
+  - name: Auth
+    description: Registration, login, token refresh, and logout flows.
+  - name: Health
+    description: Service liveness probe.
+
 x-bthwani-contract-state: AUTH_CONTRACT_ROLE_MATRIX_V3
 x-bthwani-auth-service-port: 18082
 x-bthwani-dev-tokens:
@@ -95,6 +110,8 @@ x-bthwani-dev-tokens:
 paths:
   /auth/session:
     get:
+      tags:
+        - Session
       summary: Verify Bearer token and return actor identity
       description: |
         Core session endpoint. Called by DSH and WLT middleware on every
@@ -174,6 +191,8 @@ paths:
 
   /auth/permissions:
     get:
+      tags:
+        - Session
       summary: Return the set of permitted operations for the current session
       description: |
         Returns a structured permission map for the authenticated actor.
@@ -257,7 +276,10 @@ paths:
 
   /auth/register:
     post:
+      tags:
+        - Auth
       summary: Register a new user and create an actor identity
+      description: Creates a new actor record with hashed credentials and returns an initial Bearer token.
       operationId: registerUser
       requestBody:
         required: true
@@ -311,7 +333,10 @@ paths:
 
   /auth/login:
     post:
+      tags:
+        - Auth
       summary: Authenticate user credentials and issue token
+      description: Validates credentials and issues a Bearer token and optional refresh token.
       operationId: loginUser
       requestBody:
         required: true
@@ -352,7 +377,10 @@ paths:
 
   /auth/refresh:
     post:
+      tags:
+        - Auth
       summary: Refresh active session token
+      description: Exchanges a valid refresh token for a new Bearer token. Extends session without re-authentication.
       operationId: refreshToken
       requestBody:
         required: true
@@ -389,6 +417,8 @@ paths:
 
   /auth/logout:
     post:
+      tags:
+        - Auth
       summary: Revoke active Bearer token (dev/local alias for /auth/revoke)
       description: |
         Revokes the Bearer token supplied in the Authorization header.
@@ -406,7 +436,10 @@ paths:
 
   /auth/revoke:
     post:
+      tags:
+        - Auth
       summary: Revoke session/refresh token
+      description: Permanently revokes a Bearer or refresh token. The session cannot be resumed after revocation.
       operationId: revokeToken
       security:
         - BearerAuth: []
@@ -426,7 +459,10 @@ paths:
 
   /auth/introspect:
     post:
+      tags:
+        - Session
       summary: Introspect session token status (alternative to GET /auth/session)
+      description: Validates a token and returns its session metadata without requiring it in the Authorization header.
       operationId: introspectToken
       requestBody:
         required: true
@@ -450,7 +486,10 @@ paths:
 
   /health:
     get:
+      tags:
+        - Health
       summary: Auth service liveness probe
+      description: Liveness probe — returns ok when the Auth service is running and accepting requests.
       operationId: getAuthHealth
       security: []
       responses:

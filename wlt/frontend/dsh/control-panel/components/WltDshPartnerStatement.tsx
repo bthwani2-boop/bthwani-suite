@@ -2,10 +2,7 @@
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import {
-  getWltDshPartnerSettlementStatementsPreview,
-  type WltDshPartnerStatement as PartnerStatement,
-} from '../financeContracts';
+import type { WltDshPartnerStatement as PartnerStatement } from '../../shared';
 import wltStyles from '../styles/wlt-dsh-finance.module.css';
 
 const STATUS_LABEL: Record<PartnerStatement['status'], string> = {
@@ -31,7 +28,7 @@ function Metric({ label, value }: { label: string; value: string }) {
 }
 
 export function WltDshPartnerStatement() {
-  const statements = React.useMemo(() => getWltDshPartnerSettlementStatementsPreview(), []);
+  const statements: readonly PartnerStatement[] = [];
 
   const [activePartnerId, setActivePartnerId] = React.useState<string>(statements[0]?.partnerId ?? '');
   const [selectedStoreId, setSelectedStoreId] = React.useState<string | null>(null);
@@ -59,7 +56,7 @@ export function WltDshPartnerStatement() {
       <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
         <div className={wltStyles.partnerHeaderFlex}>
           <div className={wltStyles.partnerTitleFlex}>
-            <Text role="titleMd" style={{ fontWeight: 800 }}>كشف الحساب الموحد للشريك</Text>
+            <Text role="titleMd" weight="black">كشف الحساب الموحد للشريك</Text>
             <div className={wltStyles.storeSelectorButtonsFlex}>
               {statements.map((s) => (
                 <button
@@ -116,7 +113,7 @@ export function WltDshPartnerStatement() {
         {/* Stores Table Container */}
         <Box padding={3} background="surfaceInset" radiusToken="lg" border borderTone="line" gap={2}>
           <div className={wltStyles.tableHeaderFlex}>
-            <Text role="titleSm" style={{ fontWeight: 800 }}>توزيع المستحقات المالية للمتاجر التابعة</Text>
+            <Text role="titleSm" weight="black">توزيع المستحقات المالية للمتاجر التابعة</Text>
             <span className={wltStyles.readinessDesc}>
               اضغط على أي متجر لعرض تفاصيل الصرف البنكي وقنوات التحويل المرتبطة.
             </span>
@@ -198,7 +195,7 @@ export function WltDshPartnerStatement() {
             <Box gap={1}>
               <span className={wltStyles.inspectorMetaKey}>الحساب البنكي المرتبط بصرف المتجر</span>
               <span className={wltStyles.inspectorMetaVal}>
-                بنك اليمن والكويت - حساب رقم: <code style={{ fontSize: 11, fontFamily: 'monospace' }}>2020-77981-01</code>
+                بنك اليمن والكويت - حساب رقم: <Text family="mono" style={{ fontSize: 11 }}>2020-77981-01</Text>
               </span>
             </Box>
 

@@ -5,12 +5,13 @@ import {
 	Chip,
 	colorPalette,
 	ListItem,
+	shadowPresets,
 	Text,
 	radius,
 	spacing,
 	useTheme,
 } from '@bthwani/ui-kit';
-import useWltDshWalletPreview from './useWltDshWalletPreview';
+import useWltDshWalletSession from './useWltDshWalletSession';
 
 /**
  * WLT-owned parts for DSH integration.
@@ -18,11 +19,11 @@ import useWltDshWalletPreview from './useWltDshWalletPreview';
 
 // --- Balance Preview ---
 
-export type WltDshBalancePreviewProps = {
+export type WltDshBalanceSummaryProps = {
 	balance: number | null;
 };
 
-export function WltDshBalancePreview({ balance }: WltDshBalancePreviewProps) {
+export function WltDshBalanceSummary({ balance }: WltDshBalanceSummaryProps) {
 	if (balance == null) {
 		return null;
 	}
@@ -37,7 +38,7 @@ export type WltDshConnectorPanelProps = {
 };
 
 export function WltDshConnectorPanel({ onLinked }: WltDshConnectorPanelProps) {
-	const { linked, link } = useWltDshWalletPreview();
+	const { linked, link } = useWltDshWalletSession();
 
 	return (
 		<Button
@@ -94,10 +95,7 @@ function PaymentOptionItem({ opt, selected, onPress }: { opt: Opt; selected: boo
 			transform: pressed ? [{ scale: 0.995 }] : selected ? [{ translateY: -4 }, { scale: 1.01 }] : undefined,
 			...(selected
 				? {
-						shadowColor: colorPalette.black,
-						shadowOpacity: 0.06,
-						shadowRadius: 8,
-						shadowOffset: { width: 0, height: 4 },
+						...shadowPresets.raised,
 						elevation: 4,
 					}
 				: {}),
@@ -132,15 +130,15 @@ function PaymentOptionItem({ opt, selected, onPress }: { opt: Opt; selected: boo
 				</View>
 			</View>
 
-			<Text role="bodyStrong" style={{ marginTop: 8, textAlign: 'center' }}>
+			<Text role="bodyStrong" style={{ marginTop: spacing[2], textAlign: 'center' }}>
 				{opt.label}
 			</Text>
 			{opt.subtitle ? (
-				<Text role="caption" tone="muted" style={{ marginTop: 4, textAlign: 'center' }}>
+				<Text role="caption" tone="muted" style={{ marginTop: spacing[1], textAlign: 'center' }}>
 					{opt.subtitle}
 				</Text>
 			) : null}
-			{selected && opt.meta ? <View style={{ marginTop: 8 }}>{opt.meta}</View> : null}
+			{selected && opt.meta ? <View style={{ marginTop: spacing[2] }}>{opt.meta}</View> : null}
 		</Pressable>
 	);
 }

@@ -1,0 +1,155 @@
+#!/usr/bin/env node
+import fs from 'node:fs';
+import path from 'node:path';
+
+function parseArgs(argv = process.argv.slice(2)) {
+  const args = { root: process.cwd(), mode: 'CHECK', jsonOut: '', mdOut: '' };
+  for (let i = 0; i < argv.length; i += 1) {
+    const token = argv[i];
+    if (token === '--root') args.root = argv[++i];
+    else if (token === '--mode') args.mode = argv[++i];
+    else if (token === '--json-out') args.jsonOut = argv[++i];
+    else if (token === '--md-out') args.mdOut = argv[++i];
+    else if (token.startsWith('--root=')) args.root = token.slice('--root='.length);
+    else if (token.startsWith('--mode=')) args.mode = token.slice('--mode='.length);
+    else if (token.startsWith('--json-out=')) args.jsonOut = token.slice('--json-out='.length);
+    else if (token.startsWith('--md-out=')) args.mdOut = token.slice('--md-out='.length);
+  }
+  return args;
+}
+
+const args = parseArgs();
+const root = args.root;
+const appRoots = [
+  'wlt/frontend/dsh/app-client',
+  'wlt/frontend/dsh/app-partner',
+  'wlt/frontend/dsh/app-captain',
+  'wlt/frontend/dsh/app-field',
+  'wlt/frontend/dsh/control-panel',
+];
+const extensions = new Set(['.ts', '.tsx', '.js', '.jsx']);
+
+function toPosix(value) {
+  return String(value).replace(/\\/g, '/');
+}
+
+function walk(absDir, files = []) {
+  if (!fs.existsSync(absDir)) return files;
+  for (const entry of fs.readdirSync(absDir, { withFileTypes: true })) {
+    const abs = path.join(absDir, entry.name);
+    if (entry.isDirectory()) walk(abs, files);
+    else if (entry.isFile() && extensions.has(path.extname(entry.name))) files.push(abs);
+  }
+  return files;
+}
+
+function lineNumber(text, index) {
+  return text.slice(0, index).split(/\r?\n/).length;
+}
+
+const rules = [
+  {
+    id: 'wlt_app_creates_typed_client',
+    regex: /\bcreateWltDshTypedClient\b/g,
+    remediation: 'WLT app-* must call WLT shared adapters/hooks, not construct typed clients.',
+  },
+  {
+    id: 'wlt_app_maps_ledger_entries',
+    regex: /\btransaction_type\b|\breference_type\b|\bledger[A-Z][A-Za-z0-9]*\b/g,
+    remediation: 'Move ledger entry mapping (raw API field access) into wlt/frontend/dsh/shared/read-models or shared/adapters.',
+  },
+  {
+    id: 'wlt_app_computes_finance_snapshot',
+    regex: /\bMath\.round\([^)]*amount|\breduce\([^)]*amount|\bpartner_payout\b|\bbalance\s*\*\s*100\b/g,
+    remediation: 'Move finance snapshots and amount formatting into WLT shared.',
+  },
+  {
+    id: 'wlt_app_exposes_finance_mutation',
+    regex: /\bconfirmPaymentSession\b|\bcreateClientPaymentSession\b|\bcreateRefundCase\b|\bcreateSettlement\b|\btopUp\b|\brequestSettlement\b/g,
+    remediation: 'Payment, refund, and settlement runtime decisions belong to WLT shared clients/policies.',
+  },
+  {
+    id: 'wlt_app_owns_money_format_or_policy',
+    regex: /\bformatWltYer\b|\bmoneyPolicy\b|\bfinance[A-Za-z0-9]*(?:Label|Policy|Contract)\b|\bpostingRules\b|\bsubledger\b|\bmakerChecker\b|\bfinanceContracts\b/g,
+    remediation: 'Move money formatting, finance labels, posting rules, subledger, and maker-checker policy to WLT shared.',
+  },
+  {
+    id: 'wlt_app_exposes_finance_methods_directly',
+    regex: /\b(?:getSnapshot|getRecords|getRecordsForSection|getSections)\b/g,
+    remediation: 'Do not expose or import finance query/accessor methods in UI roots; use shared view-models instead.',
+  },
+  {
+    id: 'wlt_app_uses_forbidden_selectors_or_matrices',
+    regex: /\b(?:buildFinancialCenter|buildTrialBalance|finance\.api-matrix)\b/g,
+    remediation: 'Move financial center/trial balance builders and api-matrix to WLT shared.',
+  },
+  {
+    id: 'wlt_app_defines_finance_models',
+    regex: /(?:^|\s)(?:interface|type)\s+(?:WltLedgerEntry|WltDailyReconciliation|WltTrialBalance|WltFinancialSnapshot)\b/gm,
+    remediation: 'Finance model/entity definitions must live in wlt/frontend/dsh/shared/contracts.',
+  },
+  {
+    id: 'wlt_app_imports_control_panel',
+    regex: /^\s*(?:import|export)\s+.*from\s+['"][^'"]*(?:dsh\/frontend\/control-panel|wlt\/frontend\/dsh\/control-panel|(?<!shared)\/control-panel\/|(?<!shared\/)\.\.\/control-panel)[^'"]*['"]/gm,
+    remediation: 'WLT app-* must not import DSH control-panel or depend on WLT control-panel internals.',
+  },
+  {
+    id: 'wlt_app_imports_contracts_directly_for_runtime',
+    regex: /^\s*import\s+\{[^}]*createWltDshTypedClient[^}]*\}\s+from\s+['"]\.\.\/contracts['"]/gm,
+    remediation: 'Typed runtime clients are owned by wlt/frontend/dsh/shared/clients.',
+  },
+];
+
+const files = appRoots.flatMap((appRoot) => walk(path.join(root, appRoot)));
+const findings = [];
+
+for (const abs of files) {
+  const rel = toPosix(path.relative(root, abs));
+  const text = fs.readFileSync(abs, 'utf8').replace(/^\uFEFF/, '');
+  for (const rule of rules) {
+    rule.regex.lastIndex = 0;
+    let match;
+    while ((match = rule.regex.exec(text)) !== null) {
+      findings.push({
+        severity: 'FAIL',
+        rule: rule.id,
+        file: rel,
+        line: lineNumber(text, match.index),
+        evidence: match[0].slice(0, 180),
+        remediation: rule.remediation,
+      });
+    }
+  }
+}
+
+const output = {
+  guardId: 'GUARD_WLT_DSH_UI_ONLY_BINDINGS',
+  status: findings.length > 0 ? 'FAIL' : 'PASS',
+  appRoots,
+  filesScanned: files.length,
+  findings,
+  failCount: findings.filter((f) => f.severity === 'FAIL').length,
+  warnCount: findings.filter((f) => f.severity === 'WARN').length,
+  infoCount: findings.filter((f) => f.severity === 'INFO').length,
+};
+
+console.log(JSON.stringify(output, null, 2));
+
+if (args.jsonOut) {
+  fs.writeFileSync(args.jsonOut, JSON.stringify(output, null, 2), 'utf8');
+}
+if (args.mdOut) {
+  const md = [
+    '# GUARD_WLT_DSH_UI_ONLY_BINDINGS',
+    '',
+    `status: ${output.status}`,
+    `findings: ${output.findings.length}`,
+    '',
+    '| Severity | Rule | File | Evidence |',
+    '|---|---|---|---|',
+    ...findings.map((f) => `| ${f.severity} | ${f.rule} | ${f.file} | ${f.evidence} |`),
+  ].join('\n');
+  fs.writeFileSync(args.mdOut, md, 'utf8');
+}
+
+if (findings.length > 0) process.exitCode = 1;

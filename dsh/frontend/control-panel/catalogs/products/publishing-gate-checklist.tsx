@@ -40,25 +40,25 @@ export function PublishingGateChecklist({
         borderRadius: 8,
       }}
     >
-      <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, fontWeight: '700', textAlign: 'right' }}>
+      <Text role="bodyStrong" weight="bold" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>
         بوابة النشر النهائية (Publishing Gate Checklist)
       </Text>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px', margin: '8px 0' }}>
         <Box layoutDirection="row" align="center" gap={2} style={{ justifyContent: 'flex-end' }}>
           <Text role="caption" tone={isCategoryMapped ? 'default' : 'danger'} style={{ fontSize: 11, textAlign: 'right' }}>ربط الفئات (Category Mapping)</Text>
-          <Text style={{ color: isCategoryMapped ? theme.success : theme.danger, fontWeight: 'bold', fontSize: 14 }}>
+          <Text weight="bold" style={{ color: isCategoryMapped ? theme.success : theme.danger, fontSize: 14 }}>
             {isCategoryMapped ? '✓' : '✗'}
           </Text>
         </Box>
         <Box layoutDirection="row" align="center" gap={2} style={{ justifyContent: 'flex-end' }}>
           <Text role="caption" tone={isDuplicatesClean ? 'default' : 'danger'} style={{ fontSize: 11, textAlign: 'right' }}>خلو الكتالوج من التكرارات (No Duplicates)</Text>
-          <Text style={{ color: isDuplicatesClean ? theme.success : theme.danger, fontWeight: 'bold', fontSize: 14 }}>
+          <Text weight="bold" style={{ color: isDuplicatesClean ? theme.success : theme.danger, fontSize: 14 }}>
             {isDuplicatesClean ? '✓' : '✗'}
           </Text>
         </Box>
         <Box layoutDirection="row" align="center" gap={2} style={{ justifyContent: 'flex-end' }}>
           <Text role="caption" tone={isMediaSatisfied ? 'default' : 'danger'} style={{ fontSize: 11, textAlign: 'right' }}>اعتماد الصور والسياسة (Media Satisfied)</Text>
-          <Text style={{ color: isMediaSatisfied ? theme.success : theme.danger, fontWeight: 'bold', fontSize: 14 }}>
+          <Text weight="bold" style={{ color: isMediaSatisfied ? theme.success : theme.danger, fontSize: 14 }}>
             {isMediaSatisfied ? '✓' : '✗'}
           </Text>
         </Box>
@@ -91,7 +91,7 @@ export function PublishingGateChecklist({
                 type: 'visibility-change',
                 productIds: readyProducts.map((p) => p.id),
                 label: 'نشر الكتالوج بالكامل للعميل',
-                note: 'UI_PREVIEW_ONLY: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
+                note: 'محاكاة محلية: تحويل المنتجات المعتمدة إلى client-visible كمعاينة فقط.',
                 apiBoundary: 'POST /catalog/products/publish',
               }));
               setActionMessage('تم تسجيل مقترح نشر المنتجات الجاهزة للعميل');

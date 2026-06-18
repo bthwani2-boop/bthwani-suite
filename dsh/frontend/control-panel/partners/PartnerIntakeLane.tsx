@@ -9,6 +9,7 @@ import {
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { dshPartnerIntakeItems, dshPartnerIntakeMetrics } from './workflow';
+import type { DshPartnerIntakeStage } from '../../shared/stores/partner/partner.workflow';
 
 export type PartnerIntakeLaneProps = {
   readonly state?: 'ready' | 'loading' | 'error';
@@ -17,16 +18,28 @@ export type PartnerIntakeLaneProps = {
   readonly onOpenHubItem?: (itemId: string, intent: 'approve' | 'fix' | 'inspect') => void;
 };
 
-function resolveStatusTone(queue: string): 'warning' | 'success' | 'neutral' {
-  if (queue === 'offer-approval') return 'warning';
-  if (queue === 'marketing-review') return 'success';
-  return 'neutral';
+function resolveStatusTone(stage: DshPartnerIntakeStage): 'warning' | 'success' | 'neutral' {
+  if (stage === 'pending-partner') return 'warning';
+  if (stage === 'pending-marketing') return 'neutral';
+  return 'success';
 }
 
-function resolveApproveLabel(queue: string): string {
-  if (queue === 'offer-approval') return 'اعتماد العرض';
-  if (queue === 'partner-review') return 'إنشاء الكود';
-  return 'إطلاق نهائي';
+function resolveApproveLabel(stage: DshPartnerIntakeStage): string {
+  if (stage === 'pending-partner') return 'اعتماد أولي';
+  if (stage === 'pending-marketing') return 'اعتماد تسويقي';
+  return 'عرض المنشور';
+}
+
+function resolveStageLabel(stage: DshPartnerIntakeStage): string {
+  if (stage === 'pending-partner') return 'بانتظار مراجعة الشركاء';
+  if (stage === 'pending-marketing') return 'بانتظار مراجعة التسويق';
+  return 'منشور';
+}
+
+function resolveNextStep(stage: DshPartnerIntakeStage): string {
+  if (stage === 'pending-partner') return 'مراجعة بيانات المنتج واتخاذ القرار الأولي.';
+  if (stage === 'pending-marketing') return 'اعتماد العرض التسويقي قبل النشر.';
+  return 'فتح العنصر المنشور ومراجعة حالته الحالية.';
 }
 
 export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHubItem }: PartnerIntakeLaneProps) {
@@ -68,7 +81,8 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
   }
 
   return (
-    <Box gap={6} dir="rtl">
+    <div dir="rtl">
+      <Box gap={6}>
       <Box layoutDirection="row" justify="space-between" align="center">
         <Box gap={1}>
           <Text role="caption" tone="brand">مسار استقبال الشركاء</Text>
@@ -83,7 +97,7 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
           ...dshPartnerIntakeMetrics.map((m, i) => ({
             id: m.id,
             label: m.label,
-            value: m.value,
+            value: String(m.value),
             tone: i === 0 ? ('warning' as const) : ('neutral' as const),
           })),
           { id: 'decision-time', label: 'متوسط وقت القرار', value: '١٤ د', tone: 'success' as const },
@@ -92,18 +106,18 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
 
       <Box gap={3}>
         {dshPartnerIntakeItems.map((item) => {
-          const statusTone = resolveStatusTone(item.queue);
-          const approveLabel = resolveApproveLabel(item.queue);
+          const statusTone = resolveStatusTone(item.stage);
+          const approveLabel = resolveApproveLabel(item.stage);
 
           return (
             <WebControlPanelDecisionRow
               key={item.id}
               entityId={item.id}
-              entityLabel={item.storeName}
-              status={item.fieldStatusLabel}
+              entityLabel={item.productName}
+              status={resolveStageLabel(item.stage)}
               statusTone={statusTone}
-              risk={item.queue === 'offer-approval' ? 'warning' : 'neutral'}
-              recommendation={item.nextStep}
+              risk={item.stage === 'pending-partner' ? 'warning' : 'neutral'}
+              recommendation={resolveNextStep(item.stage)}
               reason={item.note}
               sla={`${item.categoryLabel} · ${item.ownerLabel}`}
               primaryAction={{
@@ -121,7 +135,8 @@ export function PartnerIntakeLane({ state = 'ready', hubHref, onRetry, onOpenHub
           );
         })}
       </Box>
-    </Box>
+      </Box>
+    </div>
   );
 }
 

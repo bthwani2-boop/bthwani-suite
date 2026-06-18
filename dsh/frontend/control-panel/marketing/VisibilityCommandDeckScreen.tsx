@@ -4,20 +4,18 @@ import React from 'react';
 import { Text } from '@bthwani/ui-kit';
 import marketingStyles from './control-panel-marketing.module.css';
 import styles from '../shared/control-panel-surface.module.css';
-import { dshPromotionCandidates } from '../../shared/workflow';
-import {
-  getCampaignItems,
-  type CampaignAudience,
-  type CampaignPlacement,
-  type CampaignRecord,
-  type CampaignStatus,
-  type CampaignTargetType,
-} from '../../data/marketing.preview-data';
-import {
-  getPartnerOfferItems,
-  type PartnerOfferRecord,
-  type PartnerOfferStatus,
-} from '../../data/offers.preview-data';
+import { dshPromotionCandidates } from '../../shared/stores/partner/partner.workflow';
+import type {
+  CampaignAudience,
+  CampaignPlacement,
+  CampaignRecord,
+  CampaignStatus,
+  CampaignTargetType,
+} from '../../shared/marketing';
+import type {
+  PartnerOfferRecord,
+  PartnerOfferStatus,
+} from '../../shared/stores/partner/dsh-partner-offer-types';
 import {
   buildCommercialProjection,
   evaluateCommercialConflicts,
@@ -25,30 +23,30 @@ import {
   type CommercialConflict,
   type CommercialLifecycleStatus,
   type PartnerOffer,
-} from '../../shared/commercial.preview-contract';
+} from '../../shared/marketing/commercial-contract';
 import {
   getCampaignVisibilityRecord,
   getPartnerOfferVisibilityRecord,
-} from '../../shared/marketing-visibility.contract';
+} from '../../shared';
 import {
   getDshPartnerActivationStateMetadata,
   type DshPartnerActivationStatus,
-} from '../../shared/dsh-partner-activation.model';
+} from '../../shared/stores/partner/dsh-partner-activation.model';
 import {
   getDshProductApprovalStateMetadata,
   type DshProductCategoryMappingStatus,
   type DshProductDuplicateStatus,
   type DshProductIdentityApprovalStatus,
-} from '../../shared/dsh-product-identity.model';
+} from '../../shared/products';
 import {
   resolveDshProductClientVisibility,
   resolveDshStoreClientVisibility,
-} from '../../shared/dsh-client-visibility.model';
+} from '../../shared/stores/dsh-client-visibility.model';
 import {
   getDshSignalEventLabel,
   getDshSignalEventTone,
   getDshSignalSummaries,
-} from '../../shared/dsh-signal-layer.model';
+} from '../../shared/marketing/dsh-signal-layer.model';
 import type { MarketingControlView } from './types';
 
 
@@ -310,8 +308,8 @@ export function VisibilityCommandDeckScreen({
   productGates,
   setProductGates,
 }: VisibilityCommandDeckScreenProps) {
-  const partnerOfferRecords = getPartnerOfferItems();
-  const campaignRecords = getCampaignItems();
+  const partnerOfferRecords: PartnerOfferRecord[] = [];
+  const campaignRecords: CampaignRecord[] = [];
   const partnerOfferRows = partnerOfferRecords.map((offer) => ({
     offer,
     visibility: getPartnerOfferVisibilityRecord(offer, { targetSurface: 'control-panel' }),

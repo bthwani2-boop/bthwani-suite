@@ -9,7 +9,7 @@ import {
   WebControlPanelActionCluster,
 } from '@bthwani/ui-kit/web';
 import { PARTNER_FULFILLMENT_AGREEMENTS, getPartnerComplaints, updatePartnerComplaintStatus } from './workflow';
-import type { PartnerComplaint } from '../../data/partner.preview-data';
+import type { PartnerComplaint } from '../../shared';
 import styles from '../shared/control-panel-surface.module.css';
 
 
@@ -122,7 +122,7 @@ export function PartnerComplaintsWorkspace() {
               title="توجيه معالجة الشكوى"
               reason={selectedComplaint.severity === 'high' ? 'يتطلب التواصل الفوري مع الشريك وعملية التصعيد للعمليات المركزية.' : 'شكوى ضمن الإطار التشغيلي المعتاد، يرجى التوجيه للقسم المختص.'}
               confidence="high"
-              auditTag="UI_PREVIEW_ONLY"
+              auditTag="NEEDS_BINDING_LATER"
             />
 
             <Box style={{ marginVertical: 12 }}>
@@ -149,7 +149,7 @@ export function PartnerComplaintsWorkspace() {
             title="متابعة الشكاوى"
             reason="اختر شكوى من القائمة لاستعراض تفاصيلها وإدارتها ضمن مسار الدعم المتخصص للشركاء."
             confidence="high"
-            auditTag="UI_PREVIEW_ONLY"
+            auditTag="NEEDS_BINDING_LATER"
           />
         )}
       </Box>

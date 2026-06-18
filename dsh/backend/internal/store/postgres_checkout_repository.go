@@ -49,9 +49,14 @@ WHERE id = $1`, query.StoreID).Scan(&statusTone, &partnerReadiness)
 		}
 
 		rows, err := repo.db.QueryContext(ctx, `
-SELECT id FROM dsh_catalog_products
-WHERE store_id = $1 AND id = ANY($2)
-AND (available_override IS NULL OR available_override = TRUE)`, query.StoreID, uniqueIDs)
+SELECT p.id
+FROM dsh_catalog_products p
+LEFT JOIN dsh_catalog_overrides o
+  ON p.store_id = o.store_id
+ AND p.id = o.product_id
+WHERE p.store_id = $1
+  AND p.id = ANY($2)
+  AND (o.available_override IS NULL OR o.available_override = TRUE)`, query.StoreID, uniqueIDs)
 		if err != nil {
 			return domain.CartServiceabilityResponse{}, err
 		}

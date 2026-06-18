@@ -16,5 +16,3 @@ frontend/control-panel
 
 This directory is not a runtime/backend/API closure boundary.
 Any closure claim here still requires evidence.
-
-The legacy root under `packages/surfaces/src/service-owned/dsh` is not the current truth source for this parity slice.

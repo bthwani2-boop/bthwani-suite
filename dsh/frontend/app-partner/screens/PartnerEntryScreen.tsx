@@ -111,13 +111,6 @@ export function PartnerEntryScreen({
         variant="secondary"
         title="مدخل الشريك"
         style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={backAction ? {
-          id: 'back',
-          icon: <Icon name="arrow-back" size={24} tone="brand" />,
-          mirrorInRtl: true,
-          accessibilityLabel: 'رجوع',
-          onPress: backAction,
-        } : undefined}
       />
 
       {renderHero(state, onOpenOrdersBoardPress)}

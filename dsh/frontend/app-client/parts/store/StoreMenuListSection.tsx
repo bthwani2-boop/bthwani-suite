@@ -7,11 +7,14 @@ import {
   colorPalette,
   type BThwaniFilterRailItem,
 } from '@bthwani/ui-kit';
-import type { DshStoreFixtureItem as DshStoreGetMenuItem } from '../../../shared/dshStoreProductCardModel';
+import type { DshStoreMenuItem as DshStoreGetMenuItem } from '../../../shared/products';
+import type { DshStoreSearchCategory } from '../../../shared/stores';
+import type { DshFulfillmentDeliveryMode } from '../../../shared/checkout/dsh-client-binding.contracts';
 import { MenuItemCard } from './StoreMenuItemCard';
-import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../../../data/categories.preview-data';
-import { normalizeDisplayText } from '../../shared/store-formatting';
+import { DSH_STORE_CATEGORY_ICONS as CATEGORY_ICON } from '../../../shared/catalog/catalog.icons';
+import { normalizeDisplayText } from '../../../shared/stores';
 import { StoreFilterRailSection } from './StoreFilterRailSection';
+import type { styles as storeScreenStyles } from './store-screen.styles';
 
 const STORE_MENU_CARD_HEIGHT = 126;
 const STORE_MENU_CARD_GAP = 2;
@@ -84,6 +87,29 @@ export const StoreMenuListItem = React.memo(function StoreMenuListItem({
   );
 });
 
+type StoreMenuListSectionProps = {
+  listRef: React.RefObject<import('react-native').FlatList<DshStoreGetMenuItem> | null>;
+  scrollY: import('react-native').Animated.Value;
+  visibleItems: DshStoreGetMenuItem[];
+  categories: DshStoreSearchCategory[];
+  selectedCategory: string;
+  changeCategory: (id: string) => void;
+  listHeader: React.ReactElement;
+  headerSearchQuery: string;
+  normalizedStoreName: string;
+  storeText: { get: { emptyCategoryTitle: string; emptyCategoryDescription: string } };
+  storeLogoImageSource: import('react-native').ImageSourcePropType | string | null | undefined;
+  favoriteIds: ReadonlySet<string>;
+  openMeasurementPicker: (item: DshStoreGetMenuItem, anchor?: { x: number; y: number }) => void;
+  openImageViewer: (item: DshStoreGetMenuItem) => void;
+  handleToggleFavorite: (itemId: string) => void;
+  isDarkGlass: boolean;
+  stickyThreshold: number;
+  appearanceChrome: ReturnType<typeof import('./store-appearance-chrome').useStoreAppearanceChrome>;
+  tokens: { glassMutedText: string };
+  styles: typeof storeScreenStyles;
+};
+
 export const StoreMenuListSection = React.memo(function StoreMenuListSection({
   listRef,
   scrollY,
@@ -98,22 +124,22 @@ export const StoreMenuListSection = React.memo(function StoreMenuListSection({
   storeLogoImageSource,
   favoriteIds,
   openMeasurementPicker,
-  openImagePreview,
+  openImageViewer,
   handleToggleFavorite,
   isDarkGlass,
   stickyThreshold,
   appearanceChrome,
   tokens,
   styles,
-}: any) {
+}: StoreMenuListSectionProps) {
   const categoryRailItems = React.useMemo<BThwaniFilterRailItem[]>(
     () =>
-      categories.map((category: any) => ({
+      categories.map((category) => ({
         id: category.id,
         label: normalizeDisplayText(category.label),
         icon: CATEGORY_ICON[category.id]
-          ? <Text style={{ fontSize: 14 }}>{CATEGORY_ICON[category.id]}</Text>
-          : ({ selected }) => (
+          ? <Text role="bodyMd" style={{}}>{CATEGORY_ICON[category.id]}</Text>
+          : ({ selected }: { selected: boolean }) => (
               <Icon
                 name={
                   category.id === 'all' ? 'reorder-three-outline' :
@@ -154,15 +180,15 @@ export const StoreMenuListSection = React.memo(function StoreMenuListSection({
       partnerImageSource={storeLogoImageSource}
       isFavorited={favoriteIds.has(item.id)}
       onOpenMeasurementPicker={openMeasurementPicker}
-      onOpenImagePreview={openImagePreview}
+      onOpenImagePreview={openImageViewer}
       onToggleFavorite={handleToggleFavorite}
     />
-  ), [favoriteIds, handleToggleFavorite, openImagePreview, openMeasurementPicker, scrollY, storeLogoImageSource]);
+  ), [favoriteIds, handleToggleFavorite, openImageViewer, openMeasurementPicker, scrollY, storeLogoImageSource]);
 
   const listEmptyComponent = React.useMemo(() => (
     <View style={styles.emptyFeed}>
       <Text style={styles.emptyFeedEmoji}>{headerSearchQuery.trim() ? '🔎' : '🍽️'}</Text>
-      <Text style={styles.emptyFeedTitle}>
+      <Text weight="black" style={styles.emptyFeedTitle}>
         {headerSearchQuery.trim() ? 'لا توجد نتائج داخل هذا المتجر' : storeText.get.emptyCategoryTitle}
       </Text>
       <Text style={styles.emptyFeedText}>

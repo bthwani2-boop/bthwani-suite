@@ -70,7 +70,7 @@ type PrimaryTabConfig = {
   id: MySpacePrimaryTab;
   label: string;
   summary: string;
-  iconName: any;
+  iconName: React.ComponentProps<typeof Icon>['name'];
 };
 
 const primaryTabs: PrimaryTabConfig[] = [
@@ -89,7 +89,7 @@ const primaryTabs: PrimaryTabConfig[] = [
 interface MySpacePrimaryRowProps {
   title: string;
   subtitle: string;
-  iconName: any;
+  iconName: React.ComponentProps<typeof Icon>['name'];
   onPress?: () => void;
   isExpanded?: boolean;
   actionElement?: React.ReactNode;

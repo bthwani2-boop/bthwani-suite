@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
@@ -21,14 +21,16 @@ import {
   resolveMarketingTickerTargetLabel,
   pauseAllMarketingTickers,
   toggleMarketingTickerPinned,
-  type MarketingNewsTickerItem,
-  type MarketingNewsTickerAudience,
-  type MarketingNewsTickerPriority,
-  type MarketingNewsTickerSource,
-  type MarketingNewsTickerStatus,
-  type MarketingNewsTickerDeliveryMode,
-  type MarketingNewsTickerKind,
-} from '../../data/marketing.preview-data';
+} from '../../shared/marketing';
+import type {
+  MarketingNewsTickerKind,
+  MarketingNewsTickerStatus,
+  MarketingNewsTickerSource,
+  MarketingNewsTickerAudience,
+  MarketingNewsTickerDeliveryMode,
+  MarketingNewsTickerPriority,
+  MarketingNewsTickerItem,
+} from '../../shared/marketing';
 import { useMarketingPermissions } from './marketing-permissions.contract';
 
 /**

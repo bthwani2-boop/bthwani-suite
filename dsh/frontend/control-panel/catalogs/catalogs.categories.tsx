@@ -9,7 +9,7 @@ import {
 } from '@bthwani/ui-kit/web';
 import { dshCatalogCategories } from './catalogs.data';
 
-// UI_PREVIEW_ONLY: category governance actions — no backend/API binding.
+// SCAFFOLD: category governance actions — no backend/API binding yet.
 // control-panel/catalogs is the ONLY surface that can approve category nodes.
 
 type CategoryGovernanceAction = 'approve-node' | 'request-edit';
@@ -56,7 +56,7 @@ export function CategoriesScreen() {
       label: 'اعتماد الفئة',
       status: 'success',
       nextOwner: 'control-panel-catalog',
-      note: 'UI_PREVIEW_ONLY — لم يُحفظ في runtime/API',
+      note: 'محاكاة محلية — لم يُحفظ في runtime/API',
     });
   }, [activeNode]);
 
@@ -68,7 +68,7 @@ export function CategoriesScreen() {
       label: 'طلب تعديل',
       status: 'blocked',
       nextOwner: 'control-panel-marketing',
-      note: 'UI_PREVIEW_ONLY — يُرسل للتسويق عند تفعيل API',
+      note: 'محاكاة محلية — يُرسل للتسويق عند تفعيل API',
     });
   }, [activeNode]);
 
@@ -126,7 +126,7 @@ export function CategoriesScreen() {
             </Box>
           </div>
 
-          {/* Action result banner — UI_PREVIEW_ONLY */}
+          {/* Action result banner — SCAFFOLD */}
           {lastActionResult && (
             <div
               role="status"

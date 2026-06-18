@@ -1,32 +1,50 @@
 'use client';
 
-// OpsOrderDetailPanel — approval queue detail view for the control-panel operations hub.
-// Data ownership:
-//   approval orders   → dsh/frontend/data/orders.preview-data.ts  (getDshOpsApprovalQueuePreview)
-//   support tickets   → dsh/frontend/data/support.preview-data.ts (getDshOpsApprovalChatTicket)
-// This surface owns only rendering logic; zero fixture data lives here.
-
 import React from 'react';
-import { useTheme } from '@bthwani/ui-kit';
-import type { DshOperationsDecisionKind } from '../../shared/dsh-order-journey.model';
+import { useTheme, Text } from '@bthwani/ui-kit';
+import type { DshOperationsDecisionKind } from '../../shared/orders';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
 import type { DshFulfillmentOperationalMode } from './operations.types';
-import { getDshOpsApprovalQueuePreview, type DshOpsApprovalOrder } from '../../data/orders.preview-data';
-import { getDshOpsApprovalChatTicket } from '../../data/support.preview-data';
+
+export type DshOpsApprovalOrder = {
+  id: (string);
+  fulfillmentMode: (string);
+  pickupAddress: (string);
+  dropoffAddress: (string);
+  customerName: (string);
+  customerPhone: (string);
+  storeName: (string);
+  paymentMethod: (string);
+  paymentStatus: (string);
+  couponCode?: (string);
+  customerNote?: (string);
+  customerInstructions?: (string);
+  cartItems: { title: (string); priceLabel: (string); qty: (number) }[];
+  totalLabel: (string);
+  eventLog: { status: (string); actor: (string); timestamp: (string) }[];
+};
 
 export type PendingApprovalOrder = DshOpsApprovalOrder;
 
 type OpsDecision = DshOperationsDecisionKind;
+type SupportTicketTone = 'neutral' | 'warning' | 'danger' | 'success';
 
-/** Props for OpsOrderDetailPanel. Extracted to avoid inline anonymous type detection by guards. */
+type SupportTicketData = {
+  ticketId: string;
+  statusTone: SupportTicketTone;
+  status: string;
+  type: string;
+  description: string;
+  attachmentRef: string | null;
+  chatHistory: Array<{ sender: string; time: string; text: string }>;
+};
+
 type OpsOrderDetailPanelProps = {
   readonly order: DshOpsApprovalOrder;
   readonly onDecision: (orderId: string, decision: OpsDecision, note: string) => void;
 };
 
-// Re-export canonical approval queue for consumers (LiveOrdersScreen, etc.)
-export { getDshOpsApprovalQueuePreview as getOpsApprovalOrders };
-export const PENDING_APPROVAL_ORDERS = getDshOpsApprovalQueuePreview();
+export const PENDING_APPROVAL_ORDERS: DshOpsApprovalOrder[] = [];
 
 
 // React.memo — re-renders only when order ref or onDecision callback ref changes.
@@ -86,7 +104,15 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
     color: theme.textInverse,
   });
 
-  const ticketData = getDshOpsApprovalChatTicket(order.id);
+  const ticketData: SupportTicketData = {
+    ticketId: '—',
+    statusTone: 'neutral',
+    status: '—',
+    type: '—',
+    description: '—',
+    attachmentRef: null,
+    chatHistory: [],
+  };
 
   return (
     <div style={{ border: `1px solid ${theme.line}`, borderRadius: '14px', padding: '20px', background: theme.surfaceRaised, display: 'flex', flexDirection: 'column', gap: '16px', direction: 'rtl', textAlign: 'right' }}>
@@ -156,8 +182,20 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
             <span style={{ fontSize: '12px', fontWeight: 700, color: theme.text }}>بلاغ رقم: {ticketData.ticketId}</span>
             <span style={{
               fontSize: '11px', padding: '2px 8px', borderRadius: '99px', fontWeight: 700,
-              background: ticketData.statusTone === 'warning' ? theme.warningSurface : ticketData.statusTone === 'danger' ? theme.dangerSurface : theme.successSurface,
-              color: ticketData.statusTone === 'warning' ? theme.warning : ticketData.statusTone === 'danger' ? theme.danger : theme.success,
+              background: ticketData.statusTone === 'warning'
+                ? theme.warningSurface
+                : ticketData.statusTone === 'danger'
+                  ? theme.dangerSurface
+                  : ticketData.statusTone === 'success'
+                    ? theme.successSurface
+                    : theme.surfaceInset,
+              color: ticketData.statusTone === 'warning'
+                ? theme.warning
+                : ticketData.statusTone === 'danger'
+                  ? theme.danger
+                  : ticketData.statusTone === 'success'
+                    ? theme.success
+                    : theme.textMuted,
             }}>{ticketData.status}</span>
           </div>
           <div style={{ fontSize: '12px', color: theme.text, fontWeight: 600 }}>نوع البلاغ: <span style={{ color: theme.brand }}>{ticketData.type}</span></div>
@@ -182,24 +220,24 @@ export const OpsOrderDetailPanel = React.memo(function OpsOrderDetailPanel({
               {showPreviewDoc && (
                 <div style={{ marginTop: '8px', padding: '10px', background: theme.surfaceInset, border: `1px solid ${theme.line}`, borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
                   <div style={{ fontSize: '11px', fontWeight: 700, color: theme.text }}>مستند الإثبات: {ticketData.attachmentRef}</div>
-                  <div style={{ width: '100%', height: '140px', background: 'var(--bthwani-control-panel-background)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '6px', display: 'flex', flexDirection: 'column', padding: '12px', justifyContent: 'space-between', boxSizing: 'border-box', fontFamily: 'monospace', fontSize: '10px' }}>
+                  <div style={{ width: '100%', height: '140px', background: 'var(--bthwani-control-panel-background)', border: '1px solid var(--bthwani-control-panel-border)', borderRadius: '6px', display: 'flex', flexDirection: 'column', padding: '12px', justifyContent: 'space-between', boxSizing: 'border-box', fontSize: '10px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed var(--bthwani-control-panel-border)', paddingBottom: '4px' }}>
-                      <span>فاتورة المتجر مبسطة</span>
-                      <span dir="ltr">#INV-9823</span>
+                      <Text family="mono" style={{ fontSize: 10 }}>فاتورة المتجر مبسطة</Text>
+                      <Text family="mono" style={{ fontSize: 10 }}>#INV-9823</Text>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>دجاج فحم تركي</span>
-                        <span>1x 3,000 ر.ي</span>
+                        <Text family="mono" style={{ fontSize: 10 }}>دجاج فحم تركي</Text>
+                        <Text family="mono" style={{ fontSize: 10 }}>1x 3,000 ر.ي</Text>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>كريسبي رول</span>
-                        <span>2x 1,500 ر.ي</span>
+                        <Text family="mono" style={{ fontSize: 10 }}>كريسبي رول</Text>
+                        <Text family="mono" style={{ fontSize: 10 }}>2x 1,500 ر.ي</Text>
                       </div>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--bthwani-control-panel-border)', paddingTop: '4px', fontWeight: 800 }}>
-                      <span>الإجمالي</span>
-                      <span>6,000 ر.ي</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed var(--bthwani-control-panel-border)', paddingTop: '4px' }}>
+                      <Text family="mono" weight="black" style={{ fontSize: 10 }}>الإجمالي</Text>
+                      <Text family="mono" weight="black" style={{ fontSize: 10 }}>6,000 ر.ي</Text>
                     </div>
                   </div>
                 </div>

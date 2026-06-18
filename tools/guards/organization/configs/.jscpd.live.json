@@ -1,0 +1,21 @@
+{
+  "minTokens": 80,
+  "minLines": 8,
+  "threshold": 2,
+  "reporters": [
+    "console"
+  ],
+  "mode": "weak",
+  "ignore": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.tamagui/**",
+    "**/graphify-out/**",
+    "**/tools/registry/runs/**",
+    "**/docs/**",
+    "**/*.d.ts",
+    "**/*openapi.types.ts"
+  ]
+}

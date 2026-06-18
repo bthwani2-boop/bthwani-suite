@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Text } from '@bthwani/ui-kit';
-import { type DshUnifiedRecommendation, getDshRecommendationSeverityLabel } from '../../data/platform.preview-data';
+import { type DshUnifiedRecommendation, getDshRecommendationSeverityLabel } from './dsh-control-panel-display';
 import styles from './control-panel-surface.module.css';
 
 export type ControlPanelDshDecisionBoardProps = {

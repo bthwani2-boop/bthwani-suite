@@ -7,7 +7,7 @@ This root source folder contains bridge entrypoints only.
 Current implementation remains:
 
 ```text
-packages/ui-kit/src
+ui-kit/src
 ```
 
 No implementation should be authored here during the bridge phase.

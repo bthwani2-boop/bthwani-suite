@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
   Box,
   Button,
+  Divider,
   Surface,
   Text,
   TopBar,
@@ -14,6 +15,7 @@ import {
   StateView,
   radius,
   Icon,
+  shadowPresets,
 } from '@bthwani/ui-kit';
 
 export type DshCheckoutIntentScreenProps = {
@@ -42,9 +44,9 @@ function CheckoutContextNotice({
   body: string;
 }) {
   return (
-    <Box margin={spacing[4]} padding={spacing[4]} backgroundColor={colorPalette.surfaceInset} borderRadius={radius.md}>
+    <Box padding={4} background="surfaceInset" radiusToken="md" style={{ margin: spacing[4] }}>
       <Text role="titleSm" style={{ color: colorPalette.brandStrong, marginBottom: spacing[1] }}>{title}</Text>
-      <Text role="bodySm" style={{ color: colorPalette.textMuted, lineHeight: 20 }}>{body}</Text>
+      <Text role="bodySm" style={{ color: colorPalette.textMuted }}>{body}</Text>
     </Box>
   );
 }
@@ -115,7 +117,7 @@ export function DshCheckoutIntentScreen({
       <Surface style={styles.root}>
         <TopBar title="فشل الدفع" />
         <StateView
-          stateId="error"
+          stateId="recoverableError"
           title="تعذّر إتمام الدفع"
           description={paymentErrorMessage}
           actionLabel="إعادة المحاولة"
@@ -135,7 +137,7 @@ export function DshCheckoutIntentScreen({
       <Surface style={styles.root}>
         <TopBar title="تأكيد الطلب" />
         <StateView
-          stateId="error"
+          stateId="recoverableError"
           title="تعذّر حساب تكلفة التوصيل"
           description="تعذّر الحصول على عرض سعر التوصيل. يُرجى المحاولة مرة أخرى."
           actionLabel="إعادة المحاولة"
@@ -166,7 +168,7 @@ export function DshCheckoutIntentScreen({
       <Surface style={styles.root}>
         <TopBar title="الخدمة غير متوفرة" />
         <StateView
-          stateId="blocked"
+          stateId="blockingError"
           title="عذراً، الموقع خارج نطاق التغطية"
           description="المتجر لا يدعم التوصيل إلى عنوانك الحالي في الوقت الحالي."
           actionLabel="تغيير العنوان"
@@ -190,7 +192,7 @@ export function DshCheckoutIntentScreen({
       <TopBar title="تأكيد الطلب" />
       <ScrollView contentContainerStyle={styles.content}>
         {/* Section: Delivery Address */}
-        <Box padding={spacing[4]} borderBottomWidth={1} borderBottomColor={colorPalette.line}>
+        <Box padding={4} style={{ borderBottomWidth: 1, borderBottomColor: colorPalette.line }}>
           <View style={[styles.sectionHeader, { flexDirection: isRtl ? 'row' : 'row-reverse' }]}>
             <Pressable onPress={onChangeAddress}>
               <Text role="bodySm" style={styles.actionText}>تغيير</Text>
@@ -206,7 +208,7 @@ export function DshCheckoutIntentScreen({
         </Box>
 
         {/* Section: ETA Preview */}
-        <Box padding={spacing[4]} backgroundColor={colorPalette.surfaceInset} margin={spacing[4]} borderRadius={radius.md}>
+        <Box padding={4} background="surfaceInset" radiusToken="md" style={{ margin: spacing[4] }}>
           <View style={[styles.etaRow, { flexDirection: isRtl ? 'row' : 'row-reverse' }]}>
             <Icon name="time-outline" size={20} color={colorPalette.brandStrong} />
             <Text role="bodyMd" style={styles.etaText}>الوقت المتوقع للوصول: <Text role="titleSm" style={{ color: colorPalette.brand }}>{eta}</Text></Text>
@@ -219,7 +221,7 @@ export function DshCheckoutIntentScreen({
         />
 
         {/* Section: Payment Method */}
-        <Box padding={spacing[4]}>
+        <Box padding={4}>
           <Text role="titleMd" style={[styles.sectionTitle, { textAlign: isRtl ? 'right' : 'left' }]}>طريقة الدفع</Text>
           <View style={styles.paymentList}>
             {paymentMethods.map((method) => (
@@ -245,7 +247,7 @@ export function DshCheckoutIntentScreen({
             ))}
           </View>
           {paymentMethods.find(m => m.id === 'cod' && m.isSelected) && (
-            <Box marginTop={spacing[2]} padding={spacing[3]} backgroundColor={colorPalette.brandSurface} borderRadius={radius.sm}>
+            <Box padding={3} background="brandSurface" radiusToken="sm" style={{ marginTop: spacing[2] }}>
               <Text role="bodySm" style={{ color: colorPalette.brand, textAlign: isRtl ? 'right' : 'left' }}>
                 * سيتم إضافة رسوم بسيطة عند اختيار الدفع عند الاستلام.
               </Text>
@@ -254,7 +256,7 @@ export function DshCheckoutIntentScreen({
         </Box>
 
         {/* Section: Order Summary */}
-        <Box padding={spacing[4]} marginTop={spacing[2]}>
+        <Box padding={4} style={{ marginTop: spacing[2] }}>
           <Text role="titleMd" style={[styles.sectionTitle, { textAlign: isRtl ? 'right' : 'left' }]}>ملخص الحساب</Text>
           <View style={styles.summaryCard}>
             <View style={[styles.summaryRow, { flexDirection: isRtl ? 'row' : 'row-reverse' }]}>
@@ -265,7 +267,7 @@ export function DshCheckoutIntentScreen({
               <Text role="bodyMd" style={styles.summaryLabel}>رسوم التوصيل</Text>
               <Text role="bodyMd" style={styles.summaryValue}>{deliveryFee}</Text>
             </View>
-            <View style={styles.divider} />
+            <Divider />
             <View style={[styles.summaryRow, { flexDirection: isRtl ? 'row' : 'row-reverse' }]}>
               <Text role="titleMd" style={styles.totalLabel}>الإجمالي</Text>
               <Text role="titleMd" style={styles.totalValue}>{total}</Text>
@@ -275,7 +277,7 @@ export function DshCheckoutIntentScreen({
       </ScrollView>
 
       {/* Footer: Confirm Button */}
-      <Box padding={spacing[4]} borderTopWidth={1} borderTopColor={colorPalette.line}>
+      <Box padding={4} style={{ borderTopWidth: 1, borderTopColor: colorPalette.line }}>
         <Pressable style={styles.confirmButton} onPress={onConfirm}>
           <Text role="titleMd" style={styles.confirmButtonText}>تأكيد الطلب</Text>
         </Pressable>
@@ -314,7 +316,6 @@ const styles = StyleSheet.create({
   },
   addressText: {
     color: colorPalette.textMuted,
-    lineHeight: 22,
   },
   etaRow: {
     alignItems: 'center',
@@ -328,7 +329,7 @@ const styles = StyleSheet.create({
   },
   paymentItem: {
     height: 64,
-    borderRadius: 12,
+    borderRadius: radius.sm2,
     borderWidth: 1,
     borderColor: colorPalette.line,
     marginBottom: spacing[3],
@@ -351,7 +352,7 @@ const styles = StyleSheet.create({
   radioCircle: {
     width: 20,
     height: 20,
-    borderRadius: 10,
+    borderRadius: radius.sm,
     borderWidth: 2,
     borderColor: colorPalette.line,
     alignItems: 'center',
@@ -368,7 +369,7 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     backgroundColor: colorPalette.surfaceInset,
-    borderRadius: 16,
+    borderRadius: radius.md2,
     padding: spacing[4],
     marginTop: spacing[3],
   },
@@ -382,11 +383,6 @@ const styles = StyleSheet.create({
   summaryValue: {
     color: colorPalette.brandStrong,
   },
-  divider: {
-    height: 1,
-    backgroundColor: colorPalette.line,
-    marginVertical: spacing[2],
-  },
   totalLabel: {
     color: colorPalette.brandStrong,
   },
@@ -399,11 +395,7 @@ const styles = StyleSheet.create({
     backgroundColor: colorPalette.brandStrong,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colorPalette.brandStrong,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    ...shadowPresets.raised,
   },
   confirmButtonText: {
     color: colorPalette.white,

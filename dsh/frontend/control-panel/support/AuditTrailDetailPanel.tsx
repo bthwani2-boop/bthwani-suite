@@ -1,4 +1,4 @@
-// P0-06: Audit trail detail panel — read-only preview; real entries arrive via API binding.
+﻿// P0-06: Audit trail detail panel — read-only preview; real entries arrive via API binding.
 // Authority: control-panel/support owns audit log display. No mutation from this panel.
 // auditTag links the panel to a specific queue or ticket context for filtering.
 import React from 'react';
@@ -78,7 +78,7 @@ export function AuditTrailDetailPanel({ ticketId, auditTag }: { ticketId?: strin
   return (
     <Box gap={3}>
       <Box gap={1}>
-        <Text role="titleSm" tone="brand" style={{ fontWeight: '700' }}>سجل التدقيق</Text>
+        <Text role="titleSm" tone="brand" weight="bold" style={{ }}>سجل التدقيق</Text>
         <Box style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           {auditTag ? <Chip label={auditTag} /> : null}
           {ticketId ? <Chip label={`تذكرة: ${ticketId}`} tone="brand" /> : null}

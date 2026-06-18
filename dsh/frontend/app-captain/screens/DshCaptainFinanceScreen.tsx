@@ -1,11 +1,13 @@
 import React from 'react';
-import type { WltCaptainFinanceSection } from '../../data/dshFinancePreview';
-import { WltDshCaptainBridge } from '../../../../wlt/frontend/dsh/app-captain';
+import { WltDshCaptainBridge } from '../../shared/wlt/generated/wlt_frontend_dsh_app_captain.facade';
 import { DshOperationScreen } from '../parts/OperationScreen';
-import type { DshCaptainFinanceScreenState } from '../../data/operational-statuses.preview-data';
+import type {
+	DshCaptainFinanceScreenState,
+	DshCaptainFinanceSection,
+} from '../captain/captain.state';
 
 export type DshCaptainFinanceScreenProps = {
-	section?: WltCaptainFinanceSection;
+	section?: DshCaptainFinanceSection;
 	state?: DshCaptainFinanceScreenState;
 	onBack?: () => void;
 	onRetry?: () => void;

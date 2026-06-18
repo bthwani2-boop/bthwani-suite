@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pressable, StyleSheet, View, Image } from 'react-native';
 import {
   Badge,
@@ -17,20 +17,8 @@ import {
 } from '@bthwani/ui-kit';
 import { DshOperationScreen } from '../parts/OperationScreen';
 import { getDshCaptainFlowPolicy } from '../contracts/dshCaptainBinding.contracts';
-import { getDshFlowPolicySummary } from '../../shared/dsh-flow-registry';
+import { getDshFlowPolicySummary, resolveDshOnDemandPolicyLabel } from '../../shared/runtime/dsh-flow-registry';
 import { resolveDshControlPanelSectionLabel } from '../../shared';
-
-function resolvePodPolicyLabel(policy: ReturnType<typeof getDshCaptainFlowPolicy>): string {
-  if (policy === 'evidence-on-open') {
-    return 'أدلة عند الفتح';
-  }
-
-  if (policy === 'detail-on-open') {
-    return 'تفاصيل عند الفتح';
-  }
-
-  return 'سياسة من السجل';
-}
 
 export type DshCaptainPoDSubmissionScreenProps = {
   // ML-031: added 'retry-required' — ops rejected proof and captain must re-capture
@@ -122,7 +110,7 @@ export function DshCaptainPoDSubmissionScreen({
       title="إثبات التسليم (PoD)"
       subtitle="يجب التقاط صورة واضحة للطلب عند باب العميل أو مع المستلم."
       content={
-        <Box gap={4} style={{ paddingHorizontal: 4 }}>
+        <Box gap={4} style={{ paddingHorizontal: spacing[1] }}>
           <Box gap={3}>
             <Box layoutDirection="row" justify="space-between" align="center">
               <Badge label="إثبات مطلوب" tone="warning" />
@@ -142,7 +130,7 @@ export function DshCaptainPoDSubmissionScreen({
                     {podFlowSummary?.nextPolicyActionPreview ?? 'الإثبات أو معاينته لا يظهران إلا عند فتحهما من داخل المهمة.'}
                   </Text>
                 </Box>
-                <Badge label={resolvePodPolicyLabel(podFlowPolicy)} tone="brand" />
+                <Badge label={resolveDshOnDemandPolicyLabel(podFlowPolicy)} tone="brand" />
               </Box>
               <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
                 {`المراجعة التشغيلية النهائية يملكها ${resolveDshControlPanelSectionLabel('support')}.`}
@@ -152,7 +140,7 @@ export function DshCaptainPoDSubmissionScreen({
 
           <Divider />
 
-          <Box style={{ paddingVertical: 4, overflow: 'hidden' }}>
+          <Box style={{ paddingVertical: spacing[1], overflow: 'hidden' }}>
             <Pressable onPress={onCapturePhoto} style={styles.photoContainer}>
               {photoUri && proofPreviewVisible ? (
                 <View style={styles.previewWrapper}>

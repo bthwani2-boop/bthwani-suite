@@ -15,6 +15,7 @@ import (
 // Routes:
 //   POST   /stores/{store_id}/products         — create product
 //   GET    /stores/{store_id}/products         — list products for a store
+//   GET    /products                           — list all products (operator only)
 //   GET    /products/{id}                      — get single product
 //   PATCH  /products/{id}                      — update product identity
 
@@ -30,6 +31,7 @@ func NewProductsHandler(repository store.CatalogRepository) *ProductsHandler {
 	}
 	h.mux.HandleFunc("POST /stores/{store_id}/products", h.CreateProduct)
 	h.mux.HandleFunc("GET /stores/{store_id}/products", h.ListProducts)
+	h.mux.HandleFunc("GET /products", h.ListAllProducts)
 	h.mux.HandleFunc("GET /products/{id}", h.GetProduct)
 	h.mux.HandleFunc("PATCH /products/{id}", h.UpdateProduct)
 	return h
@@ -39,6 +41,7 @@ func RegisterProductRoutes(mux *http.ServeMux, repository store.CatalogRepositor
 	h := NewProductsHandler(repository)
 	mux.Handle("POST /stores/{store_id}/products", h)
 	mux.Handle("GET /stores/{store_id}/products", h)
+	mux.Handle("GET /products", h)
 	mux.Handle("GET /products/{id}", h)
 	mux.Handle("PATCH /products/{id}", h)
 }
@@ -134,6 +137,50 @@ func (h *ProductsHandler) ListProducts(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.repository.ListProducts(r.Context(), storeID, approvalStatus, limit, offset)
 	if err != nil {
 		log.Printf("dsh-api: list products error: %v", err)
+		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, "unable to list products")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, resp)
+}
+
+func (h *ProductsHandler) ListAllProducts(w http.ResponseWriter, r *http.Request) {
+	log.Printf("dsh-api: GET /products")
+
+	clientID := requireClientIdentity(w, r)
+	if clientID == "" {
+		return
+	}
+	if !HasRole(r, "operator") && !HasRole(r, "system") {
+		writeError(w, http.StatusForbidden, domain.ErrorCodeForbidden, "operator role required")
+		return
+	}
+
+	limit := defaultLimit
+	if rawLimit := strings.TrimSpace(r.URL.Query().Get("limit")); rawLimit != "" {
+		parsed, err := strconv.Atoi(rawLimit)
+		if err != nil || parsed < 1 || parsed > maxLimit {
+			writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "limit must be between 1 and 100")
+			return
+		}
+		limit = parsed
+	}
+
+	offset := 0
+	if rawOffset := strings.TrimSpace(r.URL.Query().Get("offset")); rawOffset != "" {
+		parsed, err := strconv.Atoi(rawOffset)
+		if err != nil || parsed < 0 {
+			writeError(w, http.StatusBadRequest, domain.ErrorCodeInvalidParameter, "offset must be >= 0")
+			return
+		}
+		offset = parsed
+	}
+
+	approvalStatus := strings.TrimSpace(r.URL.Query().Get("approval_status"))
+
+	resp, err := h.repository.ListAllProducts(r.Context(), approvalStatus, limit, offset)
+	if err != nil {
+		log.Printf("dsh-api: list all products error: %v", err)
 		writeError(w, http.StatusInternalServerError, domain.ErrorCodeInternalError, "unable to list products")
 		return
 	}

@@ -4,9 +4,8 @@ import type {
   DshHomeGetStore,
   DshHomeRecentOrder,
   DshServiceId,
-} from './dsh-home-types';
-import type { HomePromoRecord } from '../../data/marketing.preview-data';
-import type { MarketingVideoRecord } from '../../data/marketing.preview-data';
+} from '../../shared/discovery/dsh-home-types';
+import type { HomePromoRecord, MarketingVideoRecord } from '../../shared/marketing/marketing.types';
 
 export type DshHomeGetScreenProps = {
   state?: 'ready' | 'loading' | 'empty' | 'error' | 'offline' | 'disabled';

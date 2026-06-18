@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
@@ -41,7 +41,7 @@ export function CatalogProposalsBanner({ pendingProposals, dismissPreviewProposa
         }}
       >
         <Box layoutDirection="row" justify="space-between" align="center">
-          <Text role="caption" style={{ fontWeight: '800', fontSize: 13 }}>
+          <Text role="caption" weight="black" style={{ fontSize: 13 }}>
             📋 {proposal.label}
           </Text>
           <Button
@@ -55,7 +55,7 @@ export function CatalogProposalsBanner({ pendingProposals, dismissPreviewProposa
         <Text role="caption" tone="muted" style={{ fontSize: 11 }}>
           {proposal.note}
         </Text>
-        <Text role="caption" style={{ fontSize: 10, fontWeight: '600', direction: 'ltr' }}>
+        <Text role="caption" weight="semibold" style={{ fontSize: 10, direction: 'ltr' }}>
           status: {proposal.status} | owner: {proposal.owner}
           {proposal.apiBoundary ? ` | API: ${proposal.apiBoundary}` : ''}
         </Text>

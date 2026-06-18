@@ -1,9 +1,26 @@
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { Badge, Box, Button, Divider, colorPalette, Icon, MobileScrollView, ModernPremiumHeader, ScreenHeader, SearchField, StateView, Text, TopBar, useTheme } from '@bthwani/ui-kit';
+import { Badge, Box, Button, Divider, colorPalette, Icon, MobileScrollView, ModernPremiumHeader, ScreenHeader, SearchField, StateView, Text, TopBar, useTheme,
+  spacing,
+  Surface,
+  radius,
+} from '@bthwani/ui-kit';
 import { FieldStoreCard } from '../parts/FieldStoreCard';
 import { DSH_FIELD_BINDING_CONTRACTS } from '../contracts/dsh-field-binding.contracts';
-import { fieldFilterOptions, matchesFieldStoreFilter, resolveFieldFilterCounts, type FieldLeadFilter, type FieldStoreFile } from '../../data/stores.preview-data';
+import {
+  fieldFilterOptions,
+} from '../dsh-field.routes';
+import {
+  resolveFieldFilterCounts,
+} from '../field.surface-model';
+import type {
+  FieldLeadFilter,
+  FieldStoreFile,
+} from '../dsh-field.routes';
+import {
+  resolveFilteredOnboardingStores,
+  resolvePriorityOnboardingStore,
+} from '../../shared/stores/partner-onboarding-listing.model';
 
 function resolveStoresBindingLabel() {
   return 'جسر قائمة المتاجر';
@@ -21,32 +38,27 @@ type DshFieldStoresScreenProps = {
 export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onOpenAccount, onCreateStore, onRetry }: DshFieldStoresScreenProps) {
   const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = React.useState('');
+  const [showSearch, setShowSearch] = React.useState(false);
   const [activeFilter, setActiveFilter] = React.useState<FieldLeadFilter>('today');
+
+  const handleToggleSearch = React.useCallback(() => {
+    setShowSearch((prev) => {
+      const next = !prev;
+      if (!next) {
+        setSearchQuery('');
+      }
+      return next;
+    });
+  }, []);
 
   const counts = React.useMemo(() => resolveFieldFilterCounts(stores), [stores]);
 
   const filteredStores = React.useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
-
-    return stores.filter((store) => {
-      if (!matchesFieldStoreFilter(store, activeFilter)) {
-        return false;
-      }
-
-      if (!query) {
-        return true;
-      }
-
-      const haystack = `${store.name} ${store.category} ${store.location}`.toLowerCase();
-      return haystack.includes(query);
-    });
+    return resolveFilteredOnboardingStores(stores, activeFilter, searchQuery);
   }, [activeFilter, searchQuery, stores]);
 
   const priorityStore = React.useMemo(() => {
-    return filteredStores.find((store) => matchesFieldStoreFilter(store, 'ready'))
-      ?? filteredStores[0]
-      ?? stores.find((store) => matchesFieldStoreFilter(store, 'today'))
-      ?? stores[0];
+    return resolvePriorityOnboardingStore(filteredStores, stores);
   }, [filteredStores, stores]);
 
   const storesBinding = DSH_FIELD_BINDING_CONTRACTS.find((contract) => contract.surfaceId === 'stores');
@@ -72,6 +84,7 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
       <ModernPremiumHeader
         title="بثواني"
         locationLabel="الرياض · جولة المتاجر"
+        onSearchPress={handleToggleSearch}
         actions={[
           {
             id: 'account',
@@ -91,65 +104,47 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
 
       <MobileScrollView fill padding={0} gap={0} contentContainerStyle={{ paddingBottom: 128 }}>
         <Box padding={4} gap={4}>
-          {/* Section 1: خط الميداني الحالي */}
-          <Box gap={3} paddingVertical={2}>
-            <Box gap={1}>
-              <Text role="bodyStrong" style={{ textAlign: 'right' }}>خط الميداني الحالي</Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                ابدأ ببطاقة متجر واحدة، ثم الزيارة، ثم الإرسال للمراجعة دون أي لوحة عامة خارج نطاقك.
+          {/* Section 1: خط الميداني الحالي (بطاقة ذكية وديناميكية) */}
+          {priorityStore ? (
+            <Surface tone="raised" padding={4} gap={3} style={{ borderRadius: radius.md2 }}>
+              <View style={{ flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box gap={1} style={{ flex: 1, alignItems: 'flex-end' }}>
+                  <Text role="caption" tone="brand" style={{ textAlign: 'right' }}>المتجر التالي في جولتك</Text>
+                  <Text role="titleSm" style={{ textAlign: 'right' }}>{priorityStore.name}</Text>
+                  <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
+                    {priorityStore.category} · {priorityStore.location}
+                  </Text>
+                </Box>
+                <Button
+                  label="البدء الآن"
+                  size="sm"
+                  fullWidth={false}
+                  onPress={() => onOpenStore(priorityStore.id)}
+                />
+              </View>
+            </Surface>
+          ) : (
+            <Box paddingY={2} gap={1} style={{ alignItems: 'flex-end' }}>
+              <Text role="bodyStrong" tone="muted" style={{ textAlign: 'right' }}>جولتك الميدانية مكتملة</Text>
+              <Text role="bodySm" tone="soft" style={{ textAlign: 'right' }}>
+                لا توجد متاجر مجدولة حالياً. استخدم البحث أو زر الإضافة بالأسفل لإنشاء ملف جديد.
               </Text>
             </Box>
-            <Box gap={2}>
-              <Text role="bodyStrong" style={{ textAlign: 'right' }}>
-                {priorityStore ? `المتجر التالي: ${priorityStore.name}` : 'لا يوجد متجر جاهز الآن'}
-              </Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                {priorityStore
-                  ? `${priorityStore.category} · ${priorityStore.location} · ${priorityStore.nextVisitLabel}`
-                  : 'أنشئ ملفًا جديدًا أو وسّع البحث لاستئناف الجولة الميدانية.'}
-              </Text>
-              <Text role="caption" tone="soft" style={{ textAlign: 'right' }}>
-                {storesBinding
-                  ? `حالة الربط: ${resolveStoresBindingLabel()} · معاينة محلية لقائمة المتاجر والمفاضلة بينها.`
-                  : 'حالة الربط: معاينة محلية لقائمة المتاجر.'}
-              </Text>
-              {priorityStore ? (
-                <Button label="فتح المتجر التالي" onPress={() => onOpenStore(priorityStore.id)} />
-              ) : (
-                <Button label="إنشاء ملف جديد" onPress={onCreateStore} />
-              )}
-            </Box>
-          </Box>
+          )}
 
           <Divider />
 
-          {/* Section 2: مؤشر الملفات اليوم */}
-          <Box gap={3} paddingVertical={2}>
-            <Box gap={1}>
-              <Text role="bodyStrong" style={{ textAlign: 'right' }}>مؤشر الملفات اليوم</Text>
-              <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
-                تلخيص سريع للجولة الحالية وحجم المتابعة داخل ملف المتجر فقط.
-              </Text>
-            </Box>
-            <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
-              <Badge label={`اليوم ${counts.today}`} tone="brand" />
-              <Badge label={`جاهز للإضافة ${counts.ready}`} tone="success" />
-              <Badge label={`تحتاج متابعة ${counts['follow-up']}`} tone="warning" />
-              <Badge label={`مرسل ${counts.submitted}`} tone="info" />
-            </View>
-          </Box>
-
-          <Divider />
-
-          {/* Section 3: قائمة المتاجر */}
-          <Box gap={3} paddingVertical={2}>
+          {/* Section 2: قائمة المتاجر */}
+          <Box gap={3} paddingY={2}>
             <Box gap={3}>
-              <SearchField
-                label="ابحث في المتاجر"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                hint="الاسم، التصنيف، الموقع، أو الحالة"
-              />
+              {showSearch && (
+                <SearchField
+                  label="ابحث في المتاجر"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  hint="الاسم، التصنيف، الموقع، أو الحالة"
+                />
+              )}
 
               <ScrollView
                 horizontal
@@ -157,7 +152,7 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
                 nestedScrollEnabled
                 decelerationRate="fast"
                 style={{ transform: [{ scaleX: -1 }] }}
-                contentContainerStyle={{ flexDirection: 'row', gap: 8, paddingHorizontal: 2 }}
+                contentContainerStyle={{ flexDirection: 'row', gap: spacing[2], paddingHorizontal: 2 }}
               >
                 {fieldFilterOptions.map((option) => {
                   const selected = activeFilter === option.id;
@@ -178,7 +173,6 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
 
               <ScreenHeader
                 title="ملفات الانضمام"
-                subtitle="البطاقات تبقى هي وحدة العمل الأساسية للميداني، بدون popup أو صفحات تشغيلية منفصلة."
                 actionLabel="ملف جديد"
                 onActionPress={onCreateStore}
               />
@@ -189,7 +183,7 @@ export function DshFieldStoresScreen({ state = 'ready', stores, onOpenStore, onO
                     <FieldStoreCard key={store.id} store={store} onPress={() => onOpenStore(store.id)} />
                   ))
                 ) : (
-                  <Box gap={2} paddingVertical={2}>
+                  <Box gap={2} paddingY={2}>
                     <Text role="bodyStrong" style={{ textAlign: 'right' }}>لا توجد نتائج مطابقة</Text>
                     <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>
                       بقي نمط البحث والشرائح والبطاقات كما هو، لكن لا توجد بطاقة تطابق الشرط الحالي.

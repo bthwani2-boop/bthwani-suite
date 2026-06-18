@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Box, Button, Surface, Text, SearchField, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelStatusTag } from '@bthwani/ui-kit/web';
 import Image from 'next/image';
-import { getActualPublicMediaPath, explicitPublicMediaPathByKey, getMediaKeyFromPublicPath } from '../../shared/resolve-dsh-public-media-path';
-import { resolveDshImageSource } from '../../shared/resolve-dsh-image-source';
+import { getActualPublicMediaPath, getMediaKeyFromPublicPath } from '../../shared/media/resolve-dsh-public-media-path';
+import { resolveDshImageSource } from '../../shared/media/resolve-dsh-image-source';
 import type { CatalogProductMaster, CatalogMainCategory } from './catalogs.data';
 
 // --- FilterDropdown.tsx ---
@@ -80,7 +80,7 @@ export function InspectorTile({ tileTitle, children, dashed = false, warning = f
         borderStyle: dashed ? 'dashed' : 'solid',
       }}
     >
-       <Text role="caption" style={{ fontWeight: '800', color: warning ? theme.danger : theme.brandHeaderBackground }}>{tileTitle}</Text>
+       <Text role="caption" weight="black" style={{ color: warning ? theme.danger : theme.brandHeaderBackground }}>{tileTitle}</Text>
        {children}
     </Box>
   );
@@ -93,7 +93,7 @@ export function MiniInfoBox({ label, value, valueColor, isBoldValue = false }: {
   return (
     <Box gap={0}>
       <Text role="caption" tone="muted" style={{ fontSize: 10, textAlign: 'right' }}>{label}</Text>
-      <Text role="caption" style={{ color: valueColor || theme.brandHeaderBackground, fontWeight: isBoldValue ? '800' : '600', textAlign: 'right' }}>{value}</Text>
+      <Text role="caption" weight={isBoldValue ? 'black' : 'semibold'} style={{ color: valueColor || theme.brandHeaderBackground, textAlign: 'right' }}>{value}</Text>
     </Box>
   );
 }
@@ -104,7 +104,7 @@ export function PolicyBadge({ mediaPolicy }: { mediaPolicy: string }) {
   const { theme } = useTheme();
   const isCentral = mediaPolicy === 'catalog-owned-media';
   return (
-    <Text role="caption" numberOfLines={1} style={{ fontWeight: '700', color: isCentral ? theme.success : theme.warning }}>
+    <Text role="caption" numberOfLines={1} weight="bold" style={{ color: isCentral ? theme.success : theme.warning }}>
       {isCentral ? 'مركزي' : 'شريك'}
     </Text>
   );
@@ -151,7 +151,7 @@ function resolveWebImageSource(keyOrUri?: string | null): any {
   return resolved;
 }
 
-const WATERMARK_SRC = resolveWebImageSource('dsh.brand.logo.v1');
+const WATERMARK_SRC = resolveWebImageSource('brand.logo.v1');
 
 function getPremiumEmoji(name: string, fallback?: string): string {
   const n = name.toLowerCase();
@@ -219,7 +219,7 @@ export function WatermarkedImage({ src, mediaKey, fallback, size = 32, productNa
 export function SectionTitle({ children }: { children: string }) {
   const { theme } = useTheme();
   return (
-    <Text role="label" style={{ fontWeight: '800', color: theme.brandHeaderBackground, marginBottom: 4 }}>
+    <Text role="label" weight="black" style={{ color: theme.brandHeaderBackground, marginBottom: 4 }}>
       {children}
     </Text>
   );
@@ -238,7 +238,7 @@ export function ResultBanner({ result }: { result: ActionResult }) {
     : theme.text;
   return (
     <Box style={{ backgroundColor: bg, borderRadius: 8, padding: 10, marginTop: 8 }}>
-      <Text role="caption" style={{ color, fontWeight: '700' }}>{result.message}</Text>
+      <Text role="caption" weight="bold" style={{ color }}>{result.message}</Text>
     </Box>
   );
 }
@@ -252,7 +252,7 @@ export function WorkspacePreviewNotice({ bannerTitle, subtitle }: { bannerTitle:
       gap={1}
       style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.warning, borderStyle: 'dashed' }}
     >
-      <Text role="caption" style={{ color: theme.warning, fontWeight: '700' }}>
+      <Text role="caption" weight="bold" style={{ color: theme.warning }}>
         {bannerTitle}
       </Text>
       <Text role="caption" tone="muted">
@@ -271,11 +271,11 @@ export function WorkspaceSuccessBanner({ bannerTitle, subtitle, note }: { banner
       gap={1}
       style={{ borderRadius: 8, borderWidth: 1, borderColor: theme.success, borderStyle: 'solid' }}
     >
-      <Text role="caption" style={{ fontWeight: '800', color: theme.success }}>
+      <Text role="caption" weight="black" style={{ color: theme.success }}>
         {bannerTitle}
       </Text>
       {subtitle && (
-        <Text role="caption" style={{ fontWeight: '700', color: theme.brandHeaderBackground }}>
+        <Text role="caption" weight="bold" style={{ color: theme.brandHeaderBackground }}>
           {subtitle}
         </Text>
       )}
@@ -323,7 +323,7 @@ export function WorkspaceIntroBanner({
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
         <div>
-          <Text role="bodyStrong" style={{ fontSize: 16, color: theme.brandHeaderBackground, fontWeight: '800' }}>{bannerTitle}</Text>
+          <Text role="bodyStrong" weight="black" style={{ fontSize: 16, color: theme.brandHeaderBackground }}>{bannerTitle}</Text>
           <Text role="caption" tone="muted" style={{ fontSize: 11, marginTop: 4 }}>{description}</Text>
         </div>
         <span style={{ fontSize: '9px', color: theme.success, fontWeight: '700', backgroundColor: theme.brandSurface, padding: '2px 8px', borderRadius: '4px' }}>

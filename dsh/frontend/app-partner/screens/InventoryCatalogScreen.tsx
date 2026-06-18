@@ -1,21 +1,16 @@
 /**
  * InventoryCatalogScreen — Partner Surface
  *
- * UI_PREVIEW_ONLY: not runtime truth, not backend/API binding source.
- * Owner: app-partner surface (local state/overrides only)
- *
- * Catalog identity (name, mediaKey, categoryLabel, publishStage) comes from:
- *   central data: dsh/frontend/data/products.preview-data.ts
- *   via adapter:  dsh/frontend/shared/catalog-central-adapter.ts
+ * Runtime truth: GET /stores/{store_id}/products via dsh-product-api.client.ts.
+ * Falls back to workflow store (in-session submitted products) when API unreachable.
  *
  * Partner surface owns ONLY: stock, availability, preparationNote, internalNote, price override.
- * Surfaces must not define product identity independently.
+ * Catalog identity (name, category, publishStage) comes from the DSH backend — partners do not define it locally.
  */
 import React from 'react';
-import { getCanonicalPreviewProductCard } from '../../data/canonical.preview-data';
-import type { DshCanonicalProductCard } from '../../shared/dshStoreProductCardModel';
-import { createDshMediaApiHttpClient } from '../../shared/dsh-media-api.client';
-import { resolveDshProductApiBaseUrl } from '../../shared/dsh-product-api.transport';
+import type { DshCanonicalProductCard } from '../../shared/products';
+import { getDshProductRuntimeClient, getDshStoreVisibilityRuntimeClient } from '../../shared';
+import { useDshEntityMedia } from '../../shared/media/useDshEntityMedia';
 import {
   type DshCatalogDomainId,
   type DshCatalogMainCategoryId,
@@ -28,16 +23,8 @@ import {
   DSH_OPERATIONAL_FACETS,
   isDshOperationalFacet,
 } from '../../shared/catalog';
-import {
-  buildCentralPartnerInventoryItems,
-  CENTRAL_PRODUCT_DETAIL_LOOKUP,
-} from '../../shared/catalog-central-adapter';
-import {
-  createDshStoreVisibilityHttpClient,
-  resolveDshStoreVisibilityBaseUrl,
-  type DshStoreVisibilityTransportError,
-} from '../../shared/dsh-store-visibility-transport';
-import type { PartnerReadinessStatus } from '../../shared/dsh-store-visibility-client';
+import type { DshStoreVisibilityTransportError } from '../../shared/stores/dsh-store-visibility-transport';
+import type { PartnerReadinessStatus } from '../../shared/stores/dsh-store-visibility-client';
 
 import {
   BThwaniFilterRail,
@@ -47,6 +34,7 @@ import {
   Chip,
   Icon,
   KeyValueList,
+  type KeyValueItem,
   MobileScrollView,
   MobileStickyPrimaryAction,
   ProductCard as UiProductCard,
@@ -60,8 +48,9 @@ import {
   resolveRowDirection,
   useDirection,
   useTheme,
+  spacing,
 } from '@bthwani/ui-kit';
-import { resolveDshControlPanelSectionLabel } from '../../shared';
+import { resolveDshControlPanelSectionLabel } from '../../shared/runtime/dsh-control-panel-governance.map';
 import {
   type ApprovalStage,
   getPartnerQueueRecords,
@@ -70,7 +59,7 @@ import {
   translateStage,
   translateEntityType,
   canRenderInClientSurface,
-} from '../../shared/workflow';
+} from '../../shared/stores/partner/partner.workflow';
 
 
 // ── Light list model — only what is needed per row ────────────────────
@@ -101,9 +90,9 @@ type InventoryCatalogListItem = {
 type InventoryCatalogItemDetail = {
   id: string;
   sku: string;
-  gtin: string;
-  barcode: string;
-  manufacturerCode: string;
+  gtin?: string;
+  barcode?: string;
+  manufacturerCode?: string;
   canonicalProductId?: string;
   canonicalStoreId?: string;
   sourceRecordId?: string;
@@ -216,11 +205,7 @@ function applyHierarchyFilter(
 
 type InventoryCatalogDetailMap = Record<string, InventoryCatalogItemDetail>;
 
-// Detail lookup — partner operational data only.
-// Uses CENTRAL_PRODUCT_DETAIL_LOOKUP from shared adapter as the base,
-// plus the legacy prd-* ids that were previously hardcoded here.
-// PREVIEW_DERIVED_ONLY — not canonical, not runtime binding.
-const DETAIL_LOOKUP: InventoryCatalogDetailMap = CENTRAL_PRODUCT_DETAIL_LOOKUP;
+const DETAIL_LOOKUP: InventoryCatalogDetailMap = {};
 
 function getItemDetail(id: string): InventoryCatalogItemDetail | undefined {
   return DETAIL_LOOKUP[id];
@@ -258,16 +243,22 @@ function mapCanonicalToListItem(product: DshCanonicalProductCard): InventoryCata
   };
 }
 
-const canonicalPreviewListItems: readonly InventoryCatalogListItem[] = (() => {
-  const p = getCanonicalPreviewProductCard('canonical-product-field-lead-5-featured');
-  return p ? [mapCanonicalToListItem(p)] : [];
-})();
+const canonicalPreviewListItems: readonly InventoryCatalogListItem[] = [];
 
-// Central data-derived inventory items — sourced from dsh/frontend/data/products.preview-data.ts
-// via buildCentralPartnerInventoryItems adapter.
-// These replace the previously hardcoded prd-* items.
-// UI_PREVIEW_ONLY — not runtime truth.
-const centralInventoryItems: readonly InventoryCatalogListItem[] = buildCentralPartnerInventoryItems();
+const centralInventoryItems: readonly InventoryCatalogListItem[] = [];
+
+function mapApiStatusToPublishStage(approvalStatus: string): string {
+  switch (approvalStatus) {
+    case 'client_visible': return 'client-visible';
+    case 'catalog_adopted': return 'catalog-adopted';
+    case 'marketing_review': return 'marketing-review';
+    case 'partner_review': return 'partner-review';
+    case 'partner_submitted': return 'partner-submitted';
+    case 'rejected': return 'rejected';
+    case 'needs_fix': return 'needs-fix';
+    default: return approvalStatus;
+  }
+}
 
 function dedupeItems(items: ReadonlyArray<InventoryCatalogListItem>) {
   const seen = new Set<string>();
@@ -296,7 +287,7 @@ function buildListItems(canonicalStoreId?: string): InventoryCatalogListItem[] {
         isPrivateStoreProduct: isPrivate,
         isCatalogOwned: r.stage === 'client-visible' || r.stage === 'catalog-adopted',
         catalogLinked,
-        priceLabel: r.metadata?.priceLabel || '0.00 ر.ي',
+        priceLabel: (r.metadata as any)?.priceLabel || '0.00 ر.ي',
         stockCount: 0,
         available: true,
         lowStock: false,
@@ -409,16 +400,18 @@ function StoreReadinessGate({ storeId }: { storeId: string }) {
     status: 'ready',
   });
 
+  const retry = React.useCallback(() => setGate({ kind: 'idle', status: 'ready' }), []);
+
   const handleToggle = React.useCallback(
     async (nextStatus: PartnerReadinessStatus) => {
-      const baseUrl = resolveDshStoreVisibilityBaseUrl();
-      if (!baseUrl) {
+      const client = getDshStoreVisibilityRuntimeClient();
+      if (!client) {
         setGate({ kind: 'error', message: 'لم يُعثر على عنوان API — تحقق من EXPO_PUBLIC_DSH_API_BASE_URL.' });
         return;
       }
       setGate({ kind: 'loading' });
       try {
-        const client = createDshStoreVisibilityHttpClient(baseUrl);
+
         const res = await client.updatePartnerReadiness(storeId, nextStatus);
         setGate({ kind: 'success', clientVisible: res.client_visible, status: res.partner_readiness_status });
       } catch (err: unknown) {
@@ -444,7 +437,7 @@ function StoreReadinessGate({ storeId }: { storeId: string }) {
 
   return (
     <Surface tone={isReady ? 'default' : 'warning'} padding={2} gap={2} border>
-      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[2] }}>
         <Box style={{ flex: 1, gap: 2 }}>
           <Text role="bodyStrong" align={direction === 'rtl' ? 'end' : 'start'}>
             جاهزية المتجر للعميل
@@ -456,9 +449,12 @@ function StoreReadinessGate({ storeId }: { storeId: string }) {
               {gate.clientVisible ? 'true' : 'false'}
             </Text>
           ) : gate.kind === 'error' ? (
-            <Text role="caption" tone="danger" align={direction === 'rtl' ? 'end' : 'start'}>
-              {gate.message}
-            </Text>
+            <Box style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+              <Text role="caption" tone="danger" align={direction === 'rtl' ? 'end' : 'start'}>
+                {gate.message}
+              </Text>
+              <Button label="إعادة المحاولة" tone="secondary" size="sm" onPress={retry} />
+            </Box>
           ) : gate.kind === 'loading' ? (
             <Text role="caption" tone="muted" align={direction === 'rtl' ? 'end' : 'start'}>
               جاري التحديث...
@@ -690,7 +686,7 @@ function HierarchyFilterRail({
       ) : null}
 
       {hasActiveFilters && showActiveSummary ? (
-        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 6, paddingHorizontal: 4 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 6, paddingHorizontal: spacing[1] }}>
           <Text role="caption" tone="muted" numberOfLines={1} style={{ flex: 1 }}>
             {activeSummaryParts.join(' › ')}
           </Text>
@@ -715,7 +711,7 @@ function HelpBlock() {
 
   return (
     <Surface tone="inset" padding={1} gap={open ? 1 : 0} border={false}>
-      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 8 }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[2] }}>
         <Text role="caption" tone="muted" style={{ flex: 1 }} align={direction === 'rtl' ? 'end' : 'start'}>
           كيف أضيف منتجاً؟
         </Text>
@@ -796,7 +792,7 @@ function InlineLocalEdit({
         value={override.price}
         onChangeText={(v: string) => onChange('price', v)}
         placeholder="18.00"
-        dir="ltr"
+        style={{ textAlign: 'left' }}
         keyboardType="decimal-pad"
       />
       <TextField
@@ -805,7 +801,7 @@ function InlineLocalEdit({
         onChangeText={(v: string) => onChange('stock', v)}
         placeholder="42"
         keyboardType="numeric"
-        dir="ltr"
+        style={{ textAlign: 'left' }}
       />
       <TextField
         label="ملاحظة داخلية"
@@ -884,7 +880,7 @@ function DenseListRow({
       border
       style={{ borderColor, minHeight: 84 }}
     >
-      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'stretch', gap: 8 }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), alignItems: 'stretch', gap: spacing[2] }}>
         <Box
           style={{
             flex: 1.45,
@@ -928,7 +924,7 @@ function DenseListRow({
             minWidth: 78,
             justifyContent: 'center',
             alignItems: 'center',
-            gap: 4,
+            gap: spacing[1],
           }}
         >
           <Text role="caption" tone={denseStatusTone} numberOfLines={1} align="center">
@@ -993,27 +989,12 @@ function InventoryCatalogCardPanel({
 }) {
   const { direction } = useDirection();
 
-  const _mediaBaseUrl = React.useMemo(() => resolveDshProductApiBaseUrl(), []);
-  const _mediaClient = React.useMemo(
-    () => (_mediaBaseUrl ? createDshMediaApiHttpClient(_mediaBaseUrl) : null),
-    [_mediaBaseUrl],
-  );
-  const [thumbnailUrl, setThumbnailUrl] = React.useState<string | undefined>(undefined);
-  React.useEffect(() => {
-    if (!_mediaClient) return;
-    let cancelled = false;
-    _mediaClient
-      .listMedia({ owner_type: 'product', owner_id: item.id })
-      .then((resp) => {
-        if (cancelled) return;
-        const asset =
-          resp.items.find((a) => a.status === 'uploaded' && a.purpose === 'primary') ??
-          resp.items.find((a) => a.status === 'uploaded');
-        setThumbnailUrl(asset?.public_url ?? undefined);
-      })
-      .catch(() => undefined);
-    return () => { cancelled = true; };
-  }, [_mediaClient, item.id]);
+  const { assets: _productMedia } = useDshEntityMedia('product', item.id);
+  const thumbnailUrl = React.useMemo(() => {
+    const asset = _productMedia.find((a) => a.status === 'uploaded' && a.purpose === 'primary')
+      ?? _productMedia.find((a) => a.status === 'uploaded');
+    return asset?.public_url ?? undefined;
+  }, [_productMedia]);
 
   const isRejected = item.publishStage === 'rejected';
   const isNeedsFix = item.publishStage === 'needs-fix';
@@ -1031,7 +1012,7 @@ function InventoryCatalogCardPanel({
   const rejectReason = partnerRecord?.metadata?.rejectionReason ?? detail?.internalNote;
   const nextAction = resolveNextActionLabel(item.publishStage, item.available, item.stockCount);
   const summaryLine = resolveInventoryCardSummary(item);
-  const detailItems = [
+  const detailItems: KeyValueItem[] = [
     { label: 'SKU', value: detail?.sku },
     { label: 'GTIN', value: detail?.gtin },
     { label: 'الباركود', value: detail?.barcode },
@@ -1043,7 +1024,7 @@ function InventoryCatalogCardPanel({
     {
       label: 'ملكية الوسائط',
       value: item.isCatalogOwned ? 'كتالوج مركزي' : isPartnerOwnedException(item.publishStage as ApprovalStage, 'product-media') ? 'استثناء شريك' : 'بحاجة مراجعة',
-      tone: item.isCatalogOwned ? 'info' : 'warning',
+      tone: (item.isCatalogOwned ? 'info' : 'warning') as 'info' | 'warning',
     },
   ].filter((entry) => entry.value);
 
@@ -1087,7 +1068,7 @@ function InventoryCatalogCardPanel({
             </Surface>
           ) : null}
 
-          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+          <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: spacing[1] }}>
             <Button
               label={expanded ? 'إخفاء التعديل' : 'تعديل محلي'}
               size="sm"
@@ -1188,6 +1169,35 @@ function InventoryCatalogContent({
   const [items, setItems] = React.useState<InventoryCatalogListItem[]>(() =>
     buildListItems(canonicalStoreId),
   );
+
+  // Fetch live products from GET /stores/{store_id}/products
+  React.useEffect(() => {
+    if (!canonicalStoreId) return;
+    let cancelled = false;
+    const apiClient = getDshProductRuntimeClient();
+    apiClient.listProducts(canonicalStoreId, { limit: 100 })
+      .then((resp) => {
+        if (cancelled || !resp.products.length) return;
+        const liveItems = resp.products.map((p): InventoryCatalogListItem => ({
+          id: p.id,
+          name: p.name,
+          categoryLabel: p.category_id ?? 'بدون فئة',
+          isPrivateStoreProduct: false,
+          isCatalogOwned: p.approval_status === 'catalog_adopted' || p.approval_status === 'client_visible',
+          catalogLinked: true,
+          priceLabel: p.base_price_label || '0.00 ر.ي',
+          stockCount: p.stock_override ?? 0,
+          available: p.available_override ?? true,
+          lowStock: (p.stock_override ?? 0) <= 3,
+          publishStage: mapApiStatusToPublishStage(p.approval_status),
+          reviewNeeded: !['catalog_adopted', 'client_visible'].includes(p.approval_status),
+        }));
+        setItems(liveItems);
+      })
+      .catch(() => { /* keep preview items on error */ });
+    return () => { cancelled = true; };
+  }, [canonicalStoreId]);
+
   const [expandedEditId, setExpandedEditId] = React.useState<string | null>(null);
   const [expandedDetailsId, setExpandedDetailsId] = React.useState<string | null>(null);
   const [overrides, setOverrides] = React.useState<Record<string, PartnerLocalOverride>>({});
@@ -1303,18 +1313,18 @@ function InventoryCatalogContent({
   const publishLabel = reviewCount > 0 || lowStockCount > 0 ? 'مراجعة ونشر التغييرات' : 'حفظ تحديثات المخزون';
 
   return (
-    <Box gap={2} dir="rtl">
+    <Box gap={2}>
 
       {/* Store readiness gate — wires PATCH /stores/{id}/partner-readiness */}
       {canonicalStoreId ? <StoreReadinessGate storeId={canonicalStoreId} /> : null}
 
       {/* Summary tiles */}
       <Surface tone="raised" padding={1} gap={0} border={false}>
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: 4 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', alignItems: 'center', columnGap: 10, rowGap: spacing[1] }}>
           {kpiItems.map((item, index) => (
             <Box
               key={item.label}
-              style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: 4 }}
+              style={{ flexDirection: resolveRowDirection(direction), alignItems: 'center', gap: spacing[1] }}
             >
               <Text role="caption" tone="muted" numberOfLines={1}>{item.label}</Text>
               <Text role="label" tone={item.tone} numberOfLines={1}>{item.value}</Text>
@@ -1332,7 +1342,7 @@ function InventoryCatalogContent({
           onChangeText={setQuery}
           placeholder="اسم المنتج، SKU، GTIN، الباركود"
         />
-        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: 4 }}>
+        <Box style={{ flexDirection: resolveRowDirection(direction), flexWrap: 'wrap', gap: spacing[1] }}>
           <Button label="مسح باركود" tone="secondary" size="sm" fullWidth={false}
             onPress={() => handleBarcodeScanPreviewResult(query)} />
           <Button label="إدخال جماعي" tone="secondary" size="sm" fullWidth={false}
@@ -1472,7 +1482,7 @@ function InventoryCatalogContent({
               value={bulkPrice.value}
               onChangeText={(v: string) => { setBulkPrice({ ...bulkPrice, value: v }); setBulkPreviewMessage(null); }}
               placeholder={bulkPrice.kind === 'percent' ? '+10' : '+2.00'}
-              dir="ltr"
+              style={{ textAlign: 'left' }}
               keyboardType="decimal-pad"
             />
             <Button
@@ -1543,17 +1553,6 @@ export function InventoryCatalogScreen({ onBack, canonicalStoreId = 'store-1001'
         variant="secondary"
         title="كتالوج المخزون"
         style={{ marginHorizontal: -16, marginTop: -16 }}
-        trailingAction={
-          onBack
-            ? {
-                id: 'back',
-                icon: <Icon name="arrow-back" size={24} tone="brand" />,
-                mirrorInRtl: true,
-                accessibilityLabel: 'رجوع',
-                onPress: onBack,
-              }
-            : undefined
-        }
       />
       <Surface tone="inset" padding={3} gap={2}>
         <Text role="bodyStrong" style={{ textAlign: 'right' }}>
@@ -1564,7 +1563,7 @@ export function InventoryCatalogScreen({ onBack, canonicalStoreId = 'store-1001'
         </Text>
       </Surface>
 
-      <Box style={{ flexDirection: resolveRowDirection(direction), gap: 8, justifyContent: 'flex-start', marginVertical: 4 }}>
+      <Box style={{ flexDirection: resolveRowDirection(direction), gap: spacing[2], justifyContent: 'flex-start', marginVertical: 4 }}>
         {props.onNavigateToCategoryManagement ? (
           <Button
             label="إدارة هيكلية الفئات"

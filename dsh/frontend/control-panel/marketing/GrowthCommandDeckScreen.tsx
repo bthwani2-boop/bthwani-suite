@@ -5,15 +5,23 @@ import { StyleSheet, View } from 'react-native';
 import { Box, Button, Surface, Text, useTheme } from '@bthwani/ui-kit';
 import { WebControlPanelCompactPager } from '@bthwani/ui-kit/web';
 import { useRouter } from 'next/navigation';
-import {
-  getGrowthRecommendations,
-  type GrowthRecommendation,
-} from '../../data/marketing.preview-data';
-import { mapStoreCommercialFeatures } from '../../shared/store-card-commercial-map';
-import { CommercialParityPreview } from './commercial-parity-preview';
-import { getPartnerOfferItems, type PartnerOfferRecord } from '../../data/offers.preview-data';
-import type { SubscriptionPlan, Entitlement } from '../../data/subscriptions.preview-data';
-import type { CampaignRecord } from '../../data/marketing.preview-data';
+type GrowthRecommendation = {
+  id: string;
+  type: string;
+  severity: string;
+  title: string;
+  description: string;
+  owner: string;
+  source: string;
+  affectedSurface: string;
+  confidence: string;
+  nextAction: string;
+  actionTargetTab: string;
+};
+import { mapStoreCommercialFeatures } from '../../shared/marketing';
+import { CommercialParityPreview } from './commercial-parity-viewer';
+import type { CampaignRecord, SubscriptionPlan, Entitlement } from '../../shared/marketing';
+import type { PartnerOfferRecord } from '../../shared/stores/partner/dsh-partner-offer-types';
 
 
 
@@ -110,7 +118,7 @@ function getActionTabLabel(tab: string): string {
 export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab }: GrowthCommandDeckScreenProps) {
   const { theme } = useTheme();
   const router = useRouter();
-  const recommendations = React.useMemo(() => getGrowthRecommendations(), []);
+  const recommendations = React.useMemo<GrowthRecommendation[]>(() => [], []);
   const [selectedRecId, setSelectedRecId] = React.useState<string | null>(recommendations[0]?.id || null);
   const [recommendationsPage, setRecommendationsPage] = React.useState(1);
   const sortedRecommendations = React.useMemo(
@@ -156,7 +164,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
 
   const parityContext = React.useMemo(() => ({
     storeId: 'preview-store-1',
-    activeOffers: getPartnerOfferItems().filter(o => o.status === 'published').slice(0, 2) as PartnerOfferRecord[],
+    activeOffers: [] as PartnerOfferRecord[],
     activeSubscriptions: [{ id: 'sub-pro', name: 'اشتراك برو', monthlyFee: 0, features: [], status: 'active' }] as SubscriptionPlan[],
     activeEntitlements: [{ id: 'ent-1', type: 'loyalty-reward', referenceId: 'sub-pro', status: 'active', source: 'loyalty' }] as Entitlement[],
     activeCampaigns: [] as CampaignRecord[],
@@ -192,11 +200,9 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
     },
     detailLabel: {
       color: theme.textMuted,
-      fontWeight: '700',
     },
     detailValue: {
       color: theme.brandHeaderBackground,
-      fontWeight: '800',
     }
   }), [theme]);
 
@@ -205,8 +211,8 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
       <Surface tone="raised" gap={2} style={{ borderRadius: 16, borderWidth: 1, borderColor: theme.line, padding: 16 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <Box gap={1} style={{ flex: 1 }}>
-            <Text role="caption" style={{ color: theme.brandHeaderBackground, fontWeight: '800', letterSpacing: 0.5, textAlign: 'right' }}>مركز ذكاء النمو</Text>
-            <Text role="titleLg" style={{ fontSize: 24, fontWeight: '900', textAlign: 'right' }}>التوصيات والفرص الذكية</Text>
+            <Text role="caption" weight="black" style={{ color: theme.brandHeaderBackground, letterSpacing: 0.5, textAlign: 'right' }}>مركز ذكاء النمو</Text>
+            <Text role="titleLg" weight="black" style={{ textAlign: 'right' }}>التوصيات والفرص الذكية</Text>
             <Text role="bodySm" tone="muted" style={{ textAlign: 'right' }}>يتم استنتاج هذه التوصيات بناءً على تحليل فجوات الكتالوج، الحملات، والولاء.</Text>
           </Box>
           <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -218,7 +224,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
 
       <Surface tone="inset" gap={3} style={{ borderRadius: 16, padding: 16, backgroundColor: theme.surfaceInset }}>
         <Box gap={1}>
-          <Text role="titleSm" style={{ color: theme.brandHeaderBackground, fontWeight: '800' }}>معاينة التوافق التجاري</Text>
+          <Text role="titleSm" weight="black" style={{ color: theme.brandHeaderBackground }}>معاينة التوافق التجاري</Text>
           <Text role="caption" tone="muted">يتم فحص مصادر البيانات لضمان عدم ظهور شارات بدون تصريح أو تضارب بين الحملات.</Text>
         </Box>
         <CommercialParityPreview features={parityFeatures} storeName="متجر النخبة (معاينة)" />
@@ -261,7 +267,7 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
                         </View>
                         <Box style={{ flex: 1 }}>
                           <Text role="bodyStrong" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>{rec.title}</Text>
-                          <Text role="caption" style={{ color: getSeverityColor(rec.severity), fontWeight: '800', marginTop: 2, textAlign: 'right' }}>
+                          <Text role="caption" weight="black" style={{ color: getSeverityColor(rec.severity), marginTop: 2, textAlign: 'right' }}>
                             الأهمية: {getSeverityLabel(rec.severity)}
                           </Text>
                           <Button label="عرض" size="sm" tone="ghost" onPress={() => setSelectedRecId(rec.id)} style={{ alignSelf: 'flex-start', marginTop: 4 }} />
@@ -288,38 +294,38 @@ export function GrowthCommandDeckScreen({ hubHref, operationsHref, setActiveTab 
               <Surface tone="raised" gap={4} style={styles.columnSurface}>
                 <View style={styles.headerRow}>
                   <Text role="titleSm" style={{ color: theme.brandHeaderBackground }}>تفاصيل التوصية</Text>
-                  <Text role="caption" style={{ backgroundColor: theme.surfaceInset, paddingVertical: 2, paddingHorizontal: 8, borderRadius: 4, fontWeight: '800' }}>{selectedRec.id}</Text>
+                  <Text role="caption" weight="black" style={{ backgroundColor: theme.surfaceInset, paddingVertical: 2, paddingHorizontal: 8, borderRadius: 4 }}>{selectedRec.id}</Text>
                 </View>
 
                 <Box gap={2}>
-                  <Text role="titleMd" style={{ color: theme.brandHeaderBackground, fontWeight: '900', textAlign: 'right' }}>{selectedRec.title}</Text>
-                  <Text role="bodyMd" tone="muted" style={{ lineHeight: 22, textAlign: 'right' }}>{selectedRec.description}</Text>
+                  <Text role="titleMd" weight="black" style={{ color: theme.brandHeaderBackground, textAlign: 'right' }}>{selectedRec.title}</Text>
+                  <Text role="bodyMd" tone="muted" style={{ textAlign: 'right' }}>{selectedRec.description}</Text>
                 </Box>
 
                 <Surface tone="inset" padding={3} gap={3} style={{ borderRadius: 12 }}>
-                  <Text role="caption" tone="muted" style={{ fontWeight: '800', textAlign: 'right' }}>تحليل المصدر والأثر</Text>
+                  <Text role="caption" tone="muted" weight="black" style={{ textAlign: 'right' }}>تحليل المصدر والأثر</Text>
                   <Box gap={2}>
                     <View style={styles.detailRow}>
-                      <Text role="caption" style={styles.detailLabel}>المالك:</Text>
-                      <Text role="caption" style={styles.detailValue}>{selectedRec.owner}</Text>
+                      <Text role="caption" weight="bold" style={styles.detailLabel}>المالك:</Text>
+                      <Text role="caption" weight="black" style={styles.detailValue}>{selectedRec.owner}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <Text role="caption" style={styles.detailLabel}>المصدر:</Text>
-                      <Text role="caption" style={styles.detailValue}>{selectedRec.source}</Text>
+                      <Text role="caption" weight="bold" style={styles.detailLabel}>المصدر:</Text>
+                      <Text role="caption" weight="black" style={styles.detailValue}>{selectedRec.source}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <Text role="caption" style={styles.detailLabel}>السطح المتأثر:</Text>
-                      <Text role="caption" style={styles.detailValue}>{selectedRec.affectedSurface}</Text>
+                      <Text role="caption" weight="bold" style={styles.detailLabel}>السطح المتأثر:</Text>
+                      <Text role="caption" weight="black" style={styles.detailValue}>{selectedRec.affectedSurface}</Text>
                     </View>
                     <View style={styles.detailRow}>
-                      <Text role="caption" style={styles.detailLabel}>الموثوقية:</Text>
-                      <Text role="caption" style={{ ...styles.detailValue, color: theme.success }}>{getConfidenceLabel(selectedRec.confidence)}</Text>
+                      <Text role="caption" weight="bold" style={styles.detailLabel}>الموثوقية:</Text>
+                      <Text role="caption" weight="black" style={{ ...styles.detailValue, color: theme.success }}>{getConfidenceLabel(selectedRec.confidence)}</Text>
                     </View>
                   </Box>
                 </Surface>
 
                 <Box gap={3} style={{ marginTop: 'auto' }}>
-                  <Text role="caption" tone="muted" style={{ fontWeight: '800', textAlign: 'right' }}>الإجراء القادم المقترح</Text>
+                  <Text role="caption" tone="muted" weight="black" style={{ textAlign: 'right' }}>الإجراء القادم المقترح</Text>
                   <Button
                     label={selectedRec.nextAction}
                     tone="primary"

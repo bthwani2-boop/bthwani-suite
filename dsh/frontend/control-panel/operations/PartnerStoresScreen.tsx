@@ -12,53 +12,117 @@ import { Box } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 import { buildOperationsHref } from './operations.registry';
 import {
-  createDshStoreVisibilityHttpClient,
-  resolveDshStoreVisibilityBaseUrl,
-} from '../../shared/dsh-store-visibility-transport';
+  getDshDiscoveryStoresRuntimeClient,
+  getDshStoreVisibilityRuntimeClient,
+  isDshDiscoveryStoresOfflineError,
+  resolveDshDiscoveryStoresRuntimeConfig,
+} from '../../shared';
 
 export type PartnerStoresScreenProps = { hubHref: string; subGroup?: string; };
 
-import { PARTNER_STORES_PREVIEW } from '../../data';
+// Minimal API response shape from GET /stores (DiscoveryStore in dsh.openapi.yaml)
+type ApiDiscoveryStore = {
+  id: string;
+  name: string;
+  address: string;
+  status_label: string;
+  status_tone: 'open' | 'closed';
+  delivery_label: string;
+  service_label: string;
+  has_offer: boolean;
+  publish_stage: string;
+};
 
-const STORES = [
-  ...PARTNER_STORES_PREVIEW,
-  {
-    id: 'store-1001',
-    name: 'Haddah Central Market',
-    branch: 'Sanaa',
-    status: 'مفتوح',
-    deliveryMode: 'bthwani_delivery' as const,
-    prepTime: '15 دقيقة',
-    readyOrders: 2,
+type CpStoreRow = {
+  id: string;
+  name: string;
+  branch: string;
+  status: string;
+  deliveryMode: 'bthwani_delivery' | 'partner_delivery';
+  prepTime: string;
+  readyOrders: number;
+  issue: string;
+  suggestion: {
+    label: string;
+    reason: string;
+    confidence: 'high' | 'medium' | 'low';
+    action: string;
+    secondary: string | null;
+    auditRequired: boolean;
+  };
+  statusTone: 'success' | 'warning' | 'danger' | 'neutral';
+};
+
+function mapApiStoreToCpRow(s: ApiDiscoveryStore): CpStoreRow {
+  return {
+    id: s.id,
+    name: s.name,
+    branch: s.address,
+    status: s.status_tone === 'open' ? 'مفتوح' : 'مغلق',
+    deliveryMode: 'bthwani_delivery',
+    prepTime: '—',
+    readyOrders: 0,
     issue: '',
     suggestion: {
-      label: 'لا تدخل مطلوب',
-      reason: 'وضع المتجر مستقر',
-      confidence: 'high' as const,
+      label: 'راجع بوابات الرؤية',
+      reason: `${s.service_label} — ${s.delivery_label}`,
+      confidence: 'high',
       action: 'عرض التفاصيل',
       secondary: null,
       auditRequired: false,
     },
-    statusTone: 'success' as const,
-  },
-];
+    statusTone: s.status_tone === 'open' ? 'success' : 'neutral',
+  };
+}
 
 export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: PartnerStoresScreenProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlStoreId = searchParams.get('orderId') ?? null;
   const [selectedStoreId, setSelectedStoreId] = React.useState<string | null>(null);
+  const [storesSource, setStoresSource] = React.useState<'loading' | 'api' | 'api-error' | 'offline'>('loading');
+  const [retryCount, setRetryCount] = React.useState(0);
+  const retry = React.useCallback(() => setRetryCount((n) => n + 1), []);
 
-  const [rows, setRows] = React.useState(() =>
-    STORES.map((store) => ({
-      ...store,
-      customStatus: null as string | null,
-      customStatusTone: null as 'warning' | 'success' | 'danger' | 'neutral' | null,
-    }))
-  );
+  const [rows, setRows] = React.useState<Array<CpStoreRow & { customStatus: string | null; customStatusTone: 'warning' | 'success' | 'danger' | 'neutral' | null }>>([]);
+
+  // Fetch live stores from the configured DSH runtime.
+  React.useEffect(() => {
+    const config = resolveDshDiscoveryStoresRuntimeConfig();
+    if (!config) {
+      setRows([]);
+      setStoresSource('offline');
+      return;
+    }
+
+    let cancelled = false;
+    const client = getDshDiscoveryStoresRuntimeClient(config);
+    setStoresSource('loading');
+
+    client.listDiscoveryStores({ limit: 100 })
+      .then((data) => {
+        if (cancelled) return;
+        setRows(data.stores.map((store) => ({
+          ...mapApiStoreToCpRow(store),
+          customStatus: null,
+          customStatusTone: null,
+        })));
+        setStoresSource('api');
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          const isOffline =
+            isDshDiscoveryStoresOfflineError(err) ||
+            !globalThis.navigator?.onLine;
+          setStoresSource(isOffline ? 'offline' : 'api-error');
+        }
+      });
+
+    return () => { cancelled = true; };
+  }, [retryCount]);
 
   React.useEffect(() => {
-    if (urlStoreId && STORES.some((s) => s.id === urlStoreId)) {
+    if (urlStoreId && rows.some((s) => s.id === urlStoreId)) {
       setSelectedStoreId(urlStoreId);
     }
   }, [urlStoreId]);
@@ -75,8 +139,8 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
 
   const handleCatalogApproval = React.useCallback(
     async (storeId: string, approve: boolean) => {
-      const baseUrl = resolveDshStoreVisibilityBaseUrl();
-      if (!baseUrl) {
+      const client = getDshStoreVisibilityRuntimeClient();
+      if (!client) {
         setCatalogGateStatus('error');
         setCatalogGateFeedback('لم يُعثر على عنوان API — تحقق من NEXT_PUBLIC_DSH_API_BASE_URL.');
         return;
@@ -84,7 +148,7 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
       setCatalogGateStatus('loading');
       setCatalogGateFeedback(null);
       try {
-        const client = createDshStoreVisibilityHttpClient(baseUrl);
+
         const status = approve ? 'approved' : 'rejected';
         const res = await client.updateCatalogApproval(storeId, status, status);
         setCatalogGateStatus(approve ? 'approved' : 'rejected');
@@ -107,8 +171,8 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
 
   const handleMarketingVisibility = React.useCallback(
     async (storeId: string, activate: boolean) => {
-      const baseUrl = resolveDshStoreVisibilityBaseUrl();
-      if (!baseUrl) {
+      const client = getDshStoreVisibilityRuntimeClient();
+      if (!client) {
         setMarketingGateStatus('error');
         setMarketingGateFeedback('لم يُعثر على عنوان API — تحقق من NEXT_PUBLIC_DSH_API_BASE_URL.');
         return;
@@ -116,7 +180,7 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
       setMarketingGateStatus('loading');
       setMarketingGateFeedback(null);
       try {
-        const client = createDshStoreVisibilityHttpClient(baseUrl);
+
         const status = activate ? 'active' : 'inactive';
         const res = await client.updateMarketingVisibility(storeId, status);
         setMarketingGateStatus(activate ? 'active' : 'inactive');
@@ -131,51 +195,67 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
     [],
   );
 
-  const handleTriggerAction = React.useCallback((storeId: string, actionLabel: string) => {
+  const handleTriggerAction = React.useCallback(async (storeId: string, actionLabel: string) => {
     setActionStatus('pending');
     setActionFeedback(null);
 
-    setTimeout(() => {
+    if (actionLabel === 'تواصل' || actionLabel === 'تواصل مع المتجر') {
       setActionStatus('success');
-
-      let feedback = `تمت عملية (${actionLabel}) بنجاح.`;
-      let statusUpdate: string | null = null;
-      let statusToneUpdate: 'warning' | 'success' | 'danger' | 'neutral' | null = null;
-
-      if (actionLabel === 'إيقاف مؤقت' || actionLabel === 'إيقاف استقبال') {
-        statusUpdate = 'موقف مؤقتاً';
-        statusToneUpdate = 'danger';
-        feedback = 'تم إيقاف استقبال الطلبات للمتجر مؤقتاً بنجاح.';
-      } else if (actionLabel === 'تحديث الجاهزية' || actionLabel === 'مستقر' || actionLabel === 'تنشيط استقبال') {
-        statusUpdate = 'مفتوح';
-        statusToneUpdate = 'success';
-        feedback = 'تم تحديث حالة جاهزية المتجر إلى مستقر بنجاح.';
-      } else if (actionLabel === 'تواصل' || actionLabel === 'تواصل مع المتجر') {
-        feedback = 'تم بدء تواصل الدعم الفوري مع إدارة المتجر بنجاح.';
-      }
-
-      setActionFeedback(feedback);
-
+      setActionFeedback('تم بدء تواصل الدعم الفوري مع إدارة المتجر.');
       setTimeout(() => {
-        if (statusUpdate) {
-          setRows((prevRows) =>
-            prevRows.map((r) =>
-              r.id === storeId
-                ? {
-                    ...r,
-                    customStatus: statusUpdate,
-                    customStatusTone: statusToneUpdate,
-                  }
-                : r
-            )
-          );
-        }
+        setActionStatus('idle');
+        setActionFeedback(null);
+      }, 1500);
+      return;
+    }
+
+    const client = getDshStoreVisibilityRuntimeClient();
+    if (!client) {
+      setActionStatus('idle');
+      setActionFeedback('لم يُعثر على عنوان API — تحقق من NEXT_PUBLIC_DSH_API_BASE_URL.');
+      return;
+    }
+
+    try {
+
+      const isPause = actionLabel === 'إيقاف مؤقت' || actionLabel === 'إيقاف استقبال';
+      const nextReadiness = isPause ? ('paused' as const) : ('ready' as const);
+      const res = await client.updatePartnerReadiness(storeId, nextReadiness);
+
+      const isNowPaused = res.partner_readiness_status === 'paused';
+      const newStatus = isNowPaused ? 'موقف مؤقتاً' : 'مفتوح';
+      const newStatusTone = (isNowPaused ? 'danger' : 'success') as 'danger' | 'success';
+
+      setRows((prevRows) =>
+        prevRows.map((r) =>
+          r.id === storeId
+            ? { ...r, customStatus: newStatus, customStatusTone: newStatusTone }
+            : r
+        )
+      );
+      setActionStatus('success');
+      setActionFeedback(
+        isNowPaused
+          ? 'تم إيقاف استقبال الطلبات مؤقتاً.'
+          : 'تم تنشيط استقبال الطلبات.',
+      );
+      setTimeout(() => {
         setActionStatus('idle');
         setActionFeedback(null);
         setSelectedStoreId(null);
         router.push(buildOperationsHref('partner-stores'));
       }, 1200);
-    }, 1000);
+    } catch (err: unknown) {
+      const typedErr = err as { kind?: string; status?: number };
+      const msg =
+        typedErr.kind === 'offline'
+          ? 'لا يوجد اتصال بالشبكة.'
+          : typedErr.kind === 'http'
+            ? `خطأ من الخادم (${typedErr.status}).`
+            : 'حدث خطأ غير متوقع.';
+      setActionStatus('idle');
+      setActionFeedback(msg);
+    }
   }, [router]);
 
   // Inspector component
@@ -397,12 +477,27 @@ export function PartnerStoresScreen({ hubHref: _hubHref, subGroup: _subGroup }: 
     <Box gap={3}>
       <div className={styles.surfaceSectionHeader}>
         <h2 className={styles.surfaceSectionTitle}>المتاجر والشركاء</h2>
+        {storesSource === 'api' && (
+          <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-success)', fontWeight: 700 }}>
+            ● مصدر حي — GET /stores
+          </span>
+        )}
+        {storesSource === 'api-error' && (
+          <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-warning)', fontWeight: 700 }}>
+            ⚠ API غير متاح — بيانات معاينة
+          </span>
+        )}
+        {storesSource === 'loading' && (
+          <span style={{ fontSize: '11px', color: 'var(--bthwani-control-panel-text-muted)' }}>
+            جارٍ التحميل من API...
+          </span>
+        )}
       </div>
 
       <WebControlPanelKpiStrip
         items={[
-          { id: 'open', label: 'مفتوحة الآن', value: '١٤٢', tone: 'success' },
-          { id: 'closed', label: 'مغلقة', value: '٣٨', tone: 'neutral' },
+          { id: 'open', label: 'مفتوحة الآن', value: String(rows.filter(r => (r.customStatus ?? r.status) === 'مفتوح').length), tone: 'success' },
+          { id: 'closed', label: 'مغلقة', value: String(rows.filter(r => (r.customStatus ?? r.status) === 'مغلق').length), tone: 'neutral' },
           { id: 'surged', label: 'متاجر مضغوطة', value: String(rows.filter(r => r.customStatus === 'مضغوط' || (r.status === 'مضغوط' && !r.customStatus)).length), tone: 'warning' },
           { id: 'delay', label: 'تأخير التجهيز', value: String(rows.filter(r => r.customStatus === 'تأخير' || (r.status === 'تأخير' && !r.customStatus)).length), tone: 'danger' },
           { id: 'suspended', label: 'موقوفة مؤقتاً', value: String(rows.filter(r => r.customStatus === 'موقف مؤقتاً').length), tone: 'danger' },

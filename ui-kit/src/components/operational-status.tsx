@@ -32,6 +32,7 @@ export type OperationalStatusHeroProps = {
   routeValue?: React.ReactNode;
   nextStepLabel?: string;
   nextStepValue?: React.ReactNode;
+  items?: readonly KeyValueItem[];
 };
 
 export function OperationalStatusHero({
@@ -43,14 +44,17 @@ export function OperationalStatusHero({
   routeValue,
   nextStepLabel,
   nextStepValue,
+  items,
 }: OperationalStatusHeroProps) {
   const { direction } = useDirection();
   const { theme } = useTheme();
 
-  const heroItems: KeyValueItem[] = [
-    routeLabel && routeValue != null ? { label: routeLabel, value: routeValue, tone: 'brand' } : null,
-    nextStepLabel && nextStepValue != null ? { label: nextStepLabel, value: nextStepValue, tone: 'warning' } : null,
-  ].filter(Boolean) as KeyValueItem[];
+  const heroItems: KeyValueItem[] = items
+    ? (items as KeyValueItem[])
+    : ([
+        routeLabel && routeValue != null ? { label: routeLabel, value: routeValue, tone: 'brand' } : null,
+        nextStepLabel && nextStepValue != null ? { label: nextStepLabel, value: nextStepValue, tone: 'warning' } : null,
+      ].filter(Boolean) as KeyValueItem[]);
 
   return (
     <Surface

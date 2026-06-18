@@ -283,51 +283,6 @@
       ]
     },
     {
-      "id": "GUARD_SERVICE_FRONTEND_FIXTURE_MEDIA_IDENTITY",
-      "file": "tools/guards/guard-service-frontend-fixture-media-identity.mjs",
-      "config": "tools/guards/guard-service-frontend-fixture-media-identity.config.json",
-      "ownerPolicy": [
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "purpose": "detect service frontend fixture/media identity drift and report immediate remediation paths",
-      "runners": [
-        "governance"
-      ],
-      "mode": "advisory changed-files-blocking",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "service",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "dsh/**",
-        "wlt/**",
-        "knz/**",
-        "arb/**",
-        "amn/**",
-        "esf/**",
-        "mrf/**",
-        "snd/**",
-        "kwd/**",
-        "tools/guards/guard-service-frontend-fixture-media-identity.mjs",
-        "tools/guards/guard-service-frontend-fixture-media-identity.config.json",
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "triggerExtensions": [
-        ".ts",
-        ".tsx",
-        ".js",
-        ".jsx",
-        ".json",
-        ".jsonc",
-        ".md",
-        ".yml",
-        ".yaml"
-      ]
-    },
-    {
       "id": "GUARD_API_BINDING_RUNTIME",
       "file": "tools/guards/guard-api-binding-runtime.mjs",
       "ownerPolicy": [
@@ -500,100 +455,6 @@
       ]
     },
     {
-      "id": "GUARD_STEWARD_V3",
-      "file": "tools/guards/guard-steward-v3.mjs",
-      "ownerPolicy": [
-        "governance/14_GUARDS_CATALOG.md",
-        "governance/13_CI_AND_GATES.md"
-      ],
-      "purpose": "validate additive V3 guard system health without replacing existing guards",
-      "runners": [
-        "v3"
-      ],
-      "mode": "advisory",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "tools/guards/**",
-        "governance/14_GUARDS_CATALOG.md"
-      ],
-      "triggerExtensions": [
-        ".mjs",
-        ".json",
-        ".md",
-        ".ps1"
-      ]
-    },
-    {
-      "id": "GUARD_PHASE_SCOPE_V3",
-      "file": "tools/guards/guard-phase-scope-v3.mjs",
-      "ownerPolicy": [
-        "governance/09_API_BINDING_RUNTIME.md",
-        "governance/24_TRACEABILITY_AND_ROADMAP.md"
-      ],
-      "purpose": "phase-aware scope guard for UI/UX, API, runtime, and production stages",
-      "runners": [
-        "v3"
-      ],
-      "mode": "phase-aware",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "governance/24_TRACEABILITY_AND_ROADMAP.md",
-        "governance/09_API_BINDING_RUNTIME.md"
-      ],
-      "triggerExtensions": [
-        ".md",
-        ".json"
-      ]
-    },
-    {
-      "id": "GUARD_UIUX_RATCHET_V3",
-      "file": "tools/guards/guard-uiux-ratchet-v3.mjs",
-      "ownerPolicy": [
-        "governance/08_UI_KIT_AND_BRAND.md",
-        "governance/24_TRACEABILITY_AND_ROADMAP.md"
-      ],
-      "purpose": "UI/UX ratchet guard for central colors, RTL, ui-kit ownership, local design drift, and touched-scope discipline",
-      "runners": [
-        "v3"
-      ],
-      "mode": "audit",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "ui-kit/**",
-        "dsh/**",
-        "wlt/**",
-        "app-client/runtime/**",
-        "app-partner/runtime/**",
-        "governance/08_UI_KIT_AND_BRAND.md"
-      ],
-      "triggerExtensions": [
-        ".ts",
-        ".tsx",
-        ".js",
-        ".jsx",
-        ".mjs",
-        ".css"
-      ]
-    },
-    {
       "id": "GUARD_PLATFORM_VARS_CONTROL",
       "file": "tools/guards/guard-platform-vars-control.mjs",
       "config": "tools/guards/guard-platform-vars-control.config.json",
@@ -627,36 +488,6 @@
         ".jsx",
         ".json",
         ".md"
-      ]
-    },
-    {
-      "id": "GUARD_RELEASE_READINESS_V3",
-      "file": "tools/guards/guard-release-readiness-v3.mjs",
-      "ownerPolicy": [
-        "governance/11_EVIDENCE_AND_TRACEABILITY.md",
-        "governance/13_CI_AND_GATES.md"
-      ],
-      "purpose": "release readiness evidence, diff, warning, rollback, and guard-result aggregation",
-      "runners": [
-        "v3"
-      ],
-      "mode": "advisory",
-      "outputs": [
-        "json",
-        "md"
-      ],
-      "alwaysRun": false,
-      "selectionTier": "v3",
-      "triggerAnyChange": false,
-      "triggerPaths": [
-        "governance/11_EVIDENCE_AND_TRACEABILITY.md",
-        "governance/13_CI_AND_GATES.md",
-        "tools/registry/runs/**"
-      ],
-      "triggerExtensions": [
-        ".md",
-        ".json",
-        ".txt"
       ]
     },
     {
@@ -890,13 +721,13 @@
       ]
     },
     {
-      "id": "GUARD_DSH_MEDIA_MANIFEST",
-      "file": "tools/guards/guard-dsh-media-manifest.mjs",
+      "id": "GUARD_DSH_SURFACE_STRUCTURE",
+      "file": "tools/guards/guard-dsh-surface-structure.mjs",
       "ownerPolicy": [
         "governance/14_GUARDS_CATALOG.md",
         "governance/22_DSH_GOLDEN_SLICE.md"
       ],
-      "purpose": "verify DSH media keys are registered in manifest and resolvers, and consumer screens have no raw path leaks",
+      "purpose": "block growth and direct runtime data/media/storage leaks inside DSH Surface hosts",
       "runners": [
         "governance"
       ],
@@ -909,29 +740,71 @@
       "selectionTier": "service",
       "triggerAnyChange": false,
       "triggerPaths": [
-        "dsh/frontend/data/**",
-        "dsh/frontend/media-fixtures/**",
-        "dsh/frontend/shared/**",
-        "governance/14_GUARDS_CATALOG.md",
-        "governance/22_DSH_GOLDEN_SLICE.md"
+        "dsh/frontend/app-client/DshClientSurface.tsx",
+        "dsh/frontend/app-partner/DshPartnerSurface.tsx",
+        "dsh/frontend/app-captain/DshCaptainSurface.tsx",
+        "dsh/frontend/app-field/DshFieldSurface.tsx",
+        "tools/guards/guard-dsh-surface-structure.mjs"
       ],
       "triggerExtensions": [
         ".ts",
         ".tsx",
         ".js",
         ".jsx",
-        ".tsv",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_BTHWANI_FULL_STACK_OPERATING_SYSTEM",
+      "file": "tools/guards/guard-bthwani-full-stack-operating-system.mjs",
+      "ownerPolicy": [
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md",
+        "governance/10_SERVICE_CLOSURE.md"
+      ],
+      "purpose": "enforce BThwani Full-Stack closure coverage across backend, OpenAPI, shared, current control-panel sections, mobile role surfaces, WLT boundary, media runtime, and evidence",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/**",
+        "wlt/frontend/dsh/**",
+        "control-panel/runtime/**",
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md",
+        "governance/10_SERVICE_CLOSURE.md",
+        "tools/guards/guard-bthwani-full-stack-operating-system.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".go",
+        ".sql",
+        ".yaml",
+        ".yml",
+        ".json",
         ".md"
       ]
     },
     {
-      "id": "GUARD_DSH_SHARED_FOUNDATIONS_FINAL",
-      "file": "tools/guards/guard-dsh-shared-foundations-final.mjs",
+      "id": "GUARD_DSH_ZERO_GAP_RUNTIME_BOUNDARIES",
+      "file": "tools/guards/guard-dsh-zero-gap-runtime-boundaries.mjs",
       "ownerPolicy": [
         "governance/14_GUARDS_CATALOG.md",
         "governance/22_DSH_GOLDEN_SLICE.md"
       ],
-      "purpose": "verify DSH media keys, resolver coverage, raw path leakage, and scattered preview stores under dsh/frontend",
+      "purpose": "enforce Zero Gap runtime boundaries across dsh/frontend and wlt/frontend/dsh",
       "runners": [
         "governance"
       ],
@@ -944,19 +817,61 @@
       "selectionTier": "service",
       "triggerAnyChange": false,
       "triggerPaths": [
-        "dsh/frontend/data/**",
-        "dsh/frontend/media-fixtures/**",
         "dsh/frontend/shared/**",
-        "governance/14_GUARDS_CATALOG.md",
-        "governance/22_DSH_GOLDEN_SLICE.md"
+        "dsh/frontend/control-panel/**",
+        "dsh/frontend/app-client/**",
+        "dsh/frontend/app-partner/**",
+        "dsh/frontend/app-captain/**",
+        "dsh/frontend/app-field/**",
+        "wlt/frontend/dsh/**",
+        "tools/guards/guard-dsh-zero-gap-runtime-boundaries.mjs"
       ],
       "triggerExtensions": [
         ".ts",
         ".tsx",
         ".js",
         ".jsx",
-        ".tsv",
-        ".md"
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_REAL_MEDIA_RUNTIME",
+      "file": "tools/guards/guard-real-media-runtime.mjs",
+      "ownerPolicy": [
+        "governance/14_GUARDS_CATALOG.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "validate required media runtime files and patterns consistently before real data/media closure",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/dsh.openapi.yaml",
+        "dsh/backend/internal/http/media_runtime_handler.go",
+        "dsh/backend/internal/store/postgres_media_assets_repository.go",
+        "dsh/backend/migrations/030_dsh_media_assets.sql",
+        "dsh/backend/docker-compose.local.yml",
+        "dsh/frontend/shared/api/dsh-media-api.client.ts",
+        "tools/guards/guard-real-media-runtime.mjs"
+      ],
+      "triggerExtensions": [
+        ".yaml",
+        ".yml",
+        ".go",
+        ".sql",
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs"
       ]
     },
     {
@@ -1046,6 +961,343 @@
         ".css",
         ".scss",
         ".ps1"
+      ]
+    },
+    {
+      "id": "GUARD_DSH_CONTROL_PANEL_SECTIONS",
+      "file": "tools/guards/guard-dsh-control-panel-sections.mjs",
+      "ownerPolicy": [
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "enforce that all 10 current control-panel sections are present in the governance map and the surface host; delegates to GUARD_BTHWANI_FULL_STACK_OPERATING_SYSTEM",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/control-panel/dsh-governance.map.ts",
+        "dsh/frontend/control-panel/**",
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_DSH_SHARED_NO_UI",
+      "file": "tools/guards/guard-dsh-shared-no-ui.mjs",
+      "ownerPolicy": [
+        "governance/14_GUARDS_CATALOG.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "enforce that DSH shared remains non-visual, has no React creation or ui-kit or Tamagui imports",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/**",
+        "tools/guards/guard-dsh-shared-no-ui.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_DSH_SHARED_OWNERSHIP",
+      "file": "tools/guards/guard-dsh-shared-ownership.mjs",
+      "ownerPolicy": [
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md"
+      ],
+      "purpose": "enforce shared ownership rules: shared must not import surfaces, no preview/design in shared, WLT boundary enforced; delegates to GUARD_BTHWANI_FULL_STACK_OPERATING_SYSTEM",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/**",
+        "wlt/frontend/dsh/shared/**",
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_FULL_STACK_CAPABILITY_COVERAGE",
+      "file": "tools/guards/guard-full-stack-capability-coverage.mjs",
+      "ownerPolicy": [
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "verify all 13 BThwani full-stack capabilities are registered in capability map and governance map with correct full-stack fields and no preview references",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/full-stack/**",
+        "dsh/frontend/shared/control-panel/dsh-governance.map.ts",
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".mjs",
+        ".md"
+      ]
+    },
+    {
+      "id": "GUARD_NO_BROKEN_IMPORTS",
+      "file": "tools/guards/guard-no-broken-imports.mjs",
+      "ownerPolicy": [
+        "governance/03_REPO_BOUNDARIES.md",
+        "governance/14_GUARDS_CATALOG.md"
+      ],
+      "purpose": "detect malformed ES import/export declarations and broken layout imports in DSH/WLT frontend routes",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/app-client/**",
+        "dsh/frontend/app-partner/**",
+        "dsh/frontend/app-captain/**",
+        "dsh/frontend/app-field/**",
+        "dsh/frontend/control-panel/**",
+        "dsh/frontend/shared/**",
+        "wlt/frontend/dsh/**",
+        "tools/guards/guard-no-broken-imports.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs",
+        ".cjs"
+      ]
+    },
+    {
+      "id": "GUARD_SURFACE_LIGHTWEIGHT_BINDINGS",
+      "file": "tools/guards/guard-surface-lightweight-bindings.mjs",
+      "ownerPolicy": [
+        "governance/07_SURFACES_AND_SERVICES.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "detect direct API client, money adapters, media upload flows, status mapping, or large mapping functions in DSH surface shells",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/app-client/DshClientSurface.tsx",
+        "dsh/frontend/app-partner/DshPartnerSurface.tsx",
+        "dsh/frontend/app-captain/DshCaptainSurface.tsx",
+        "dsh/frontend/app-field/DshFieldSurface.tsx",
+        "tools/guards/guard-surface-lightweight-bindings.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_UI_ONLY_ROOTS_OWNERSHIP",
+      "file": "tools/guards/guard-ui-only-roots-ownership.mjs",
+      "config": "tools/guards/guard-ui-only-roots-ownership.config.json",
+      "ownerPolicy": [
+        "governance/03_REPO_BOUNDARIES.md",
+        "governance/06_APPS_AND_SHELLS.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "prevent runtime client creation, env reads, network fetch, and storage usage in UI-only roots",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/app-captain/**",
+        "dsh/frontend/app-client/**",
+        "dsh/frontend/app-field/**",
+        "dsh/frontend/app-partner/**",
+        "dsh/frontend/control-panel/**",
+        "wlt/frontend/dsh/app-captain/**",
+        "wlt/frontend/dsh/app-client/**",
+        "wlt/frontend/dsh/app-field/**",
+        "wlt/frontend/dsh/app-partner/**",
+        "wlt/frontend/dsh/control-panel/**",
+        "tools/guards/guard-ui-only-roots-ownership.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx"
+      ]
+    },
+    {
+      "id": "GUARD_UI_ONLY_FILE_VOLUME",
+      "file": "tools/guards/guard-ui-only-file-volume.mjs",
+      "ownerPolicy": [
+        "governance/03_REPO_BOUNDARIES.md",
+        "governance/06_APPS_AND_SHELLS.md",
+        "governance/22_DSH_GOLDEN_SLICE.md",
+        "governance/25_BTHWANI_FULL_STACK_OPERATING_MODEL.md"
+      ],
+      "purpose": "fail when UI roots contain non-UI folders and non-UI responsibilities to prevent clutter and keep them purely visual",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/app-captain/**",
+        "dsh/frontend/app-client/**",
+        "dsh/frontend/app-field/**",
+        "dsh/frontend/app-partner/**",
+        "dsh/frontend/control-panel/**",
+        "wlt/frontend/dsh/app-captain/**",
+        "wlt/frontend/dsh/app-client/**",
+        "wlt/frontend/dsh/app-field/**",
+        "wlt/frontend/dsh/app-partner/**",
+        "wlt/frontend/dsh/control-panel/**",
+        "tools/guards/guard-ui-only-file-volume.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx",
+        ".mjs"
+      ]
+    },
+    {
+      "id": "GUARD_WLT_DSH_SHARED_OWNERSHIP",
+      "file": "tools/guards/guard-wlt-dsh-shared-ownership.mjs",
+      "ownerPolicy": [
+        "governance/03_REPO_BOUNDARIES.md",
+        "governance/05_PACKAGE_BOUNDARIES.md",
+        "governance/22_DSH_GOLDEN_SLICE.md"
+      ],
+      "purpose": "WLT app-* must call WLT shared adapters/hooks and must not construct typed clients or perform mutations/direct ledger mapping",
+      "runners": [
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "service",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "wlt/frontend/dsh/app-client/**",
+        "wlt/frontend/dsh/app-partner/**",
+        "wlt/frontend/dsh/app-captain/**",
+        "wlt/frontend/dsh/app-field/**",
+        "tools/guards/guard-wlt-dsh-shared-ownership.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts",
+        ".tsx",
+        ".js",
+        ".jsx"
+      ]
+    },
+    {
+      "id": "GUARD_NO_SURFACE_MODEL_GOD_HOOKS",
+      "file": "tools/guards/guard-no-surface-model-god-hooks.mjs",
+      "ownerPolicy": [
+        "governance/15_AGENT_AND_AI_EXECUTION.md",
+        ".agents/AUTHORITY_BOUNDARY.md"
+      ],
+      "purpose": "Enforce that *.surface-model.ts files are orchestration-only: no direct fetch/HTTP clients, no inline business validation, max useState budget per file",
+      "runners": [
+        "agent",
+        "governance"
+      ],
+      "mode": "blocking",
+      "outputs": [
+        "json",
+        "md"
+      ],
+      "alwaysRun": false,
+      "selectionTier": "dsh",
+      "triggerAnyChange": false,
+      "triggerPaths": [
+        "dsh/frontend/shared/**/*.surface-model.ts",
+        "tools/guards/guard-no-surface-model-god-hooks.mjs"
+      ],
+      "triggerExtensions": [
+        ".ts"
       ]
     }
   ]

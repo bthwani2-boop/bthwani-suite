@@ -8,13 +8,9 @@ import {
   WebControlPanelKpiStrip,
   WebControlPanelRecommendation,
 } from '@bthwani/ui-kit/web';
-import {
-  DSH_ASSISTED_ORDER_PREVIEW,
-  getDshAssistedOrderByContext,
-} from '../../data/orders.preview-data';
-import { DSH_OPS_INTERVENTION_PLAYBOOKS } from '../../data/support.preview-data';
 import { buildOperationsHref } from './operations.registry';
 import { DSH_FULFILLMENT_OPERATIONAL_MODE_META } from './operations.types';
+import type { DshFulfillmentDeliveryMode } from '../../shared/delivery/delivery.contract';
 import styles from '../shared/control-panel-surface.module.css';
 
 export type AssistedOrderDeskScreenProps = {
@@ -49,25 +45,103 @@ const SERVICEABILITY_STATUS_META = {
   blocked: { label: 'محظور', tone: 'danger' as const },
 } as const;
 
+type AssistedOrderVerificationStatus = keyof typeof IDENTITY_STATUS_META;
+type AssistedOrderServiceabilityStatus = keyof typeof SERVICEABILITY_STATUS_META;
+type AssistedOrderCartItemStatus = 'active' | 'substitute' | 'unavailable';
+
+type AssistedLookupInput = {
+  key: string;
+  label?: string;
+  value: string;
+  [key: string]: unknown;
+};
+
+type AssistedVerificationStep = {
+  stepId: string;
+  label: string;
+  completed: boolean;
+  [key: string]: unknown;
+};
+
+type AssistedOrderCartItem = {
+  sku: string;
+  name: string;
+  quantity: number;
+  status: AssistedOrderCartItemStatus;
+  published?: boolean;
+  note?: string;
+  [key: string]: unknown;
+};
+
+type AssistedDeliveryModeOption = {
+  modeId: DshFulfillmentDeliveryMode;
+  label: string;
+  [key: string]: unknown;
+};
+
+type AssistedOrderDesk = {
+  deskId: string;
+  orderId?: string;
+  customerId: string;
+  ticketId?: string;
+  customerName: string;
+  basketSummary: string;
+  nextAction: string;
+  auditFlags: string[];
+  lookupPanel: {
+    inputs: AssistedLookupInput[];
+  };
+  identityVerification: {
+    verificationStatus: AssistedOrderVerificationStatus;
+    verificationSteps: AssistedVerificationStep[];
+  };
+  cartBuilderPreview: {
+    items: AssistedOrderCartItem[];
+  };
+  deliveryModeSelector: {
+    selectedMode: DshFulfillmentDeliveryMode;
+    options: AssistedDeliveryModeOption[];
+  };
+  serviceabilitySummary: {
+    serviceabilityStatus: AssistedOrderServiceabilityStatus;
+    zoneLabel: string;
+  };
+  wltReadOnlyHandoff: {
+    calculationTruthOwner: string;
+    paymentVisibility: string;
+    refundVisibility: string;
+    settlementVisibility?: string;
+    [key: string]: string | undefined;
+  };
+  auditReason: {
+    reasonLabel: string;
+    operatorNote: string;
+    [key: string]: string;
+  };
+  submitDraftPreview: {
+    nextAction: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
+
+type AssistedOrderPlaybook = {
+  playbookId: string;
+  title: string;
+  checkpoints: string[];
+  severity: 'danger' | 'warning' | 'neutral' | 'success';
+};
+
 export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup }: AssistedOrderDeskScreenProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const [desks, setDesks] = React.useState(() => [...DSH_ASSISTED_ORDER_PREVIEW]);
+  const [desks, setDesks] = React.useState<AssistedOrderDesk[]>(() => []);
   // null = no selection = full width queue
   const [selectedDeskId, setSelectedDeskId] = React.useState<string | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const matchedDesk = getDshAssistedOrderByContext({
-      deskId: searchParams.get('deskId'),
-      orderId: searchParams.get('orderId'),
-      customerId: searchParams.get('customerId'),
-      ticketId: searchParams.get('ticketId'),
-    });
-    if (matchedDesk) {
-      setSelectedDeskId(matchedDesk.deskId);
-    }
+    // searchParams-based desk selection not yet implemented
   }, [searchParams]);
 
   const selectedDesk = React.useMemo(
@@ -75,8 +149,8 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
     [desks, selectedDeskId],
   );
 
-  const relevantPlaybook = React.useMemo(
-    () => DSH_OPS_INTERVENTION_PLAYBOOKS.find((p) => p.triggerFlowIds.includes('assisted-order-desk')),
+  const relevantPlaybook = React.useMemo<AssistedOrderPlaybook | undefined>(
+    () => undefined,
     [],
   );
 
@@ -87,7 +161,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
     setDesks((prev) =>
       prev.map((d) =>
         d.deskId === selectedDesk.deskId
-          ? { ...d, lookupPanel: { ...d.lookupPanel, inputs: d.lookupPanel.inputs.map((inp) => (inp.key === key ? { ...inp, value } : inp)) } }
+          ? { ...d, lookupPanel: { ...d.lookupPanel, inputs: d.lookupPanel.inputs.map((inp: AssistedLookupInput) => (inp.key === key ? { ...inp, value } : inp)) } }
           : d,
       ),
     );
@@ -189,7 +263,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
     setDesks((prev) =>
       prev.map((d) => {
         if (d.deskId !== selectedDesk.deskId) return d;
-        return { ...d, deliveryModeSelector: { ...d.deliveryModeSelector, selectedMode: modeId as import('../../app-client/contracts/dsh-client-binding.contracts').DshFulfillmentDeliveryMode } };
+        return { ...d, deliveryModeSelector: { ...d.deliveryModeSelector, selectedMode: modeId as DshFulfillmentDeliveryMode } };
       }),
     );
   };
@@ -396,7 +470,7 @@ export function AssistedOrderDeskScreen({ hubHref: _hubHref, subGroup: _subGroup
                   };
                   return (
                     <div key={input.key} className={styles.surfaceInspectorRow} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
-                      <strong>{lookupLabels[input.key] ?? input.label}</strong>
+                      <strong>{lookupLabels[input.key] ?? input.label ?? input.key}</strong>
                       <input
                         type="text"
                         value={input.value}

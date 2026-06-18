@@ -1,41 +1,22 @@
-import { PlatformVarsRegistry } from './platform/PlatformVarsProvider';
+import { PlatformVarsRegistry } from './platform/platform-vars';
 
-export type DshCreateFieldVisitRequest = {
-  readonly field_agent_id?: string;
+export type DshFieldVisitRequest = {
   readonly visit_summary: string;
   readonly follow_up_action: string;
-  readonly evidence_media_keys?: readonly string[];
-  readonly location_confidence?: string;
+  readonly evidence_media_keys: readonly string[];
+  readonly location_confidence: 'manual_confirmed' | 'gps_confirmed' | 'low_confidence';
 };
 
-export type DshCreateFieldVisitResponse = {
-  readonly id: string;
-  readonly store_id: string;
-  readonly field_agent_id?: string;
-  readonly visit_summary: string;
-  readonly follow_up_action: string;
-  readonly evidence_media_keys?: readonly string[];
-  readonly location_confidence?: string;
-  readonly status: 'submitted';
-  readonly created_at: string;
+export type DshFieldVisitResponse = {
+  readonly id?: string;
+  readonly store_id?: string;
+  readonly created_at?: string;
 };
 
 export type DshFieldVisitFetchFn = (input: string, init?: RequestInit) => Promise<Response>;
 
-export type DshFieldVisitOfflineError = { readonly kind: 'offline' };
-export type DshFieldVisitHttpError = {
-  readonly kind: 'http';
-  readonly status: number;
-  readonly body: string;
-};
-export type DshFieldVisitError = DshFieldVisitOfflineError | DshFieldVisitHttpError;
-
 export interface DshFieldVisitClient {
-  createFieldVisit(storeId: string, req: DshCreateFieldVisitRequest): Promise<DshCreateFieldVisitResponse>;
-}
-
-export function isDshFieldVisitOfflineError(err: unknown): err is DshFieldVisitOfflineError {
-  return typeof err === 'object' && err !== null && (err as { kind?: unknown }).kind === 'offline';
+  createFieldVisit(storeId: string, req: DshFieldVisitRequest): Promise<DshFieldVisitResponse>;
 }
 
 export function resolveDshFieldVisitBaseUrl(): string | null {
@@ -49,27 +30,39 @@ export function createDshFieldVisitHttpClient(
   return {
     createFieldVisit: async (storeId, req) => {
       const transport = fetchFn ?? globalThis.fetch?.bind(globalThis);
-      const cleanStoreId = storeId.trim();
 
-      if (!baseUrl || !transport || !cleanStoreId) {
-        throw { kind: 'offline' } satisfies DshFieldVisitOfflineError;
+      if (!baseUrl || !transport) {
+        throw { kind: 'offline', reason: 'missing_base_url_or_fetch' };
       }
 
-      const response = await transport(`${baseUrl.replace(/\/$/, '')}/stores/${encodeURIComponent(cleanStoreId)}/field-visits`, {
-        method: 'POST',
-        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify(req),
-      });
+      const clientId = (PlatformVarsRegistry.get('dshClientId') ?? 'field-agent-dev').trim() || 'field-agent-dev';
+      const url = `${baseUrl.replace(/\/$/, '')}/stores/${encodeURIComponent(storeId)}/field-visits`;
+
+      let response: Response;
+      try {
+        response = await transport(url, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-Client-Id': clientId,
+            'X-Actor-Type': 'field',
+          },
+          body: JSON.stringify(req),
+        });
+      } catch {
+        throw { kind: 'offline', reason: 'network_request_failed', baseUrl };
+      }
 
       if (!response.ok) {
         throw {
           kind: 'http',
           status: response.status,
           body: await response.text(),
-        } satisfies DshFieldVisitHttpError;
+        };
       }
 
-      return response.json() as Promise<DshCreateFieldVisitResponse>;
+      return response.json() as Promise<DshFieldVisitResponse>;
     },
   };
 }

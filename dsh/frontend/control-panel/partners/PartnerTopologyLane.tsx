@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Box, Surface, Text } from '@bthwani/ui-kit';
 import styles from '../shared/control-panel-surface.module.css';
 
-// UI_PREVIEW_ONLY: load values are static structural reference — not live runtime metrics
+// SCAFFOLD: load values are static structural reference — not live runtime metrics
 const TOPOLOGY_LANES = [
   { id: 'onboarding', title: 'الاستقبال', sub: 'مدخل الشريك والوثائق', flow: 'الشريك → الاستقبال → العمليات', load: 'طبيعي', tone: 'success' as const },
   { id: 'topology_orders', title: 'الطلبات', sub: 'الطلبات والتسليم', flow: 'الشريك → الطلبات → العمليات', load: 'مرتفع', tone: 'danger' as const },
@@ -32,7 +32,7 @@ export function PartnerTopologyLane({
           <Text role="caption" tone="brand">خارطة نظام الشركاء</Text>
           <Text role="titleLg">خارطة مسارات الشركاء</Text>
         </Box>
-        <Text role="caption" tone="muted">تكامل السطح التشغيلي الموحد · UI_PREVIEW_ONLY</Text>
+        <Text role="caption" tone="muted">تكامل السطح التشغيلي الموحد — الربط قيد التنفيذ</Text>
       </div>
 
       <div className={styles.topologyCardGrid}>
