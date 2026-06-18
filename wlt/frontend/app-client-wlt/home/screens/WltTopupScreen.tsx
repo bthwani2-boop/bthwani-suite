@@ -20,7 +20,7 @@ export const WltTopupScreen: React.FC<{
   const [paymentMethod, setPaymentMethod] = useState<string | undefined>(undefined);
   const [dialogVisible, setDialogVisible] = useState(false);
 
-  const activeClientId = dshClientId || 'client-demo';
+  const activeClientId = dshClientId?.trim() || undefined;
 
   const client = useMemo(
     () => createWltDshTypedClient({ devClientId: activeClientId, bearerToken: dshAuthBearerToken || undefined }),
@@ -32,10 +32,10 @@ export const WltTopupScreen: React.FC<{
   ), [t]);
 
   const topupAmount = Math.floor(parseFloat(amount.replace(/,/g, '')) || 0);
-  const canSubmit = topupAmount > 0 && !!paymentMethod;
+  const canSubmit = topupAmount > 0 && !!paymentMethod && !!activeClientId;
 
   const handleTopup = async () => {
-    if (!canSubmit) return setDialogVisible(true);
+    if (!activeClientId || !canSubmit) return setDialogVisible(true);
     setState('loading');
     const { checkoutIntentId, idempotencyKey, confirmationRef } = generatePaymentSessionIds('topup');
     try {

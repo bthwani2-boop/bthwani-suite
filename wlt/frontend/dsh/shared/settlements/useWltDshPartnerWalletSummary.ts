@@ -11,9 +11,15 @@ export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerT
   const [partnerPreview, setPartnerPreview] = React.useState(EMPTY_PARTNER_FINANCE_SNAPSHOT);
   const [lastError, setLastError] = React.useState<string | null>(null);
 
-  const activePartnerId = partnerId || 'partner-demo';
+  const activePartnerId = partnerId?.trim() || undefined;
 
   React.useEffect(() => {
+    if (!activePartnerId) {
+      setPartnerPreview(EMPTY_PARTNER_FINANCE_SNAPSHOT);
+      setLastError('missing_partner_id');
+      return;
+    }
+
     let cancelled = false;
 
     void getPartnerSnapshot(activePartnerId, dshAuthBearerToken)
@@ -24,6 +30,7 @@ export function useWltDshPartnerWalletSummary(partnerId?: string, dshAuthBearerT
       })
       .catch((error) => {
         if (cancelled) return;
+        setPartnerPreview(EMPTY_PARTNER_FINANCE_SNAPSHOT);
         setLastError(error instanceof Error ? error.message : 'wlt_partner_runtime_unavailable');
       });
 

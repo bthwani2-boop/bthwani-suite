@@ -26,7 +26,7 @@ export const WltHomeGetScreen: React.FC<{
   const [trigger, setTrigger] = useState(0);
   const retry = React.useCallback(() => setTrigger((n) => n + 1), []);
 
-  const activeClientId = dshClientId || 'client-demo';
+  const activeClientId = dshClientId?.trim() || undefined;
 
   const client = useMemo(() => createWltDshTypedClient({
     bearerToken: dshAuthBearerToken || undefined,
@@ -34,6 +34,12 @@ export const WltHomeGetScreen: React.FC<{
   }), [dshAuthBearerToken, activeClientId]);
 
   React.useEffect(() => {
+    if (!activeClientId) {
+      setBalance(null);
+      setOffline(false);
+      return;
+    }
+
     let active = true;
     setOffline(false);
     client.getClientWalletSummary(activeClientId)
@@ -54,14 +60,14 @@ export const WltHomeGetScreen: React.FC<{
   }, [client, activeClientId, trigger]);
 
   const topupAmount = Math.floor(parseFloat(amount.replace(/,/g, '')) || 0);
-  const canSubmit = topupAmount > 0 && !!method;
+  const canSubmit = topupAmount > 0 && !!method && !!activeClientId;
 
   const methods = useMemo(() => (
     financeProviders.map((p: FinanceProvider) => ({ id: p.id, label: tr(p.labelKey, p.fallback), icon: p.icon }))
   ), [t]);
 
   const handleTopup = async () => {
-    if (!canSubmit) return setState('error');
+    if (!activeClientId || !canSubmit) return setState('error');
     setState('loading');
     const { checkoutIntentId, idempotencyKey, confirmationRef } = generatePaymentSessionIds('topup');
     try {

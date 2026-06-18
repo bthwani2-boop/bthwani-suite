@@ -3,11 +3,9 @@ import { appCaptainSurfaceRegistry, type DshCaptainNavigationCommand } from '../
 
 export type CaptainSurfaceHostProps = Record<string, never>;
 
-const APP_CAPTAIN_PREVIEW_ID = 'CAP-0041';
-
-function resolveCaptainRuntimeId(): string {
+function resolveCaptainRuntimeId(): string | undefined {
   const configuredCaptainId = process.env.EXPO_PUBLIC_DSH_CAPTAIN_ID?.trim();
-  return configuredCaptainId || APP_CAPTAIN_PREVIEW_ID;
+  return configuredCaptainId && configuredCaptainId.length > 0 ? configuredCaptainId : undefined;
 }
 
 export function CaptainSurfaceHost(_props: CaptainSurfaceHostProps = {}) {
