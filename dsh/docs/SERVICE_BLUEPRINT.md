@@ -1,5 +1,9 @@
 # DSH Service Blueprint
 
+> **DOCS_DRIFT_SYNC_REQUIRED** — هذا الملف ليس مصدر جاهزية مستقل.
+> مصدر الحقيقة الحي هو: live code + `dsh/frontend/control-panel/shared/dshCrossSurfaceClosureMap.ts` + `tools/registry/runs` evidence.
+> أي PASS هنا يجب تأكيده من terminal output وليس من هذا الملف وحده.
+
 Single truth file for the `dsh` service.
 Platform-wide policy: `governance/02_PLATFORM_SSOT.md`, `governance/10_SERVICE_CLOSURE.md`, and `governance/22_DSH_GOLDEN_SLICE.md`.
 API contract: `dsh/dsh.openapi.yaml`.
@@ -17,9 +21,9 @@ API contract: `dsh/dsh.openapi.yaml`.
 | Truth File | `dsh/docs/SERVICE_BLUEPRINT.md` |
 | OpenAPI Contract | `dsh/dsh.openapi.yaml` |
 | Public Export Path | `dsh/index.ts` |
-| Current Decision | `START_CONTROLLED_LOCAL_SMOKE_TEST_2026-06-06` |
-| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / SCREEN_RUNTIME_PROVEN; J-003 = IMPLEMENTATION_STARTED / BearerAuth backend + contracts ready / WLT E2E pending / local testing ready; J-004 = DEFERRED / cross-surface proof pending J-003 / local testing ready; J-005 = DEFERRED / depends on J-004/J-009 runtime / local testing ready; J-006 = PASS / SLICE_GROUP_CLOSED; J-009 = DEFERRED / ops room visual/runtime proof pending / local testing ready; J-010 = BLOCKED_WITH_REASON / WLT-owned read-only bridge / local testing ready; Production readiness = NOT_CLAIMED |
-| Live Closure Truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/dsh-flow-registry.ts` |
+| Current Decision | `DOCS_DRIFT_SYNC_REQUIRED / START_CONTROLLED_LOCAL_SMOKE_TEST_2026-06-06` |
+| Current Status | J-001 = PASS / SCREEN_RUNTIME_PROVEN; J-002 = PASS / SCREEN_RUNTIME_PROVEN; J-003 = IMPLEMENTATION_STARTED / BearerAuth backend + contracts ready / WLT E2E pending / local testing ready; J-004 = DEFERRED / cross-surface proof pending J-003 / local testing ready; J-005 = DEFERRED / depends on J-004/J-009 runtime / local testing ready; J-006 = BLOCKED_WITH_REASON / slice manifest closed / auth + DB runtime proof pending; J-009 = DEFERRED / ops room visual/runtime proof pending / local testing ready; J-010 = BLOCKED_WITH_REASON / WLT-owned read-only bridge / local testing ready; Production readiness = NOT_CLAIMED |
+| Live Closure Truth | `dsh/frontend/control-panel/shared/dshCrossSurfaceClosureMap.ts` + `dsh/frontend/shared/runtime/dsh-flow-registry.ts` |
 | Historic Runtime Baseline | `tools/registry/runs/DSH_FINAL_REALITY_LOCK-20260512-023336` |
 
 ### Surface Status
@@ -29,7 +33,7 @@ API contract: `dsh/dsh.openapi.yaml`.
 | `app-client` | `J-001: SCREEN_RUNTIME_PROVEN; J-002: SCREEN_RUNTIME_PROVEN; J-003+: DEFERRED_WITH_REASON` | discovery feed (J-001) E2E proven (DSH_SLICE001_FINAL_SCREEN_RUNTIME-20260603-194700); J-002 catalog proven (DSH_SLICE_002*_FINAL_CLOSURE-*); cart/checkout/tracking (J-003+) deferred |
 | `app-partner` | `J-001: SCREEN_RUNTIME_PROVEN; J-002: SCREEN_RUNTIME_PROVEN; J-003+: DEFERRED_WITH_REASON` | partner-readiness gate (J-001) E2E proven on physical device; catalog management (J-002) proven (DSH_SLICE_002*_FINAL_CLOSURE-*); J-003+ deferred |
 | `app-captain` | `DEFERRED_WITH_REASON / LOCAL_PROVEN` | map + GPS ON + active order (ready for local smoke testing); evidence: DSH_VISUAL_EVIDENCE_2026-06-05/J005_captain_*.png |
-| `app-field` | `J-006: SLICE_GROUP_CLOSED` | field onboarding, visit, document, escalation, and approval slices are closed in the slice manifest; later cross-surface runtime proof remains governed by its parent journey |
+| `app-field` | `J-006: SLICE_GROUP_CLOSED_IN_MANIFEST / BLOCKED_WITH_REASON` | slice manifest closed; cross-surface runtime proof blocked: auth + real DB E2E proof pending; not PASS until runtime evidence confirmed |
 | `control-panel operations` | `DEFERRED_WITH_REASON / LOCAL_PROVEN` | operations room with CommandCenter and LiveOrdersScreen (ready for local smoke testing); evidence: DSH_VISUAL_EVIDENCE_2026-06-05/J009_cp_operations.png |
 | `control-panel finance` | `blocked-by-wlt` | finance remains a read-only WLT bridge and not a DSH-owned money surface |
 
@@ -45,8 +49,8 @@ API contract: `dsh/dsh.openapi.yaml`.
 
 ### Live code sources
 
-- `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts`
-- `dsh/frontend/shared/dsh-flow-registry.ts`
+- `dsh/frontend/control-panel/shared/dshCrossSurfaceClosureMap.ts`
+- `dsh/frontend/shared/runtime/dsh-flow-registry.ts`
 - `dsh/frontend/app-client/dsh-client.screen-registry.ts`
 - `dsh/frontend/app-partner/dsh-partner.screen-registry.ts`
 - `dsh/frontend/app-captain/dsh-captain.screen-registry.ts`
@@ -111,8 +115,8 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 
 | Source | Path | Role |
 |---|---|---|
-| Cross-surface closure truth | `dsh/frontend/shared/dshCrossSurfaceClosureMap.ts` | live frontend closure status |
-| Flow ownership truth | `dsh/frontend/shared/dsh-flow-registry.ts` | flow ownership, visibility, escalation, on-demand rules |
+| Cross-surface closure truth | `dsh/frontend/control-panel/shared/dshCrossSurfaceClosureMap.ts` | live frontend closure status |
+| Flow ownership truth | `dsh/frontend/shared/runtime/dsh-flow-registry.ts` | flow ownership, visibility, escalation, on-demand rules |
 | Slice coverage manifest | `dsh/docs/DSH_SLICE_COVERAGE_MANIFEST.md` | journey and slice closure authority |
 | UI/UX flow matrix | `dsh/docs/UI_UX_FLOW_CLOSURE_MATRIX.md` | UI/UX flow evidence rows |
 | Screen/API matrix | `dsh/docs/SCREEN_API_MATRIX.md` | API-readiness and binding rows |
@@ -147,7 +151,7 @@ This lifecycle is logically wired for human visual review, but runtime proof is 
 | J-003 Checkout / Payment | `IMPLEMENTATION_STARTED` â€” contracts designed (auth+wlt+dsh OpenAPI); Go handlers 003A/003B/003C/003E done; production BearerAuth backend path + app-client Bearer checkout transport implemented; callback-primary flow; live auth-service runtime proof + WLT E2E runtime pending before PASS |
 | J-004 Order Lifecycle | `FUTURE_NEEDS_CROSS_SURFACE_PROOF` â€” DEFERRED pending J-003 closure; 004Aâ€“004F all DEFERRED_WITH_REASON in slice manifest |
 | J-005 Delivery Execution | `DEFERRED` â€” depends on J-004/J-009 runtime |
-| J-006 Field Readiness | `DEFERRED` â€” no onboarding API designed |
+| J-006 Field Readiness | `BLOCKED_WITH_REASON` — slice manifest closed; no production auth + real DB E2E proof yet; not PASS until runtime evidence confirmed |
 | J-007 Data / Media Governance | `FOUNDATION_ACTIVE` â€” preview data governed; no runtime proof required |
 | J-008 Platform / Vars / Provider | `DEFERRED` â€” provider policy not enforced |
 | J-009 Control Panel Operations | `DEFERRED` â€” ops room visual/runtime proof pending |

@@ -1,5 +1,7 @@
 # DSH Screen/API Matrix
 
+> **NON-AUTHORITATIVE WHEN STALE** — هذا الملف execution guide فقط. لا يرفع أي slice إلى PASS بدون evidence في `tools/registry/runs`. أي row متعارض مع live closure map يصبح تلقائياً DOCS_DRIFT_SYNC_REQUIRED.
+
 Status: MIXED_SERVICE_MATRIX
 Decision: FIX_REQUIRED
 

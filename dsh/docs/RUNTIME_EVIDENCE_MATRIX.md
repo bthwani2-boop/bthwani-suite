@@ -1,5 +1,7 @@
 # DSH Runtime Evidence Matrix
 
+> **NON-AUTHORITATIVE WHEN STALE** — هذا الملف execution guide فقط. لا يرفع أي slice إلى PASS بدون evidence في `tools/registry/runs`. أي row متعارض مع live closure map يصبح تلقائياً DOCS_DRIFT_SYNC_REQUIRED.
+
 Status: MIXED_RUNTIME_MATRIX
 Decision: AUTH_SERVICE_BACKEND_LIVE__STARTUP_WIRED__2026-06-07
 

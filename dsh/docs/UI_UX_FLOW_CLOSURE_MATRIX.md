@@ -1,5 +1,7 @@
 # DSH UI/UX Flow Closure Matrix
 
+> **NON-AUTHORITATIVE WHEN STALE** — هذا الملف execution guide فقط. لا يرفع أي slice إلى PASS بدون evidence في `tools/registry/runs`. أي row متعارض مع live closure map يصبح تلقائياً DOCS_DRIFT_SYNC_REQUIRED.
+
 Status: ACTIVE_FRONTEND_CLOSURE_TRUTH
 Decision: AUTH_SERVICE_LIVE__RUNTIME_SMOKE_PENDING
 

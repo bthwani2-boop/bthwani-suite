@@ -1,5 +1,7 @@
 # DSH Slice Coverage Manifest
 
+> **NON-AUTHORITATIVE WHEN STALE** — هذا الملف planning/governance inventory. لا يرفع أي slice إلى PASS بدون evidence في `tools/registry/runs`. أي row متعارض مع `dsh/frontend/control-panel/shared/dshCrossSurfaceClosureMap.ts` يصبح DOCS_DRIFT_SYNC_REQUIRED.
+
 Status: ACTIVE_SLICE_COVERAGE_PROTOCOL
 Decision: MANIFEST_REQUIRED_BEFORE_SLICE_CLOSURE
 

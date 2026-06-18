@@ -1,5 +1,7 @@
 # DSH Closure Decision Log
 
+> **HISTORICAL ONLY** — هذا السجل تاريخي append-only. لا يتجاوز live matrices ولا live closure map. لا يسمح له برفع أي status إلى PASS.
+
 Status: ACTIVE_CLOSURE_CONTROL
 Decision: ACTIVE_LOG_NO_SERVICE_STATE_OVERRIDE
 
