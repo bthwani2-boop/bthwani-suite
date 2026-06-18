@@ -5,7 +5,7 @@ import type { ClientOperationScreenId } from '../../shared/checkout/dsh-client-b
 import type { DshFulfillmentDeliveryMode } from '../../shared/checkout/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostCartItem, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import type { DshRoute } from '../dsh-client.types';
-import type { BThwaniAppearanceMode } from '@bthwani/ui-kit';
+import type { DshAppearanceMode } from '../../shared/platform/appearance.contract';
 import type { DshClientWltIntentEntry } from '../../shared/finance-boundary';
 import type { DshTrackingTimelineItem } from '../hooks';
 import type { DshDiscoveryStoresBridgeResult } from '../../shared/stores';
@@ -23,8 +23,8 @@ export type DshClientSessionContext = {
   dshAuthBearerToken: string | null | undefined;
   dshClientId: string | null | undefined;
   appearanceHydrated: boolean;
-  appearanceMode: BThwaniAppearanceMode;
-  setAppearanceMode: (mode: BThwaniAppearanceMode) => void;
+  appearanceMode: DshAppearanceMode;
+  setAppearanceMode: (mode: DshAppearanceMode) => void;
   bellSignalEvents: readonly DshSignalSummary[];
   walletSession: WltDshWalletSessionState;
 };
