@@ -36,6 +36,9 @@ export * from './media';
 // Runtime Topic — auth client, flow registry, surface binding, price formatting, runtime contracts
 export * from './runtime';
 
+// Control Panel Governance shared helpers for mobile surfaces
+export * from './control-panel/dsh-governance.map';
+
 // Approval Workflow — shared pipeline types, stage transitions, and in-memory store
 // Used across control-panel/catalogs, control-panel/marketing, control-panel/partners, control-panel/operations
 export type {

@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction, ReactNode } from 'react';
+import type { DshHomeApprovedVideoReelsViewerProps } from '../parts/ApprovedVideoReelsViewer';
 import type { DshHomeCategory, DshHomeGetPromo, DshHomeGetStore, DshHomeRecentOrder } from '../../shared/discovery/dsh-home-types';
-import type { ClientOperationScreenId } from '../screens/parts/OperationScreenView';
+import type { ClientOperationScreenId } from '../../shared/checkout/dsh-client-binding.contracts';
 import type { DshFulfillmentDeliveryMode } from '../../shared/checkout/dsh-client-binding.contracts';
 import type { CreateOrderValues, HostCartItem, HostOrderSummary } from '../dsh-client.navigation-bridge';
 import type { DshRoute } from '../dsh-client.types';
@@ -10,7 +11,8 @@ import type { DshTrackingTimelineItem } from '../hooks';
 import type { DshDiscoveryStoresBridgeResult } from '../../shared/stores';
 import type { DshClientState } from '../dsh-client.types';
 import type { DshCheckoutAuthContext } from '../../shared/checkout';
-import type { DshStoreMenuItem, DshDiscoveryStore } from '../../shared/products';
+import type { DshStoreMenuItem } from '../../shared/products';
+import type { DshDiscoveryStore } from '../../shared/stores';
 import type { HomePromoRecord, MarketingGrowthRecord, MarketingVideoRecord } from '../../shared/marketing/marketing.types';
 import type { WltDshWalletSessionState } from '../../shared/wlt/generated/wlt_frontend_dsh_shared.facade';
 import type { DshStoreGetScreenProps } from '../screens/StoreScreen';
@@ -33,8 +35,8 @@ export type DshClientRouteContext = {
   returnHome: () => void;
   openCreateOrderJourney: () => void;
   openTrackedOrder: (orderId?: string) => void;
-  setSelectedOperationScreen: Dispatch<SetStateAction<ClientOperationScreenId>>;
-  selectedOperationScreen: ClientOperationScreenId;
+  setSelectedOperationScreen: Dispatch<SetStateAction<ClientOperationScreenId | null>>;
+  selectedOperationScreen: ClientOperationScreenId | null;
   onExit?: () => void;
   openSupportFlow: () => void;
   handleRegisterBackHandler: ((handler: (() => boolean) | null) => void) | undefined;
@@ -64,7 +66,7 @@ export type DshClientHomeContext = {
   setSheinInlineOpen: (open: boolean) => void;
   awnakInlineOpen: boolean;
   setAwnakInlineOpen: (open: boolean) => void;
-  renderApprovedVideoReelsViewer: ((props: unknown) => ReactNode) | undefined;
+  renderApprovedVideoReelsViewer: ((props: DshHomeApprovedVideoReelsViewerProps) => ReactNode) | undefined;
   clientDiscoveryStoresBridge: DshDiscoveryStoresBridgeResult;
 };
 

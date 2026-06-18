@@ -4,7 +4,7 @@
 
 import React from 'react';
 import type { DshRoute } from '../checkout/dsh-client-binding.contracts';
-import type { ClientOperationScreenId } from './useDshClientBellState';
+import type { ClientOperationScreenId } from '../checkout/dsh-client-binding.contracts';
 
 export type ClientNavigationModelProps = {
   route: DshRoute;

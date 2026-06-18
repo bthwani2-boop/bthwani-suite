@@ -31,9 +31,9 @@ function DshClientSurfaceInner(props: DshClientSurfaceProps) {
 
   const model = useDshClientSurfaceModel({
     ...props,
-    dshApiBaseUrl,
-    dshAuthBearerToken,
-    dshClientId,
+    dshApiBaseUrl: dshApiBaseUrl ?? undefined,
+    dshAuthBearerToken: dshAuthBearerToken ?? undefined,
+    dshClientId: dshClientId ?? undefined,
     isAwnakEnabled,
   });
 

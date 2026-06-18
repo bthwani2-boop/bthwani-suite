@@ -46,7 +46,7 @@ export function useDshClientHomeActions({
   setItemsQuery: (q: string) => void;
   setItemsCategory: (c: string) => void;
   setSelectedItemId: (id: string) => void;
-  setStoreItemsEntryOrigin: (o: string) => void;
+  setStoreItemsEntryOrigin: (o: 'home' | 'store-get') => void;
   favoriteOverrides: Record<string, boolean>;
   setFavoriteOverrides: (updater: (v: Record<string, boolean>) => Record<string, boolean>) => void;
   hasStoreTarget: (storeId?: string) => boolean;

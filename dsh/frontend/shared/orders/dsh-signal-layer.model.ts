@@ -15,7 +15,13 @@ export type DshSignalEventKind =
   | 'delivered'
   | 'delivery_failed'
   | 'payment_failed'
-  | 'refund_pending_wlt';
+  | 'refund_pending_wlt'
+  | 'catalog_item_approved'
+  | 'catalog_published'
+  | 'partner_capacity_degraded'
+  | 'partner_docs_missing'
+  | 'partner_submitted'
+  | 'ticket_escalated';
 
 export type DshSignalPriority = 'urgent' | 'important' | 'normal';
 
@@ -36,6 +42,12 @@ const SIGNAL_ROUTES: Partial<Record<DshSignalEventKind, DshSignalActorRoute>> = 
   delivery_failed: { routeId: 'cp/operations', auditRequired: true, priority: 'urgent' },
   payment_failed: { routeId: 'cp/finance', auditRequired: true, priority: 'urgent' },
   refund_pending_wlt: { routeId: 'cp/finance', auditRequired: true, priority: 'important' },
+  catalog_item_approved: { routeId: 'cp/catalog', auditRequired: true, priority: 'important' },
+  catalog_published: { routeId: 'cp/catalog', auditRequired: true, priority: 'normal' },
+  partner_capacity_degraded: { routeId: 'cp/partners', auditRequired: true, priority: 'important' },
+  partner_docs_missing: { routeId: 'cp/partners', auditRequired: true, priority: 'important' },
+  partner_submitted: { routeId: 'cp/partners', auditRequired: true, priority: 'normal' },
+  ticket_escalated: { routeId: 'cp/support', auditRequired: true, priority: 'urgent' },
 };
 
 export function getDshSignalActorRoute(signalKind: DshSignalEventKind): DshSignalActorRoute | undefined {

@@ -6,6 +6,7 @@ export * from './orders.api';
 export * from './orders.adapters';
 export * from './orders.view-model';
 export * from './client-order-tracking.model';
+export * from './dsh-signal-layer.model';
 
 export {
   getSurfaceModeCapability,

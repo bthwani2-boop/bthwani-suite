@@ -1,6 +1,7 @@
 import { useAppClientAppearance } from '../../../app-client/shell/appearance';
 import { useDshClientSurfaceBinding } from '../shared/discovery/client-surface.binding';
 import type { DshClientSurfaceProps } from './dsh-client.types';
+import type { DshAppearanceMode } from '../shared/platform/appearance.contract';
 
 type UseDshClientSurfaceModelProps = DshClientSurfaceProps & {
   dshApiBaseUrl: string | undefined;

@@ -1,5 +1,5 @@
 {
-  "$schema": "../../../tools/schemas/package.schema.json",
+  "$schema": "../../tools/schemas/package.schema.json",
   "name": "@bthwani/app-partner",
   "version": "0.0.0",
   "private": true,

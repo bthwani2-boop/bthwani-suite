@@ -55,6 +55,7 @@ export type FieldDocumentStatus = FieldDocumentRuntimeStatus;
 
 export type FieldOnboardingDraft = PartnerOnboardingDraft;
 export type FieldStoreFile = OnboardingStoreFile;
+export type { OnboardingProductItem } from '../shared';
 export type FieldSectionSummary = PartnerSectionSummary;
 
 // ── Surface routing types ──────────────────────────────────────────────────

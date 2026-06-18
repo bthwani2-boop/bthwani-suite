@@ -3,13 +3,13 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
-import type { DshRoute } from '../checkout/dsh-client-binding.contracts';
+import type { DshRoute, ClientOperationScreenId } from '../checkout/dsh-client-binding.contracts';
 import type { DshSignalSummary } from '../marketing/dsh-signal-layer.model';
 import { getDshSignalSummaries } from '../marketing/dsh-signal-layer.model';
 
 type CheckoutAuth = { bearerToken?: string; clientId?: string };
 
-type ClientOperationScreenId = 'support' | 'benefits' | 'service-launcher';
+
 
 type UseDshClientBellStateOptions = {
   route: DshRoute;
@@ -44,7 +44,8 @@ export function useDshClientBellState({
   }, [setRoute]);
 
   const openSupportFlow = React.useCallback(() => {
-    setSelectedOperationScreen('support');
+    setSelectedOperationScreen('order-issue-flag');
+    setRoute('order-issue-workspace');
   }, []);
 
   return {

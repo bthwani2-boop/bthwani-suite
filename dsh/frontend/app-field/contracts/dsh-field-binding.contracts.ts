@@ -1,4 +1,4 @@
-import type { DshFieldSurfaceId } from '../../shared';
+import type { DshFieldSurfaceId } from '../dsh-field.routes';
 
 export type DshFieldBindingContract = {
   surfaceId: DshFieldSurfaceId;

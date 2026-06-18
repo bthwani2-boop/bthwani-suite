@@ -11,3 +11,4 @@ export * from './local-temp-id';
 export * from './FeatureFlagProvider';
 export * from './PlatformVarsProvider';
 export * from './resolve-dsh-color-token';
+export * from './appearance.contract';

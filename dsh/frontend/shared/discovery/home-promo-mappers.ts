@@ -1,3 +1,4 @@
+import type { DshHomeBannerActionType } from './dsh-home-types';
 import type { DshHomeCategory } from './dsh-home-types';
 
 export function resolveHomeCategoryContext(
@@ -24,4 +25,29 @@ export function resolveHomeCategoryContext(
 
 export function resolveHomePromoPublishStage(status: string) {
   return status === 'published' ? 'published-preview' : 'draft';
+}
+
+export function normalizeHomePromoActionType(actionType?: string | null): DshHomeBannerActionType | undefined {
+  const normalized = (actionType ?? '').trim();
+
+  if (
+    normalized === 'main_category' ||
+    normalized === 'sub_category' ||
+    normalized === 'store' ||
+    normalized === 'external' ||
+    normalized === 'store_category' ||
+    normalized === 'product' ||
+    normalized === 'subscription'
+  ) {
+    return normalized;
+  }
+
+  if (normalized === 'open_store') return 'store';
+  if (normalized === 'open_category') return 'main_category';
+  if (normalized === 'open_product') return 'product';
+  if (normalized === 'open_search') return 'external';
+  if (normalized === 'open_benefits') return 'subscription';
+  if (normalized === 'open_service') return 'external';
+
+  return undefined;
 }

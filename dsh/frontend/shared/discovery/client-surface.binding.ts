@@ -59,7 +59,9 @@ export function useDshClientSurfaceBinding(props: UseDshClientSurfaceBindingProp
     devClientId: props.devClientId,
     dshClientId: props.dshClientId,
   });
-  const walletSession = useDshClientWltReadModel(checkoutAuth.clientId, checkoutAuth.bearerToken);
+  const checkoutClientId = 'clientId' in checkoutAuth ? checkoutAuth.clientId : undefined;
+  const checkoutBearerToken = 'bearerToken' in checkoutAuth ? checkoutAuth.bearerToken : undefined;
+  const walletSession = useDshClientWltReadModel(checkoutClientId, checkoutBearerToken);
 
   const ordersTracking = useDshClientOrderTrackingModel({
     route: navigation.route,

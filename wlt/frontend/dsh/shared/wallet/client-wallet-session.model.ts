@@ -50,11 +50,12 @@ export function useWltDshWalletSession(clientId: string | undefined, bearerToken
   }, [refresh]);
 
   const requestPayment = React.useCallback(
-    async (amountMinorUnits: number, orderId: string) => {
+    async (amountMinorUnits: number, intentId?: string) => {
       if (!runtimeClientId) return Promise.reject(new Error('wlt:no_client_id'));
-      if (!orderId.trim()) return Promise.reject(new Error('wlt:no_order_id'));
+      const paymentTargetId = (intentId ?? '').trim();
+      if (!paymentTargetId) return Promise.reject(new Error('wlt:no_payment_intent_id'));
       if (amountMinorUnits <= 0) return Promise.reject(new Error('wlt:invalid_amount'));
-      return requestRuntimePayment(amountMinorUnits, runtimeClientId, orderId, bearerToken);
+      return requestRuntimePayment(amountMinorUnits, runtimeClientId, paymentTargetId, bearerToken);
     },
     [runtimeClientId, bearerToken],
   );

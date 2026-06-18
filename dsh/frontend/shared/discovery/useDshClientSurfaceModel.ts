@@ -5,6 +5,7 @@
 // No JSX. No ui-kit. No Tamagui.
 
 import React from 'react';
+import type { DshAppearanceMode } from '../platform/appearance.contract';
 import type { useDshClientHomeComposition } from './client-home.composition';
 import type { useDshClientNavigation } from './useDshClientNavigation';
 import type { useDshClientHomeActions } from './useDshClientHomeActions';
@@ -32,8 +33,8 @@ import { useDshClientHomeActionsTopicModel } from './client-home-actions.model';
 
 export type DshClientAppearance = {
   hydrated: boolean;
-  mode: string;
-  setMode: (mode: string) => void;
+  mode: DshAppearanceMode;
+  setMode: (mode: DshAppearanceMode) => void;
 };
 
 export type DshClientSurfaceSharedProps = {

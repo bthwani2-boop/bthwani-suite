@@ -247,9 +247,9 @@ export function useFieldRuntimeActions() {
   );
 
   const submitDocument = React.useCallback(
-    (storeId: string, kind: PartnerDocumentKind, uploadedRef: string) =>
+    (storeId: string, kind: string, uploadedRef: string) =>
       partnerDocumentClient.createDocument(storeId, {
-        document_kind: kind,
+        document_kind: kind as PartnerDocumentKind,
         media_key: uploadedRef,
       }),
     [partnerDocumentClient],
@@ -329,7 +329,42 @@ export function useDshFieldSurfaceModel(command?: DshFieldNavigationCommand) {
 
   const { route, routeStack, pushRoute, popRoute, resetToStores } = useFieldNavigationModel({ command });
 
-  const draftModel = usePartnerOnboardingDraftModel({ onboardingRuntime: fieldRuntime, pushRoute });
+  const pushOnboardingRoute = React.useCallback((nextRoute: { kind: string; storeId?: string; backendStoreId?: string }) => {
+    if (nextRoute.kind === 'onboarding' && nextRoute.storeId) {
+      pushRoute({ kind: 'onboarding', storeId: nextRoute.storeId });
+      return;
+    }
+    if (nextRoute.kind === 'visit') {
+      const backendStoreId = nextRoute.backendStoreId ?? nextRoute.storeId;
+      pushRoute(backendStoreId ? { kind: 'visit', backendStoreId } : { kind: 'stores' });
+      return;
+    }
+    if (nextRoute.kind === 'readiness-escalation' && nextRoute.storeId) {
+      pushRoute({ kind: 'readiness-escalation', storeId: nextRoute.storeId });
+      return;
+    }
+    if (nextRoute.kind === 'document-upload' && nextRoute.storeId) {
+      pushRoute({ kind: 'document-upload', storeId: nextRoute.storeId });
+      return;
+    }
+    if (nextRoute.kind === 'products-upload' && nextRoute.storeId) {
+      pushRoute({ kind: 'products-upload', storeId: nextRoute.storeId });
+      return;
+    }
+    if (
+      nextRoute.kind === 'stores' ||
+      nextRoute.kind === 'account' ||
+      nextRoute.kind === 'profile' ||
+      nextRoute.kind === 'history' ||
+      nextRoute.kind === 'finance'
+    ) {
+      pushRoute({ kind: nextRoute.kind });
+      return;
+    }
+    pushRoute({ kind: 'stores' });
+  }, [pushRoute]);
+
+  const draftModel = usePartnerOnboardingDraftModel({ onboardingRuntime: fieldRuntime, pushRoute: pushOnboardingRoute });
   const visitModel = useFieldVisitModel({ fieldRuntime, patchStore: draftModel.patchStore, pushRoute });
   const escalationModel = usePartnerReadinessEscalationModel({ patchStore: draftModel.patchStore });
 

@@ -31,6 +31,7 @@ import { buildDshClientCheckoutPresenterModel } from '../shared/checkout';
 import { mapLiveOrderStatusToClientState } from '../shared/orders';
 import { getDshClientStateMeta } from '../shared/orders/orders.client-state';
 import type { DshClientRouteRendererProps } from './contracts/dsh-client-renderer.contracts';
+import type { DshHomeGetStore } from '../shared/discovery/dsh-home-types';
 
 export function DshClientRouteRenderer({
   session,
@@ -390,7 +391,7 @@ export function DshClientRouteRenderer({
   if (route === 'benefits') {
     return (
       <DshBenefitsHubScreen
-        screenId={selectedOperationScreen}
+        screenId={selectedOperationScreen ?? undefined}
         onPrimaryAction={returnHome}
         onSecondaryAction={returnHome}
         onRetry={() => setRoute('benefits')}
@@ -423,7 +424,7 @@ export function DshClientRouteRenderer({
     return (
       <DshProxyHubScreen
         screenId={selectedOperationScreen as 'proxy-request-create' | 'proxy-request-approve' | 'proxy-request-review' | 'proxy-request-reject' | 'proxy-request-tracking'}
-        onPrimaryAction={() => setRoute(selectedOperationScreen === 'proxy-request-tracking' ? 'tracking' : 'orders-list')}
+        onPrimaryAction={() => setRoute((selectedOperationScreen as string | null) === 'proxy-request-tracking' ? 'tracking' : 'orders-list')}
         onSecondaryAction={returnOrdersList}
         onRetry={() => setRoute('proxy-workspace')}
       />
