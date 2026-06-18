@@ -81,7 +81,7 @@ $ErrorActionPreference = "Stop"
 $env:NEXT_PUBLIC_DSH_API_BASE_URL = "http://localhost:8080"
 $env:NEXT_PUBLIC_AUTH_BASE_URL = "http://localhost:18082"
 $env:EXPO_PUBLIC_AUTH_BASE_URL = "http://localhost:18082"
-$env:NEXT_PUBLIC_WLT_API_BASE_URL = "http://localhost:18083"
+$env:NEXT_PUBLIC_WLT_DSH_API_BASE_URL = "http://localhost:18083"
 $env:BTHWANI_ENV = "local"
 $env:BTHWANI_LOCAL_LIVE_TEST = "1"
 pnpm --dir control-panel/runtime dev

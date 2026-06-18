@@ -288,7 +288,9 @@ export function resolveWltDshApiBaseUrl(): string {
 		const env = (process as { env?: Record<string, string | undefined> }).env;
 		const raw =
 			env?.NEXT_PUBLIC_WLT_DSH_API_BASE_URL ??
-			env?.EXPO_PUBLIC_WLT_DSH_API_BASE_URL;
+			env?.EXPO_PUBLIC_WLT_DSH_API_BASE_URL ??
+			env?.NEXT_PUBLIC_WLT_API_BASE_URL ??
+			env?.EXPO_PUBLIC_WLT_API_BASE_URL;
 		const trimmed = raw?.trim();
 		if (trimmed) return trimBaseUrl(trimmed);
 	}

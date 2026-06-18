@@ -96,6 +96,7 @@ export type DshCreateOrderRequest = {
   readonly store_id: string;
   readonly client_id?: string;
   readonly total_price: number;
+  readonly checkout_intent_id: string;
   readonly wlt_payment_ref_id?: string;
   readonly items: readonly DshOrderItemInput[];
 };

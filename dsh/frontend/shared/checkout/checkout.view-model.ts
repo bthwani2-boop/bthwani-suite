@@ -44,6 +44,7 @@ type UseDshCheckoutOptions = {
     fulfillmentMode?: DshFulfillmentDeliveryMode;
     orderDraft?: Partial<CreateOrderValues>;
     wltPaymentRefId?: string;
+    checkoutIntentId?: string;
   }) => void;
 };
 
@@ -118,7 +119,7 @@ export function useDshCheckout({
       try {
         const result = await walletPreview.requestPayment(cartTotal, resolvedIntentId ?? undefined);
         if (result.success && result.txId) {
-          onOrderExecute({ wltPaymentRefId: result.txId, fulfillmentMode: selectedFulfillmentMode });
+          onOrderExecute({ wltPaymentRefId: result.txId, fulfillmentMode: selectedFulfillmentMode, checkoutIntentId: resolvedIntentId ?? undefined });
           setCheckoutState('ready');
           setCheckoutIntentId(null);
           void walletPreview.refresh();
@@ -141,7 +142,7 @@ export function useDshCheckout({
         setPaymentErrorMessage('الدفع عند الاستلام غير متاح لهذا النوع من التوصيل.');
         return;
       }
-      onOrderExecute({ wltPaymentRefId: resolvedIntentId ?? undefined, fulfillmentMode: selectedFulfillmentMode });
+      onOrderExecute({ wltPaymentRefId: resolvedIntentId ?? undefined, fulfillmentMode: selectedFulfillmentMode, checkoutIntentId: resolvedIntentId ?? undefined });
       setCheckoutState('ready');
       setCheckoutIntentId(null);
     }
@@ -200,6 +201,7 @@ export function useDshClientOrderExecution({
     fulfillmentMode?: DshFulfillmentDeliveryMode;
     orderDraft?: Partial<CreateOrderValues>;
     wltPaymentRefId?: string;
+    checkoutIntentId?: string;
   }) => {
     const config = resolveDshDiscoveryStoresRuntimeConfig();
     if (config && cartItems.length > 0) {
@@ -217,10 +219,17 @@ export function useDshClientOrderExecution({
       const orderBaseUrl = resolveDshOrderApiBaseUrl();
       const orderClient = orderBaseUrl ? createDshOrderLifecycleHttpClient(orderBaseUrl, undefined, checkoutAuth) : null;
       if (!orderClient) return;
+      const intentId = payload?.checkoutIntentId ?? '';
+      if (!intentId) {
+        console.error('[checkout:create-order] checkout_intent_id is required but missing');
+        openTrackedOrder(undefined, { fulfillmentMode: payload?.fulfillmentMode, orderDraft: payload?.orderDraft });
+        return;
+      }
       orderClient.createOrder({
         store_id: activeStore.id,
         client_id: checkoutAuth.clientId ?? '',
         total_price: totalPrice,
+        checkout_intent_id: intentId,
         wlt_payment_ref_id: payload?.wltPaymentRefId,
         items,
       }).then((resp) => {

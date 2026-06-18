@@ -213,8 +213,8 @@ func main() {
 
 		err = bcrypt.CompareHashAndPassword([]byte(hash.String), []byte(req.Password))
 		if err != nil {
-			// dev fallback: check if password matches username
-			if req.Password != username {
+			// dev fallback: only active when AUTH_DEV_PASSWORD_FALLBACK=1; never enabled by default
+			if os.Getenv("AUTH_DEV_PASSWORD_FALLBACK") != "1" || req.Password != username {
 				w.WriteHeader(http.StatusUnauthorized)
 				json.NewEncoder(w).Encode(errorResponse{Error: "invalid_credentials"}) //nolint:errcheck
 				return
